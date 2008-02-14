@@ -1,6 +1,6 @@
-NAME=man-pages-zh_CN
-DESTDIR=/usr/share
-CONFDIR=/etc
+NAME=manpages-zh
+INSTDIR=$(DESTDIR)/usr/share
+CONFDIR=$(DESTDIR)/etc
 TRANSLATED=DOCS/00TRANSLATED
 
 MAN=1 1p 8 2 3 3p 4 5 6 7 9 0p tcl n l p o 3pm 3perl
@@ -15,8 +15,16 @@ gb:
 	done
 	for f in `cat $(TRANSLATED)` ; do \
 		iconv -f utf8 -t gb18030 src/$$f > GB/$$f ; \
+		dos2unix GB/$$f ; \
 	done
-	cp src/man.macros GB/
+b5:
+	for i in $(MAN) ; do \
+		mkdir -p BIG5/man$$i ; \
+	done
+	for f in `cat $(TRANSLATED)` ; do \
+		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > BIG5/$$f ; \
+		dos2unix BIG5/$$f ; \
+	done
 html-gb:
 	mkdir html-gb
 	for i in $(MAN) ; do \
@@ -36,27 +44,25 @@ clean:
 	-o -name *.3gl -o -name *.[13457]x -o -name *.[013]p \
 	|sort > TRANSLATED && cd .. && mv src/TRANSLATED $(TRANSLATED)
 install-doc:
-	rm -rf $(DESTDIR)/doc/$(NAME)
-	mkdir -p $(DESTDIR)/doc
-	cp -R DOCS $(DESTDIR)/doc/$(NAME)
-	cp README* $(DESTDIR)/doc/$(NAME)
-	cp COPYING $(DESTDIR)/doc/$(NAME)
+	rm -rf $(INSTDIR)/doc/$(NAME)
+	mkdir -p $(INSTDIR)/doc
+	cp -R DOCS $(INSTDIR)/doc/$(NAME)
+	cp README* $(INSTDIR)/doc/$(NAME)
+	cp COPYING $(INSTDIR)/doc/$(NAME)
 install-u8:
-	rm -rf $(DESTDIR)/man/zh_CN.UTF-8
-	mkdir -p $(DESTDIR)/man
-	cp -R UTF-8 $(DESTDIR)/man/zh_CN.UTF-8
+	rm -rf $(INSTDIR)/man/zh_CN.UTF-8
+	mkdir -p $(INSTDIR)/man
+	cp -R UTF-8 $(INSTDIR)/man/zh_CN.UTF-8
 install-gb:
-	rm -rf $(DESTDIR)/man/zh_CN.GB* /usr/share/man/zh_CN.GB*
-	mkdir -p $(DESTDIR)/man
-	cp -R GB $(DESTDIR)/man/zh_CN.GB18030
-	ln -s /usr/share/man/zh_CN.GB18030 $(DESTDIR)/man/zh_CN.GB2312
-	ln -s /usr/share/man/zh_CN.GB18030 $(DESTDIR)/man/zh_CN.GBK
-	ln -s /usr/share/man/zh_CN.GB18030 $(DESTDIR)/man/zh_CN
-	mkdir -p $(CONFDIR)/profile.d
-	cp -f src/cman/cman.conf $(CONFDIR)/
-	cp -pf src/cman/cman.sh $(CONFDIR)/profile.d/
-	cp -pf src/cman/cman.csh $(CONFDIR)/profile.d/
+	rm -rf $(INSTDIR)/man/zh_CN.GB* $(INSTDIR)/man/zh_CN
+	mkdir -p $(INSTDIR)/man
+	cp -R GB $(INSTDIR)/man/zh_CN
+install-b5:
+	rm -rf $(INSTDIR)/man/zh_TW
+	mkdir -p $(INSTDIR)/man
+	cp -R BIG5 $(INSTDIR)/man/zh_TW
 uninstall:
-	rm -rf $(DESTDIR)/doc/$(NAME)
-	rm -rf $(DESTDIR)/man/zh_CN* /usr/share/man/zh_CN*
+	rm -rf $(INSTDIR)/doc/$(NAME)
+	rm -rf $(INSTDIR)/man/zh_CN* /usr/share/man/zh_CN*
+	rm -rf $(INSTDIR)/man/zh_TW* /usr/share/man/zh_TW*
 	rm -f $(CONFDIR)/cman.conf $(CONFDIR)/profile.d/cman.*
