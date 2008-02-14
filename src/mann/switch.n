@@ -1,0 +1,331 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: switch.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: switch.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH switch n 7.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+switch \- 依据一个给定的值对多个脚本中的一个进行求值
+.SH "总览 SYNOPSIS"
+\fBswitch \fR?\fIoptions\fR?\fI string pattern body \fR?\fIpattern body \fR...?
+.sp
+\fBswitch \fR?\fIoptions\fR?\fI string \fR{\fIpattern body \fR?\fIpattern body \fR...?}
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+\fBswitch\fR 命令依次针对每个 \fIpattern \fR(模式)参数匹配它的 
+\fIstring\fR 参数。如果它发现一个 \fIpattern\fR 匹配 \fIstring\fR，则立即通过把跟随在(这个模式)后面的 
+\fIbody\fR 参数递归的传递给 Tcl 
+解释器来求值它，并返回这次求值的结果。如果最后的 \fIpattern\fR 
+参数是 \fBdefault\fR，则它匹配所有的东西。如果没有 \fIpattern\fR 
+参数匹配 \fIstring\fR 并且没有给出缺省，则 \fBswitch\fR 
+命令返回一个空串。
+.PP
+如果给 \fBswitch\fR 的最初的参数以 \fB-\fR 
+开始，则它们被作为选项来对待。当前支持下列选项:
+.TP 10
+\fB\-exact\fR
+当与一个模式比较 \fIstring\fR  的时候，使用精确匹配。这是缺省的。
+.TP 10
+\fB\-glob\fR
+当与一个模式比较 \fIstring\fR 的时候，使用通配符式样的匹配(与 \fBstring match\fR 命令所实现的相同)。
+.TP 10
+\fB\-regexp\fR
+当与一个模式比较 \fIstring\fR 的时候，使用正则表达式匹配(在 \fBre_syntax\fR 参考页中描述)。
+.TP 10
+\fB\-\|\-\fR
+选项结束的标志。此后的参数即使以 \fB-\fR 开始仍被作为 \fIstring\fR 来对待。
+.PP
+为 \fIpattern\fR 和 \fIbody\fR 参数提供了两个语法。第一个是对于每个模式和命令使用一个独立的参数；如果在一些模式或命令上需要替换，则这种形式是很方便的。第二种形式是把所有的模式和命令放在一起作为一个单一的参数；这个参数必须有正确的列表结构，它的元素是模式和命令。第二种形式适合于构造多行 switch 命令，因为花括号包围着所有元素，所以没有必要在每行结束之处包含一个反斜杠。
+在第二种形式中因为 \fIpattern\fR参数在花括号中，所以在它们上不进行命令和变量替换；这使得第二种形式的行为在一些情况下与第一种形式不同。
+.PP
+如果指定一个 \fIbody\fR 为``\fB\-\fR''，则意味着给下一个模式的 \fIbody \fR也被用于这个模式(如果下一个模式也有一个执行体“\fB-\fR”则使用它后面的这个执行体，以此类推)。这个特征使在多个模式之间共享一个单一的 \fIbody\fR 成为可能。
+.PP
+在 \fBswitch\fR 命令放置注释要注意。注释只能放置在一个模式的执行体中，而不能与模式混合。
+.PP
+下面是 \fBswitch\fR 命令的一些例子:
+.CS
+\fBswitch\0abc\0a\0\-\0b\0{format 1}\0abc\0{format 2}\0default\0{format 3}\fR
+.CE
+将返回 \fB2\fR, 
+.CS
+\fBswitch\0\-regexp\0aaab {
+	^a.*b$\0\-
+	b\0{format 1}
+	a*\0{format 2}
+	default\0{format 3}
+}\fR
+.CE
+将返回  \fB1\fR, 而
+.CS
+\fBswitch\0xyz {
+	a
+		\-
+	b
+		{
+		# Correct Comment Placement
+		format 1
+	}
+	a*
+		{format 2}
+	default
+		{format 3}
+}\fR
+.CE
+将返回  \fB3\fR.
+
+.SH "参见 SEE ALSO"
+for(n), if(n), regexp(n)
+
+.SH "关键字 KEYWORDS"
+switch, match, regular expression
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/11/15
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

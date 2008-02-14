@@ -1,0 +1,376 @@
+.TH TEX 1 "10 November 2001" "Web2C 7.4.5"
+.\"=====================================================================
+.if n .ds MF Metafont
+.if t .ds MF M\s-2ETAFONT\s0
+.if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
+.if n .ds TX TeX
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
+.el .ds OX TeX\" for nroff
+.\" the same but obliqued
+.\" BX definition must follow TX so BX can use TX
+.if t .ds BX \fRB\s-2IB\s0\fP\*(TX
+.if n .ds BX BibTeX
+.\" LX definition must follow TX so LX can use TX
+.if t .ds LX \fRL\\h'-0.36m'\\v'-0.15v'\s-2A\s0\\h'-0.15m'\\v'0.15v'\fP\*(TX
+.if n .ds LX LaTeX
+.if n .ds WB Web
+.if t .ds WB W\s-2EB\s0
+.\"=====================================================================
+.SH NAME
+tex, virtex, initex \- 文本格式化和排版
+.SH "SYNOPSIS 总览"
+.B tex
+.RI [ options ]
+.RI [ commands ]
+.\"=====================================================================
+.SH "DESCRIPTION 描述"
+这份手册页并不全面。此版本的 \*(TX 完整的文档可以从 info 文件或者手册
+.IR "Web2C: A TeX implementation"
+中找到。
+.PP
+\*(TX
+格式化指定的文件中包含着命令的文本，输出一个设备无关的文件 (称为
+.IR DVI
+，即 “设备无关”
+.IR "DeVice Independent" 
+的缩写)。在
+.IR "The \*(OXbook"
+中讲述了 \*(TX 的功能和语言。
+\*(TX 通常与一个大型的预编译的宏包同时使用，有一些特定的排版系统，例如
+\*(LX,
+通常需要很多宏包的支持。
+.PP
+这个版本的 \*(TX 通过查看它的命令行，查找自身是以什么名称被调用的。
+.B initex
+和
+.B virtex
+都是到可执行文件
+.B tex
+的符号链接。当作为
+.BR initex
+调用时 (或者使用了
+.B --ini
+选项时)，它可以用于将宏预编译，输出到一个
+.I .fmt
+文件中。当作为
+.B virtex
+调用时，它将使用
+.I plain
+格式。当以任何其他名称调用时，\*(TX 将使用那个名称作为要使用的格式名称。例如，当作为
+.B tex
+调用时，将使用
+.I tex
+格式，这与
+.I plain
+格式是相同的。
+.I plain
+格式中定义的命令记载在
+.IR "The \*(OXbook"
+中。其他常用的格式包括
+.I latex
+和
+.IR amstex
+。
+.PP
+调用 
+\*(TX
+时，命令行给出的
+.I commands
+被传递给它作为输入的第一行。(但是通常将扩展的参数作为输入的第一行要简单许多，因为 UNIX 命令解释器总是会 “吃掉” 或者错误地解释 \*(TX 的符号，例如反斜杠，除非你引用它们。)
+同
+.IR "The \*(OXbook" 
+书中描述的一致，第一行应当以一个文件名开始，或者是一个控制序列
+.IR \econtrolsequence ,
+或者是一个格式名称
+.IR &formatname .
+.PP
+通常的用法是输入
+.RS
+.I tex paper
+.RE
+来处理
+.IR paper.tex
+。名称
+.I paper
+将作为任务名 (``jobname'')，也用来产生输出文件名。
+如果 \*(TX 没有在第一行获得一个文件名，jobname 将是
+.IR texput
+。当查找一个文件时，\*(TX 查找带有和不带默认扩展名
+.RI ( .tex )
+的文件，除非名称中已包含了此扩展名。如果
+.I paper
+是任务名(``jobname'')，错误消息的日志记录，包含着比通常屏幕上显示的内容更加详细的内容，将保存为
+.IR paper.log
+，输出文件将保存为
+.IR paper.dvi 
+。
+.PP
+这个版本的 \*(TX 可以查看文件
+.I paper.tex
+的第一行，看它是否以特殊序列
+.IR %&
+开始。如果第一行以
+.BI %& format
+.BI --translate-file \ tcxname
+开始，那么 \*(TX 将使用指定的格式和转换表
+.I tcxname
+来处理源文件。格式名称和
+.B --translate-file
+转换定义都可以被忽略，但是不能同时忽略。这个设定超越了基于可执行文件名称的格式选择。
+选项
+.B --parse-first-line
+或者配置中的变量
+.B parse_first_line
+控制了是否允许这样的行为。
+.PP
+在 \*(TX 的错误提示下回应
+.I e
+将使得系统默认的编辑器被启动，修改当前文件的当前行。环境变量 TEXEDIT 可以用来修改所用的编辑器。它可以包含一个字符串 "%s"，指定文件名要替换的位置，以及字符串 "%d"，指定行号 (如果有的话) 要替换的位置。例如，要使用
+.B emacs
+，可以这样设置 TEXEDIT 字符串，使用
+.B sh
+命令
+.RS
+\fITEXEDIT="emacs +%d %s"; export TEXEDIT\fP
+.RE
+.PP
+为了方便，库中有一个文件
+.IR null.tex
+，内容为空。当 \*(TX 找不到可能的输入时，它会一直让用户输入另一个文件名；如果不想输入任何东西，回应 `null' 可以跳出这个循环。也可以输入 EOF 字符 (通常是 control-D)。
+.PP
+.\"=====================================================================
+.SH "OPTIONS 选项"
+这个版本的 \*(TX 可以解释下列命令行选项。
+.TP
+.B --file-line-error-style
+.rb
+打印错误消息，以
+.I file:line:error
+的形式，与大多数编译器格式化消息的方式相似。
+.TP
+.BI --fmt \ format
+.rb
+使用
+.I format
+作为要使用的格式名，而不是调用
+\*(TX 的名称或者
+.I %&
+一行指定的内容。
+.TP
+.B --help
+.rb
+打印帮助信息，然后退出。
+.TP
+.B --ini
+.rb
+成为
+.BR initex
+，用于转储格式 (dump formats)；如果调用的程序名是
+.BR initex
+，那么隐含这个选项。
+.TP
+.BI --interaction \ mode
+.rb
+设置交互模式。mode 可以是
+.IR batchmode ,
+.IR nonstopmode ,
+.IR scrollmode ,
+和
+.IR errorstopmode
+其中之一。这些模式的含义与相应的
+\ecommands
+相同。
+.TP
+.B --ipc
+.rb
+将 DVI 输出发送到一个 socket，同时像通常那样输出到文件。这个选项是否可用取决于安装程序的选择。
+.TP
+.B --ipc-start
+.rb
+与
+.BR --ipc
+类似，并且同时也在另一段启动服务器。这个选项是否可用取决于安装程序的选择。
+.TP
+.BI --jobname \ name
+.rb
+使用
+.I name
+作为作业名，而不是从输入文件名获得。
+.TP
+.BI --kpathsea-debug \ bitmask
+.rb
+根据位掩码，设置路径搜索调试标志。细节请参见
+.I Kpathsea
+手册页。
+.TP
+.BI --maketex \ fmt
+.rb
+启用
+.RI mktex fmt
+，这里
+.I fmt
+必须是
+.I tex
+或者
+.IR tfm
+之一。
+.TP
+.B --mltex
+.rb
+启用 ML\*(TX 扩展。
+.TP
+.BI --no-maketex \ fmt
+.rb
+禁用
+.RI mktex fmt
+这里
+.I fmt
+必须是
+.I tex
+或者
+.IR tfm
+之一。
+.TP
+.BI --output-comment \ string
+.rb
+使用
+.I string
+作为 DVI 文件的注释，而不是时间。
+.TP
+.B --parse-first-line
+.rb
+如果主输入文件的第一行以
+.I %&
+开始，就解释它，从中查找一个转储名称或者一个
+.B --translate-file
+选项。
+.TP
+.BI --progname \ name
+.rb
+伪装是程序
+.IR name
+。这对所用格式和搜索路径都有影响。
+.TP
+.B --recorder
+.rb
+启用文件名记录。这将在一个扩展名为
+.IR .fls
+的文件中记录输入和输出中打开的所有文件。
+.TP
+.B --shell-escape
+.rb
+启用
+.BI \ewrite18{ command }
+结构。
+.I command
+可以是任何 Bourne shell 命令。出于安全原因，这个结构通常被禁止。
+.TP
+.BI --translate-file \ tcxname
+.rb
+使用
+.I tcxname
+转换表。
+.TP
+.B --version
+.rb
+显示版本信息，然后退出。
+.\"=====================================================================
+.SH "ENVIRONMENT 环境"
+参见 Kpathsearch 库的文档 (手册页的 `Path specifications' 节点) 来查看使用环境变量的精确的细节。
+.B kpsewhich
+实用工具可以用来查询变量的值。
+.PP
+警告：在大多数 \*(TX 格式中，不能直接传给 \*(TX 带有 ~ 的文件名，因为 ~ 是一个有特殊意义的字符，它将被扩展，不会作为文件名的一部分。其他程序，例如 \*(MF，没有这个问题。
+.PP
+.TP
+TEXMFOUTPUT
+通常，\*(TX 将输出文件放在当前目录。如果不能在那里创建任何输出文件，它试着在环境变量 TEXMFOUTPUT 指定的目录中创建它。这个参数没有默认值。例如，假设命令是
+.I tex paper
+并且当前目录不可写，如果 TEXMFOUTPUT 设置为
+.IR /tmp
+，\*(TX 试图创建
+.I /tmp/paper.log
+(还有
+.IR /tmp/paper.dvi
+，如果产生了任何输出。)
+.TP
+TEXINPUTS
+.I \einput
+和
+.I \eopenin
+文件的搜索路径。它们一般应当以 ``.'' 开始，使得用户文件可以先于系统文件被找到。空路径成分将被替换为
+.I texmf.cnf
+文件中定义的路径。例如，设置 TEXINPUTS 为 ".:/home/usr/tex:" 来将当前目录和 ``/home/user/tex'' 添加到标准的搜索路径之前。
+.TP
+TEXEDIT
+切换为编辑器的命令模板。默认值通常是
+.BR vi
+，在 \*(TX 编译时进行设置。
+.\"=====================================================================
+.SH "FILES 文件"
+下面提到的文件的位置在各个系统中是不相同的。使用
+.B kpsewhich
+实用工具来找到它们的位置。
+.TP
+.I texmf.cnf
+配置文件。它包含着搜索路径的定义，还有其他配置参数，例如
+.BR parse_first_line .
+.TP
+.I tex.pool
+编码的文本，是 \*(TX 的提示消息。
+.TP
+.I texfonts.map
+文件名映射定义。
+.TP
+.I *.tfm
+\*(TX 字体的度量的文件。
+.TP
+.I *.fmt
+简写的 \*(TX 格式 (.\|fmt) 文件。
+.TP
+.I $TEXMFMAIN/tex/plain/base/plain.tex
+基本的宏包，在 \*(OXbook 中有详细描述。
+.br
+.\"=====================================================================
+.SH BUGS
+这个版本的 \*(TX 实现了大量的可选的扩展。实际上，其中大部分与 \*(TX 的定义有或多或少的冲突。当启用这样的扩展时，\*(TX 启动时打印的提示信息将是
+.B TeXk
+而不是
+.BR TeX
+。
+.PP
+这个版本的 \*(TX 在面积增加或减少时不能捕获算术下溢错误。这种情况很少见，但是一旦出现，产生的
+.I DVI
+文件将是无效的。
+.\"=====================================================================
+.SH "SEE ALSO 参见"
+.BR mf (1),
+.br
+Donald E. Knuth,
+.IR "The \*(OXbook" ,
+Addison-Wesley, 1986, ISBN 0-201-13447-0.
+.br
+Leslie Lamport,
+.IR "\*(LX \- A Document Preparation System" ,
+Addison-Wesley, 1985, ISBN 0-201-15790-X.
+.br
+K. Berry,
+.IR "Eplain: Expanded plain \*(TX" ,
+ftp://ftp.cs.umb.edu/pub/tex/eplain/doc.
+.br
+Michael Spivak,
+.IR "The Joy of \*(OX" ,
+2nd edition, Addison-Wesley, 1990, ISBN 0-8218-2997-1.
+.br
+.I TUGboat
+(the journal of the \*(TX Users Group).
+.\"=====================================================================
+.SH "TRIVIA 提醒"
+\*(TX，如果发音正确的话，与 ``blecchhh'' 押韵 (rhymes)。使用 typewriter 字体时，正确的拼写是 ``TeX'' 而不是 ``TEX'' 或者 ``tex''。
+.\"=====================================================================
+.SH "AUTHORS 作者"
+\*(TX 的设计者是 by Donald E. Knuth，他用他的 \*(WB 系统实现了它。后来，它分别被 Stanford 的 Howard Tricky 和 Cornell 的 Pavel Curtis 移植到了 Unix。当前随 Unix \*(TX 发行的这个版本使用了 \*(WB 到 C 的翻译系统
+.RB ( web2c )
+来产生，
+.RB ( web2c )
+最初由 Tomas Rokicki 和 Tim Morgan 实现。

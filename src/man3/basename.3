@@ -1,0 +1,142 @@
+.\" (c) 2000 by Michael Kerrisk (michael.kerrisk@gmx.net)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein. 
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" License.
+.\" Created, 14 Dec 2000 by Michael Kerrisk
+.\"
+.TH DIRNAME 3  2000-12-14 "GNU" "Linux Programmer's Manual"
+.SH NAME
+dirname, basename \- 分析路径成员
+
+.SH "总览 (SYNOPSIS)"
+.nf
+.B #include <libgen.h>
+.sp
+.BI "char *dirname(char " "*path" ");"
+.nl
+.BI "char *basename(char " "*path" ");"
+.fi
+
+.SH "描述 (DESCRIPTION)"
+.B dirname
+和
+.B basename
+把 以 null 结尾 的 路径名 分解为 目录 和 文件名. 一般情况下, 
+.B dirname
+返回 路径名 的 前面部分, 直到 (但不包括) 最后一个 '/', 而
+.B basename
+则 返回 最后一个 '/' 后面 的 内容. 如果 路径名 以 '/' 结尾, 
+该 '/' 被认为 不是 路径名 的 一部分.
+
+.PP
+如果 路径名
+.I path
+不包含 斜杠 '/', 
+.B dirname
+返回 字符串 ".", 而
+.B basename
+返回
+.IR path 
+的 副本. 如果 路径名
+.I path
+是 "/", 则
+.B dirname
+和
+.B basename
+均 返回 "/". 如果 路径名
+.I path
+是 NULL 指针 或 指向 空串, 则
+.B dirname
+和
+.B basename
+均 返回 ".".
+.PP
+把
+.BR dirname 
+返回的 字符串, "/", 和
+.B basename
+返回的 字符串 连接 起来, 能够 产生 一个 完整 的 路径名.
+.PP
+无论
+.B dirname
+还是
+.B basename
+都 有可能 更改 
+.IR path
+的 内容, 因此 如果 需要 保护 原有 路径名, 应该 传送 副本 作为 参数. 此外,
+.B dirname
+和
+.B basename
+返回的 指针 可能 指向 一块 静态分配 的 内存, 会被 下次 调用 覆盖.
+.PP
+下面 的 例子 (摘自 SUSv2) 展示了 对于 不同的 路径名,
+.B dirname
+和
+.B basename
+返回 的 字符串:
+.sp
+.nf
+.B 
+path  		dirname		basename
+"/usr/lib"	"/usr"		"lib"
+"/usr/"		"/"  		"usr"
+"usr"		"."  		"usr"
+"/"  		"/"  		"/"
+"."  		"."  		"."
+".."  		"."  		".."
+.fi
+
+.SH "示例 (EXAMPLE)"
+.nf
+char *dirc, *basec, *bname, *dname;
+char *path = "/etc/passwd";
+
+dirc = strdup(path);
+basec = strdup(path);
+dname = dirname(dirc);
+bname = basename(basec);
+printf("dirname=%s, basename=%s\\n", dname, bname);
+free(dirc);
+free(basec);
+.fi
+
+.SH "返回值 (RETURN VALUE)"
+.B dirname
+和
+.B basename
+均 返回 以 null 结尾的 字符串 的 指针.
+
+.SH "BUGS"
+在 glibc 的 各个 版本 中, 直到 (并包括) 2.2.1,
+.B dirname
+无法 正确 处理 以 '/' 字符 结尾 的 路径名. 如果 参数 是 NULL 指针,
+他 还会 产生 段冲突 (segmentation violation).
+
+.SH "遵循 (CONFORMING TO)"
+SUSv2
+
+.SH "另见 (SEE ALSO)"
+.BR dirname (1),
+.BR basename (1)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

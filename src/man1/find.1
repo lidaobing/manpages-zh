@@ -1,0 +1,368 @@
+.TH FIND 1L \" -*- nroff -*-
+.SH NAME
+find \- 递归地在层次目录中处理文件
+.SH 总览 SYNOPSIS
+.B find
+[path...] [expression]
+.SH 描述 DESCRIPTION
+这个文档是GNU版本
+.BR find
+命令的使用手册。
+.B find
+搜索目录树上的每一个文件名，它从左至右运算给定的表达式，按照优先规则(见运算符OPERATORS一节)进行匹配，直到得出结果（左边运算在 '与' 操作中得出假，在'或' 操作中得出真），然后
+.B find
+移向下一个文件名。
+.PP 
+第一个以 '\-' , '(' , ')' , ',' 或 '!' 这些字符起始的参数是表达式的开始; 在它之前的任何参数是要搜索的路径，在它之后的任何参数都是表达式的余下部分。如果没有路径参数，缺省用当前目录。如果没有表达式，缺省表达式用 '\-print'.
+.PP
+当所有文件都成功处理时
+.B find
+退出并返回状态值0。如果发生错误则返回一个大于0的值。
+.SH 表达式 EXPRESSIONS
+.P
+表达式是由\fB选项\fR(选项总是影响所有的操作, 而不仅仅是一个指定的文件的处理, 而且总是返回真值)，\fB测试\fR(测试返回一个真值或一个假值)，还有\fB动作\fR(动作有side effects, 返回一个真值或假值) 组成。它们都以运算符分开.忽略运算符的时候，默认使用 \-and 连接. 如果表达式没有包含 \-prune 以外的动作，当表达式为真时会执行 \-print 动作。
+.SS 选项 OPTIONS
+.P
+所有的选项都总是返回真值，它们总会被执行，除非放在表达式中执行不到的地方。因此，清楚起见，最好把它们放在表达式的开头部分。
+.IP \-daystart
+从当日起始时开始而不是从24小时之前，计算时间(for \-amin, \-atime, \-cmin, \-ctime, \-mmin, and \-mtime)。
+.IP \-depth
+先处理目录的内容再处理目录本身。
+.IP \-follow
+不检索符号链接。隐含了 \-noleaf。
+.IP "\-help, \-\-help"
+列出
+.B find
+的命令行用法的概要，然后退出。
+.IP "\-maxdepth \fIlevels\fR"
+进入命令行参数指定的目录下层目录时，最深不超过\fIlevels\fR(一个非负整数)层。`\-maxdepth 0' 意味着只在命令行参数指定的目录中执行测试和动作。
+.IP "\-mindepth \fIlevels\fR"
+不在\fIlevels\fR(一个非负整数)层之内执行任何测试和动作。`\-mindepth 1'意味着处理所有的文件，除了命令行参数指定的目录中的文件。
+.IP \-mount
+不进入处于其它文件系统之上的目录。可以用\-xdev代替，从而和一些其他版本的
+.BR find
+兼容。
+.IP "\-noleaf"
+不为“目录中子目录数量比硬连接数少2”这种假设做优化。这个选项在搜索那些不遵循UNIX文件系统链接约定的文件系统时用，比如CD-ROM,MS-DOS文件系统或AFS卷的加载点。在普通的UNIX文件系统中,每个目录至少有两个硬连接,它的名字和它的 '.' 条目。另外，它的子目录(假如有)还会各有一个 '..' 链接到它。在
+.B find
+检索一个目录时，发现子目录数比它的连接数少二时，它就知道目录中的其他条目并非目录(而是目录树中的叶(`leaf')节点)。除非需要检索的是这个叶节点，否则没必要去处理它。这样可以带来很大的搜索速度提升。
+.IP "\-version, \-\-version"
+打印\fBfind\fR的版本号然后退出。
+.IP \-xdev
+不进入处于其他文件系统之上的目录。
+.SS 测试 TESTS
+.P
+数字参数可以这样给出：
+.IP \fI+n\fP
+是比
+.IR n
+大，
+.IP \fI\-n\fP
+是比
+.IR n
+小，
+.IP \fIn\fP
+正好是
+.IR n
+。
+.IP "\-amin \fIn\fR"
+对文件的最近一次访问是在 \fIn\fR 分钟之前。
+.IP "\-anewer \fIfile\fR"
+对文件的最近一次访问比 \fIfile\fR 修改时间要晚。如果命令行中 \-follow 在 \-anewer 之前，(也只有在这种情况下) \-anewer 会受 \-follow 的影响。
+.IP "\-atime \fIn\fR"
+对文件的最近一次访问是在 \fIn\fR*24 小时之前。
+.IP "\-cmin \fIn\fR"
+对文件状态的最近一次修改是在 \fIn\fR 分钟之前。
+.IP "\-cnewer \fIfile\fR"
+对文件状态的最近一次修改比 \fIfile\fR 修改时间要晚。如果命令行中 \-follow 在 \-cnewer 之前，(也只有在这种情况下) \-cnewer 会受 \-follow 的影响。
+.IP "\-ctime \fIn\fR"
+对文件状态的最近一次修改是在 \fIn\fR*24 小时之前。
+.IP \-empty
+文件是空的普通文件或者空目录。
+.IP \-false
+总是false。
+.IP "\-fstype \fItype\fR"
+文件处于 \fItype\fR 类型的文件系统之上。有效的文件系统类型在不同版本的Unix中是不同的；一些Unix中的不完全的文件系统类型列表是这样：ufs, 4.2, 4.3, nfs, tmp, mfs, S51K, S52K. 你可以用 \-printf 加上 %F 指令来查看你的文件系统的类型。
+.IP "\-gid \fIn\fR"
+文件的数字形式的组ID是 \fIn\fR。
+.IP "\-group \fIgname\fR"
+文件属于 \fIgname\fR (也允许使用数字形式的组ID).
+.IP "\-ilname \fIpattern\fR"
+和 \-lname 类似，但是匹配时是不区分大小写的。
+.IP "\-iname \fIpattern\fR"
+和 \-name 类似，但是匹配时是不区分大小写的。例如，`fo*' and `F??' 模式与文件名 `Foo', `FOO', `foo', `fOo' 等等相匹配。
+.IP "\-inum \fIn\fR"
+文件的 i 结点数是 \fIn\fR。
+.IP "\-ipath \fIpattern\fR"
+和 \-path 类似，但是匹配时是不区分大小写的。
+.IP "\-iregex \fIpattern\fR"
+和 \-regex 类似, 但是匹配时是不区分大小写的。
+.IP "\-links \fIn\fR"
+文件有 \fIn\fR 个链接。
+.IP "\-lname \fIpattern\fR"
+文件是一个与\fIpattern\fR 匹配的符号链接。元字符不会对`/' 或 `.' 做特殊处理。
+.IP "\-mmin \fIn\fR"
+对文件数据的最近一次修改是在 \fIn\fR 分钟之前。
+.IP "\-mtime \fIn\fR"
+对文件数据的最近一次修改是在 \fIn\fR*24 小时之前。
+.IP "\-name \fIpattern\fR"
+基本的文件名(将路径去掉了前面的目录)与shell模式\fIpattern\fR相匹配。元字符(`*', `?', 还有`[]' ) 不会匹配文件名开头的`.' 。使用 \-prune 来略过一个目录及其中的文件。查看 \-path 的描述中的范例。
+.IP "\-newer \fIfile\fR"
+对文件的最近一次修改比 \fIfile\fR 修改时间要晚。如果命令行中 \-follow 在 \-newer 之前，(也只有在这种情况下) \-newer 会受 \-follow 的影响。
+.IP \-nouser
+没有符合文件的数字形式的用户ID的用户。
+.IP \-nogroup
+没有符合文件的数字形式的组ID的组。
+.IP "\-path \fIpattern\fR"
+文件名与shell模式\fIpattern\fR相匹配。元字符不会对`/' 或 `.' 做特殊处理。因此，例如：
+.br
+.in +1i
+find . \-path './sr*sc'
+.br
+.in -1i
+如果存在 './src/misc' 的话，会将它打印出来。想要忽略一个完整的目录树，应当使用\-prune 而不是检查目录树中所有的文件。例如：要跳过 'src/emacs' 目录和其中所有的文件和子目录，把其他找到的文件打印出来，应当这样：
+.br
+.in +1i
+find . \-path './src/emacs' -prune -o -print
+.br
+.in -1i
+.IP "\-perm \fImode\fR"
+文件的权限位恰好是 \fImode\fR (八进制或符号)。
+Symbolic modes use mode 0 as a point of departure.
+.IP "\-perm \-\fImode\fR"
+所有的权限位 \fImode\fR 都被设置了的文件。
+.IP "\-perm +\fImode\fR"
+任何权限位 \fImode\fR 被设置了的文件。
+.IP "\-regex \fIpattern\fR"
+文件名与正则表达式 \fIpattern\fR 匹配。这是对整个路径的匹配，不是搜索文件。例如，要匹配名为`./fubar3' 的文件，可以使用正则表达式 `.*bar.' 或者 `.*b.*3'，但是不能用`b.*r3'。
+.IP "\-size \fIn\fR[bckw]"
+文件使用了 \fIn\fP 单位个存储单元。默认的单位是512字节的块，也可以用\fIn\fP后面加上 `b' 来指定这个值。其他的单位是字节，如果在 \fIn\fP 后面加上 `c' ；千字节(kB)，如果在 \fIn\fP 后面加上`k' ；两字节的字，如果在 \fIn\fP 后面加上 `w' 。大小不会计入 indirect blocks，但是会计入没有真正分配空间的疏松文件中的块。
+.IP \-true
+总是true。
+.IP "\-type \fIc\fR"
+文件是 \fIc\fR 类型的。类型可取值如下：
+.RS
+.IP b
+特殊块文件(缓冲的)
+.IP c
+特殊字符文件(不缓冲)
+.IP d
+目录
+.IP p
+命名管道 (FIFO)
+.IP f
+普通文件
+.IP l
+符号链接
+.IP s
+套接字
+.IP D
+门 (Solaris 特有)
+.RE
+.IP "\-uid \fIn\fR"
+文件的数字形式的用户ID是 \fIn\fR 。
+.IP "\-used \fIn\fR"
+文件最后一次存取是在最后一次修改它的状态的 \fIn\fR 天之后。
+.IP "\-user \fIuname\fR"
+文件的所有者是 \fIuname\fR (也可以使用数字形式的用户ID).
+.IP "\-xtype \fIc\fR"
+和 \-type 相同，除非文件是一个符号链接。对于符号链接：如果没有给出 \-follow ，如果文件是一个指向 \fIc\fR 类型文件的链接，那么返回true；如果给出了 \-follow ，如果 \fIc\fR 是 `l' 那么返回true。换句话说，对于符号链接，\-xtype 检查那些 \-type 不检查的文件。
+.SS 动作 ACTIONS
+.IP "\-exec \fIcommand\fR ;"
+执行 \fIcommand\fR；如果命令返回状态值0，那么 exec 返回true。所有
+.B find
+其余的命令行参数将作为提供给命令的参数，直到遇到一个由 `;' 组成的参数为止。命令的参数中，字符串 `{}' 将以正在处理的文件名替换。所有的 `{}' 都会被替换，不仅是在单独的一个参数中。有些版本的
+.BR find 
+不是这样做的。
+这些参数可能需要用 `\e' 来escape 或者用括号括住，防止它们被shell展开。命令是从起始目录执行的。
+.IP "\-fls \fIfile\fR"
+返回true；类似 \-ls 但是像 \-fprint 那样写入 \fIfile\fR。
+.IP "\-fprint \fIfile\fR"
+返回true；将文件全名打印到文件 \fIfile\fR 中。如果运行 \fBfind\fR 时 \fIfile\fR 不存在，那么它将被创建。如果它存在，它将被覆盖。文件名``/dev/stdout'' 和``/dev/stderr'' 会作特殊处理；它们分别指的是标准输出和标准错误输出。
+.IP "\-fprint0 \fIfile\fR"
+返回true；类似 \-print0 但是像 \-fprint 那样写入 \fIfile\fR。
+.IP "\-fprintf \fIfile\fR \fIformat\fR"
+返回true；类似 \-printf 但是像 \-fprint 那样写入 \fIfile\fR。
+.IP "\-ok \fIcommand\fR ;"
+类似 \-exec 但是会先向用户询问 (在标准输入); 如果回应不是以 `y' 或 `Y' 起始则不会运行 \fIcommand\fR 而是返回false。
+.IP \-print
+返回true；在标准输出打印文件全名，然后是一个换行符。
+.IP \-print0
+返回true；在标准输出打印文件全名，然后是一个null字符。这样可以使得处理 \fBfind\fR 的输出的程序可以正确地理解带有换行符的文件名。
+.IP "\-printf \fIformat\fR"
+返回true；在标准输出打印 \fIformat\fR , 解释 `\e' escape 还有 `%' 指令。字段宽度和精度可以像C函数 `printf' 那样来指定。与 \-print 不同的是, \-printf 在字符串末端不会添加一个新行。可用的escape 和指令如下：
+.RS
+.IP \ea
+警告铃声
+.IP \eb
+回退
+.IP \ec
+立即停止以当前格式输出，刷新输出设备。
+.IP \ef
+表格结束
+.IP \en
+新行
+.IP \er
+回车
+.IP \et
+水平tab
+.IP \ev
+竖直tab
+.IP \e\e
+输出自身`\e'
+.IP \eNNN
+ASCII编码是NNN(八进制)的字符
+.PP
+在一个 `\e' 字符后面使用任何其他字符会被作为普通的字符，因此它们都会被打印出来。
+.IP %%
+输出自身`%'
+.IP %a
+文件最后一次存取的时间。格式是C函数 `ctime' 返回值的格式。
+.IP %A\fIk\fP
+文件最后一次存取的时间。格式以 \fIk\fR 指定，可以是 `@' 或者是C函数 `strftime' 的指令格式。下面列出了 \fIk\fR 可用的值；有一些并不是在所有系统上都可用，因为不同系统中 `strftime' 也不同。
+.RS
+.IP @
+从 Jan. 1, 1970, 00:00 GMT 起的秒数
+.PP
+时间字段：
+.IP H
+小时 (00..23)
+.IP I
+小时 (01..12)
+.IP k
+小时 ( 0..23)
+.IP l
+小时 ( 1..12)
+.IP M
+分钟 (00..59)
+.IP p
+本地的 AM 或者 PM
+.IP r
+12小时格式的时间 (hh:mm:ss [AP]M)
+.IP S
+秒 (00..61)
+.IP T
+24小时格式的时间 (hh:mm:ss)
+.IP X
+本地的时间表示方法 (H:M:S)
+.IP Z
+时区(例如，EDT)，如果不能决定时区就是空
+.PP
+日期字段：
+.IP a
+本地一星期中每天的名称的缩写(Sun..Sat)
+.IP A
+本地一星期中每天的全名，可变长度 (Sunday..Saturday)
+.IP b
+本地每月的名称的缩写 (Jan..Dec)
+.IP B
+本地每月的全名，可变长度 (January..December)
+.IP c
+本地的日期和时间表示 (Sat Nov 04 12:02:33 EST 1989)
+.IP d
+一个月当中的日子 (01..31)
+.IP D
+日期 (mm/dd/yy)
+.IP h
+与 b 相同
+.IP j
+一年当中的日子 (001..366)
+.IP m
+月份 (01..12)
+.IP U
+以星期日作为每周起始，一年当中的星期 (00..53)
+.IP w
+一星期当中的日子 (0..6)
+.IP W
+以星期一当作每周起始，一年当中的星期 (00..53)
+.IP x
+本地的日期表示 (mm/dd/yy)
+.IP y
+年份的最后两位 (00..99)
+.IP Y
+年份 (1970...)
+.RE
+.IP %b
+文件大小，以512字节的块为单位 (四舍五入)。
+.IP %c
+文件状态最后一次修改的时间。格式是C函数 `ctime' 返回值的格式。
+.IP %C\fIk\fP
+文件状态最后一次修改的时间。格式以 \fIk\fR 指定，类似于%A。
+.IP %d
+文件在目录树中的深度；0 意味着文件是一个命令行参数。
+.IP %f
+去掉了前面的目录的文件名 (只剩下最后的成分)。
+.IP %F
+文件所在文件系统的类型；这个值可以为 \-fstype 所用。
+.IP %g
+文件的组名，如果组没有名称就是数字形式的组ID。
+.IP %G
+文件的数字形式的组ID。
+.IP %h
+文件名的前面的目录部分 (仅除去最后的成分)。
+.IP %H
+据以找到了文件的命令行参数。
+.IP %i
+文件的 i 结点号(16进制)。
+.IP %k
+文件大小，以1kB 的块为单位 (四舍五入)。
+.IP %l
+符号链接的目标 (如果文件不是一个符号链接，那么结果是空字符串)。
+.IP %m
+文件的权限位 (8进制)。
+.IP %n
+文件的硬连接数。
+.IP %p
+文件名。
+.IP %P
+文件名，去掉了据以找到了文件的命令行参数的名称部分。
+.IP %s
+文件大小，以字节为单位。
+.IP %t
+文件最后一次修改的时间。格式是C函数 `ctime' 返回值的格式。
+.IP %T\fIk\fP
+文件最后一次修改的时间。格式以 \fIk\fR 指定，类似于%A。
+.IP %u
+文件的用户名，如果用户没有名称就是数字形式的用户ID。
+.IP %U
+文件的数字形式的用户ID。
+.PP
+在一个 `%' 字符后面使用任何其他字符，`%' 将被忽略 (但是其他字符会被打印出来)。
+.RE
+.IP \-prune
+如果没有给出 \-depth 则返回 true; 不进入当前目录。
+.br
+如果给出了 \-depth 则返回false; 没有效果。
+.IP \-ls
+返回true；以 `ls \-dils' 格式在标准输出列出文件。块以1kB 字节为单位计数，除非设置了环境变量POSIXLY_CORRECT，那样的话会使用 512字节的块。
+.SS 运算符 OPERATORS
+.P
+以优先级高低顺序排列：
+.IP "( \fIexpr\fR )"
+强制为优先
+.IP "! \fIexpr\fR"
+如果 \fIexpr\fR 是false则返回true
+.IP "\-not \fIexpr\fR"
+与 ! \fIexpr\fR 相同
+.IP "\fIexpr1 expr2\fR"
+与 (隐含的默认运算符)；如果 \fIexpr1\fR 为false则不会执行 \fIexpr2\fR
+.IP "\fIexpr1\fR \-a \fIexpr2\fR"
+与 \fIexpr1 expr2\fR 相同
+.IP "\fIexpr1\fR \-and \fIexpr2\fR"
+与 \fIexpr1 expr2\fR 相同
+.IP "\fIexpr1\fR \-o \fIexpr2\fR"
+或；如果 \fIexpr1\fR 为true 则不会执行 \fIexpr2\fR
+.IP "\fIexpr1\fR \-or \fIexpr2\fR"
+与 \fIexpr1\fR \-o \fIexpr2\fR 相同
+.IP "\fIexpr1\fR , \fIexpr2\fR"
+列表；\fIexpr1\fR 和 \fIexpr2\fR 都会被执行。\fIexpr1\fR 的值被忽略，列表的值是 \fIexpr2\fR的值
+.SH "参见 SEE ALSO"
+\fBlocate\fP(1L), \fBlocatedb\fP(5L), \fBupdatedb\fP(1L), \fBxargs\fP(1L)
+\fBFinding Files\fP (Info 在线帮助, 或者是打印的版本)
+
+.SH "[中文版维护人]"
+.B 袁乙钧 <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 11/01/2003
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

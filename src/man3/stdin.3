@@ -1,0 +1,104 @@
+.\" From dholland@burgundy.eecs.harvard.edu Tue Mar 24 18:08:15 1998
+.\"
+.\" This man page was written in 1998 by David A. Holland
+.\" and placed in the Public Domain. Polished a bit by aeb.
+.\"
+.Dd March 24, 1998
+.Dt STDIN 3
+.Os "Linux 2.0"
+.Sh NAME
+.Nm stdin ,
+.Nm stdout ,
+.Nm stderr
+.Nd 标准 I/O 流
+.Sh "SYNOPSIS 总览"
+.Fd #include <stdio.h>
+.Fd extern FILE *stdin;
+.Fd extern FILE *stdout;
+.Fd extern FILE *stderr;
+.Sh "DESCRIPTION 描述"
+通常，每个 Unix 程序在启动时都会打开三个流，一个用于输入，一个用于输出，一个用于打印诊断或错误消息。典型的，他们被连接到用户的终端 (参见
+.Xr tty 4 )
+但是也有可能指向文件或是其他设备，取决于父进程选择设置了什么 (参见 
+.Xr sh 1 
+的重定向 (``Redirection'') 章节。)
+.Pp
+输入流被称为 ``standard input''; 输出流被称为 ``standard output''; 错误流被称为 ``standard error''。这些名词通常简写为符号，用于引用这些文件，它们是
+.Nm stdin ,
+.Nm stdout ,
+和
+.Nm stderr .
+.Pp
+这些符号中，每一个都是
+.Xr stdio 3
+中的一个宏，类型是指向 FILE 的指针，可以用于类似
+.Xr fprintf 3
+或
+.Xr fread 3
+等函数中。
+.Pp
+由于 FILE 是一个对 Unix 文件描述符加以缓冲的包装，下层的文件也可以使用原始的 Unix 文件接口来存取。也就是，类似
+.Xr read 2
+和
+.Xr lseek 2 
+的函数。与流
+.Nm stdin ,
+.Nm stdout ,
+和
+.Nm stderr
+关联的整数形式的文件描述符分别是 0，1 还有 2。预处理器符号 STDIN_FILENO，STDOUT_FILENO 和 STDERR_FILENO 分别以它们为值，定义在 <unistd.h> 中。
+.Pp
+注意混合使用 FILE 和原始的文件描述符可能带来不可预料的结果，一般应当避免。(对于喜欢追根问底的人：POSIX.1 规范的 8.2.3 节详细地描述了这样的混合使用怎样才能不出错。) 一个简单的规则是，文件描述符由内核控制，而 stdio 仅仅是一个库。它的意思是，例如当调用 exec 之后，子进程可以继承所有打开的文件描述符，但是任何原有的流都不可再存取了。
+.Pp
+由于符号
+.Nm stdin ,
+.Nm stdout ,
+和
+.Nm stderr
+被指定为宏，为它们赋值将导致不可移植。利用库函数
+.Xr freopen 3
+，标准流可以用来指向不同的文件。引进这个函数专门用来为
+.Nm stdin ,
+.Nm stdout ,
+和
+.Nm stderr
+重新赋值。标准流在调用
+.Xr exit 3
+和程序正常中止时被关闭。
+.Sh "SEE ALSO 参见"
+.Xr sh 1 ,
+.Xr csh 1 ,
+.Xr open 2 ,
+.Xr fopen 3 ,
+.Xr stdio 3
+.Sh CONSIDERATIONS
+错误流
+.Nm stderr
+是非缓冲的。输出流
+.Nm stdout
+是行缓冲的，如果它指向一个终端。不完全的行只有在调用
+.Xr fflush 3
+或
+.Xr exit 3
+，或者打印了新行符之后才会显示。这样可能带来无法预料的结果，尤其是调试输出时。标准流 (或任何其他流) 的缓冲模式可以用函数
+.Xr setbuf 3
+或
+.Xr setvbuf 3
+来切换。注意当
+.Nm stdin
+与一个终端关联时，也许终端驱动中存在输入缓冲，与 stdio 缓冲完全无关。(确实如此，一般的终端输入在内核中是行缓冲的。) 内核对输入的控制可以通过对
+.Xr tcsetattr 3
+的调用来修改，参见
+.Xr stty 1 ,
+和
+.Xr termios 3
+。
+.Sh "CONFORMING TO 标准参考"
+宏
+.Nm stdin ,
+.Nm stdout ,
+和
+.Nm stderr
+遵循
+.St -ansiC
+标准，这个标准同时规定了这三个流应当在程序启动时打开。

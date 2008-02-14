@@ -1,0 +1,90 @@
+.TH KILLALL 1  1999年9月7日   Linux   User Commands(用户命令) 
+.SH NAME (名称)
+killall \- 以名字方式来杀死进程
+.SH SYNOPSIS (总览)
+.ad l
+.B killall
+.RB [ \-egiqvw ]
+.RB [ \-\fIsignal\fB ]
+.I name ...
+.br
+.B killall
+.RB \-l
+.br
+.B killall
+.RB \-V
+.ad b
+.SH DESCRIPTION (描述)
+.B killall
+发送一条信号给所有运行任意指定命令的进程.
+如果没有指定信号名, 则发送 SIGTERM.
+.PP
+信号可以以名字 (如 \fB\-HUP\fP ) 或者数字 (如 \fB\-1\fP ) 的方式指定.
+信号 0 (检查进程是否存在)只能以数字方式指定.
+.PP
+如果命令名包括斜杠 (\fB/\fP), 那么执行该特定文件的进程将被杀掉,
+这与进程名无关.
+.PP
+如果对于所列命令无进程可杀,
+那么 \fBkillall\fP 会返回非零值.
+如果对于每条命令至少杀死了一个进程,
+\fBkillall\fP 返回 0.
+.PP
+\fBkillall\fP 进程决不会杀死自己
+(但是可以杀死其它 \fBkillall\fP 进程).
+.SH OPTIONS (选项)
+.IP \fB\-e\fP
+对于很长的名字, 要求准确匹配.
+如果一个命令名长于 15 个字符,
+则可能不能用整个名字 (溢出了).
+在这种情况下,
+\fBkillall\fP 会杀死所有匹配名字前 15 个字符的所有进程.
+有了
+\fB\-e\fP 选项,这样的记录将忽略.
+如果同时指定了 \fB\-v\fP 选项,
+\fBkillall\fP 会针对每个忽略的记录打印一条消息.
+.IP \fB\-g\fP
+杀死属于该进程组的进程.
+kill 信号给每个组只发送一次, 即使同一进程组中包含多个进程.
+.IP \fB\-i\fP
+交互方式，在杀死进程之前征求确认信息.
+.IP \fB\-l\fP
+列出所有已知的信号名.
+.IP \fB\-q\fP
+如果没有进程杀死, 不会提出抱怨.
+.IP \fB\-v\fP
+报告信号是否成功发送.
+.IP \fB\-V\fP
+显示版本信息.
+.IP \fB\-w\fP
+等待所有杀的进程死去.
+\fBkillall\fP 会每秒检查一次是否任何被杀的进程仍然存在,
+仅当都死光后才返回.
+注意: 如果信号被忽略或没有起作用,
+或者进程停留在僵尸状态, \fBkillall\fP 可能会永久等待.
+.SH FILES(相关文件)
+.nf
+/proc   proc文件系统的存在位置
+.fi
+.SH  "KNOWN BUGS (已知 BUGS)"
+以文件方式杀死只对那些在执行时一直打开的可执行文件起作用,
+也即, 混杂的可执行文件不能够通过这种方式杀死.
+.PP
+要警告的是输入 \fBkillall\fP \fIname\fP
+可能不会在非 Linux 系统上产生预期的效果,
+特别是特权用户执行时要小心.
+.PP
+在两次扫描的间隙, 如果进程消失了而被代之以一个有同样 PID 的新进程,
+\fBkillall \-w\fP 侦测不到．
+.SH AUTHOR (作者)
+Werner Almesberger &lt;Werner.Almesberger@epfl.ch&gt;
+.SH  SEE ALSO (又见)
+kill(1), fuser(1), pidof(1), ps(1), kill(2)
+.\ {{{}}}
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

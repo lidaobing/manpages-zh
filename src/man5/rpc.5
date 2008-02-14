@@ -1,0 +1,67 @@
+.\" @(#)rpc.5	2.2 88/08/03 4.0 RPCSRC; from 1.4 87/11/27 SMI;
+.TH RPC 5  "26 September 1985"
+.SH NAME
+rpc \- rpc 程序号数据库
+.SH SYNOPSIS
+.B /etc/rpc
+.SH DESCRIPTION
+.I rpc
+文件列出了rpc 程序的可读名, 可以此代替rpc 程序号.
+
+每行包含如下信息:
+.HP 10
+运行rpc 程序的服务名
+.br
+.ns
+.HP 10
+rpc 程序号
+.br
+.ns
+.HP 10
+别名
+.LP
+各条目之间以任意数目的空格和(或)tab 字符分隔. '#' 符号表明
+后面是注释, 直到行末的字符都不会被搜索该文件的例程所解释. 
+.LP
+下面是\fI/etc/rpc\fP文件的一个例子, 从Sun RPC 的源代码里取得.
+.nf
+.ta 1.5i +0.5i +1.0i +1.0i
+#
+# rpc 88/08/01 4.0 RPCSRC; from 1.12   88/02/07 SMI
+#
+portmapper		100000	portmap sunrpc
+rstatd		100001	rstat rstat_svc rup perfmeter
+rusersd		100002	rusers
+nfs		100003	nfsprog
+ypserv		100004	ypprog
+mountd		100005	mount showmount
+ypbind		100007
+walld		100008	rwall shutdown
+yppasswdd		100009	yppasswd
+etherstatd		100010	etherstat
+rquotad		100011	rquotaprog quota rquota
+sprayd		100012	spray
+3270_mapper		100013
+rje_mapper		100014
+selection_svc		100015	selnsvc
+database_svc		100016
+rexd		100017	rex
+alis		100018
+sched		100019
+llockmgr		100020
+nlockmgr		100021
+x25.inr		100022
+statmon		100023
+status		100024
+bootparam		100026
+ypupdated		100028	ypupdate
+keyserv		100029	keyserver
+tfsd		100037 
+nsed		100038
+nsemntd		100039
+.fi
+.DT
+.SH FILES
+/etc/rpc
+.SH "SEE ALSO"
+getrpcent(3N)

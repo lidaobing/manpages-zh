@@ -1,0 +1,198 @@
+.TH QUOTAON 8
+.UC 4
+.SH NAME
+quotaon, quotaoff \- turn filesystem quotas on and off
+.SH SYNOPSIS
+.B /sbin/quotaon
+[
+.B \-vugfp
+] [
+.B \-F
+.I format-name
+]
+.IR filesystem .\|.\|.
+.br
+.B /sbin/quotaon
+[
+.B \-avugfp
+] [
+.B \-F
+.I format-name
+]
+.LP
+.B /sbin/quotaoff
+[
+.B \-vugp
+]
+[
+.B \-x
+.I state
+]
+.IR filesystem .\|.\|.
+.br
+.B /sbin/quotaoff
+[
+.B \-avugp
+]
+.SH DESCRIPTION
+.SS quotaon
+.IX  "quotaon command"  ""  "\fLquotaon\fP \(em turn filesystem quotas on"
+.IX  "user quotas"  "quotaon command"  ""  "\fLquotaon\fP \(em turn filesystem quotas on"
+.IX  "disk quotas"  "quotaon command"  ""  "\fLquotaon\fP \(em turn filesystem quotas on"
+.IX  "quotas"  "quotaon command"  ""  "\fLquotaon\fP \(em turn filesystem quotas on"
+.IX  "filesystem"  "quotaon command"  ""  "\fLquotaon\fP \(em turn filesystem quotas on"
+.LP
+.B quotaon
+announces to the system that disk quotas should be enabled on one or
+more filesystems. The filesystem quota files must be present in the root
+directory of the specified filesystem and be named either
+.IR aquota.user
+(for version 2 user quota),
+.IR quota.user
+(for version 1 user quota),
+.IR aquota.group
+(for version 2 group quota), or
+.IR quota.group
+(for version 1 group quota).
+.PP
+XFS filesystems are a special case - XFS considers quota
+information as filesystem metadata and uses journaling to provide
+a higher level guarantee of consistency.
+There are two components to the XFS disk quota system:
+accounting and limit enforcement.
+Except in the case of the root filesystem, XFS filesystems require
+that quota accounting be turned on at mount time.
+It is possible to enable and disable limit enforcement on any XFS
+filesystem after quota accounting is already turned on.
+The default is to turn on both accounting and enforcement.
+.PP
+The XFS quota implementation does not maintain quota information in
+user-visible files, but rather stores this information internally.
+.SS quotaoff
+.IX  "quotaoff command"  ""  "\fLquotaoff\fP \(em turn filesystem quotas off"
+.IX  "user quotas"  "quotaoff command"  ""  "\fLquotaoff\fP \(em turn filesystem quotas off"
+.IX  "disk quotas"  "quotaoff command"  ""  "\fLquotaoff\fP \(em turn filesystem quotas off"
+.IX  "quotas"  "quotaoff command"  ""  "\fLquotaoff\fP \(em turn filesystem quotas off"
+.IX  "filesystem"  "quotaoff command"  ""  "\fLquotaoff\fP \(em turn filesystem quotas off"
+.LP
+.B quotaoff
+announces to the system that the specified filesystems should
+have any disk quotas turned off.
+.SH OPTIONS
+.SS quotaon
+.TP
+.B \-a
+All automatically mounted (no
+.B noauto
+option) non-NFS filesystems in
+.B /etc/fstab
+with quotas will have their quotas turned on.
+This is normally used at boot time to enable quotas.
+.TP
+.B \-v
+Display a message for each filesystem where quotas are turned on.
+.TP
+.B \-u
+Manipulate user quotas. This is the default.
+.TP
+.B \-g
+Manipulate group quotas.
+.TP
+.B \-p
+Instead of turning quotas on just print state of quotas (ie. whether. quota is on or off)
+.TP
+.B \-f
+Make
+.B quotaon
+behave like being called as
+.BR quotaoff .
+.SS quotaoff
+.TP
+.B \-F \f2format-name\f1
+Report quota for specified format (ie. don't perform format autodetection).
+Possible format names are:
+.B vfsold
+(version 1 quota),
+.B vfsv0
+(version 2 quota),
+.B xfs
+(quota on XFS filesystem)
+.TP
+.B \-a
+Force all filesystems in
+.B /etc/fstab
+to have their quotas disabled.
+.TP
+.B \-v
+Display a message for each filesystem affected.
+.TP
+.B \-u
+Manipulate user quotas. This is the default.
+.TP
+.B \-g
+Manipulate group quotas.
+.TP
+.B \-p
+Instead of turning quotas off just print state of quotas (ie. whether. quota is on or off)
+.TP
+.B \-x delete
+Free up the space used to hold quota information (maintained
+internally) within XFS.
+This option is only applicable to XFS, and is silently
+ignored for other filesystem types.
+It can only be used on a filesystem with quota previously turned off.
+.TP
+.B \-x enforce
+Switch off limit enforcement for XFS filesystems (perform
+quota accounting only).
+This option is only applicable to XFS, and is silently
+ignored for other filesystem types.
+.LP
+.SH "XFS EXAMPLES"
+.TP 0
+.B "Turning on quotas on a non-root XFS filesystem"
+Use
+.IR mount (8)
+or
+.B /etc/fstab
+option quota to enable both accounting and limit enforcement.
+.B quotaon
+utility cannot be used for this purpose.
+.TP
+.B "Turning on quotas on an XFS root filesystem"
+Use
+.BR "quotaon -v /" ,
+and
+.IR reboot (8).
+This procedure will enable both accounting and limit enforcement.
+.TP
+.B "Turning off quota limit enforcement on any XFS filesystem"
+Make sure that quota accounting and enforcement are both turned on using
+.BR "repquota -s" .
+Use
+.B "quotaoff -vo"
+to disable limit enforcement.
+This may be done while the filesystem is mounted.
+.TP
+.BR "Turning on quota limit enforcement on any XFS filesystem"
+Make sure that quota accounting is turned on using
+.BR "repquota -s" .
+Use
+.BR "quotaon -v" .
+This may be done while the filesystem is mounted.
+.SH FILES
+.PD 0
+.TP 20
+.B aquota.user or aquota.group
+quota file at the filesystem root (version 2 quota, non-XFS filesystems)
+.TP
+.B quota.user or quota.group
+quota file at the filesystem root (version 1 quota, non-XFS filesystems)
+.TP
+.B /etc/fstab
+default filesystems
+.PD
+.SH "SEE ALSO"
+.BR quotactl (2),
+.BR fstab (5),
+.BR repquota (8).

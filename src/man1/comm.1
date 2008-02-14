@@ -1,0 +1,59 @@
+.TH COMM "1" "February 2000" "GNU textutils 2.0a" FSF
+.SH NAME
+comm \- 逐行比较两个已排序的文件
+.SH "总览 (SYNOPSIS)"
+.B ../src/comm
+[\fIOPTION\fR]... \fILEFT_FILE RIGHT_FILE\fR
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+逐行比较 已排序的 文件 LEFT_FILE 和 RIGHT_FILE.
+.TP
+\fB\-1\fR
+屏蔽 左边文件 (LEFT_FILE) 中 不同于 右边文件 的 行(或内容)
+.TP
+\fB\-2\fR
+屏蔽 右边文件 (RIGHT_FILE) 中 不同于 左边文件 的 行(或内容)
+.TP
+\fB\-3\fR
+屏蔽 两个文件 中 相同 的 行(或内容)
+
+(译注: 原文为 "不相同的行", 疑有误)
+.TP
+\fB\-l\fR
+认为 输入数据 根据 当前的 locale 排了序 (应该 给 \fBsort\fR 提供
+\fB\-l\fR 选项).
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.SH "作者 (AUTHOR)"
+Richard Stallman 和 David MacKenzie.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B comm
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B comm
+程序, 使用 命令
+.IP
+.B info comm
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/10/19
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

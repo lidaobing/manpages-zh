@@ -1,0 +1,271 @@
+.\" ++Copyright++ 1993
+.\" -
+.\" Copyright (c) 1993
+.\"    The Regents of the University of California.  All rights reserved.
+.\" 
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\" 	This product includes software developed by the University of
+.\" 	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\" -
+.\" Portions Copyright (c) 1993 by Digital Equipment Corporation.
+.\" 
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies, and that
+.\" the name of Digital Equipment Corporation not be used in advertising or
+.\" publicity pertaining to distribution of the document or software without
+.\" specific, written prior permission.
+.\" 
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
+.\" WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
+.\" OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
+.\" CORPORATION BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+.\" DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+.\" PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+.\" ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+.\" SOFTWARE.
+.\" -
+.\" --Copyright--
+.Dd December 15, 1994
+.Dt HOST 1
+.Os BSD 4
+.Sh NAME (名字)
+.Nm host 
+.Nd 使用域名服务器查询主机名字
+.Sh SYNOPSIS (总览)
+.Nm host 
+.Op Fl l
+.Op Fl v
+.Op Fl w
+.Op Fl r
+.Op Fl d
+.Op Fl t Ar querytype
+.Op Fl a 
+.Ar host 
+.Op Ar server 
+.Sh DESCRIPTION (描述)
+.Ic Host
+查询 Internet 主机 的 信息. 它 通过 一组 分布在 国家间的 互连服务器 获取
+这些 信息. 缺省情况下, host 只是 简单的 做 主机名字 和 Internet 地址 的 转换. 
+然而 通过
+.Dq Fl t 
+或
+.Dq Fl a 
+选项, 它 可以 用来 查找 由 域名服务器 维护的 某个主机 的 全部信息.
+.Pp
+参数 可以是 主机名称, 也可以是 数字地址. 此程序 首先 把它 当做 主机的 
+数字地址, 如果 尝试 失败, 再把它 当做 主机名称. 主机的 数字地址 由 句点隔开的
+四个 十进位制数 组成, 例如 128.6.4.194. 主机名称 由 句点隔开的 名字 组成, 
+例如 topaz.rutgers.edu. 除非 名字 以句点 结尾, 否则 本地域名 将 自动 添加在
+后面. 因此, Rutgers 的 用户 可以 输入
+.Pp
+.D1 Ic host topaz 
+.Pp
+它 实际上 查找  "topaz.rutgers.edu". 
+如果 尝试 失败, 就用 原来输入的 名字 再试一次 (这里就是 "topaz").
+邮件 和 其他 网络工具 用了 同样的 策略.
+添加在 名字 后面 的 后缀 来自 调用
+.Xr hostname 1
+的 结果, 使用了 第一个点 后面的 全部 数据.
+(另见 下面
+.Sx 定制查询主机名字 
+的 描述. )
+.Pp
+第一个参数 是 你 打算查询的 主机名称.
+如果 是 数字地址, 就 执行
+.Dq 反向查询 (inverse query)
+也就是说, 域名系统 查看 一系列 独立的 数据库, 把 数字地址 转换成 名字.
+.Pp
+第二个 参数 是 可选的. 它 允许你 指定查询 某个 特定的 服务器. 如果 没有 使用
+这个参数, 就用 缺省 服务器 (一般是本地机).
+.Pp
+如果 指定了 名字, 你 可以见到 三个 不同种类的 输出. 这里是 它们的 例子:
+.Pp
+.D1 Ic % host sun4
+.Dl sun4.rutgers.edu is a nickname for ATHOS.RUTGERS.EDU
+.Dl ATHOS.RUTGERS.EDU has address 128.6.5.46
+.Dl ATHOS.RUTGERS.EDU has address 128.6.4.4
+.Dl ATHOS.RUTGERS.EDU mail is handled by ARAMIS.RUTGERS.EDU
+.Pp
+用户 键入的命令 是
+.Dq Ic host sun4 .  
+第一行 表明
+.Dq Li sun4.rutgers.edu 
+实际上 是 别名. 正式名字 是
+.Dq Li ATHOS.RUTGERS.EDU .  
+接下来 两行 显示 地址. 如果 系统 有 多个 网络接口, host 就 分别 显示 每个
+接口 的 地址. 最后一行 表明
+.Li ATHOS.RUTGERS.EDU 
+不接收 属于它的 邮件, 邮件 由 
+.Li ARAMIS.RUTGERS.EDU 
+处理. 由于 某些系统 拥有 多个 处理邮件的 系统, 可能 会有 多行 这样的显示.
+从 技术角度 看, 我们 认为 每个 能够 接收邮件 的 系统 应该有 这样的项. 如果 
+系统 接收 它自己的 邮件, 应该 有一项 提及 该系统 自身; 例如:
+.Pp
+.D1 Li XXX mail is handled by XXX 
+.Pp
+然而, 很多 能够 接收 自己邮件 的 系统 不愿意 提及 这个事实. 如果 系统 有一项
+.Dq Li mail is handled by ,
+但是 没有 地址, 这 表明 它 不是 Internet 的 一部分, 而是 在 网络上 转发
+邮件 的 系统. Usenet, Bitnet 和 许多 其他网络 都有 类似项.
+.Sh 选项
+在 主机名字 前面 能够 使用 很多 选项. 大多数 选项 只对 维护 域名数据库 有意义.
+.Bl -tag -width Fl
+.It Fl w 
+这一项 导致
+.Ic host 
+永久 等待 应答. 正常情况下, 大约 一分钟后 产生 超时.
+.It Fl v
+以 "繁琐" 格式 输出, 它是 正式的 主域文件格式, 在 手册页
+.Xr named 8 
+中 有描述. 没有 这个选项 时, 基本术语 的 输出 仍然 遵循 这个 格式, 
+但是 试图 对 普通用户 显示的 更智能些. 如果 不使用
+.Dq Fl v ,
+所有的 "a", "mx", 和 "cname" 项目 显示成 相应的 "has address",  
+"mail is handled by" 和 "is a nickname for", 而且 不显示 TTL 和类型.
+.It Fl r
+查询时 关闭 递归. 这 意味着 名字服务器 只返回 它 自身 数据库 的 数据.
+不向 其他服务器 询问 更多 信息.
+.It Fl d
+打开 调试功能. 显示 网络应答细节.
+.It Fl t Ar querytype
+允许 指定
+.Ar querytype 
+来 查询 某个信息. 手册页
+.Xr named 8 
+中 定义了 这些 参数. 目前支持的 类型有:
+.Dq Cm a , 
+.Dq Cm ns , 
+.Dq Cm md , 
+.Dq Cm mf , 
+.Dq Cm cname ,
+.Dq Cm soa , 
+.Dq Cm mb , 
+.Dq Cm mg , 
+.Dq Cm mr , 
+.Dq Cm null , 
+.Dq Cm wks , 
+.Dq Cm ptr , 
+.Dq Cm hinfo , 
+.Dq Cm minfo , 
+.Dq Cm mx , 
+.Dq Cm uinfo ,
+.Dq Cm uid , 
+.Dq Cm gid , 
+.Dq Cm unspec .  
+另外, 通配符 (可以 写成
+.Dq Cm any 
+或
+.Dq Cm * 
+) 可以 指定 上面的 任意(全部) 类型. 类型 必须是 小写字符.
+注意 缺省 搜索顺序 首先是
+.Dq Cm a , 
+然后是
+.Dq Cm mx , 
+除非 打开了 -v 选项, 使 缺省值 只是
+.Dq Cm a .
+.Dq Fl t
+选项 在过滤
+.Ic host 
+返回的信息 时 非常有用. 更多的 内容 参见 下面
+.Dq Fl l
+选项 的 说明.
+.It Fl a 
+.Dq 全部 ;
+等同于
+.Dq Fl v Fl t Cm any .
+.It Fl l
+列出 全部域项; 例如:
+.Pp
+.D1 Ic host -l rutgers.edu
+.Pp
+将 列出  rutgers.edu 域 中 所有的 主机.
+.Dq Fl t
+选项 可以 按需 过滤 收到的信息. 缺省值 是 地址信息, 包括 PTR 和 NS
+记录. 
+.Pp
+.D1 Ic host -l -v -t any rutgers.edu
+.Pp
+命令 以 正式主域文件格式 下载 rutgers.edu 的 全部 区域(zone) 数据.
+(然而 由于 某些 复杂原因, SOA 记录 显示了 两次.)
+.Pp
+.Sy 注意: 
+.Dq Fl l 
+执行 全部的 区域 传输, 然后 过滤出 要求的 信息. 所以 万不得已
+才用 这个 命令.
+.Sh 定制查询主机名字
+一般说来, 如果 用户 给出的 名字 中 不含 任何 句点, host 就把 缺省域名
+添加在 它的末尾. 缺省域名 能够 定义 在
+.Pa /etc/resolv.conf 
+中, 但是 通常 从 本机名字 的 第一个 句点 后面 提取. 
+用户 可以 通过 环境变量
+.Ev LOCALDOMAIN 
+指定 不同的 缺省域名.
+另外, 用户 可以 自定义 主机名字 的 缩写. 缩写 存放在 某个文件 中, 
+一行 一项, 格式是 一个 缩写名字, 一个 空格, 然后是 完整的 主机名. 
+这个 名字文件 必须 用
+.Ev HOSTALIASES 
+环境变量 指出.
+.Sh 环境变量
+.Bl -tag -width "/etc/resolv.conf  " -compress
+.It Ev HOSTALIASES
+名字文件, 含有
+.Pq Ar 主机别名 , 主机全名
+对.
+.El
+.Sh 文件
+.Bl -tag -width "/etc/resolv.conf  " -compress
+.It Pa /etc/resolv.conf 
+另见
+.Xr resolver 5 .
+.Sh 另见
+.Xr named  8 , 
+.Xr resolver 5 .
+.Sh BUGS
+当你 输入的 名字 不属于 本地域 时, 将会 出现 不希望 的 现象. 
+请记住 除非 输入的名字 以 点 结尾, 否则 本地域名 总会 附加在 它 后面,
+失败后 才使用 原来的 名字.
+.Pp
+.Dq Fl l 
+选项 只 联系 指定域 中 的 第一个 名字服务器. 如果 这个 服务器 宕机,
+你 应该 手工 指定 一个 服务器. 例如, 要 获取 foo.edu 的清单, 可以 用
+.Pp
+.D1 Ic host -t ns foo.edu 
+.Pp
+获得 foo.edu 的 全部 名字服务器, 然后 用
+.Pp
+.D1 Ic host -l foo.edu xxx
+.Pp
+试验 每一个
+.Dq Ic xxx 
+名字服务器, 直到 碰上 能用的.
+.Sh "[中文版维护人]"
+徐明 <xuming@users.sourceforge.net>
+.Sh "[中文版最新更新]"
+2003/05/13
+.Sh "《中国Linux论坛man手册页翻译计划》"
+http://cmpp.linuxforum.net

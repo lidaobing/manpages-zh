@@ -1,0 +1,511 @@
+'\" t
+.\" Copyright (c)1996 Andries Brouwer <aeb@cwi.nl>, Mon Oct 31 22:13:04 1996
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option)any later version.
+.\"
+.\" This is combined from many sources.
+.\" For Linux, the definitive source is of course console.c.
+.\" About vt100-like escape sequences in general there are
+.\" the ISO 6429 and ISO 2022 norms, the descriptions of
+.\" an actual vt100, and the xterm docs (ctlseqs.ms).
+.\" Substantial portions of this text are derived from a write-up
+.\" by Eric S.Raymond <esr@thyrsus.com>.
+.\"
+.\" Tiny correction, aeb, 961107.
+.\"
+.TH CONSOLE_CODES 4 "October 31, 1996" "Linux" "Linux Programmer's Manual"
+.SH NAME 名称
+控制终端代码 \- Linux 控制终端转义和控制序列
+.SH DESCRIPTION 描述
+Linux控制台实现了VT102和ECMA-48/ISO 6429/ANSI X3.64终端控制的子集,
+这个子集很庞大,当然还有Linux自己私有的控制序列,以改变颜色配置,字符
+集映像,等等.在下面将要给出的表格中,第二列为指定的功能给出了ECMA-48
+或者DEC助记符(如果是后者会在前面加有DEC前缀).没有给出助记符的序列
+既不是ECMA-48也不是VT102字符.
+.LP
+在所有标准输出进程执行完毕,并且一个字符流被送到控制台
+驱动程序准备显示出来的时候,所发生的第一件事就是将进程
+使用的代码转换成显示使用的代码.
+.LP
+如果控制台工作于 UTF-8 模式,那么输入的字节会首先编码
+成16位的 Unicode 代码.如果不是UTF-8模式,那么每个字节
+会按照当前的字符映射表完成转换(转换成Unicode编码的值).
+参看下面将要讨论的 CHARACTER SETS 一章.
+..LP
+在一般情况下,Unicode 代码被转换成为存储在视频存储器中的
+字体索引,这样对应的具体字符(字符存储在视频ROM中)就显示
+在屏幕上了.
+注意使用 Unicode 编码允许我们同时使用 512 种不同的字体(和
+计算机硬件有关).
+.LP
+如果当前的 Unicode 代码是一个控制字符,或者系统目前正在处
+理一个转义序列,处理的方式有些特别.它不会被转换成字体索
+引,也不会直接显示在屏幕上.它可能控制光标的移动,或者实现
+其它控制功能.参看下面的 LINUX CONSOLE CONTROLS 一节
+所进行的讨论.
+.LP
+一般来说直接在程序中插入终端控制字符并不是很好.Linux 支
+持终端兼容的 
+.BR terminfo(5)
+数据库.
+除了直接插入控制和转义序列,也可以使用象
+.BR ncurses(3),
+.BR tput(1),
+或者
+.BR reset(1).
+这样的显示库或者工具.
+
+.SH LINUX CONSOLE CONTROLS Linux终端控制
+
+这一段描述了所有在Linux控制台下使用的调用特殊功能的控制字符
+和转义序列(例如.任何不在当前光标处插入可见字符的序列).
+.SS "Control characters" "控制字符"
+当一个字符在通过字符映射表转换之前含有以下14个代码之一的时
+候表明它是一个控制字符.
+00(NUL),07(BEL),08(BS),09(HT),0a(LF),0b(VT),
+0c(FF),0d(CR),0e(SO),0f(SI),18(CAN),1a(SUB),
+1b(ESC),7f(DEL).
+我们可以通过设置 `显示控制字符' 模式(见下文)以允许07,09,0b,
+18,1a,7f 像普通字符一样显示在屏幕上.另一方面,在UTF-8模式下
+所有位于 00-1f之间的代码都被认为是控制字符,而不管是否处于
+`显示控制字符'模式.
+
+一个控制字符会立刻生效,然后被丢弃(即使是在转义序列中间),
+之后转义序列才继续处理下一个字符.
+(在任何情况下,ESC都表示一个新的转义序列的开始,可能导致 
+前一个序列的非正常终止,CAN和SUB 终止任何转义序列.)
+可识别的控制字符是BEL,BS,HT,LF,VT,FF,CR,SO,SI,CAN,
+SUB,ESC,DEL,CSI.他们的功能如下.:
+.HP
+BEL(0x07,^G)铃声;
+.HP
+BS(0x08,^H)后退一格(在行首不起作用);
+.HP
+HT(0x09,^I)跳至下一个制表位.如果后面已没有制表位则跳至行尾;
+.HP
+LF(0x0A,^J),VT(0x0B,^K),FF(0x0C,^L)三者都表示换行;
+.HP
+CR(0x0D,^M)回车并换行;
+.HP
+SO(0x0E,^N)激活 G1 字符集,
+如果设置了 LF/NL(新行模式)还要加上回车换行;
+.HP
+SI(0x0F,^O)激活 G0 字符集;
+.HP
+CAN(0x18,^X),SUB(0x1A,^Z)两者都表示中断转义序列;
+.HP
+ESC(0x1B,^[)开始一个新的转义序列;
+.HP
+DEL(0x7F)忽略;
+.HP
+CSI(0x9B)等同于 ESC [;
+.LP
+
+.SS "ESC- but not CSI-sequences" "非控制转义序列"
+.TS
+l l l.
+ESC c	RIS	重绘屏幕.
+ESC D	IND	换行.
+ESC E	NEL	新的一行.
+ESC H	HTS	设置当前列为制表位.
+ESC M	RI	翻转换行(Reverse linefeed).
+ESC Z	DECID	DEC 私有定义.内核将其解释为
+		VT102字符,返回字符ESC [ ? 6 c.
+ESC 7	DECSC	存储当前状态(光标坐标,
+		属性,字符集).
+ESC 8	DECRC	恢复上一次储存的设置
+ESC [	CSI	控制序列介绍
+ESC %		开始一个字符集选择序列
+ESC % @	\0\0\0选择默认字符集(ISO 646 / ISO 8859-1)
+ESC % G		\0\0\0选择 UTF-8
+ESC % 8		\0\0\0选择 UTF-8(已不用)
+ESC # 8	DECALN	DEC 屏幕校准测试 - 以E's填充屏幕.
+ESC(		开始一个 G0 字符集定义序列
+ESC( B		\0\0\0选择默认字符集(ISO 8859-1 mapping)
+ESC( 0		\0\0\0选择 vt100 图形映射
+ESC( U		\0\0\0选择空映射 - 直接访问字符ROM
+ESC( K		\0\0\0选择用户映射 -  由程序\fBmapscrn\fP(8)
+		\0\0\0加载.
+ESC )		开始一个 G1 字符集定义
+		(后面跟 B,0,U,K,同上).
+ESC >	DECPNM	设置数字小键盘模式
+ESC =	DECPAM	设置程序键盘模式
+ESC ]	OSC	(是perating system command的缩写)
+		ESC ] P \fInrrggbb\fP: 设置调色板,后面紧跟7个
+		十六进制数,再跟一个 P :-(.
+		这里 \fIn\fP 是颜色(0-16),而 \fIrrggbb\fP 表示
+		红/绿/蓝 值(0-255).
+		ESC ] R: 重置调色板
+.TE
+.SS "ECMA-48 CSI sequence" "ECMA-48 CSI 序列"
+
+CSI(或者 ESC [)后面跟的参数序列大部分是NPAR(16),
+就是由分号隔开的十进制数.空参数或缺少的参数以0处理.
+可以用一个问号代替参数序列.
+
+在任何情况下,系统读取 CSI [(或者 ESC [ [)后的单个字符,
+而忽略整个序列.(用于忽略回显功能键.)
+
+CSI 序列的动作由其最后一个字符决定.
+
+.TS
+l l l.
+@	ICH	用#符号指示空格.
+A	CUU	光标上移到#标识的行.
+B	CUD	光标下移到#标识的行.
+C	CUF	光标右移到#标识的列.
+D	CUB	光标左移到#标识的列.
+E	CNL	将光标下移到#指示的行的第一列.
+F	CPL	将光标上移到#指示的行的第一列.
+G	CHA	光标移动到当前行的指定列.
+H	CUP	光标移动到指定行和列(以1行1列为参照).
+J	ED	删除(默认从当前光标处到行尾的)内容.
+		ESC [ 1 J: 删除从开始到光标处的内容.
+		ESC [ 2 J: 清空整个屏幕.
+K	EL	删除行(默认从当前光标处到结尾).
+		ESC [ 1 K: 删除从行首到当前光标处的内容.
+		ESC [ 2 K: 删除整行.
+L	IL	在空行插入#.
+M	DL	删除#标记的行.
+P	DCH	删除当前行中#标记的字符.
+X	ECH	删除当前行中#标记的单词.
+a	HPR	光标移动到#标记的右边.
+c	DA	以`I am a VT102'应答 ESC [ ? 6 c: 
+d	VPA	光标移动到当前列指定行
+e	VPR	光标移动到#标记的下一行.
+f	HVP	光标移动到指定的行和列.
+g	TBC	没有参数: 清除当前位置的制表站.
+		ESC [ 3 g: 删除所有制表站.
+h	SM	设置模式(见下文).
+l	RM	重置模式(见下文).
+m	SGR	设置属性(见下文).
+n	DSR	状态报告(见下文).
+q	DECLL	设置键盘指示灯.
+		ESC [ 0 q: 熄灭所有指示灯
+		ESC [ 1 q: 点亮 Scroll Lock 灯
+		ESC [ 2 q: 点亮 Num Lock 灯
+		ESC [ 3 q: 点亮 Caps Lock 灯
+r	DECSTBM	设置滚动范围; 参数为首行和末行.
+s	?	存储光标位置.
+u	?	恢复光标位置.
+`	HPA	光标移动到当前行指定列.
+.TE
+.SS ECMA-48 Set Graphics Rendition 设置图形属性
+
+ECMA-48 SGR 序列 ESC [ <parameters> m 设置显示属性.
+同样的序列可以设置一个或多个属性.
+.LP
+.TS
+l l.
+par	作用
+0	所有属性重设为默认值
+1	设置边框
+2	设置亮度减半(用一种颜色模拟另一种颜色)
+4	设置底纹(用一种颜色模拟另一种颜色)
+	(用于模拟的颜色由using ESC ] ...设置)
+5	设置闪烁
+7	设置反转视频(reverse video)
+10	重设选定映像,显示控制标记,
+	反转元素标记.
+11	选择空映像,设置显示控制标记,
+	重设反转标记.
+12	选择空映像,设置显示控制标记,
+	重设反转标记.(在完成映像表转
+	换之前反转标记引起每一字节的
+	高位反转.)
+21	设置正常亮度(和 ECMA-48 不兼容)
+22	设置正常亮度
+24	关闭下划线
+25	不闪烁
+27	反转视频关闭
+30	黑色背景
+31	红色前景
+32	绿色前景
+33	棕色前景
+34	蓝色前景
+35	品红前景
+36	孔雀蓝前景
+37	白色前景
+38	打开下划线,设置默认前景色
+39	关闭下划线,设置默认前景色
+40	黑色背景
+41	红色背景
+42	绿色背景
+43	棕色背景
+44	蓝色背景
+45	品红背景
+46	孔雀蓝背景
+47	白色背景
+49	设置默认背景色
+.TE
+.SS ECMA-48 Mode Switches ECMA-48模式选择
+.TP
+ESC [ 3 h
+DECCRM(默认关闭): 显示控制字符.
+.TP
+ESC [ 4 h
+DECIM(默认关闭): 设置插入模式.
+.TP
+ESC [ 20 h
+LF/NL(默认关闭): 自动在CR后加上 LF,VT 或者 FF.
+.LP
+.SS ECMA-48 状态报告命令.
+.TP
+ESC [ 5 n
+设备状态报告(DSR): 以 ESC [ 0 n 应答(终端准备好).
+.TP
+ESC [ 6 n
+光标位置报告(CPR): 以ESC [ \fIy\fP ; \fIx\fP R 应答,
+这里 \fIx,y\fP 指光标位置.
+
+.SS DEC Private Mode(DECSET/DECRST)sequences DEC私有模式序列.
+
+这里给出的序列在 ECMA-48中没有描述.我们列出了设置模式序列;
+用l替换最后一个h就是重设模式序列.
+.TP
+ESC [ ? 1 h
+DECCKM(默认关闭): 打开时光标键送出 ESC O 前缀,
+而不是 ESC [.
+.TP
+ESC [ ? 3 h
+DECCOLM(默认 = 80 行): 交替选择 80/132 行模式.当原显示
+模式不足以满足要求的时候,象
+.BR resizecons(8)
+这样的用户程序会改变终端显示卡的硬件注册.
+.TP
+ESC [ ? 5 h
+DECSCNM(默认关闭): 设置视频反转模式.
+.TP
+ESC [ ? 6 h
+DECOM(默认关闭): 打开时,光标位置用相对于滚动条左上角
+的位置表示.
+.TP
+ESC [ ? 7 h
+DECAWM(默认关闭): 打开自动换行.在这种模式下,一行中
+超过80列的字符将自动换行(在DECCOLM打开时是132列).
+.TP
+ESC [ ? 8 h
+DECARM(默认关闭): 打开键盘自动重复.
+.TP
+ESC [ ? 9 h
+X10 鼠标报告(默认关闭): 设置报告模式 1(或者重设为
+0)\- 见下文.
+.TP
+ESC [ ? 25 h
+DECCM(默认打开): 设置光标可见.
+.TP
+ESC [ ? 1000 h
+X11 鼠标报告(默认关闭): 设置报告模式 2(或者重设为
+0)\- 见下文.
+
+.SS Linux Console Private CSI Sequences Linux控制台私有控制序列
+
+下面的序列既不属于 ECMA-48 字符也不属于 VT102.它们只在
+Linux控制台上使用.颜色采用 SGR 参数:
+0 = 黑色,1 = 红色,2 = 绿色,3 =褐色 ,4 = 蓝色,5 = 洋红,6 =
+孔雀蓝,7 = 白色.
+
+.TS
+l l.
+ESC [ 1 ; \fIn\fP ]	设置下划线颜色为 \fIn\fP
+ESC [ 2 ; \fIn\fP ]	设置暗色为 \fIn\fP
+ESC [ 8 ]       	设置当前颜色对为默认属性.
+ESC [ 9 ; \fIn\fP ]	设置屏幕空白超时为 \fIn\fP 分钟.
+ESC [ 10 ; \fIn\fP ]	设置机箱喇叭鸣叫频率,单位: Hz.
+ESC [ 11 ; \fIn\fP ]	设置机箱喇叭鸣叫持续时间,单位:微秒.
+ESC [ 12 ; \fIn\fP ]	设置指定控制台前台运行.
+ESC [ 13 ]      	设置指定控制台黑色
+ESC [ 14 ; \fIn\fP ]   	设置 VESA 关闭间隔,单位: 分钟.
+.TE
+
+.SH "CHARACTER SETS" "字符集"
+
+内核可以完成以下四种字符转换,使字符能在屏幕上显示.
+a)Latin1 -> PC,b)VT100 graphics -> PC,c)PC -> PC,
+d)user-defined(用户自定义).
+
+有两种字符集设置,以 G0 和 G1定义,当前字符集必定是其中之一.(初
+始化为G0.)键入 ^N 使 G1 成为当前字符集,键入 ^O 使 G0 成为当前设置.
+
+变量 G0 and G1 指向字符映射关系表,并且这种指向关系可以由用户改变.
+系统初始化时它们分别指向表 a)and b).
+序列 ESC( B ,ESC( 0 ,ESC( U 和 ESC( K 分别使 G0 指向字符映射表
+ a),b),c)和 d).
+序列 ESC )B ,ESC )0 ,ESC )U 和 ESC )K 分别使 G1 指向字符映射表
+a),b),c)和 d).
+
+序列 ESC c 重置一个终端,当屏幕显示出现混乱时可以使用这个序列.
+另一个序列 "echo ^V^O" 仅仅将G0设为当前字符集,但并不保证 G0 指
+向映射表 a).
+有的Linux发行版中提供一个叫做
+.BR reset(1)
+的程序用来送出序列 "echo ^[c".
+如果你的系统终端变量没有错误( rs1=\\Ec),
+那么使用"tput reset"也可以达到同样效果.
+
+用户自定义映射表可以用程序
+.BR mapscrn(8).
+定义.这个程序工作时会将送入的字符c通过关系式s=map[c]映射到
+字符s然后送入显存.字符s所对应的位图放在字符ROM里面,可以使
+用程序
+.BR setfont(8).
+
+来改变.
+
+.SH "MOUSE TRACKING" "鼠标轨迹"
+
+鼠标轨迹工具可以返回与 xterm 兼容的鼠标状态报告.因为控制台
+驱动没有办法知道鼠标类型,只有当虚拟终端驱动接收到鼠标输入
+输出消息更新时才会将这些报告返回给控制台输入流..这些鼠标
+输入输出消息由 \fBgpm(8)\fR 守护进程产生.
+
+所有鼠标轨迹转义序列参数由\fIxterm\fP 编码成象\fIvalue\fP+040
+这样的单一字符形式的数字参数.比如,`!' 编码成 1.屏幕坐标系统
+以'1'为基准.
+
+X10 兼容模式在鼠标键按下时将按下的键和鼠标位置编码后送出.
+ESC [ ? 9 h 允许这一动作,ESC [ ? 9 l禁止这一动作.
+有键按下时,\fIxterm\fP 送出ESC [ M \fIbxy\fP(6 个字符).这里 
+\fIb\fP 代表 键\-1,而 \fIx\fP 和 \fIy\fP 是鼠标的 x 和 y 坐标.这和
+内核产生的序列相同.
+
+常规的轨迹模式(Linux 2.0.24不再支持)在左右两键同时按下然后
+释放时送出转义序列.组合键编码也被送出.ESC [ ? 1000 h 允许这
+个动作而ESC [ 1000 l 禁止这个动作.当有键按下或者释放时,
+\fIxterm\fP 送出 ESC [ M \fIbxy\fP.\fIb\fP 的低两位对按键信息编码:
+0=鼠标键1按下,1=鼠标键2 按下,2=鼠标键3 按下,3=释放.
+高位编码代表组合键,和上述编码一起送出:
+4=Shift,8=Meta(Alt),16=Control(Ctrl).\fIx\fP 和\fIy\fP为发生鼠标事
+件的x和y坐标.以左上角为(1,1).
+
+.SH 和其它终端的比较
+
+我们已经讨论了几种终端类型,比如Linux 控制台.这类终端称为
+"VT100兼容"的终端.这里我们再介绍其他两种重要的终端类型:
+DEC VT102 和
+.BR xterm(1)
+以及他们和Linux控制终端的区别.
+
+.SS Control-character handling 控制字符处理
+vt102 也使用以下控制序列:
+.HP
+NUL(0x00)忽略;
+.HP
+ENQ(0x05)触发应答消息;
+.HP
+DC1(0x11,^Q,XON)继续传送;
+.HP
+DC3(0x13,^S,XOFF)使 vt100 忽略(并停止传送)
+除 XOFF and XON 以外的一切字符.
+.LP
+VT100-like DC1/DC3 进程可以由 tty 驱动激活.
+.LP 
+程序
+.I xterm
+(在 vt100 模式 中)使用控制序列 
+BEL,BS,HT,LF,VT,FF,CR,SO,SI,ESC.
+
+.SS Escape sequences 转义序列
+VT100  控制台序列不完全支持Linux控制台序列:
+.LP
+.TS
+l l l.
+ESC N	SS2	仅仅为下一个字符选择 G2 字符集
+		(Single shift 2).
+ESC O	SS3	仅仅为下一个字符选择 G2 字符集
+		(Single shift 2).
+ESC P	DCS	设备控制字符,由ESC \e 终止
+		(Device control string).
+ESC X	SOS	字符串开始.
+		(Start of string)
+ESC ^	PM	私有消息,由 ESC \e 终结
+		(Privacy message)
+ESC \e	ST	字符串终结
+		(String terminator)
+ESC * ...		指定 G2 字符集
+ESC + ...		指定 G3 字符集
+.TE
+
+程序
+.I xterm
+(vt100 模式)承认 ESC c,ESC # 8,ESC >,ESC =,
+ESC D,ESC E,ESC H,ESC M,ESC N,ESC O,ESC P ...ESC \,
+ESC Z(以 [ ? 1 ; 2 c,`I am a vt100 with advanced video option'回应)
+以及 ESC ^ ...ESC \,意义同上.
+接受 ESC(,ESC ),ESC *,ESC + 后跟 0,A,B 的字符序列,分别
+代表的DEC 特殊字符,画线设置,UK 和 US ASCII码.
+接受 ESC ] 作为特定资源设置:
+.LP
+.TS
+l l.
+ESC ] 0 ; txt BEL	将图标名和窗口标题设为文本.
+ESC ] 1 ; txt BEL	将图标名设为文本.
+ESC ] 2 ; txt BEL	将窗口名设为文本.
+ESC ] 4 6 ; name BEL	改变日志文件名(一般
+	由编译时选项禁止)
+ESC ] 5 0 ; fn BEL	字体设置为 fn.
+.TE
+
+以下字符的含义略有不同::
+.LP
+.TS
+l l l.
+ESC 7  DECSC	存储光标位置
+ESC 8  DECRC	恢复光标位置
+.TE
+
+它还接受以下序列:
+.LP
+.TS
+l l l.
+ESC F		光标移动到屏幕左下角(由
+		hpLowerleftBugCompat 打开这项设置)
+ESC l		内存锁定(对于 HP 终端).
+		锁定光标以上的内存.
+ESC m		内存解锁(对于 HP 终端).
+ESC n	LS2	调用 G2 字符集.
+ESC o	LS3	调用 G3 字符集.
+ESC |	LS3R	以GR调用 G3 字符集.
+		在xterm上看不到效果.
+ESC }	LS2R	以GR调用 G3 字符集.
+		在xterm上看不到效果.
+ESC ~	LS1R	以GR调用 G3 字符集.
+		在xterm上看不到效果.
+.TE
+
+它不识别 ESC % ...
+
+.SS CSI Sequences CSI 序列
+程序
+.I xterm
+(直到 XFree86 3.1.2G)不能识别闪烁或者不可见模式的 
+SGR值.X11R6 也不能识别以 SGRs 为参数设置的色彩.
+.IR xterm
+可以识别其他的 ECMA-48 CSI 序列,只要Linux可以识别.
+反之亦然.
+
+.I xterm
+可以识别以上列出的所有 DEC 私有序列,但是不包括 Linux 私有模式序列.
+在
+.I Xterm Control Sequences
+中有关于
+.IR xterm 
+的私有模式序列的讨论.
+
+document by Edward Moy and Stephen Gildea,available with the X 
+distribution.
+
+.SH BUGS
+
+在版本为 2.0.23 的内核中,CSI 序列的识别有些问题: 不能识别转义序列中的NUL.
+
+.SH 参见
+.BR console(4),
+.BR console_ioctl(4),
+.BR charsets(7)
+
+
+

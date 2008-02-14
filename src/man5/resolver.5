@@ -1,0 +1,117 @@
+.\" Copyright (c) 1986 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms are permitted
+.\" provided that the above copyright notice and this paragraph are
+.\" duplicated in all such forms and that any documentation,
+.\" advertising materials, and other materials related to such
+.\" distribution and use acknowledge that the software was developed
+.\" by the University of California, Berkeley.  The name of the
+.\" University may not be used to endorse or promote products derived
+.\" from this software without specific prior written permission.
+.\" THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+.\"
+.\"
+.TH RESOLVER 5 "November 11, 1993"
+.UC 4
+
+.SH NAME
+resolver \- 解析器(resolver) 配置文件
+
+.SH "总览 (SYNOPSIS)"
+/etc/resolv.conf
+
+.SH "描述 (DESCRIPTION)"
+.LP
+.I 解析器(resolver)
+是 C 函数库 中 的 一组 例程, 用于 访问 Internet 域名系统.
+当 某个 进程 第一次 调用 这些函数 时, 它们 读取 解析器配置文件 的 内容.
+这个文件 很容易 理解, 它 由 关键字 和 对应值 的 列表 组成, 提供 各种类型
+的 解析器信息.
+.LP
+正常 配置 的 系统 中, 这个 文件 并非 必不可少: 名字服务器 可以 位于 本机,
+域名 从 主机名 中 获得, 域名搜索路径 由 域名 产生.
+.LP
+各种配置选项有:
+.TP
+\fBnameserver\fP
+名字服务器 的 Internet 地址, 用于 解析器 查询.
+最多 可以 列出 MAXNS (目前是 3) 个 名字服务器, 一个关键字 对应 一个服务器.
+如果 列出 多个 服务器, 解析器 按照 列举的顺序 访问.
+如果 没有 给出 \fBnameserver\fP 项, 缺省方法 是 使用 本机的 名字服务.
+(使用的算法 是 先试 第一个 名字服务器, 如果 请求 超时, 就试 下一个 服务器, 
+直到 试遍 所有的 服务器. 然后 重复 这个过程, 直到 最大 重试次数).
+.TP
+\fBdomain\fP
+本地域名.
+多数 对 本域内 的 名字查询 能够 使用 对应的 短名字.
+如果 \fBdomain\fP 项 不存在, 本地域名 取决于 \fIgethostname\fP\|() 
+返回的 主机名: 第一个 '.' 以后的 所有内容 都是 域名 部分.
+最后, 如果 主机名 不含有 域名 部分, 就认为 指定了 根域.
+.TP
+\fBsearch\fP
+主机名查询 的 查找列表.
+查找列表 一般 取决于 本地域名; 缺省情况下 就是 本地域名.
+这一点 可以 改变, 
+在 关键字 \fIsearch\fP 后面, 隔着 空格 或 制表符, 列出 期望的 域名查找路径.
+多数 解析请求 会 按顺序 尝试 查找路径 里的 每一个 成员, 直到 发现 匹配项.
+注意, 如果 所列域名 对应的 服务器 不在 本地网络, 这个 过程 可能 很慢, 而且 
+生成 大量的 网络数据, 如果 其中的 某个域名 没有 对应的 服务器, 将导致 请求
+超时.
+.IP
+目前, 查找列表 限制在 六个 域名 内, 总共 不超过 256 个字符.
+.TP
+\fBsortlist\fP
+排序列表 允许 对 gethostbyname 返回的 地址 排序.
+排序列表 由 IP地址 和 屏蔽字 对 指明. 屏蔽字 是 可选项, 缺省是 网络的
+自然屏蔽字. IP地址 和 可选的屏蔽字 对 用 斜杠符 隔开. 最多 可以 指定
+10 对.
+.IP
+例如: sortlist 130.155.160.0/255.255.240.0 130.155.0.0
+.TP
+\fBoptions\fP
+选项, 允许 修改 某些 解析器 的 内部变量.
+语法形式 是:
+.IP
+\fBoptions\fP \fIoption\fP \fI...\fP
+.IP
+这里的 \fIoption\fP 是 下列 项目 之一:
+.IP
+\fBdebug\fP \(em 在 _res.options 中 设置 RES_DEBUG.
+.IP
+\fBndots:\fP\fIn\fP \(em 设置 句点数目 的 门限值, 如果要 直接 做 
+\fI绝对查询\fP, 传给 \fBres_query\fP (另见 \fIresolver\fP(3)) 的 名字中 的
+句点 不得小于 这个数. \fIn\fP 的 缺省值 是 ``1'', 意即 只要 名字中 有 
+一个 句点, 在 添加 \fI查找列表\fP 中 任何 成员 前, 首先 按 绝对名字 查询.
+.LP
+\fIdomain\fP 和 \fIsearch\fP 关键字 是 互斥的.
+如果 它们 先后 出现, 则 最后一个 有效.
+.LP
+系统文件 \fIresolv.conf\fP 中的 \fIsearch\fP 关键字 能够 被 环境变量
+``\s-1LOCALDOMAIN\s+1'' 的 内容 取代, 域名列表 用 空格 隔开.
+.LP
+系统文件 \fIresolv.conf\fP 中的 \fIoptions\fP 关键字 能够 被 环境变量
+``\s-1RES_OPTIONS\s+1'' 的 内容 修正, 其中 的 选项 (见前面的 \fBoptions\fP)
+用 空格 隔开.
+.LP
+关键字 及其 对应值 必须 列在 同一行, 而且 关键字(例如 \fBnameserver\fP) 
+必须 在 行始.  对应值 在后面 用 空白符(white space) 隔开.
+
+.SH "文件 (FILES)"
+.I /etc/resolv.conf
+
+.SH "另见 (SEE ALSO)"
+.BR gethostbyname (3),
+.BR hostname (7),
+.BR named (8),
+.br
+Name Server Operations Guide for BIND
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

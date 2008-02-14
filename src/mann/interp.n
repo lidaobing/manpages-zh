@@ -1,0 +1,463 @@
+'\"
+'\" Copyright (c) 1995-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: interp.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: interp.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH interp n 7.6 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+interp \- 建立和操纵 Tcl 解释器
+.SH "总览 SYNOPSIS"
+\fBinterp \fIoption \fR?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令建立一个或多个新的 Tcl 解释器，并使其与建立(它们的)解释器在相同的应用中共存。建立解释器的解释器叫做主解释器(\fImaster\fR)而新解释器叫做从解释器(\fIslave\fR)。主解释器可以建立任意数目的从解释器，每个从解释器也可以自己建立增添的从解释器而成为它们的主解释器，这将导致解释器的一个等级层次(hierarchy)。
+.PP
+每个解释器相对其他解释器是独立的: 它有给命令、过程、和全局变量的自己的名字空间。一个主解释器可以使用叫别名(\fIalias\fR)的机制建立它的从解释器与它自身间的连接。别名是在一个从解释器中的一个命令，调用它时，导致在它的主解释器或其他从解释器中调用一个命令。解释器之间的唯一其他连接是通过环境变量(\fBenv\fR 变量)，它通常被在这个应用中的所有解释器共享。注意给文件的名字空间(比如由 \fBopen\fR命令返回的名字)不在解释器之间共享。提供显式的命令来共享文件和把到打开文件的引用从一个解释器转换(transfer)到另一个。
+.PP
+\fBinterp\fR命令还提供对安全(\fIsafe\fR)解释器的支持。一个安全解释器是一个功能被严格限制了的从解释器，这样就可以执行不可信任的脚本而不用害怕它们毁坏其他解释器或这个应用的环境。例如，安全解释器不能访问所有 IO  通道建立命令和子过程建立命令。
+.VS
+详情参见下面的 SAFE INTERPRETERS (安全的解释器) 章节。未从安全的解释器中去除有危险的功能；但是，它们是隐藏的，所以只有可信任的解释器可以获得到它们的访问。隐藏命令的详细解释请参见下面的 HIDDEN COMMANDS (隐藏命令) 章节。可以使用别名机制来在从解释器和它的主解释器之间进行受保护的通信(类似于一个内核调用)。别名机制工作的详情参见下面的 ALIAS INVOCATION (别名调用)章节。
+.VE
+.PP
+一个限定的(qualified)解释器的名字是一个适当的 Tcl 列表，它包含在这个解释器层次中它的祖先的一个子集，终结于以它的直接上级(immediate)主解释器命名的字符串。解释器名字是相对于在其中使用它的哪个解释器的。例如，如果 \fBa\fR 是当前解释器的一个从解释器并且它有一个从解释器 \fBa1\fR，它依次有一个从解释器 \fBa11\fR，在\fBa\fR  中 \fBa11\fR  的限定的名字是列表 \fBa1 a11\fR。
+.PP
+下面描述的 \fBinterp\fR命令接受限定的解释器名字作为参数；命令在其中求值的解释器总是可以作为 \fB{}\fR来引用(空列表或字符串)。注意除了通过别名之外，在一个从解释器中不可能通过名字引用一个主(祖先)解释器。还有，没有通过它可以引用在应用中建立的第一个解释器的全局名字。这两种限制的目的都是为了安全。
+
+.VS
+.SH "INTERP 命令 COMMAND"
+.PP
+.VE
+使用 \fBinterp\fR  命令建立、删除、和操纵从解释器，并在解释器之间共享或转换通道。依赖于 \fIoption\fR 参数，它可以有下列一些形式:        
+.TP
+\fBinterp\fR \fBalias\fR \fIsrcPath\fR \fIsrcCmd\fR
+返回一个 Tcl 列表，它的元素是与叫做 \fIsrcCmd\fR的别名有关的 \fItargetCmd\fR  和 \fIarg\fRs(在建立别名时指定所有这些值；在从解释器中实际的源命令如果被重命名的话可能与 \fIsrcCmd\fR 不同)。                                
+.TP
+\fBinterp\fR \fBalias\fR \fIsrcPath\fR \fIsrcCmd\fR \fB{}\fR
+删除在从解释器中用 \fIsrcPath \fR标识的给 \fIsrcCmd\fR  的别名。\fIsrcCmd\fR 引用在其下建立别名的名字；如果 源命令已经被重命名，则删除重命名后的命令。
+.TP
+\fBinterp\fR \fBalias\fR \fIsrcPath\fR \fIsrcCmd\fR \fItargetPath\fR \fItargetCmd \fR?\fIarg arg ...\fR?
+这个命令在一个从解释器和其他解释器之间建立一个别名(关于在一个从解释器和它的主解释器之间建立别名请参见下面的 \fBalias\fR 从命令)。在这个命令中，两个从解释器可以在调用这个命令的解释器底下的解释器层次中的任何位置。\fISrcPath\fR和 \fIsrcCmd\fR  标识这个别名的来源。\fISrcPath\fR  是一个 Tcl 列表，它的元素选择一个特定的解释器。例如，“\fBa b\fR”标识一个解释器 \fBb\fR，它是解释器 \fBa\fR 的一个从解释器，\fBa\fR解释器是调用(命令)的解释器的一个从解释器。一个空列表指定调用这个命令的解释器。\fIsrcCmd\fR给出一个新命令的名字，将在源解释器中建立它。\fITargetPath\fR和 \fItargetCmd\fR  指定一个目标解释器和命令，和 \fIarg\fR   参数，如果有的话，给 \fItargetCmd \fR指定增补的参数，它们在 \fIsrcCmd\fR 调用中指定的所有参数的前面。\fITargetCmd\fR在这个调用的时候可以被取消定义(undefine)了，或者它已经存在了；它不由这个命令来建立。别名安排在源解释器中调用给定源命令的时候在目标解释器中调用给定目标命令。详情参见下面的 ALIAS INVOCATION (别名调用)章节。
+.TP
+\fBinterp\fR \fBaliases \fR?\fIpath\fR?
+这个命令返回给在用 \fIpath \fR表示的解释器中定义的别名的所有源命令的名字一个 Tcl 列表。 
+.TP
+\fBinterp\fR \fBcreate \fR?\fB\-safe\fR? ?\fB\-\|\-\fR? ?\fIpath\fR?
+建立用 \fIpath\fR  标识的一个从解释器和叫做从命令(\fIslave command\fR)的一个新命令。从命令的名字是 \fIpath\fR的最后一个成员。在其中建立新的从解释器和从命令的解释器由从 \fIpath\fR 中去除最后一个成员所获得的路径来标识。例如，如果 \fIpath \fR是\fI \fR\fBa b c\fR  则一个新的从解释器和叫做 \fBc\fR的从命令建立在用路径 \fBa b \fR标识的从解释器中。可以使用从命令先下面描述的那样操纵新解释器。如果省略了 \fIpath\fR， Tcl 建立 \fBinterp\fR\fIx \fR形式的一个唯一的名字，这里的 \fIx\fR是一个整数，并用于解释器和从命令。如果指定了 \fB-safe\fR开关(或者主解释器是一个安全解释器)，新的从解释器将建立成功能有限的一个安全解释器；否则从解释器将包含 Tcl  内置命令和变量的全集。使用 \fB\-\|\-\fR 开关来标记开关的结束；如果路径是象 \fB-safe\fR  这样的一个特殊的值的时候需要这个开关。这个命令的结果是新解释器的名字。一个从解释器的名字在它的主解释器的所有从解释器中必须是唯一的；如果在这个主解释器中用给定名字(标识)的一个从解释器已经存在则发生一个错误。
+.TP
+\fBinterp\fR \fBdelete \fR?\fIpath ...?\fR
+删除用可选的 \fIpath\fR 参数给出的零个或多个解释器，并且对于每个解释器，它还删除它的所有从解释器。这个命令还删除给每个被删除的解释器的从命令。对于每个 \fIpath\fR 参数，如果叫这个名字的解释器不存在，这个名字将引发一个错误。
+.TP
+\fBinterp\fR \fBeval\fR \fIpath arg \fR?\fIarg ...\fR?
+这个命令用与 \fBconcat\fR命令相同的方式串联所有的 \fIarg\fR 参数，接着在用 \fIpath \fR标识的解释器中把结果字符串作为一个 Tcl 脚本来求值。把这个求值的结果(如果发生错误的话，包括象 \fBerrorInfo\fR和 \fBerrorCode\fR  变量这样的错误信息)返回给调用(命令)的解释器。
+.TP
+\fBinterp exists \fIpath\fR
+如果在这个主解释器中存在用 \fIpath\fR 指定的从解释器则返回  \fB1\fR，否则返回 \fB0\fR。如果省略了 \fIpath\fR，使用调用(命令)的解释器。
+.VS "" BR
+.TP
+\fBinterp expose \fIpath\fR \fIhiddenName\fR ?\fIexposedCmdName\fR?
+在用 \fIpath \fR表示(denote)的解释器中，使隐藏的命令 \fIhiddenName\fR  暴露(expose)，最终把它带回在一个新的\fIexposedCmdName\fR  名字之下(目前只接受没有任何:: 的一个全局名字空间名字)。如果有目标名字的一个暴露的命令已经存在，这个命令失败。隐藏命令的详情参见下面的HIDDEN COMMANDS (隐藏命令)章节。
+.TP
+\fBinterp\fR \fBhide\fR \fIpath\fR \fIexposedCmdName\fR ?\fIhiddenCmdName\fR?
+在用 \fIpath \fR表示(denote)的解释器中，使暴露的命令 \fIexposedCmdName\fR 隐藏，并把它重命名成隐藏命令 \fIhiddenCmdName\fR，如果未给出                                  
+\fIhiddenCmdName\fR 则保持相同的名字。如果有目标名字的一个隐藏的命令已经存在，这个命令失败。目前 \fIexposedCmdName\fR 和 \fIhiddenCmdName\fR二者不能不能包含名字空间限定符，否则将引发一个错误。即使当前名字空间不是全局名字空间，仍在全局名字空间中查找要被 \fBinterp hide\fR隐藏的命令。这防止从解释器通过使当前的名字空间不同于全局名字空间(的方式)，来愚弄主解释器去隐藏错误的命令。隐藏命令的详情参见下面的HIDDEN COMMANDS (隐藏命令)章节。                                 
+.TP
+\fBinterp\fR \fBhidden\fR \fIpath\fR
+返回在用 \fIpath\fR  标识的解释器中所有隐藏命令的名字的一个列表。
+.TP
+\fBinterp\fR \fBinvokehidden\fR \fIpath\fR ?\fB-global\fR? \fIhiddenCmdName\fR ?\fIarg ...\fR?
+在由 \fIpath\fR 表示的解释器中用提供的参数调用隐藏命令 \fIhiddenCmdName\fR 。对参数不(进行)替换或求值。如果存在 \fB-global\fR  标志，在目标解释器的全局层次上调用隐藏命令；否则在当前的调用框架 (frame)上调用它并且可以访问调用框架内部和外部的局部变量。隐藏命令的详情请参见下面的HIDDEN COMMANDS (隐藏命令)章节。
+.VE
+.TP
+\fBinterp issafe\fR ?\fIpath\fR?
+如果由 \fIpath\fR 指定的解释器是安全的则返回 \fB1\fR，否则返回 \fB0\fR。 
+.VS "" BR
+.TP
+\fBinterp marktrusted\fR \fIpath\fR
+标记用 \fIpath\fR  标识的解释器是可信任的。不暴露隐藏命令。这个命令只能在可信任的解释器中调用。如果由 \fIpath\fR标识的解释器已经是可信任的，则这个命令没有影响。
+.VE
+.TP
+\fBinterp\fR \fBshare\fR \fIsrcPath channelId destPath\fR
+在用 \fIsrcPath\fR  标识的解释器和用 \fIdestPath \fR标识的解释器之间导致用 \fIchannelId\fR标识的 IO 通道变成共享的。两个解释器在这个 IO通道上由相同的权限。两个解释器必须关闭它来关闭低层的 IO 通道；在销毁一个解释器的时候自动关闭在这个解释器中可访问的 IO 通道。
+.TP
+\fBinterp\fR \fBslaves\fR ?\fIpath\fR?
+返回与用 \fIpath \fR标识的解释器相关的所有从解释器的名字的一个 Tcl  列表。如果省略了 \fIpath\fR，使用调用(命令)的解释器。
+.TP
+\fBinterp\fR \fBtarget\fR \fIpath alias\fR
+返回描述给一个别名的目标解释器的一个 Tcl 列表。用一个解释器路径和源命令名指定这个别名， 就象在上面的 \fBinterp alias\fR 中那样。目标解释器的名字被返回为相对于调用(命令)的解释器的一个解释器路径。如果给这个别名的目标解释器是调用(命令)的解释器则返回一个空列表。如果给别名的目标解释器不是调用(命令)的解释器或是它的后代之一则生成一个错误。在调用这个命令的时候目标命令不是必须定义的。
+.TP
+\fBinterp\fR \fBtransfer\fR \fIsrcPath channelId destPath\fR
+导致用 \fIchannelId\fR  标识的 IO 通道，在用 \fIdestPath\fR 标识的解释器中变成可获得的，而在用 \fIsrcPath \fR标识的解释器中变成不可获得的。
+
+.SH "SLAVE 命令 COMMAND"
+.PP
+对于每个用 \fBinterp\fR  建立的从解释器，在主解释器中建立名字与这个新解释器相同的一个新 Tcl 命令。可以使用这个命令调用在这个解释器上的各种操作。它有下面的一般形式:
+.CS
+\fIslave command \fR?\fIarg arg ...\fR?
+.CE
+\fISlave\fR  是解释器的名字，\fIcommand\fR 和 \fIarg\fRs确定这个命令的具体行为。这个命令有效形式有: 
+.TP
+\fIslave \fBaliases\fR
+返回一个 Tcl 列表，它的元素是在 \fIslave \fR中的所有别名的名字。返回的名字是建立别名时使用的 \fIsrcCmd\fR 的值(如果它们已经被重命名，则它可以同这个命令的当前的名字不相同)。
+.TP
+\fIslave \fBalias \fIsrcCmd\fR
+返回一个 Tcl 列表，它的元素是与叫做 \fIsrcCmd\fR  的别名相关的 \fItargetCmd\fR  和 \fIarg\fRs(在建立这个别名的时候指定所有这些值；在从解释器中的实际的源命令如果被重命令则可能与 \fIsrcCmd\fR不同)。
+.TP
+\fIslave \fBalias \fIsrcCmd \fB{}\fR
+在从解释器中删除给 \fIsrcCmd\fR  的别名。\fIsrcCmd\fR 参照在其下建立别名的那个名字；如果源命令已经被重命名，则删除重命名后的命令。 
+.TP
+\fIslave \fBalias \fIsrcCmd targetCmd \fR?\fIarg ..\fR?
+建立一个别名，当在\fIslave \fR中调用 \fIsrcCmd\fR  的时候, 在主解释器中调用 \fItargetCmd \fR。把 \fIarg\fR 参数作为补充的参数传递给 \fItargetCmd\fR  ，这些参数在 \fIsrcCmd \fR的调用中传递的任何参数之前。详情参见下面的ALIAS INVOCATION (别名调用)章节。 
+.TP
+\fIslave \fBeval \fIarg \fR?\fIarg ..\fR?
+这个命令用与 \fBconcat\fR 命令相同的方式串联所有的 \fIarg\fR  参数，接着在\fI slave \fR中把结果字符串作为一个 Tcl 脚本来求值。把这个求值的结果(如果有错误发生，包括象 \fBerrorInfo\fR  和 \fBerrorCode\fR  变量这样的错误信息)返回给调用(命令)的解释器。
+.VS "" BR
+.TP
+\fIslave \fBexpose \fIhiddenName \fR?\fIexposedCmdName\fR?
+这个命令暴露在 \fIslave \fR的隐藏的命令 \fIhiddenName\fR，最终把它带回在一个新的\fIexposedCmdName\fR  名字之下(目前只接受没有任何:: 的一个全局名字空间名字)。如果有目标名字的一个暴露的命令已经存在，这个命令失败。隐藏命令的详情参见下面的HIDDEN COMMANDS (隐藏命令)章节。
+.TP
+\fIslave \fBhide \fIexposedCmdName\fR ?\fIhiddenCmdName\fR?
+这个命令隐藏在从解释器中暴露的命令 \fIexposedCmdName\fR，并把它重命名成隐藏命令 \fIhiddenCmdName\fR，如果未给出\fIhiddenCmdName\fR 则保持相同的名字。如果有目标名字的一个隐藏的命令已经存在，这个命令失败。目前 \fIexposedCmdName\fR和 \fIhiddenCmdName\fR二者不能不能包含名字空间限定符，否则将引发一个错误。即使当前名字空间不是全局名字空间，仍在全局名字空间中查找要被隐藏的命令。这防止从解释器通过使当前的名字空间不同于全局名字空间(的方式)，来愚弄主解释器去隐藏错误的命令。隐藏命令的详情参见下面的HIDDEN COMMANDS (隐藏命令)章节。                                 
+.TP
+\fIslave \fBhidden\fR
+返回在 \fIslave \fR中所有隐藏的名字的一个列表。
+.TP
+\fIslave \fBinvokehidden\fR ?\fB-global\fR \fIhiddenName \fR?\fIarg ..\fR?
+这个命令在 \fIslave \fR中用提供的参数调用隐藏的命令 \fIhiddenName\fR。对这些参数不进行求值或替换。如果给出了 \fB-global\fR标志，则在这个从解释器的全局层次上调用这个命令；否则在当前调用框架上调用它并可访问这个调用框架内部或外部的局部变量。隐藏命令的详情参见下面的HIDDEN COMMANDS (隐藏命令)章节。
+.VE
+.TP
+\fIslave \fBissafe\fR
+如果从解释器是安全的则返回  \fB1\fR，否则返回 \fB0\fR。
+.VS "" BR
+.TP
+\fIslave \fBmarktrusted\fR
+标记从解释器为可以信任的。只可以被可信任的解释器调用。这个命令不暴露在这个从解释器中的任何隐含命令。如果这个命令已经是可以信任的了，则这个命令没有影响。
+.VE
+
+.SH "安全解释器 SAFE INTERPRETERS"
+.PP
+一个安全解释器是一个功能受限制的解释器，所以执行从最恶毒的敌人那里来的任意脚本都是安全的而不用害怕这个脚本毁坏包围它的(enclosing)应用或你的计算环境的其余部分。要使一个解释器安全，要从这个解释器中删除特定的命令和变量。例如，删除在磁盘上建立文件的命令，和删除\fBexec\fR命令，因为它可通过子进程导致破坏。通过建立到主解释器的别名，它小心的检查它们的参数并提供对设施的一个安全子集的受限制的访问，可以提供对这些设施的有限的访问。例如，在一个特定的子目录中允许文件建立，和允许对仔细选择的和一个固定的程序的集合的子进程调用。
+.PP
+通过给 \fBinterp create \fR命令指定 \fB-safe\fR开关来建立一个安全的解释器。进而，一个安全解释器建立的任何从解释器都是安全的。
+.PP
+建立的安全解释器准确的有下列的内置的命令集: 
+.DS
+.ta 1.2i 2.4i 3.6i
+\fBafter	append	array	binary
+break	case	catch	clock
+close	concat	continue	eof
+error	eval	expr	fblocked
+fcopy	fileevent	flush	for
+foreach	format	gets	global
+history	if	incr	info
+interp	join	lappend	lindex
+linsert	list	llength	lrange
+lreplace	lsearch	lsort	namespace
+package	pid	proc	puts
+read	regexp	regsub	rename
+return	scan	seek	set
+split	string	subst	switch
+tell	trace	unset	update
+uplevel	upvar	variable	vwait
+while\fR
+.DE
+.VS ""  BR
+\fBinterp create\fR  建立一个安全解释器时下列命令是隐藏的: 
+.DS
+.ta 1.2i 2.4i 3.6i
+\fBcd	exec	exit	fconfigure
+file	glob	load	open
+pwd	socket	source	vwait\fR
+.DE
+以后这些命令可以作为 Tcl 过程或别名来重新建立，或用 \fBinterp expose\fR暴露出来。
+.VE
+.PP
+除此之外，在一个安全解释器中不存在 \fBenv\fR变量，所以不能同其他解释器共享环境变量。\fBenv\fR  变量可能造成一次安全冒险，因为用户可能在某个环境变量中存储敏感信息。例如，PGP 手册建议在环境变量 \fIPGPPASS \fR中存储 PGP 私有密钥。让不可信任代码可以在安全解释器中访问这个变量将招致一次安全冒险。
+.PP
+如果扩展被装载到安全解释器中，它们也可以限制它们自己功能来排除不安全的命令。对扩展的安全性的管理的讨论参见\fBSafe-Tcl\fR  和 \fBload\fR Tcl 命令的手册条目。 
+
+.SH "别名调用 ALIAS INVOCATION"
+.PP
+精心的设计了别名机制，所以在安全的从解释器中执行不可信任的脚本是安全的而别名的目标是一个可信任的主解释器。最保证安全性的最重要的事情是确保从从解释器传递到主解释器的信息在主解释器中永不被求值或替换；如果这种情况发生了，它将开启在从解释器中的某个邪恶的脚本来在主解释器中调用任意函数，这将危及安全。
+.PP
+当从解释器中调用一个别名的源(命令)的时候，在分析这个命令时进行常规的 Tcl 替换。在源解释器中完成这些替换，就象对在这个解释器中的调用的其他命令一样。源命令的命令过程接受它的参数并把它们与给这个别名的 \fItargetCmd\fR和 \fIarg\fRs 融合起来建立一个新的参数数组。如果 \fIsrcCmd\fR的字是``\fIsrcCmd arg1 arg2 ... argN\fR''，则新的字集将是``\fItargetCmd arg arg ... arg arg1 arg2 ... argN\fR''。这里的 \fItargetCmd\fR和 \fIarg\fRs 是在建立别名的时候提供的值。接着用 \fITargetCmd\fR来在目标解释器中定位(locate)一个命令过程，并且用新的参数集来调用这个命令过程。如果在目标解释器中没有叫做 \fItargetCmd\fR 的命令则发生一个错误。在这个字上不进行补充的替换:不通过常规的 Tcl 求值机制，直接调用目标命令过程。所以在每个字上精确的进行一次替换: 在分析建立这个别名的命令的时候替换 \fItargetCmd\fR 和 \fIargs\fR，当在源解释器中分析这个别名的源命令的时候替换 \fIarg1 - argN\fR。
+.PP
+在安全解释器中给别名写 \fItargetCmd\fRs 的时候，给它的参数永远不被求值或替换是非常重要的，因为这将提供一种逃逸机制，使从解释器可以执行在主解释器中的任意代码。这将危及系统的安全。
+
+.VS
+.SH "隐藏命令 HIDDEN COMMANDS"
+.PP
+安全解释器严重的限制了在其中执行的 Tcl 程序可获得的功能。允许不可信任的 Tcl 程序访问这些功能是不安全的，因为它们可以在这个环境中被用于各种攻击。但是，有时在安全解释器的上下文中有使用危险的功能的合理需要。例如，有时一个程序必须 \fBsource \fR到解释器中。另一个例子是 Tk，在这里窗口被绑定到与一个特定解释器关联的窗口层次当中；一些潜在的危险函数，比如窗口管理，必须在这个解释器上下文中的那些窗口上进行。
+.PP
+\fBinterp\fR 命令提供了对这个问题的一种\fI隐藏命令\fR形式的解决方案。不是从安全解释器中整个的删除危险的命令，而是隐藏这些命令，所以它们变成对在这个解释器中执行的 Tcl 脚本是不可获得的。但是，这个安全解释器的任何可信任的祖先可以使用 \fBinterp invoke\fR，在这个安全解释器的上下文中，调用这些隐藏命令。隐藏命令和暴露命令驻留在分开的名字空间中。在一个解释器中可以定义叫相同名字的隐藏命令和暴露命令。
+.PP
+在别名调用期间，在主解释器中调用的过程体中可以调用在从解释器中的隐藏命令。例如，在一个从解释器中可以给 \fBsource\fR 建立一个别名。当在这个从解释器中调用它的时候，调用在主解释器中的一个过程来检查这个操作是否是允许的(比如，是否允许这个从解释器访问的它要求source 的文件)。接着这个过程在从解释器中调用隐藏的 \fBsource\fR命令来实际装载(source)这个文件的内容。注意在从解释器中存在来着两个叫 \fBsource\fR 的命令: 别名和隐藏命令。
+.PP
+因为一个主解释器可以把调用一个隐藏命令作为处理一个别名调用的一部分，必须非常小心的避免对通过别名调用传递来的任何参数进行求值。否则，恶意的从解释器可以导致一个可信任的代表它们来执行危险的命令。这个主题的完整讨论参见ALIAS INVOCATION (别名调用)章节。要避免这个问题，对 \fBinterp invokehidden\fR的参数不要进行替换或求值。
+.PP
+不允许安全解释器调用它自身中或它后代中的隐藏命令。这防止安全从解释器访问在自身中或它们的后代中的隐藏命令。
+.PP
+一个可信任的解释器可以使用 \fBinterp expose\fR和 \fBinterp hide \fR来操纵一个解释器中的隐藏命令的集合。\fBinterp expose\fR  命令把在用 \fIpath \fR标识的解释器中一个隐藏命令移动到暴露命令的集合中，在这个过程中可能重命名这个命令。如果叫目标名字的一个暴露的命令已经存在，这个操作失败。类似的，\fBinterp hide\fR  把在这个解释器中的一个暴露命令移动到隐藏命令的集合中。不允许安全解释器在它自身中或它的后代中的隐藏命令和暴露命令的集合之间移动命令。
+.PP
+目前，隐藏命令的名字不能包含名字空间限定符，并且在你可以隐藏它之前必须首先把在一个名字空间中的命令重命令到全局名字空中。在全局名字空间中查找要被 \fBinterp hide\fR 隐藏的命令。这防止从解释器通过使当前的名字空间不同于全局名字空间(的方式)，来愚弄主解释器去隐藏错误的命令。 
+
+.VE
+.SH "感谢 CREDITS"
+.PP
+这个机制基于由 Nathaniel Borenstein 和 Marshall Rose 实现的 Safe-Tcl                             
+原型。
+
+.SH "参见 SEE ALSO"
+load(n), safe(n), Tcl_CreateSlave(3)
+
+.SH "关键字 KEYWORDS"
+alias, master interpreter, safe interpreter, slave interpreter
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/10/09
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

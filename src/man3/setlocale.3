@@ -1,0 +1,185 @@
+.\" (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\" and 1999 by Bruno Haible (haible@clisp.cons.org)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" License.
+.\" Modified Sat Jul 24 18:20:12 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Tue Jul 15 16:49:10 1997 by Andries Brouwer (aeb@cwi.nl)
+.\" Modified Sun Jul  4 14:52:16 1999 by Bruno Haible (haible@clisp.cons.org)
+.\" Modified Tue Aug 24 17:11:01 1999 by Andries Brouwer (aeb@cwi.nl)
+.\" Modified Tue Feb  6 03:31:55 2001 by Andries Brouwer (aeb@cwi.nl)
+.TH SETLOCALE 3  1999-07-04 "GNU" "Linux Programmer's Manual"
+
+.SH NAME
+setlocale \- 设置当前的区域选项
+
+.SH "总览 (SYNOPSIS)"
+.nf
+.B #include <locale.h>
+.sp
+.BI "char *setlocale(int " category ", const char * " locale ");"
+.fi
+
+.SH "描述 (DESCRIPTION)"
+.B setlocale()
+函数 用来 设置 或者 查询 程序 当前 的 区域选项.
+.PP
+如果
+.I locale
+不是
+.BR NULL ,
+程序 就会 根据 参数 更改 相应的 区域选项.
+.I category
+参数 指定 区域选项 的 哪一部分 需要 更改.
+.TP
+.B LC_ALL
+代表 所有 部分.
+.TP
+.B LC_COLLATE
+代表 正则 表达式 匹配 (和 范围 表达式[range expressions] 以及 字符类[classes]
+有关系) 和 字符串 排序.
+.TP
+.B LC_CTYPE
+代表 正则 表达式 匹配, 字符类(character classification), 转换, 区分大小写 的
+比较, 以及 宽字符 函数.
+.TP
+.B LC_MESSAGES
+代表 可以 本地化的 消息 (自然语言).
+.TP
+.B LC_MONETARY
+代表 货币 格式.
+.TP
+.B LC_NUMERIC
+代表 数字 格式 (比如 小数点 和 千位分组符).
+.TP
+.B LC_TIME
+代表 时间 和 日期 格式.
+.PP
+.I locale
+参数 是 一个 指向 字符串的 指针. 此 字符串 为
+.IR category
+需要的 设置. 此 字符串 可以是 一个 众所周知 的 区域选项 常量, 如 "C" 或 "da_DK"
+(见下), 也可以是 另外 一个
+.BR setlocale
+调用 返回 的 字符串.
+.PP
+如果
+.I locale
+是
+.BR """""" ,
+需要 更改 的 部分 会根据 环境变量 做 相应的 设置. 具体的 和 实现 有关. 对于
+glibc 来说, 首先 查看
+.\" [This is false on my system - must check which library versions do this]
+.\" if
+.\" .I category
+.\" is LC_MESSAGES, the environment variable LANGUAGE is inspected,
+.\" then
+环境变量 LC_ALL (不管
+.IR category ), 然后 查看 和 category
+(LC_COLLATE, LC_CTYPE, LC_MESSAGES, LC_MONETARY, LC_NUMERIC, LC_TIME)
+同名的 环境变量, 最后 查看 环境变量 LANG. 以 先查到 的 环境变量 为准. 如果 其值
+不是 一个 有效 的 区域选项, 区域选项 将 不会改变,
+.B setlocale
+会 返回 NULL.
+.\" The environment variable LANGUAGE may contain several, colon-separated,
+.\" locale names.
+.PP
+标准 区域选项
+.B """C"""
+和
+.B """POSIX"""
+是 可移植的; 它的 LC_CTYPE 部分 对应的 是 7 位的 ASCII 字符集.
+.PP
+一个 典型的 区域选项 有 如下的 格式:
+.IR language "[_" territory "][." codeset "][@" modifier "],"
+其中
+.I language
+是 一个 ISO 639 语言 代码,
+.I territory
+是 一个 ISO 3166 国家 代码,
+.I codeset
+是 一个 象
+.B "ISO-8859-1"
+或者
+.BR "UTF-8"
+的 字符集 或者 编码 标识符. 用 "locale -a", cf.\&
+.BR locale (1)
+可以 获得 一个 系统 支持的 区域选项 的 列表.
+.PP
+如果
+.I locale
+是
+.BR NULL ,
+意味着 只是 查询 当前 的 区域选项 而不 更改它.
+.PP
+当 main 程序 开始的 时候 可移植的
+.B """C"""
+区域选项 作为 默认值 被设置. 一个 程序 可以 在 初始化 之后 调用
+.B setlocale(LC_ALL, """""")
+函数, 并且 从
+.B localeconv()
+调用 的 返回 中 获得 和 区域选项 相关的 信息, 如果
+.BR "MB_CUR_MAX > 1"
+就用 多字节 和 宽字节 函数 来 处理 文本, 用
+.BR strcoll() ", " wcscoll()
+或者
+.BR strxfrm() ", " wcsxfrm()
+来 比较 字符串, 这样 就可以 使 程序 有 较好的 移植性.
+
+.SH "返回值 (RETURN VALUE)"
+一个 成功的
+.B setlocale()
+调用 会 返回 一个 表示 当前 区域选项 的 字符串 (指针). 这个 字符串 可能 是在
+静态 存储区 中 分配 的. 之后 用 相应的 category 和 这个 字符串 作为 参数 再去
+调用 这个 函数 会 重新 把 程序 区域选项 的 相应 部分 恢复. 如果 请求 不能 完成
+将会 返回
+.B NULL .
+
+.SH "遵循 (CONFORMING TO)"
+ANSI C, POSIX.1
+
+.SH "注意 (NOTES)"
+Linux (也就是, GNU libc) 支持 可移植的
+.BR """C""" " 和 " """POSIX"""
+区域选项. 在 以前 它 曾经 支持 欧洲 Latin-1 区域选项
+.B """ISO-8859-1"""
+(比如说 在 libc-4.5.21 和 libc-4.6.27 中), 和 俄罗斯的
+.B """KOI-8"""
+(更 准确点 是, "koi-8r") 区域选项 (比如 在 libc-4.6.27 中), 所以 设置 一个
+环境变量 LC_CTYPE=ISO-8859-1 就 能够 让 isprint() 返回 正确的 结果. 现在 不讲
+英语 的 欧洲人 会 比以前 更麻烦 一些, 他们 需要 安装 相应 的 区域选项 文件.
+
+.SH "参见 (SEE ALSO)"
+.BR locale (1),
+.BR localedef (1),
+.BR strcoll (3),
+.BR isalpha (3),
+.BR localeconv (3),
+.BR strftime (3),
+.BR charsets (4),
+.BR locale (7)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/12/2
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

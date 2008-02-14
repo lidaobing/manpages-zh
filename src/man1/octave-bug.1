@@ -1,0 +1,66 @@
+.\" Man page for octave-bug
+.\"
+.\" Copyright (C) 1996 - 2000 John W. Eaton
+.\"
+.\" This file is part of Octave.
+.\"
+.\" Octave is free software; you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published by the
+.\" Free Software Foundation; either version 2, or (at your option) any
+.\" later version.
+.\"
+.\" Octave is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with Octave; see the file COPYING.  If not, write to the Free
+.\" Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+.\" 02111-1307, USA.
+.\"
+.\" This page was contributed by Dirk Eddelbuettel <edd@debian.org>
+.\" 
+.TH octave-bug 1 "6 March 2000" GNU
+.LO 1
+.SH NAME
+octave-bug \- 报告 GNU Octave 中的 bug
+.SH "SYNOPSIS 总览"
+.B octave-bug
+.RB [\| \-s
+.IR subject \|]
+.SH "DESCRIPTION 描述"
+.B octave-bug
+是一个 shell 脚本，用于以一种标准的格式撰写有关 Octave 的 bug 报告并发送。
+.B octave-bug
+通常由 Octave 命令
+.B bug_report
+启动，这个命令只能在 Octave 内部，以交互方式调用。这种方式是提交 Octave 错误报告的最佳放方式。它创建一个错误报告的空模板文件，并用一个编辑器打开它。编辑完成后，错误报告将被发送到 bug-octave 邮件列表 (这样做的前提是你的系统可以发送邮件)。但是，用户也可以在 Octave 之外使用 \fBoctave-bug\fR 命令。
+.PP
+请阅读 Octave 手册页中的 `Bugs' 章节，学习如何提交错误报告来使 Octave 的维护者修正问题。如果不能使用 bug_report 命令，就直接将邮件发送到 bug-octave 邮件列表，就是 bug-octave@bevo.che.wisc.edu 。
+.SH "OPTIONS 选项"
+.TP
+.BI -s\  subject
+指定错误报告的主题行。主题中的空格必须被引用。
+.SH "ENVIRONMENT VARIABLES 环境变量"
+.B 
+octave-bug 
+使用环境变量
+.BR USER, 
+.BR EDITOR, 
+和
+.B PAGER 
+从而定制工具
+.SH "VERSION 版本"
+本文档最后一次校订与 Octave 2.0.16 同时发布。
+.SH "SEE ALSO 参见"
+.BR octave (1),
+.BR bashbug (1)     
+.SH AUTHOR
+.nf
+John W. Eaton
+Department of Chemical Engineering
+University of Wisconsin-Madison
+Madison, WI 53706
+USA
+<jwe@bevo.che.wisc.edu>       

@@ -1,0 +1,66 @@
+
+.TH smbsh 1 Samba "23 Oct 1998"
+
+
+.SH NAME
+.B smbsh - 允许用UNIX命令访问NT文件系统 
+
+.SH 总览
+.B smbsh 
+
+.SH 描述
+此程序是\fBSamba\fR套件的一部分。 
+
+\fBsmbsh\fR允许你用UNIX命令诸如\fBls\fR，\fBegrep\fR和\fBrcp\fR等来访问NT文件系统。必须用动态链接的shell以便使\fBsmbsh\fR工作正常。
+
+从命令提示上执行\fBsmbsh\fR命令，并输入用户账号和口令以便在NT操作系统中验证你的身份。 
+
+.nf
+system% smbsh
+Username: user
+Password:
+.fi
+
+从shell上执行任何动态链接的命令都会用smb协议来访问/smb目录。例如命令：
+
+.nf
+ls /smb 
+.fi
+
+会显示你工作组里的所有主机。而命令： 
+
+.nf
+ls /smb/<machine-name> 
+.fi
+
+会显示指定主机上的共享名。当然也可以用\fBcd\fR命令来改变目录，\fBvi\fR来编辑文件，\fBrcp\fR来拷贝文件。 
+
+.SH 版本
+此手册页是针对samba套件版本2.0的。 
+
+.SH 错误
+\fBsmbsh\fR通过动态装入的\fIsmbwrapper.o\fR截获标准libc调用来工作。但并不是所有的调用都可以被截获，所以有些程序可能在smbsh下工作得不太正常。
+
+非动态链接的程序并不能使用\fBsmbsh\fR的功能。很多版本的UNIX有一个\fBfile\fR命令会描述程序如何被链接。
+
+.SH 另见 SEE ALSO
+.PP
+\fBsmb.conf\fR (5), \fBsmbd\fR (8).
+
+.SH "作者 AUTHOR"
+
+.PP
+samba软件和相关工具最初由Andrew Tridgell创建。samba现在由Samba Team 作为开源软件来发展，类似linux内核的开发方式。
+
+.PP
+最初的samba手册页是 Karl Auer写的。
+手册页源码已经转换为YODL格式(另一种很好的开源软件，可以在ftp://ftp.ice.rug.nl/pub/unix找到)，由Jeremy Sllison 更新到Samba2.0 版本。
+Gerald Carter 在Samba2.2中将它转化为DocBook 格式。
+Alexander Bokovoy 在Samba 3.0中实现了DocBook XML4.2 格式的转换。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

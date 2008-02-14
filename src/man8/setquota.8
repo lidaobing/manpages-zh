@@ -1,0 +1,113 @@
+.TH SETQUOTA 8 "1999年8月20日星期五"
+.SH NAME(名称)
+setquota \- 设置磁盘配额或时间限制
+.SH SYNOPSIS(总览)
+.B setquota
+[
+.B \-u
+|
+.B \-g
+]
+.I filesystem-name
+.I block-soft
+.I block-hard
+.I inode-soft
+.I inode-hard
+.IR name .\|.\|.\|
+.LP
+.B setquota
+[
+.B \-u
+|
+.B \-g
+]
+.I filesystem-name
+.B \-p
+.I model-name
+.IR name .\|.\|.\|
+.LP
+.B setquota
+.B -p
+[
+.B \-u
+|
+.B \-g
+]
+.I filesystem-name
+.I block-time-limit
+.I inode-time-limit
+.SH DESCRIPTION(描述)
+.IX  "setquota command"  ""  "\fLsetquota\fP \(em set disk quotas"
+.IX  set "disk quotas \(em \fLsetquota\fP"
+.IX  "disk quotas"  "setquota command"  ""  "\fLsetquota\fP \(em set disk quotas"
+.IX  "disk quotas"  "setquota command"  ""  "\fLsetquota\fP \(em set disk quotas"
+.IX  "quotas"  "setquota command"  ""  "\fLsetquota\fP \(em set disk quotas"
+.IX  "file system"  "setquota command"  ""  "\fLsetquota\fP \(em set disk quotas"
+.B setquota
+是一个命令行配额编辑器.它允许针对特定(通过名字或id标识的)用户/组的
+配额设置.
+配额可以直接指定,也可以从其它用户复制(参看选项
+.BR -p ).
+使用这个应用程序，同时可以设置超出软配额的可能的时间限制(参看选项
+.BR -t ).
+如果你想手工编辑配额,你也可以使用
+.BR edquota (8)
+应用程序,倘若你觉得它更方便的话.
+
+.SH OPTIONS(选项)
+.TP
+.B -u
+为指定的用户设置用户配额.这是默认的选项
+.TP
+.B -g
+为指定的组设置组配额.
+.TP
+.B -p model-name
+设置指定的用户/组的配额与
+.I model-name
+的用户/组相同.
+.TP
+.B -t
+在指定的文件系统上针对特定的配额类型设置时间限制.
+限制以秒计.
+.LP
+要禁止使用配额,可以设置相应的参数为0.
+要对几个文件系统修改配额,可以对每个文件系统调用一次.
+.LP
+只有超级用户可以编辑配额.(为了在一个文件系统上建立配额,文件系统的
+root目录下必须包含一个由root所有,叫做
+.BR aquota.user
+或
+.BR aquota.group
+的文件.
+参看
+.BR quotaon (8)
+以了解详情.)
+.SH FILES(相关文件)
+.PD 0
+.TP 20
+.B aquota.user或aquota.group
+位于文件系统root下的配额文件
+.TP
+.B /etc/mtab
+已挂载的文件系统表
+.PD
+.SH SEE ALSO(另见)
+.BR quota (1),
+.BR quotactl (2),
+.BR quotacheck (8),
+.BR quotaon (8),
+.BR repquota (8),
+.BR convertquota (8),
+.BR edquota (8)
+.SH AUTHOR(作者)
+Jan Kara \<jack@atrey.karlin.mff.cuni.cz\>
+
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]" 
+.B 2001.07.10
+.br
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

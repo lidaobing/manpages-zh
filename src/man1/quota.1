@@ -1,0 +1,85 @@
+.TH quota 8 "Tue Jun 8 1993"
+.SH NAME
+quota \- 显示磁盘的使用和限额
+.SH "总览 (SYNOPSIS)"
+quota [
+.B -guv | q
+]
+.br
+quota [
+.B -uv | q
+] user
+.br
+quota [
+.B -gv | q
+] group
+.SH "描述 (DESCRIPTION)"
+.B Quota
+显示 用户的 磁盘 使用情况 和 限额. 缺省功能 只显示 用户限额.
+.LP
+.TP
+.B \-g
+显示 用户所在组 的 组限额. 可选项(optional).
+.TP
+.B \-u
+和 缺省情况 一样.
+.TP
+.B \-v
+显示 文件系统上 的 限额, 即使 没有 占用 空间.
+.TP
+.B -q
+简洁的 信息, 只 显示 超出 限额 的 文件系统.
+.LP
+同时指定
+.B \-g
+和
+.B \-u
+既显示 用户限额, 也显示 该用户 的 组限额.
+.LP
+只有 超级用户 可以 使用
+.B \-u
+选项 和 
+.B user
+参数 察看 其他用户 的 限额. 普通用户 可以 使用
+.B \-g
+选项 和
+.B group
+参数 察看 用户所在组 的 限额.
+.LP
+.B \-q
+选项 优先于
+.B \-v
+选项.
+.LP
+.B Quota
+报告 
+.B /etc/fstab
+中 列出的 全部 文件系统 上 的 限额. 如果 文件系统 是 挂载的 NFS, 
+Quota 调用 服务器 上的 rpc.rquotad, 以便 获取 相关信息.
+
+如果
+.B quota
+返回 非零值, 表明 在 某些 文件系统 上 超出了 限额.
+.SH "文件 (FILES)"
+.B quota.user
+位于 文件系统 根目录, 存放 用户限额
+.br
+.B quota.group
+位于 文件系统 根目录, 存放 组限额
+.br
+.B /etc/fstab
+用于 查找 文件系统 的 名称和位置
+.SH "另见 (SEE ALSO)"
+quotactl (2),
+fstab (5),
+edquota (8),
+quotacheck (8),
+quotaon (8),
+repquota (8)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

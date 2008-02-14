@@ -1,0 +1,21 @@
+.\" You can view this file with:
+.\" nroff -man [filename]
+.\"
+.TH svndumpfilter 1
+.SH NAME
+svndumpfilter \- 过滤一个 Subversion 仓库的转储文件 `dumpfile'。
+.SH "SYNOPSIS 总览"
+.TP
+\fBsvndumpfilter\fP \fIcommand\fP [\fIoptions\fP & \fIargs\fP]
+.SH "OVERVIEW 概述"
+Subversion 是一个版本控制系统，允许保存旧版本的文件和目录 (通常是源代码)，保存一个记录何人，何时，为何作出修改等等信息的日志，与 CVS，RCS 或者 SCCS 工具类似。
+\fBSubversion\fP 保存着主控源文件的单一拷贝。这份拷贝被称为代码 “仓库” (``repository'')；它包含所有的信息，从而可以从中获取这些文件在先前任何时间的版本。
+.
+要获得有关 Subversion 项目的更多信息，请访问
+http://subversion.tigris.org。
+.
+Subversion 及其工具的文档，包括对 \fBsvn\fP，\fBsvnadmin\fP，\fBsvnserve\fP 和 \fBsnvlook\fP 程序详细的使用说明和解释，历史背景，哲学探讨和追求等等，可以从
+http://svnbook.red-bean.com/
+找到。
+.
+运行 `svndumpfilter help' 来阅读内建的工具文档。

@@ -1,0 +1,259 @@
+.\" t
+.\" (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date. The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein. The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" License.
+.\' 
+.\" Modified Sat Jul 24 17:35:15 1993 by Rik Faith 
+.\" Modified Sun Feb 19 22:02:32 1995 by Rik Faith 
+.\" Modified Tue Oct 22 23:28:12 1996 by Eric S. Raymond 
+.\" Modified Sun Jan 26 21:56:56 1997 by Ralph Schleicher
+.\" 
+.\" Modified Mon Jun 16 20:24:58 1997 by Nicol醩 Lichtmaier 
+.\" Modified Sun Oct 18 22:11:28 1998 by Joseph S. Myers 
+.\" Modified Mon Nov 16 17:24:47 1998 by Andries Brouwer 
+.\"
+.\" 中文版版权所有 redcandle, Laser www.linuxforum.net 2000
+
+.TH SUFFIXES 7 "April 4, 1996" "Linux" "Linux 程序员手册"
+.SH NAME [命令名]
+suffixes \- 列出文件后缀。 
+.SH DESCRIPTION [描述]
+文件后缀与文件名之间以点（.）间隔，通常包括一个或多个字母。 
+我们用文件后缀来描述文件的内容。很多标准的实用程序，如编译器，
+以后缀来识别文件类型。
+.BR make (1)
+就是基于文件后缀的。
+.PP
+下面是 Linux 下常见的文件后缀：
+.TS
+ l | l
+ _ | _
+ lI |  l .
+ 后缀	文件类型
+ ,v	RCS(Revision Control System（修改控制系统）) 文件 
+ -	备份文件。
+ .C	C++ 源代码文件。
+ .F	带 \fBcpp\fP(1) 的 Fortran 源代码或用 freeze 压缩的文件。
+ .S	汇编源代码。
+ .Y	用 yabba 压缩的文件。
+ .Z	用 \fB compress\fR (1) 压缩的文件。
+ .[0-9]+gf	TeX 普通字体文件
+ .[0-9]+pk	TeX 打包字体文件
+ .[1-9]	相关章节的手册页
+ .[1-9][a-z]	包含子章节的手册页
+ .a	静态对象代码库 
+ .ad	X 应用程序缺省资源文件。 
+ .adb	Ada 体源文件（校注：懂 Ada 的同志请指正）
+ .ads	Ada 描述源文件
+ .afm	PostScript 字体度量
+ .al	Perl 自动加载文件
+ .am	\fB automake\fR (1) 输入文件
+ .arc	\fB arc\fR (1) 档案文件 
+ .arj	\fB arj\fR (1) 档案文件 
+ .asc	PGP ASCII-保护数据
+ .asm	(GNU) 汇编源代码 
+ .au	Audio 声音文件
+ .aux	LaTeX 辅助文件 
+ .avi	(msvideo) 电影 
+ .awk	AWK 程序 
+ .b	LILO 启动加载器镜象
+ .bak	备份文件 
+ .bash	\fB bash\fR (1) 脚本
+ .bb	gcc -ftest-coverage 生成的基础块列表数据
+ .bbg	gcc -ftest-coverage 生成的基础块图形数据
+ .bbl	BibTeX 输出文件 
+ .bdf	X 字体文件 
+ .bib	TeX 数目数据库，BibTeX 输入文件
+ .bm	bitmap 源文件
+ .bmp	bitmap 位图 
+ .bz2	\fB bzip2\fR (1)的压缩文件
+ .c	C 源代码 
+ .cat	信息目录文件
+ .cc	C++ 源代码
+ .cf	配置文件 
+ .cfg	同上
+ .cgi	可以产生 web 页的脚本或程序
+ .class	Java 已编译文件 
+ .conf	配置文件 
+ .config	同上
+ .cpp	\fI (等价于 .cc) \fR
+ .csh	\fB csh\fR (1) 脚本 
+ .cxx	\fI (等价于 .cc) \fR
+ .dat	数据文件 
+ .deb	Debian 软件包 
+ .def	Modula-2 语言的定义模块的源代码 
+ .def	其它定义文件 
+ .desc	用 munpack 解压的邮件信息的初始化部分 
+ .diff	文件不同之处 (diff(1) 的输出文件) 
+ .dir	dbm 数据库目录文件 
+ .doc	文档文件 
+ .dtx	LaTeX 包的源文件 
+ .dvi	TeX's 设备无关的输出文件 
+ .el	Emacs-Lisp 源代码 
+ .elc	编译后的 Emacs-Lisp 文件 
+ .eps	压缩过的 PostScript 
+ .f	Fortran 源代码 
+ .f77	Fortran 77 源代码 
+ .f90	Fortran 90 源代码 
+ .fas	预编译的 Common-Lisp 
+ .fi	Fortran 包含文件 
+ .fig	FIG 图象文件 (\fB xfig\fR (1)调用) 
+ .fmt	TeX 格式文件 
+ .gif	Compuserve Graphics Image File format(图象文件) 
+ .gmo	GNU 格式信息目录
+ .gsf	Ghostscript 字体 
+ .gz	用 \fB gzip\fR (1) 压缩的文件
+ .h	C 或 C++ 头文件
+ .help	帮助文件 \fR
+ .hf	等价于 \fI .help\fR 
+ .hlp	等价于 \fI .help\fR 
+ .htm	穷人的（有些系统扩展名只能三个字符）\fI .html
+ .html	WWW 中使用的 HTML 文档
+ .hqx	7-位编码的 Macintosh 文件
+ .i	预处理过的 C 程序 
+ .icon	位图源文件
+ .idx	超文本或数据库系统用的参考书目或数据索引
+ .image	位图源文件
+ .in	配置摸板,常用于 GNU Autoconf 
+ .info	Emacs info 浏览器文件
+ .info-[0-9]+	info 文件 
+ .ins	LaTeX 打包的用于 docstrip 的安装文件
+ .java	Java 源代码 
+ .jpeg	Joint Photographic Experts Group format 
+ .jpg	有些系统扩展名只能三个字符\fI .jpeg \fR 
+ .kmap	\fB lyx\fR (1) 键盘布局 
+ .l	等价于 \fI .lex\fR 或 \fI .lisp\fR 
+ .lex	\fB lex\fR (1) 或 \fB flex\fR (1) 文件
+ .lha	lharc 档案文件 
+ .lib	Common-Lisp 库文件 
+ .lisp	Lisp 源代码 
+ .ln	files for use with \fB lint\fR (1) 
+ .log	日志文件, 多见于 TeX 
+ .lsm	Linux Software Map entry(软件列表?)
+ .lsp	Common-Lisp 源代码
+ .lzh	lharc 档案文件
+ .m4	\fB m4\fR (1) 源代码
+ .mac	宏命令文件 
+ .man	手册页 (通常是源文件,有些是格式化过的) 
+ .map	map 文件
+ .me	使用 me 宏命令包的 Nroff 源文件
+ .mf	Metafont (Tex 使用的字体) 资源 
+ .mm	\fB groff\fR (1) 的 mm 格式的文件
+ .mo	信息目录二进制文件（校注：本地化文件）
+ .mod	Modula-2 执行模块源代码 
+ .mov	(quicktime) 电影
+ .mp	Metapost 资源 
+ .mpe	电影 
+ .o	 对象文件
+ .old	 旧的或备份文件 
+ .orig	 \fB patch\fR (1) 产生的备份或原始文件 
+ .out	 输出文件, 一般是可执行程序(a.out) 
+ .p	 Pascal 源代码 
+ .pag	 dbm 数据库数据文件 
+ .patch	 \fB patch\fR (1) 用的文件的差别文件
+ .pbm	 portable bitmap format(可移植位图格式) 
+ .pcf	 X11 字体 
+ .pdf	 AdobePortableDataFormat(用Acrobat/\fBacroread\fR或\fBxpdf\fR查看 ) 
+ .perl	 Perl 源代码 
+ .pfa	 PostScript 字体定义文件, ASCII 格式 
+ .pfb	 PostScript 字体定义文件, 二进制格式 
+ .pgm	 portable greymap format(可移植灰度图格式)
+ .pgp	 PGP 二进制数据
+ .ph	 Perl 头文件
+ .pid	 存储后台程序信息的文件(e.g. crond.pid)
+ .pl	 TeX 属性列表 或 Perl 库文件 
+ .pm	 Perl 模块
+ .png	 Portable Network Graphics file(可移植网络图象文件) 
+ .po	 信息目录资源（校注：本地化资源文件）
+ .pod	 \fB perldoc\fR (1) 文件 
+ .ppm	 portable pixmap format(可移植点图格式) 
+ .pr	 bitmap source(位图资源) 
+ .ps	 PostScript 文件
+ .py	 Python 源代码 
+ .pyc	 python 编译后文件 
+ .qt	 quicktime movie(电影)
+ .r	 RATFOR 资源 (已过时) 
+ .rej	 \fB patch\fR (1) 不能用的补丁 
+ .rpm	 RedHat 软件包 
+ .rtf	 Rich Text Format file(富文本文件) 
+ .rules	 rules for something(规则文件)
+ .s	 assembler source(汇编源代码) 
+ .sa	 a.out 共享库的存根库
+ .sc	 \fB sc\fR (1) 电子表格命令
+ .sgml	 SGML 源文件 
+ .sh	 \fB sh\fR (1) 脚本 
+ .shar	 \fB shar\fR (1) 产生的档案文件 
+ .so	 共享库或动态可载入对象 
+ .sql	 SQL 资源 
+ .sqml	 SQML 结构或查询程序
+ .sty	 LaTeX 类型文件 
+ .sym	 Modula-2 已编译的定义模块 
+ .tar	 \fB tar\fR (1) 产生的档案文件 
+ .tar.Z	 \fB compress\fR (1) 压缩的tar档案文件 
+ .tar.bz2	 \fB bzip2\fR (1) 压缩的tar档案文件
+ .tar.gz	 \fB gzip\fR (1) 压缩的tar档案文件 
+ .taz	 \fB compress\fR (1) 压缩的tar档案文件 
+ .tex	 TeX 或 LaTeX 资源 
+ .texi	 等价于 \fI .texinfo\fR 
+ .texinfo	 Texinfo 文档资源 
+ .text	 文本文件 
+ .tfm	 TeX font metric file 
+ .tgz	 \fB gzip\fR (1) 压缩的tar档案文件 
+ .tif	 poor man's \fI .tiff(图象) \fR
+ .tiff	 Tagged Image File Format(图象) 
+ .tk	 tcl/tk 脚本 
+ .tmp	 临时文件 
+ .tmpl	 临时文件 
+ .txt	 等价于 \fI .text\fR 
+ .uu	 等价于 \fI .uue\fR 
+ .uue	 \fB uuencode\fR (1) 编码的二进制文件 
+ .vf	 TeX 虚拟字体文件 
+ .vpl	 TeX 虚拟属性列表 
+ .w	 Silvio Levi's CWEB 
+ .wav	 波形声音文件
+ .web	 Donald Knuth's WEB(唐纳得.可鲁梭的 WEB) ??
+ .xbm	 X11 位图源文件
+ .xml	 eXtended Markup Language file（扩展标记语言文件）
+ .xsl	 XSL stylesheet 
+ .xpm	 X11 点图源文件
+ .xs	 h2xs 生成的 Perl 的 xsub 文件
+ .y	 \fB yacc\fR (1) 或 \fB bison\fR (1)（分析器生成器）文件
+ .z	 \fB pack\fR (1) (或旧版 \fB gzip\fR (1)) 产生的压缩文件 
+ .zip	 \fB zip\fR (1) 档案文件 
+ .zoo	 \fB zoo\fR (1) 档案文件 
+ ~	 Emacs 或 \fB patch\fR (1) 备份文件 
+ rc	 开始 (`运行控制') 文件, 如. \fI .newsrc\fR 
+.TE
+.SH "CONFORMS TO [遵循]"
+一般 UNIX 约定 
+.SH BUGS
+本列表尚有遗漏 \fR
+.SH "SEE ALSO [另见]"
+.BR file (1), 
+.BR make (1) 
+
+.SH "[中文版维护人]"
+.B RedCandle <redcandle51@chinaren.com>
+.SH "[中文版最新更新]"
+.B 2000/11/10
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

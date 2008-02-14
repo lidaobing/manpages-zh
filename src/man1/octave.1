@@ -1,0 +1,70 @@
+.\" Man page for Octave
+.\"
+.\" Copyright (C) 1996, 1997 John W. Eaton
+.\"
+.\" This file is part of Octave.
+.\"
+.\" Octave is free software; you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published by the
+.\" Free Software Foundation; either version 2, or (at your option) any
+.\" later version.
+.\"
+.\" Octave is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with Octave; see the file COPYING.  If not, write to the Free
+.\" Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+.\" 02111-1307, USA. 
+.\"
+.TH Octave 1 "Jan 8 1996"
+.LO 1
+.SH NAME
+octave \- 用于数值计算的高级交互式语言
+.SH "SYNOPSIS 总览"
+.nf
+octave [options]
+.fi
+.SH "OPTIONS 选项"
+octave 全部命令行选项可以通过运行命令
+.nf
+
+    octave --help
+
+.fi
+来查看。
+.SH "DESCRIPTION 描述"
+Octave 是一种高级语言，主要用于数值计算。它提供了极为方便的命令行界面，用数值的方式解决线性和非线性问题。
+.SH "DOCUMENTATION 文档"
+Octave 主要的文档以 Texinfo (GNU 文档系统) 写成，可以用同样的文件产生手册的在线版本和打印版本。
+.PP
+你可以在交互运行 Octave 时执行命令
+.nf
+
+    octave:13> help -i
+
+.fi
+来阅读 Octave 文档的在线版本，它将用到 GNU Emacs 的 info 模式；或者也可以直接运行单独的程序，例如 info 或者 xinfo。
+.SH BUGS
+提交 Octave 错误报告的最佳方法是在交互运行 Octave 时执行命令
+.nf
+
+     octave:13> bug_report
+
+.fi
+。这将创建一个错误报告的模板文件，并打开一个编辑器。编辑完毕后，邮件将发送到 bug-octave 邮件列表。
+.PP
+如果不能使用 bug_report 命令，可以用其他方法将邮件发送到
+.B bug-octave@bevo.che.wisc.edu
+邮件列表。请阅读 Octave 手册页中的 `Bugs' 章节，学习如何提交错误报告来使 Octave 的维护者修正问题。
+.SH AUTHOR
+.nf
+John W. Eaton
+Department of Chemical Engineering
+University of Wisconsin-Madison
+Madison, WI 53706
+USA
+<jwe@bevo.che.wisc.edu>
+.fi

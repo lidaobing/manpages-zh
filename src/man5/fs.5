@@ -1,0 +1,156 @@
+.\" Copyright 1996 Daniel Quinlan (Daniel.Quinlan@linux.org)
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\" Chinese Version Copyright mhss, www.linuxforum.net, 2000
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.TH FILESYSTEMS(5) Linux Programmer's Manual FILESYSTEMS(5)
+.nh
+.SH NAME
+文件系统 - Linux 支持的文件系统类型：minix, ext, ext2, xia, 
+msdos, umsdos, vfat, proc, nfs, iso9660, hpfs, sysv, smb,
+ncpfs
+
+.SH DESCRIPTION 描述
+在文件 /proc/filesystems 中你可以发现当前内核支持哪些文件系统。
+(如果你需要一个当前所不支持的类型，插入相应的模块或重新编译内核。)
+
+下面是对各种文件系统的描述。
+
+.TP
+.\"----------------------------------------------------------------------
+.B "minix"
+是 Minix 操作系统使用的文件系统，Linux 一开始时使用
+的。它有一些不足：64 MB 的分区限制，短文件名，单一的
+时间戳等等。
+.sp 
+对于软盘和 RAM 盘仍然有用。
+.\"----------------------------------------------------------------------
+.TP
+.B ext
+是对 minix 文件系统的精心设计的扩展。它已经完全被扩
+展文件系统的第二版(ext2)所淘汰并且最终将被从内核中
+去除。
+.\"----------------------------------------------------------------------
+.TP
+.B ext2
+是 Linux 对固定磁盘和可移动(装卸)介质所使用的高性能
+文件系统。
+.sp
+扩展文件系统的第二版的设计是对扩展文件系统(ext)的扩
+展。ext2 是 Linux 支持的提供了最佳性能(术语上的速度
+和 CPU 使用率)的文件系统。
+.\"----------------------------------------------------------------------
+.TP
+.B xiafs
+对它的设计和实现是为了
+通过扩展 Minix 文件系统的代码，实现稳定和安全的文件系统。
+它提供了最基本的要求的特征而且不会过于复杂。
+
+xia 文件系统已经不再有活跃的开发或维护。也不经常使用。
+.\"----------------------------------------------------------------------
+.TP
+.B msdos
+是 DOS、Windows、和一些 OS/2 计算机使用的文件系统。
+msdos 文件系统的文件名不长于 8 个字符并跟随着可选的 '.'
+和 3 个字符的扩展名。
+.\"----------------------------------------------------------------------
+.TP
+.B umsdos
+是 Linux 使用的扩展了的 DOS 文件系统。它在 DOS 文件
+系统下增加了长文件名、 UID/GID、POSIX 权限和特殊文件
+(设备、命名管道等)功能，而不牺牲对 DOS 的兼容性。
+.\"----------------------------------------------------------------------
+.TP
+.B vfat
+是 Microsoft Windows95 和 Windows NT 使用的扩展了的
+DOS 文件系统。VFAT 在 MSDOS 文件系统下增加了长文件名
+功能。
+.\"----------------------------------------------------------------------
+.TP
+.B proc
+是一种伪文件系统，被用来作为内核数据的界面，这样就不
+用读并解释 /dev/kmem 了。特别的是，它的文件不占用磁
+盘空间。参见 proc(5)。 
+.\"----------------------------------------------------------------------
+.TP
+.B iso9660
+是满足 ISO 9660 标准的 CD-ROM 文件系统类型。
+.RS
+.TP
+.B "High Sierra"
+Linux 支持 High Sierra，它是ISO 9660 标准的
+CD-ROM 文件系统的先驱。在 Linux 下支持的 
+iso9660 文件系统内，它被自动识别。
+.TP 
+.B "Rock Ridge"
+Linux 也支持使用由 Rock Ridge 交换协议指定的
+使用共享的协议记录的系统。它们被用于进一步为
+一个 UNIX 主机描述 iso9660 文件系统中的文件，
+并且提供象长文件名、UID/GID、POSIX 权限和设备
+。在 Linux 下支持的 iso9660 文件系统内，它被
+自动识别。
+.RE 
+.\"----------------------------------------------------------------------
+.TP
+.B hpfs
+是 OS/2 使用的高性能文件系统。由于缺乏可用的文档，
+在 Linux 下这种文件系统是只读的。
+.\"----------------------------------------------------------------------
+.TP
+.B sysv
+为 Linux 实现的 SystemV/Coherent 文件系统。它实现了
+Xenix FS、SystemV/386 FS 和 Coherent FS。
+.\"----------------------------------------------------------------------
+.TP
+.B nfs
+是用于访问位于远程计算机上的磁盘的网络文件系统。
+.\"----------------------------------------------------------------------
+.TP
+.B smb
+是支持 smb 协议的网络文件系统，被 Windows for 
+Workgroups、Windows NT和 Lan Manager 使用。
+.sp
+要使用 smb 文件系统，你需要一个特殊的 mount 程序，
+这个程序可在 ksmbfs 包中找到，也可从下面网址下载：
+.IR ftp://sunsite.unc.edu/pub/Linux/system/Filesystems/smbfs.
+.\"----------------------------------------------------------------------
+.TP
+.B ncpfs
+是支持 NCP 协议的网络文件系统，被 Novell NetWare 使用。
+.sp 
+要使用 ncpfs，你需要一个特殊的程序，这个程序可在
+下面网址下栽：
+.IR ftp://linux01.gwdg.de/pub/ncpfs。
+.\"----------------------------------------------------------------------
+.SH SEE ALSO 又见
+.BR proc(5),
+.BR fsck(8),
+.BR mkfs(8),
+.BR mount(8).
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.br
+摘录于：Linux 实用大全/陈向阳，方汉 编著. -北京：科学出版社 1998.8
+余进行了一些修订。
+.SH "[中文版最新更新]"
+.B 2000/11/26
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

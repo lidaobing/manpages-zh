@@ -1,0 +1,40 @@
+.\" Man page contributed by Dirk Eddelbuettel <edd@debian.org>
+.\" and released under the GNU GPL
+.TH OCTAVE-CONFIG 1 "19 February 2003" "GNU Octave"
+.SH NAME
+octave-config - 检索 GNU Octave 组件和库信息
+.SH "SYNOPSIS 总览"
+.BR octave-config\  [--m-site-dir]\ [--oct-site-dir]\ [-v|--version]\ 
+[-h|-?|--help]
+.SH "DESCRIPTION 描述"
+.PP
+\fIoctave-config\fP 是用于为
+.BR octave (1)
+获取
+.f .oct
+和
+.f .m
+文件的目录信息的工具。
+.SH "OPTIONS 选项"
+.l
+\fIoctave-config\fP 接受下列选项：
+.TP 8
+.B \--m-site-dir
+显示本地的或 site-specific 的，.m 脚本文件所在的主目录。
+.TP 8
+.B \--oct-site-dir
+显示本地的或 site-specific 的，.oct 动态链接库所在的主目录。
+.B \-v|\-\-version
+显示
+.BR octave (1)
+的版本信息。
+.TP 8
+.B \-h|-?|--help
+显示
+\fIoctave-config\fP
+的帮助页面。
+.SH AUTHOR
+John W. Eaton <jwe@bevo.che.wisc.edu>
+
+This manual page was contributed by Dirk Eddelbuettel <edd@debian.org> 
+for the Debian GNU/Linux distribution but may be used by others.

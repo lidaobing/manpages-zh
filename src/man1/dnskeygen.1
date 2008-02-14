@@ -1,0 +1,136 @@
+.\" Copyright (c) 1996,1999 by Internet Software Consortium
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
+.\" ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+.\" OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
+.\" CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+.\" DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+.\" PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+.\" ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+.\" SOFTWARE.
+.\"
+.Dd 1998 年 12 月 2 日
+.Dt DNSKEYGEN 1
+.Os BSD 4
+.Sh NAME
+.Nm dnskeygen
+.Nd 针对DNS安全性所生成的公共,私有和共享的密钥
+.Sh SYNOPSIS(总览)
+.Nm dnskeygen
+.Oo Fl
+.Op Cm DHR
+.Ar size
+.Oc
+.Op Fl F
+.Fl Op Cm zhu
+.Op Cm Fl a
+.Op Cm Fl c
+.Op Cm Fl p Ar num
+.Op Cm Fl s Ar num
+.Fl n Ar name
+.Sh DESCRIPTION(描述)
+.Ic Dnskeygen
+(DNS密钥生成器)是一个用来在DNS(Domain Name System)内部
+生成和维护针对DNS安全性的密钥的工具.
+.Nm Dnskeygen
+可以生成鉴别区域数据的公共和私有密钥,以及用于请求/事务处理签名的
+共享密钥.
+.Bl -tag -width Fl
+.It Fl D
+Dnskeygen会生成一个
+.Ic DSA/DSS
+密钥.
+.Dq size
+必为[512, 576, 640, 704, 768, 832, 896, 960, 1024]中的一个.
+.It Fl H
+Dnskeygen会生成一个
+.Ic HMAC-MD5
+密钥.
+.Dq size
+必定在128到504之间.
+.It Fl R
+Dnskeygen会生成一个
+.Ic RSA
+密钥.
+.Dq size
+必定在512到4096之间.
+.It Fl F
+.Ic (只用于RSA)
+在生成密钥中使用大指数.
+.It Fl z Fl h Fl u
+这些标识分别定义了所生成密钥的类型为区域(DNS有效性)密钥,
+主机(主机或服务)密钥还是用户(如email)密钥.
+.It Fl a
+指明该密钥
+.Ic 不能
+用作鉴别.
+.It Fl c
+指明该密钥
+.Ic 不能
+用作加密.
+.It Fl p Ar num
+设置密钥的协议字段为
+.Ar num
+;默认为
+.Ic 3
+(DNSSEC)如果指定了
+.Dq Fl z
+或
+.Dq Fl h
+那么则为
+.Ic 2
+(EMAIL).
+其它可接受的值还有
+.Ic 1
+(TLS),
+.Ic 4
+(IPSEC),和
+.Ic 255
+(ANY).
+.It Fl s Ar num
+设置密钥的强度字段为
+.Ar num;
+默认为
+.Sy 0.
+.It Fl n Ar name
+设置密钥的名字为
+.Ar name.
+.El
+.Ss DETAILS(细节)
+.Ic Dnskeygen
+存储每个密钥在两个文件中:
+.Pa K<name>+<alg>+<footprint>.private
+和
+.Pa K<name>+<alg>+<footprint>.key
+文件
+.Pa K<name>+<alg>+<footprint>.private
+包含了以可移植格式保存的私有密钥.文件
+.Pa K<name>+<alg>+<footprint>.key
+包含了以DNS区域文件格式保存的公共密钥:
+.Pp
+.D1 Ar <name> IN KEY <flags> <algorithm> <protocol> <exponent|modulus>
+.Pp
+.Sh ENVIRONMENT(环境变量)
+没有涉及到任何环境变量.
+.Sh SEE ALSO(另见)
+.Em RFC 2065
+关于维护DNS安全的文档以及
+.Em TSIG
+Internet草案.
+.Sh AUTHOR(作者)
+Olafur Gudmundsson (ogud@tis.com).
+.Sh ACKNOWLEDGMENTS(致谢)
+基本的加密数学是由DNSSAFE和/或Foundation Toolkit libraries完成的.
+.Sh BUGS
+目前尚无已知的bugs.
+
+.Sh "[中文版维护人]"
+riser <boomer@ccidnet.com>
+.Sh "[中文版最新更新]"
+2001/7/13
+.Sh "《中国Linux论坛man手册页翻译计划》"
+http://cmpp.linuxforum.net

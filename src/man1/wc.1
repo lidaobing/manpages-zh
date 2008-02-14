@@ -1,0 +1,55 @@
+.TH WC "1" "December 1999" "GNU textutils 2.0a" FSF
+
+.SH NAME
+wc \- 输出文件中的行数、单词数、字节数
+
+.SH SYNOPSIS 总览
+.B wc
+[\fI选项列表\fR]... [\fI文件名列表\fR]...
+
+.SH DESCRIPTION 描述
+.\" Add any additional description here
+.PP
+对每个文件输出行、单词、和字节统计数，如果指定了多于一个文件则还有一
+个行数的总计。没有指定文件或指定的文件是 -，则读取标准输入。
+.TP
+\fB\-c\fR, \fB\-\-bytes\fR, \fB\-\-chars\fR
+输出字节统计数。
+.TP
+\fB\-l\fR, \fB\-\-lines\fR
+输出换行符统计数。
+.TP
+\fB\-L\fR, \fB\-\-max\-line\-length\fR
+输出最长的行的长度。
+.TP
+\fB\-w\fR, \fB\-\-words\fR
+输出单词统计数。
+.TP
+\fB\-\-help\fR
+显示帮助并退出
+.TP
+\fB\-\-version\fR
+输出版本信息并退出
+
+.SH AUTHOR 著作者
+由 Paul Rubin 和 David MacKenzie 完成。
+
+.SH "REPORTING BUGS 报告缺陷"
+向 <bug-textutils@gnu.org>报告缺陷。
+
+.SH COPYRIGHT 版权
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "SEE ALSO 参见"
+完整的 wc 文档是以 Texinfo 手册的形式维护的，如果 info 和 wc 在你的机器上
+被正确的安装了，使用命令 info wc 就访问完整的文档了。
+
+.SH "[中文版维护人]"
+.B mhss<jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+.BR 2000/11/7
+.SH "《中国Linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

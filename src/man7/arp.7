@@ -1,0 +1,239 @@
+.\" 版权所有：1999 Matthew Wilcox。发布任何修改拷贝时，必须包含此处原文，
+.\" 并将修改人和修改日期，加在这里
+.\" 中文版版权所有 Alian Yao, BitBIRD www.linuxforum.net 2000
+.\" 修改1：June 1999 Andi Kleen 
+
+.TH ARP 7 "3 Jun 1999" "Linux Man Page" "Linux 程序员手册" 
+.SH NAME
+arp \- Linux的ARP核心模块 
+.SH 描述
+这个核心协议模块实现RFC826中定义的 Address Resolution Protocol
+[译注：即TCP/IP的第三层到第一层的地址转换协议]，
+用于在直接相连的网络中换第二层硬件地址和 Ipv4 协议地址之间的转换。
+用户除非想对其进行配置，否则一般不会直接操作这个模块。
+
+实际上，它提供对核心中其它协议的服务。 
+
+用户进程可以使用
+.BR packet (7)
+的 sockets，收到 ARP 包（译注：一译分组）。
+还有一种机制是使用
+.BR netlink (7)
+sockets，在用户空间管理 ARP 缓存的机制。
+我们也可以通过
+.B ioctl (2)
+控制任意
+.B PF_INET 
+socket上的
+ARP 表 
+
+
+ARP 模块维护一个硬件地址到协议地址映射的缓存。这个缓存有大小限制，所以
+不常用的和旧的记录（Entry）将被垃圾收集器清除（garbage-collected），
+垃圾收集器永远不能删除标为永久的记录。我们可以使用ioctls直接操纵缓冲，
+并且其性状可以用下面定义的 sysctl 调节。
+
+如果在限定的时间（见下面的sysctl）内，一条现存映射没有肯定反馈时，
+则认为相邻层的缓存记录失效。
+为了再次向目标发送数据，ARP将首先试着询问本地arp进程
+.B app_solicit 
+次，获取更新了的 MAC（介质访问控制）地址。
+如果失败，并且旧的MAC地址是已知的，则发送
+.B ucast_solicit
+次的 unicast probe。如果仍然失败，则将向网络广播一个新的ARP请求,此时要
+有待发送数据的队列
+
+如果 Linux 接到一个地址请求，而且该地址指向 Linux 转发的地址，
+并且接收接口打开了代理 arp 时，Linux 将自动添加一条非永久的
+代理 arp 记录；如果存在拒绝到目标的路由，则不添加代理 arp 记录。
+
+.SH IOCTLS
+有三个 ioctl
+可以用于所有 
+.B PF_INET
+的 sockets 中。它们以一个指向
+.B struct arpreq
+的指针作为它们的参数。
+
+.nf
+.ta 4 20 33
+struct arpreq
+{
+struct sockaddr arp_pa; /* 协议地址(protocol address)*/
+struct sockaddr arp_ha; /* 硬件地址(hardware address) */
+int arp_flags; /* 标志(flags) */
+struct sockaddr arp_netmask; 
+/* 协议地址的网络掩码(netmask of protocol address)*/
+char arp_dev[16];
+};
+.fi
+
+.BR SIOCSARP ", " SIOCDARP " 和 " SIOCGARP
+可分贝设置、删除和获取 ARP 映射。设置和删除 ARP 映射是特许操作，
+只有拥有
+.B CAP_NET_ADMIN
+权限的进程或有效UID为0的进程可以执行。
+
+.I arp_pa
+必须是
+.B AF_INET
+socket，并且
+.I arp_ha
+必须有和
+.IR arp_dev .
+指定的设备相同的类型。
+.I arp_dev
+是个以null结束的设备名字符串。
+
+.TS
+tab(:) allbox;
+c s
+l l.
+\fIarp_flags\fR
+标志(flag):含义(meaning)
+ATF_COM:查找完成(Lookup complete)
+ATF_PERM:永久记录(Permanent entry)
+ATF_PUBL:张贴记录(Publish entry)
+ATF_USETRAILERS:要求使用后缀(Trailers requested)
+ATF_NETMASK:使用网络掩码(Use a netmask)
+ATF_DONTPUB:不回复(Don't answer)
+.TE
+
+.PP
+
+如果设置了
+.B ATF_NETMASK
+标志，那么
+.I arp_netmask
+必须有效。 
+Linux 2.2 不支持代理网络 ARP 记录，因此，要设成0xffffffff或者0，
+以删除现存代理arp记录。这里不使用
+现存代理arp记录。
+.B ATF_USETRAILERS
+已经过时了，不应该继续使用。
+
+
+.SH SYSCTLS
+ARP 支持一个 sysctl 接口，可以用以配置全局参数或逐个网络接口地进行配制。
+该 sysctl 可以通过
+.B /proc/sys/net/ipv4/neigh/*/*
+文件或者使用
+.BR sysctl (2)
+接口来访问。系统中每个接口都在
+/proc/sys/net/ipv4/neigh/.
+中有自己的目录。`default'目录中的设置用于所有新建的设备。
+sysctl 相关的时间是以秒为单位，除非特别声明过．
+.TP
+.B anycast_delay
+对 IPv6 相邻请求信息的回复的最大延迟时间；
+目前还不支持 anycast。缺省值为1秒。
+.TP
+.B app_solicit
+这是在使用多路广播探测(multicast probe)前，
+经过网络连接送到用户间隙ARP端口监控程序的探测（probe）
+最大数目(见
+.IR mcast_solicit 
+)。
+缺省值为0。
+.TP
+.B base_reachable_time
+一旦发现相邻记录，至少在一段介于
+.IR base_reachable_time "/2和3*" base_reachable_time /2
+之间的随机时间内，该记录是有效的。如果收到上层协议的肯定反馈，
+那么记录的有效期将延长。
+缺省值是30秒。
+.TP
+.B delay_first_probe_time
+发现某个相邻层记录无效(stale)后，发出第一个探测要等待的时间。 缺省值是5秒。
+.TP
+.B gc_interval
+收集相邻层记录的无用记录的垃圾收集程序的运行周期，缺省为30秒。
+.TP
+.B gc_stale_time
+决定检查一次相邻层记录的有效性的周期。
+当相邻层记录失效时，将在给它发送数据前，再解析一次。
+缺省值是60秒。
+.TP
+.B gc_thresh1
+存在于ARP高速缓存中的最少层数，如果少于这个数，
+垃圾收集器将不会运行。缺省值是128。
+.TP
+.B gc_thresh2
+保存在 ARP 高速缓存中的最多的记录软限制。
+垃圾收集器在开始收集前，允许记录数超过这个数字 5 秒。
+缺省值是 512。
+.TP
+.B gc_thresh3
+保存在 ARP 高速缓存中的最多记录的硬限制，
+一旦高速缓存中的数目高于此，
+垃圾收集器将马上运行。缺省值是1024。
+.TP
+.B locktime
+ARP 记录保存在高速缓存内的最短时间（jiffy数），
+以防止存在多个可能的映射(potential mapping)时，
+ARP 高速缓存系统的颠簸 (经常是由于网络的错误配置而引起)。
+缺省值是 1 秒。
+.TP
+.B mcast_solicit
+在把记录标记为不可抵达的之前，
+用多路广播/广播（multicast/broadcast）方式解析地址的最大次数。
+缺省值是3。
+.TP
+.B proxy_delay
+当接收到有一个请求已知的代理 ARP 地址的 ARP 请求时，
+在回应前可以延迟的 jiffy（时间单位，见BUG）数目。
+这样，以防止网络风暴。缺省值是0.8秒。
+.TP
+.B proxy_qlen
+能放入代理 ARP 地址队列(proxy-ARP addresses)的数据包最大数目。缺省值是64。
+.TP
+.B retrans_time
+重发一个请求前的等待 jiffy（时间单位，见BUG）的数目。缺省值是1秒。
+.TP
+.B ucast_solicit
+询问ARP端口监控程序前，试图发送单探测（unicast probe）的次数。 (见
+.IR app_solicit ).
+缺省值是3秒。
+.TP
+.B unres_qlen
+每个没有被其它网络层解析的地址，在队列中可存放包的最大数目。缺省值是3.
+
+.SH BUGS
+时钟设置的时间单位 jiffy，跟硬件体系有关。
+在 Alpha 上，一个 jiffy 是 1/1024 秒，而在其它机器上，是 1/100 秒。
+
+目前还没有办法从用户空间发送肯定反馈。
+这意味着在用户空间实现的面向连接的协议
+（connection oriented protocols）将产生大量的 ARP 通讯。
+因为ndisc将重新探测MAC地址。内核 NFS 的实现也存在同样的问题。
+
+这个手册页主要讲 IPv4 规范并且共享 IPv4 和 IPv6 的功能．
+
+.SH 版本
+
+Linux 2.0中的
+.B struct arpreq，
+添加了
+.I arp_dev
+，同时 ioctl 数目也改变了。在 Linux 2.2 中将不再支持旧的ioctl。
+
+在 Linux 2.2 中，取消了对网络代理 arp 记录(网络掩码不是0xffffffff)的支持。
+这个功能被内核设置的一个自动代理 arp 取代，这个自动代理 arp 用于所有位于
+其它接上的可到达的主机（如果该接口的转发和代理 arp 打开了）。
+
+
+
+.SH 另见
+.BR ip (7)
+.PP
+
+RFC826 了解 ARP 描述．
+.br
+RFC2461 描述了IPv6使用的近邻查找以及基本算法
+
+.SH "[中文版维护人]"
+.B Alan Yao <Alan_Yao@163.net>
+.SH "[中文版最新更新]"
+.B 2000/10/23
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

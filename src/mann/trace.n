@@ -1,0 +1,309 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: trace.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: trace.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH trace n "" Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+trace \- 监视变量访问
+.SH "总览 SYNOPSIS"
+\fBtrace \fIoption\fR ?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令导致在调用了特定操作的时候执行 Tcl 命令。现在只实现了变量跟踪。合法的 \fIoption\fR (选项) (可以是缩写)有:
+.TP
+\fBtrace variable \fIname ops command\fR
+安排 \fIcommand\fR 在变量 \fIname\fR 被以用 \fIops \fR给出的方式访问的时候执行。\fIName\fR     可以引用一个普通变量、数组的一个元素，或整个的一个数组(就是说，\fIname\fR     可以只是一个数组的名字，而不加在圆括号中的索引)。如果     \fIname\fR     引用整个的一个数组，则在操纵了这个数组的任何元素的时候调用     \fIcommand\fR     。如果这个变量不存在，则建立它但不给它值，所以对 \fBnamespace     which\fR 查询是可见的，但对 \fBinfo exists\fR     不是。
+.RS
+.PP
+\fIOps\fR     指示要进行何种操作，它由下列字母中的一个或多个组成:
+.TP
+\fBr\fR
+在读这个变量的时候调用 \fIcommand\fR。
+.TP
+\fBw\fR
+在写这个变量的时候调用 \fIcommand\fR。
+.TP
+\fBu\fR
+在删除这个变量的时候调用 \fIcommand\fR。可以使用 \fBunset\fR  命令显式的删除变量，或者在过程返回的时候隐式的删除(所有它们的局部变量)。在删除解释器的时候也删除变量，因为没有在其中执行命令的解释器所以不调用跟踪。
+.PP
+当触发跟踪的时候，向 \fIcommand\fR     添加三个参数，所以实际上的命令如下:
+.CS
+\fIcommand name1 name2 op\fR
+.CE
+\fIName1\fR 和 \fIname2\fR 给出被访问了的变量的名字:     如果这个变量是个标量，则 \fIname1\fR 给出变量的名字而 \fIname2\fR     是一个空串；如果变量是一个数组元素，则 \fIname1\fR     给出数组的名字而 \fIname2\fR     给出在这个数组中的索引；如果整个数组被删除并且跟踪注册在整个数组上，而不是在一个单一元素上，则     \fIname1\fR 给出这个数组的名字而 \fIname2\fR 是一个空串。\fIName1\fR     和 \fIname2\fR 不是必须与在 \fBtrace variable\fR     命令中使用的名字相同: \fBupvar\fR     命令允许一个过程在不同的名字下引用一个变量。\fIOp\fR     指示在这个变量上进行了何种操作，它是上面定义的 \fBr\fR、\fBw\fR、或     \fBu\fR 中的一个。
+.PP
+\fICommand\fR     在与调用跟踪操作的代码的相同的上下文中执行:     如果被访问的变量是一个 Tcl 过程的一部分，则 \fIcommand\fR     将访问到与过程中的代码相同的局部变量。这个上下文可能与在其中建立跟踪的上下文不同。如果     \fIcommand\fR 调用一个过程(它经常这么做)，则过程要想访问被跟踪的变量必须使用     \fBupvar\fR 或 \fBuplevel\fR。还要注意     \fIname1\fR     不是必须与用来在变量上设置跟踪的那个名字相同；如果通过用     \fBupvar\fR     定义的一个变量进行访问，则可能发生不同。
+.PP
+对于读和写跟踪，\fIcommand\fR     可以修改变量来影响被跟踪的操作的结果。如果\fIcommand\fR     在读写跟踪期间修改了一个变量的值，则这个新值将被返回为跟踪操作的结果。除非从     \fIcommand\fR     返回的值是一个某种错误，此时跟踪的操作返回的错误与跟踪命令返回的错误消息相同，否则忽略它(例如，可使用这种机制实现只读变量)。对于写跟踪，在这个变量的值被改变之后调用     \fIcommand\fR     ；它把一个新值写到这个变量中来屏弃在这次写操作中指定的原始值。要实现只读变量，\fIcommand\fR     必须存储这个变量的旧值。
+.PP
+当 \fIcommand\fR     在一个读或写跟踪期间执行的时候，在变量上的跟踪被暂时禁用。这意味着     \fIcommand\fR 调用的读和写将直接发生，不用再次调用 \fIcommand\fR     (或任何其他跟踪)。但是，如果 \fIcommand\fR     删除了这个变量则调用删除跟踪。
+.PP
+在调用一个删除跟踪的时候，这个变量已经被删除了:     它将出现为未定义的而不加以跟踪。如果因为一个过程返回而发生一个删除，则在返回到的那个过程的变量上下文中调用跟踪:     返回的过程的栈桢已经不存在了。在删除跟踪期间不禁止跟踪，所以如果一个删除跟踪命令建立了一个新的跟踪并访问了这个变量，则调用这个跟踪。忽略删除跟踪的任何错误。
+.PP
+如果在一个变量上有多个跟踪，则以建立的次序调用它们，先处理最新的。如果一个跟踪返回一个错误，则不对这个变量调用进一步的跟踪。如果一个数组元素有一个跟踪设置，并且还有一个在整个数组上的跟踪设置，调用在整个数组上的跟踪先于在这个元素上的跟踪。
+.PP
+一旦建立了，跟踪保持有效直到用下面描述的 \fBtrace vdelete\fR 命令删除这个跟踪、直到删除了这个变量，或直到删除了这个解释器为止。删除数组的一个元素将删除在这个元素上的任何跟踪，但不删除在整个数组上的跟踪。
+.PP
+这个命令返回一个空串。
+.RE
+.TP
+\fBtrace vdelete \fIname ops command\fR
+如果在变量 \fIname\fR 上设置了一个用 \fIops\fR     给出操作和用 \fIcommand\fR     给出命令的跟踪，则删除这个跟踪，这样将永不再次调用 \fIcommand\fR     。返回一个空串。
+.TP
+\fBtrace vinfo \fIname\fR
+返回一个列表，为每个在变量 \fIname \fR设置的当前跟踪包含一个元素。这个列表的每个元素自身是一个包含两个元素的列表，它们是与这个跟踪相关的     \fIops\fR 和 \fIcommand\fR 。如果 \fIname\fR     不存在或没有跟踪设置，则命令的结果是一个空串。
+
+.SH "关键字 KEYWORDS"
+read, variable, write, trace, unset
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/11/21
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

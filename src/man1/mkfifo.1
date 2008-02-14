@@ -1,0 +1,60 @@
+.\" 版权所有 Andries Brouwer, Ragnar Hojland Espinosa和A. Wik, 1998.
+.\" 中文版版权所有 riser,www.linuxforum.net 2000
+.\" 本文档可在遵照LDP GENERAL PUBLIC LICENSE，Version 1, September 1998
+.\" 中描述的条件下进行复制,且该文件发布时必须包含该文档．
+.\"
+.TH MKFIFO 1 "1998年11月" "GNU fileutils 4.0"
+.SH NAME(名称）
+mkfifo \- 创建FIFO(命名管道）
+.SH SYNOPSIS(总览）
+.BI "mkfifo [" options "] " file...
+.sp
+POSIX options(选项）：
+.BI "[\-m " mode ]
+.sp
+GNU options(选项）（最短格式）：
+.BI "[\-m " mode "] [\-\-help] [\-\-version] [\-\-]"
+.SH DESCRIPTION(描述)
+.B mkfifo
+使用指定的文件名创建FIFO(也称为"命名管道").
+.PP
+"FIFO"是一种特殊的文件类型，它允许独立的进程通讯.
+一个进程打开FIFO文件进行写操作,而另一个进程对之进行读操作,
+然后数据便可以如同在shell或者其它地方常见的的匿名管道一样流线执行.
+.PP
+默认情况下,创建的FIFO的模式为0666('a+rw')减去umask中设置的位.
+.SH OPTIONS(选项)
+.TP
+.BI "\-m " mode ", \-\-mode=" mode
+设置创建的FIFO的模式为
+.IR mode ,
+这可以是
+.BR chmod(1)
+中的符号模式,并使用默认模式作为起始点.
+.SH "GNU STANDARD OPTIONS(GNU标准选项)"
+.TP
+.B "\-\-help"
+在标准输出上打印一条用法信息,并以成功状态退出.
+.TP
+.B "\-\-version"
+在标准输出上打印版本信息,然后以成功状态退出.
+.TP
+.B "\-\-"
+终止选项列表.
+.SH ENVIRONMENT(环境变量)
+变量LANG, LC_ALL, LC_CTYPE和LC_MESSAGES取其常用义.
+.SH "CONFORMING TO(遵循规则)"
+POSIX 1003.2
+.SH NOTES(备注）
+本页介绍了包含在fileutils-4.0包中的
+.B mkfifo ;
+其他版本可能会有细微差别.
+请把您的修正和增补建议发邮件到aeb@cwi.nl.报告程序中的bug请发到
+fileutils-bugs@gnu.ai.mit.edu.
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

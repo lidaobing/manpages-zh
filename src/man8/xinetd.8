@@ -1,0 +1,140 @@
+.\"(c) Copyright 1992 by Panagiotis Tsirigotis
+.\"(c) Sections Copyright 1998-2001 by Rob Braun
+.\"All rights reserved.  The file named COPYRIGHT specifies the terms
+.\"and conditions for redistribution.
+.\"
+.TH XINETD 8 "14 June 2001"
+.\" *************************** NAME *********************************
+.SH NAME
+xinetd \- 扩展的互联网服务守护进程
+.\" *************************** SYNOPSIS *********************************
+.SH 总览 SYNOPSIS
+.B xinetd
+[\fIoptions\fP]
+.\" *************************** DESCRIPTION *********************************
+.SH 描述 DESCRIPTION
+\fBxinetd\fP 执行与 \fBinetd\fP 相同的任务：它启动提供互联网服务的程序。与在系统初始化时启动这些服务器，让它们保持休眠，直到有连接请求到达才提供服务这种做法不同，\ fBxinetd\fP 是唯一的被启动的守护进程，它侦听各种服务在它们各自的配置文件中列出的所有端口。当一个请求到达，\fBxinetd\fP  启动合适的服务器。因为它以这种方式操作，\fBxinetd\fP (还有 \fBinetd\fP) 常被称作超级服务器。
+.LP
+列在 \fBxinetd\fP 的配置文件中的服务可以分为两组。第一组的服务称为
+.I "多线程的 (multi-threaded)"
+并且它们需要为每个新的连接请求产生 (fork) 一个新的服务器进程。接下来新的服务器将处理那个连接。对于这些服务，\fBxinetd\fP 保持侦听新的请求从而可以孵化 (spawn) 新的服务器。另一方面，第二组包含着需要由服务器守护进程处理所有新的连接请求的服务。这些服务称为
+.I "单线程的 (single-threaded)"
+并且 \fBxinetd\fP 将停止为它们处理新的请求，直到这个服务器退出。这个组中的服务一般都是基于数据报的。
+.LP
+至今，超级服务器存在的唯一理由是通过避免大量产生生命周期中大部分时间可能都是空闲着的进程，从而节省系统资源。当实现这种功能时，\ fBxinetd\fP 从超级服务器这种思想中获得了好处，可以提供访问控制和日志等特性。更进一步，\fBxinetd\fP 不仅限于侦听
+.I /etc/services
+中列出的服务。因此，任何人都可以使用 \fBxinetd\fP 来启动特殊用途的服务器。
+.\" *************************** OPTIONS *********************************
+.SH 选项 OPTIONS
+.TP
+.BR \-d
+启用调试模式。这样将产生大量调试输出，并且使得在 \fBxinetd\fP 上使用一个调试器成为可能。
+.TP
+.BI \-syslog " syslog_facility"
+这个选项使得 syslog 使用指定的日志功能来记录 \fBxinetd\fP 产生的消息。可以使用下列功能：
+.I daemon,
+.I auth,
+.I user,
+.I "local[0-7]"
+(参见 \fIsyslog.conf(5)\fP 来查看它们的意义)。这个选项在 debug 模式是无效的，因为所有的相关信息都将送到终端上。
+.TP
+.BI \-filelog " logfile"
+\fBxinetd\fP 产生的信息将放到指定文件中。信息总是添加到文件之后。如果文件不存在，将会被创建。这个选项在 debug 模式无效，因为所有的相关信息都将送到终端上。
+.TP
+.BI \-f " config_file"
+决定\fBxinetd\fP 用来配置的文件。默认设置是 \fI/etc/xinetd.conf\fP。
+.TP
+.BR \-pidfile " pid_file"
+.br
+进程 ID 被写入的文件。这个选项在 debug 模式无效。
+.TP
+.BI \-dontfork
+指定\fBxinetd\fP 在前台运行，而不是分离自身以支持由 init 或 daemontools 运行。这个选项自动设置了
+.B \-stayalive
+(参见下面)。
+.TP
+.BI \-stayalive
+指定\fBxinetd\fP 保持运行，即使没有指定服务。
+.TP
+.BI \-limit " proc_limit"
+这个选项为
+.B xinetd
+可以启动的并行运行的进程数设置了一个上限。目的是防止进程表溢出。
+.TP
+.BI \-logprocs " limit"
+这个选项为服务远程用户的并行运行的进程数设置了一个上限。
+.TP
+.BI \-version
+这个选项使得 xinetd 打印出它的版本信息。
+.TP
+.BI \-inetd_compat
+这个选项使得 xinetd 在标准的配置文件之外，附加地读取\fI/etc/inetd.conf\fR。\fI/etc/inetd.conf\fR 的读取是在读取标准的配置文件之后。
+.TP
+.BI \-cc " interval"
+这个选项指定
+.B xinetd
+每
+.I interval
+秒对内部状态进行一次定时的一致性检查。
+.LP
+\fIsyslog\fP 和 \fIfilelog\fP 选项是互相独立的。如果没有指定任何一个，默认将使用 syslog 的
+.I daemon
+功能。你不应将 \fBxinetd\fP 信息与和服务日志相关的信息相混淆。后者只有在配置文件中指定之后才会记录。
+.\" *********************** CONTROLLING XINETD ****************************
+.SH "控制 xinetd CONTROLLING XINETD"
+.LP
+\fBxinetd\fP 收到一定的信号时会执行一定的动作。与特定信号相关联的特定动作可以通过修改 \fIconfig.h\fP 并且重新编译来重新定义。
+.TP 15
+.B SIGHUP
+导致一个强制的重新配置，意味着 \fBxinetd\fP 重新读取配置文件，停止不再有效的服务的服务器。在正在运行的服务器上将刷新访问控制，检查远程位置，访问时间和服务器实例。如果允许的服务器实例数减少了，一些随机选取的服务器将会被杀掉来满足限制; 这将在任何服务器停止\fI之后\fR发生，因为不能通过远程位置或访问时间的检查(this will happen \fIafter\fP any servers are terminated because of failing the remote location or access time checks)。还有，如果
+.B INTERCEPT
+标志被清除后又重新设置，此服务的任何运行中的服务器将被停止。\fI这样做的目的是保证在强制的重新配置之后，没有那种接受从不遵循访问控制标准的地址发来的包的服务器在运行。
+.TP
+.B SIGQUIT
+导致程序退出。
+.TP
+.B SIGTERM
+在 \fBxinetd\fP 退出之前，停止所有运行中的服务器。
+.TP
+.B SIGUSR1
+导致内部状态转储 (默认的转储文件是 \fI/var/run/xinetd.dump\fP；要改变文件名，修改 \fIconfig.h\fP 然后重新编译。)
+.TP
+.B SIGIOT
+导致一个内部一致性检查来核对程序使用的数据结构没有崩溃。当检查结束时，
+.B xinetd
+将产生一个消息，报告测试是成功了还是失败了。
+.LP
+重新配置的时候，日志文件被关闭又重新打开。这样做允许移除旧的日志文件。
+.\" *********************** FILES ****************************
+.SH 文件 FILES
+.LP
+.PD .1v
+.TP 20
+.B /etc/xinetd.conf
+默认的配置文件
+.TP
+.B /var/run/xinetd.dump
+默认的转储文件
+.PD
+.\" *********************** SEE ALSO ****************************
+.SH "参见 SEE ALSO"
+.I "inetd(8),"
+.LP
+.I "xinetd.conf(5),"
+.LP
+.I "xinetd.log(5)"
+.LP
+.I "http://cr.yp.to/daemontools.html
+.\" *********************** AUTHOR ****************************
+.SH 作者 AUTHOR
+Panos Tsirigotis, CS Dept, University of Colorado, Boulder
+Rob Braun
+.\" *********************** PRONUNCIATION ****************************
+.SH 发音 PRONUNCIATION
+zy-net-d
+.SH "[中文版维护人]"
+.B 袁乙钧 <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 2003.11.04
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

@@ -1,0 +1,1112 @@
+.\" Copyright (c) 1987, 1988, 1989, 1990, 1991, 1992, 1994, 1995, 1996, 1997
+.\"     The Regents of the University of California.  All rights reserved.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that: (1) source code distributions
+.\" retain the above copyright notice and this paragraph in its entirety, (2)
+.\" distributions including binary code include the above copyright notice and
+.\" this paragraph in its entirety in the documentation or other materials
+.\" provided with the distribution, and (3) all advertising materials mentioning
+.\" features or use of this software display the following acknowledgement:
+.\" ``This product includes software developed by the University of California,
+.\" Lawrence Berkeley Laboratory and its contributors.'' Neither the name of
+.\" the University nor the names of its contributors may be used to endorse
+.\" or promote products derived from this software without specific prior
+.\" written permission.
+.\" THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+.\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+.\"
+.TH TCPDUMP 8  "30 June 1997"
+.SH NAME
+tcpdump \- 转储网络上的数据流
+.SH 总览 (SYNOPSIS)
+.na
+.B tcpdump
+[
+.B \-adeflnNOpqStvx
+] [
+.B \-c
+.I count
+] [
+.B \-F
+.I file
+]
+.br
+.ti +8
+[
+.B \-i
+.I interface
+] [
+.B \-r
+.I file
+]
+[
+.B \-s
+.I snaplen
+]
+.br
+.ti +8
+[
+.B \-T
+.I type
+]
+[
+.B \-w
+.I file
+]
+[
+.I expression
+]
+.br
+.ad
+.SH 描述 (DESCRIPTION)
+.LP
+\fITcpdump\fP 打印出 在某个 网络界面 上,
+匹配 布尔表达式 \fIexpression\fP 的报文 的 报头.
+.LP
+.B 对于 SunOS 的 nit 或 bpf 界面:
+要 运行
+.I tcpdump ,
+你 必须 有 
+.I /dev/nit
+或
+.IR /dev/bpf* 
+的 读访问 权限.
+
+.B 对于 Solaris 的 dlpi:
+你 必须 有 网络仿真设备 (network pseudo device), 如
+.IR /dev/le 
+的 读访问 权限.
+
+.B 对于 HP-UX 的 dlpi:
+你 必须 是 root, 或者 把它 安装成 root 的 设置uid 程序.
+
+.B 对于 IRIX 的 snoop:
+你 必须 是 root, 或者 把它 安装成 root 的 设置uid 程序.
+
+.B 对于 Linux:
+你 必须 是 root, 或者 把它 安装成 root 的 设置uid 程序.
+
+.B 对于 Ultrix 和 Digital UNIX:
+一旦 超级用户 使用
+.IR pfconfig (8)
+开放了 promiscuous 操作模式 (promiscuous-mode),
+任何用户 都可以 运行
+.BR tcpdump .
+
+.B 对于 BSD:
+你 必须 有 
+.IR /dev/bpf* 
+的 读访问 权限.
+
+.SH 选项 (OPTIONS)
+.TP
+.B \-a
+试着 把 网络和广播地址 转换成 名称.
+.TP
+.B \-c
+当 收到 \fIcount\fP 报文 后 退出.
+.TP
+.B \-d
+把 编译好的 报文匹配代码 (packet-matching code) 翻译成 可读形式,
+传往 标准输出, 然后退出.
+.TP
+.B \-dd
+把 报文匹配代码 (packet-matching code) 以 
+.B C
+程序片断 的 形式 输出.
+.TP
+.B \-ddd
+把 报文匹配代码 (packet-matching code) 以 十进制数 形式 输出 
+(前面 加上 总数).
+.TP
+.B \-e
+显示 链路层报头.
+.TP
+.B \-f
+以 数字形式 显示 '外部的' 互联网地址, 而不是 字符形式 (这个 选项 用来
+绕开 脑壳坏光的 SUN 黄页服务器 的 问题 \(em 一般说来 当它 翻译 外部网络
+的 数字地址 时 会长期挂起).
+.TP
+.B \-F
+把 \fIfile\fP 的内容 用作 过滤表达式. 忽略 命令行 上 的 表达式.
+.TP
+.B \-i
+监听 \fIinterface\fP.
+如果 不指定 接口, \fItcpdump\fP 在 系统 的 接口 清单 中, 寻找 号码最小,
+已经 配置好的 接口 (loopback 除外). 选中的时候 会 中断 连接.
+.TP
+.B \-l
+行缓冲 标准输出. 可用于 捕捉 数据 的 同时 查看 数据. 例如,
+.br
+``tcpdump\ \ \-l\ \ |\ \ tee dat'' or
+``tcpdump\ \ \-l \ \ > dat\ \ &\ \ tail\ \ \-f\ \ dat''.
+.TP
+.B \-n
+不要把 地址 转换成 名字 (指的是 主机地址, 端口号等)
+.TP
+.B \-N
+不显示 主机名字 中的 域名 部分. 例如, 如果 使用 这个 选项, 
+\fItcpdump\fP 只显示 ``nic'', 而不是 ``nic.ddn.mil''.
+.TP
+.B \-O
+禁止运行 报文匹配代码 的 优化器. 这个选项 只有 当你 怀疑 优化器 有 bug 时 
+才有用.
+.TP
+.B \-p
+\fI禁止\fP 把 接口 置成 promiscuous(杂凑) 模式. 注意, 接口 有可能 因 其他原因
+而 处于 promiscuous 模式; 因此, '-p' 不能 作为
+`ether host {local-hw-addr} 或 ether broadcast' 的 简写.
+.TP
+.B \-q
+快速输出. 显示 较少的 协议信息, 输出行 会 短一点点.
+.TP
+.B \-r
+从 \fIfile\fR 中 读入 数据报 (文件 是用 -w 选项 创建的).
+如果 \fIfile\fR 是 ``-'', 就从 标准输入 读入.
+.TP
+.B \-s
+从每个 报文 中 截取 \fIsnaplen\fP 字节的数据, 而不是 缺省的 68 (如果是
+SunOS 的 NIT, 最小值是 96). 68 个字节 适用于 IP, ICMP, TCP 和 UDP, 
+但是 有可能 截掉 名字服务器 和 NFS 报文 的 协议 信息 (见下文).
+输出时 如果指定 ``[|\fIproto\fP]'',  tcpdump 可以 指出 那些 捕捉量过小
+的 数据报, 这里的 \fIproto\fP 是 截断发生处 的 协议层 名称.
+注意, 采用 更大的 捕捉范围 不但 增加了 处理 报文 的 时间, 而且 减少了
+报文的 缓冲 数量, 可能 导致 报文的丢失. 你 应该 把 \fIsnaplen\fP 设的
+尽量小, 只要 能够 容纳 你 需要 的 协议信息 就可以了.
+
+.TP
+.B \-T
+把 通过 "\fIexpression\fP" 挑选出来的 报文 解释成 指定的 \fItype\fR. 
+目前 已知 的 类型 有:
+\fBrpc\fR (远程过程调用 Remote Procedure Call),
+\fBrtp\fR (实时应用协议 Real-Time Applications protocol),
+\fBrtcp\fR (实时应用控制协议 Real-Time Applications control protocol),
+\fBvat\fR (可视音频工具 Visual Audio Tool),
+和
+\fBwb\fR (分布式白板 distributed White Board).
+.TP
+.B \-S
+显示 绝对的, 而不是 相对的 TCP 流序号.
+.TP
+.B \-t
+\fI禁止\fP 显示 时戳标志.
+.TP
+.B \-tt
+显示 未格式化的 时戳标志.
+.TP
+.B \-v
+(稍微多一点) 繁琐的输出. 例如, 显示 IP 数据报 中的 生存周期 和 服务类型.
+.TP
+.B \-vv
+更繁琐的输出. 例如, 显示 NFS 应答报文 的 附加域.
+.TP
+.B \-w
+把 原始报文 存进 \fIfile\fR, 不做 分析 和 显示. 它们 可以 以后 用 \-r 
+选项 显示. 如果 \fIfile\fR 是 ``-'', 就 写往 标准输出.
+.TP
+.B \-x
+以 16 进制数 形式 显示 每一个 报文 (去掉链路层报头后) .
+可以 显示 较小的 完整 报文, 否则 只 显示
+.I snaplen
+个 字节 .
+.IP "\fIexpression\fP"
+.RS
+用来 选择 要 转储 的 数据报.  如果 没有 指定 \fIexpression\fP ,
+就 转储 网络的 全部 报文.  否则, 只转储 相对 \fIexpression\fP 为 `true' 
+的 数据报.
+.LP
+\fIexpression\fP 由 一个或多个
+.I 原语 (primitive) 
+组成. 原语 通常 由 一个
+.I 标识 
+(id, 名称或数字), 和 标识 前面的 一个或多个 修饰子(qualifier) 组成.
+修饰子 有 三种 不同的类型:
+.IP \fItype\fP
+类型修饰子 指出 标识名称 或 标识数字 代表 什么 类型的东西.
+可以使用的 类型 有
+.BR host ,
+.B net
+和
+.BR port .
+例如, `host foo', `net 128.3', `port 20'.  如果 不指定 类型修饰子,
+就使用 缺省的
+.B host .
+
+.IP \fIdir\fP
+方向修饰子 指出 相对于 
+.B 标识
+的 传输方向 (数据是 传入还是传出 标识).
+可以使用的 方向 有
+.BR src ,
+.BR dst ,
+.B "src or dst"
+和
+.B "src and"
+.BR dst .
+例如, `src foo', `dst net 128.3', `src or dst port ftp-data'.  
+如果 不指定 方向修饰子, 就使用 缺省的
+.B "src or dst" .
+对于 `null' 链路层 (就是说 象 slip 之类的 点到点 协议), 用
+.B inbound
+和
+.B outbound
+修饰子 指定 所需的 传输方向.
+.IP \fIproto\fP
+协议修饰子 要求 匹配 指定的协议. 可以使用的 协议 有:
+.BR ether ,
+.BR fddi ,
+.BR ip ,
+.BR arp ,
+.BR rarp ,
+.BR decnet ,
+.BR lat ,
+.BR sca ,
+.BR moprc ,
+.BR mopdl ,
+.B tcp
+和
+.BR udp .
+例如, `ether src foo', `arp net 128.3', `tcp port 21'.  如果 不指定
+协议修饰子, 就使用 所有 符合 类型 的 协议. 例如, `src foo' 指 
+`(ip 或 arp 或 rarp) src foo' (注意后者不符合语法), `net bar' 指 `(ip 或
+arp 或 rarp) net bar',  `port 53' 指 `(tcp 或 udp) port 53'.
+.LP
+[`fddi' 实际上 是 `ether' 的 别名; 分析器 把 它们 视为
+``用在 指定 网络接口 上的 数据链路层.''  FDDI 报头 包含 类似于 以太协议
+的 源目地址, 而且 通常 包含 类似于 以太协议 的 报文类型, 因此 你 可以
+过滤 FDDI 域, 就象 分析 以太协议 一样. FDDI 报头 也 包含 其他 域, 但是
+你 不能 在 过滤器 表达式 里 显式描述.]
+
+.LP
+作为 上述 的 补充, 有一些 特殊的 `原语' 关键字:
+.BR gateway ,
+.BR broadcast ,
+.BR less ,
+.B greater
+和 数学表达式. 
+它们 不同于 上面的模式, 这些 在 后面 有 叙述.
+.LP
+更复杂的 过滤器表达式 可以 通过
+.BR and ,
+.B or
+和
+.B not
+连接 原语 来 组建.  例如, `host foo and not port ftp and not port ftp-data'.
+为了少敲点键, 可以忽略 相同的 修饰子.  例如,
+`tcp dst port ftp or ftp-data or domain' 实际上 就是
+`tcp dst port ftp or tcp dst port ftp-data or tcp dst port domain'.
+.LP
+允许的 原语 有:
+.IP "\fBdst host \fIhost\fR"
+如果 报文中 IP 的 目的地址域 是 \fIhost\fP, 则 逻辑 为 真.
+\fIhost\fP 既可以 是 地址, 也可以 是 主机名.
+.IP "\fBsrc host \fIhost\fR"
+如果 报文中 IP 的 源地址域 是 \fIhost\fP, 则 逻辑 为 真.
+.IP "\fBhost \fIhost\fP
+如果 报文中 IP 的 源地址域 或者 目的地址域 是 \fIhost\fP, 则 逻辑 为 真.
+上面 所有的 host 表达式 都可以 加上
+\fBip\fP, \fBarp\fP, 或 \fBrarp\fP 关键字 做 前缀, 就象:
+.in +.5i
+.nf
+\fBip host \fIhost\fR
+.fi
+.in -.5i
+它等价于:
+.in +.5i
+.nf
+\fBether proto \fI\\ip\fB and host \fIhost\fR
+.fi
+.in -.5i
+如果 \fIhost\fR 是 拥有 多个 IP 地址 的 主机名, 它的 每个地址 都会 被查验.
+
+.IP "\fBether dst \fIehost\fP
+如果 报文的 以太目的地址 是 \fIehost\fP, 则 逻辑 为 真. \fIEhost\fP
+既可以是 名字 (/etc/ethers 里有), 也可以是 数字 (有关 数字格式 另见
+.IR ethers (3N)
+).
+.IP "\fBether src \fIehost\fP
+如果 报文的 以太源地址 是 \fIehost\fP, 则 逻辑 为 真.
+.IP "\fBether host \fIehost\fP
+如果 报文的 以太源地址 或 以太目的地址 是 \fIehost\fP, 则 逻辑 为 真.
+.IP "\fBgateway\fP \fIhost\fP
+如果 报文 把 \fIhost\fP 当做 网关, 则 逻辑 为 真.  也就是说, 报文的
+以太源或目的地址 是 \fIhost\fP, 但是 IP 的 源目地址 都不是 \fIhost\fP.
+\fIhost\fP 必须 是个 主机名, 而且 必须 存在 /etc/hosts 和 /etc/ethers 中.  
+(一个等价的表达式是
+.in +.5i
+.nf
+\fBether host \fIehost \fBand not host \fIhost\fR
+.fi
+.in -.5i
+对于 \fIhost / ehost\fP, 它既可以是 名字, 也可以是 数字.)
+.IP "\fBdst net \fInet\fR"
+如果 报文的 IP 目的地址 属于 网络号 \fInet\fP, 则 逻辑 为 真. \fInet\fP 
+既可以 是 名字 (存在 /etc/networks 中), 也可以是 网络号. 
+(详见 \fInetworks(4)\fP).
+.IP "\fBsrc net \fInet\fR"
+如果 报文的 IP 源地址 属于 网络号 \fInet\fP, 则 逻辑 为 真.
+.IP "\fBnet \fInet\fR"
+如果 报文的 IP 源地址 或 目的地址 属于 网络号 \fInet\fP, 则 逻辑 为 真.
+.IP "\fBnet \fInet\fR \fBmask \fImask\fR"
+如果 IP 地址 匹配 指定 网络掩码(netmask) 的 \fInet\fR,  则 逻辑 为 真.
+本原语 可以用 \fBsrc\fR 或 \fBdst\fR 修饰.
+.IP "\fBnet \fInet\fR/\fIlen\fR"
+如果 IP 地址 匹配 指定 网络掩码 的 \fInet\fR,  则 逻辑 为 真,
+掩码 的 有效位宽 为 \fIlen\fR.
+本原语 可以用 \fBsrc\fR 或 \fBdst\fR 修饰.
+.IP "\fBdst port \fIport\fR"
+如果 报文 是 ip/tcp 或 ip/udp, 并且 目的端口 是 \fIport\fP, 则 逻辑 为 真.
+\fIport\fP 是一个 数字, 也可以是 /etc/services 中 说明过的 名字 (参看
+.IR tcp (4P)
+和
+.IR udp (4P)).
+如果 使用 名字, 则 检查 端口号 和 协议. 如果 使用 数字, 或者 有二义的名字,
+则 只检查 端口号 (例如, \fBdst port 513\fR 将显示 tcp/login 的数据 和 udp/who 
+的数据, 而 \fBport domain\fR 将显示 tcp/domain 和 udp/domain 的数据).
+.IP "\fBsrc port \fIport\fR"
+如果 报文 的 源端口号 是 \fIport\fP, 则 逻辑 为 真.
+.IP "\fBport \fIport\fR"
+如果 报文 的 源端口 或 目的端口 是 \fIport\fP, 则 逻辑 为 真.
+上述的 任意一个 端口表达式 都可以 用 关键字
+\fBtcp\fP 或 \fBudp\fP 做 前缀, 就象:
+.in +.5i
+.nf
+\fBtcp src port \fIport\fR
+.fi
+.in -.5i
+它 只匹配 源端口 是 \fIport\fP 的 TCP 报文.
+.IP "\fBless \fIlength\fR"
+如果 报文 的 长度 小于等于 \fIlength\fP, 则 逻辑 为 真.
+它等同于:
+.in +.5i
+.nf
+\fBlen <= \fIlength\fP.
+.fi
+.in -.5i
+.IP "\fBgreater \fIlength\fR"
+如果 报文 的 长度 大于等于 \fIlength\fP, 则 逻辑 为 真.
+它等同于:
+.in +.5i
+.nf
+\fBlen >= \fIlength\fP.
+.fi
+.in -.5i
+.IP "\fBip proto \fIprotocol\fR"
+如果 报文 是 IP 数据报(参见
+.IR ip (4P)) ,
+其 内容 的 协议类型 是 \fIprotocol\fP, 则 逻辑 为 真.
+\fIProtocol\fP 可以是 数字, 也可以是 下列 名称 中的 一个:
+\fIicmp\fP, \fIigrp\fP, \fIudp\fP, \fInd\fP, 或 \fItcp\fP.
+注意 这些 标识符 \fItcp\fP, \fIudp\fP, 和 \fIicmp\fP 也是 关键字,
+所以 必须 用 反斜杠(\\) 转义, 在 C-shell 中 应该是 \\\\ .
+.IP "\fBether broadcast\fR"
+如果 报文 是 以太广播报文, 则 逻辑 为 真.
+关键字 \fIether\fP 是 可选的.
+.IP "\fBip broadcast\fR"
+如果 报文 是 IP广播报文, 则 逻辑 为 真. Tcpdump 检查 全0 和 全1 广播约定,
+并且 检查 本地 的 子网掩码.
+.IP "\fBether multicast\fR"
+如果 报文 是 以太多目传送报文(multicast), 则 逻辑 为 真.
+关键字 \fIether\fP 是 可选的. 这实际上 是 `\fBether[0] & 1 != 0\fP' 的简写.
+.IP "\fBip multicast\fR"
+如果 报文 是 IP多目传送报文, 则 逻辑 为 真.
+.IP  "\fBether proto \fIprotocol\fR"
+如果 报文协议 属于 以太类型 的 \fIprotocol\fR, 则 逻辑 为 真.
+\fIProtocol\fP 可以是 数字, 也可以是 名字, 如
+\fIip\fP, \fIarp\fP, 或 \fIrarp\fP.
+注意 这些 标识符 也是 关键字, 所以 必须 用 反斜杠(\\) 转义.
+[如果是 FDDI (例如, `\fBfddi protocol arp\fR'), 协议 标识 来自 802.2 
+逻辑链路控制(LLC)报头, 它 通常 位于 FDDI 报头 的 顶层. 当 根据 协议标识
+过滤 报文 时, \fITcpdump\fP 假设 所有的 FDDI 报文 含有 LLC 报头, 而且
+LLC 报头 用的是 SNAP 格式.]
+
+.IP "\fBdecnet src \fIhost\fR"
+如果 DECNET 的 源地址 是
+.IR host ,
+则 逻辑 为 真, 该 主机地址 的 形式 可能 是 ``10.123'', 或者是 DECNET 主机名.
+[只有 配置成 运行 DECNET 的 Ultrix 系统 支持 DECNET 主机名.]
+.IP "\fBdecnet dst \fIhost\fR"
+如果 DECNET 的 目的地址 是
+.IR host ,
+则 逻辑 为 真.
+.IP "\fBdecnet host \fIhost\fR"
+如果 DECNET 的 源地址 或 目的地址 是
+.IR host ,
+则 逻辑 为 真.
+.IP "\fBip\fR, \fBarp\fR, \fBrarp\fR, \fBdecnet\fR"
+是:
+.in +.5i
+.nf
+\fBether proto \fIp\fR
+.fi
+.in -.5i
+的 简写 形式, 其中 \fIp\fR 为 上述 协议 的 一种.
+.IP "\fBlat\fR, \fBmoprc\fR, \fBmopdl\fR"
+是:
+.in +.5i
+.nf
+\fBether proto \fIp\fR
+.fi
+.in -.5i
+的 简写 形式, 其中 \fIp\fR 为 上述 协议 的 一种.
+注意
+\fItcpdump\fP 目前 不知道 如何 分析 这些 协议.
+.IP  "\fBtcp\fR, \fBudp\fR, \fBicmp\fR"
+是:
+.in +.5i
+.nf
+\fBip proto \fIp\fR
+.fi
+.in -.5i
+的 简写 形式, 其中 \fIp\fR 为 上述 协议 的 一种.
+.IP  "\fIexpr relop expr\fR"
+如果 这个 关系式 成立, 则 逻辑 为 真, 其中 \fIrelop\fR 是 >, <, >=, <=, =, != 
+之一, \fIexpr\fR 是 数学表达式, 由 常整数(标准C语法形式), 普通的 二进制运算符
+[+, -, *, /, &, |], 一个 长度运算符, 和 指定的 报文数据访问算符 组成.
+要 访问 报文内 的 数据, 使用 下面的 语法:
+.in +.5i
+.nf
+\fIproto\fB [ \fIexpr\fB : \fIsize\fB ]\fR
+.fi
+.in -.5i
+\fIProto\fR 是 \fBether, fddi,
+ip, arp, rarp, tcp, udp, \fRor \fBicmp\fR 之一, 同时 也指出了 下标 操作 的
+协议层. \fIexpr\fR 给出 字节单位 的 偏移量, 该 偏移量 相对于 指定的 协议层.
+\fISize\fR 是 可选项, 指出 感兴趣的 字节数; 它可以 是 1, 2, 4, 缺省为 1 字节.
+由 关键字 \fBlen\fP 给出的 长度运算符 指明 报文 的 长度.
+
+例如, `\fBether[0] & 1 != 0\fP' 捕捉 所有的 多目传送 报文.
+表达式 `\fBip[0] & 0xf != 5\fP' 捕捉 所有 带 可选域 的 IP 报文.
+表达式 `\fBip[6:2] & 0x1fff = 0\fP' 只捕捉 未分片 和 片偏移为0 的 数据报.
+这种 检查 隐含在 \fBtcp\fP 和 \fBudp\fP 下标操作 中.
+例如, \fBtcp[0]\fP 一定是 TCP \fI报头\fP 的 第一个 字节, 而不是 其中 某个
+IP片 的 第一个 字节.
+.LP
+原语 可以 用 下述 方法 结合使用:
+.IP
+园括弧 括起来的 原语 和 操作符 (园括弧 在 Shell 中 有专用, 所以必须转义).
+.IP
+取反操作 (`\fB!\fP' or `\fBnot\fP').
+.IP
+连结操作 (`\fB&&\fP' or `\fBand\fP').
+.IP
+或操作 (`\fB||\fP' or `\fBor\fP').
+.LP
+取反操作 有 最高优先级.
+或操作 和 连结操作 有 相同的 优先级, 运算时 从左到右 结合.
+注意 连结操作 需要 显式的 \fBand\fR 算符, 而不是 并列放置.
+.LP
+如果 给出 标识符, 但没给 关键字, 那么 暗指 最近使用 的 关键字.
+例如,
+.in +.5i
+.nf
+\fBnot host vs and ace\fR
+.fi
+.in -.5i
+作为
+.in +.5i
+.nf
+\fBnot host vs and host ace\fR
+.fi
+.in -.5i
+的 简写形式, 不应该 和
+.in +.5i
+.nf
+\fBnot ( host vs or ace )\fR
+.fi
+.in -.5i
+混淆.
+.LP
+表达式参数 可以 作为 单个 参数, 也可以 作为 复合参数 传给 tcpdump,
+后者 更方便 一些.
+一般说来, 如果 表达式 包含 Shell 元字符(metacharacter), 传递 单个 括起来
+的 参数 要 容易 一些. 复合参数 在 被解析前 用 空格 联接 一起.
+
+.SH 示例 (EXAMPLES)
+.LP
+显示 所有 进出 \fIsundown\fP 的 报文:
+.RS
+.nf
+\fBtcpdump host sundown\fP
+.fi
+.RE
+.LP
+显示 \fIhelios\fR 和 主机 \fIhot\fR, \fIace\fR 之间 的 报文 传送:
+.RS
+.nf
+\fBtcpdump host helios and \\( hot or ace \\)\fP
+.fi
+.RE
+.LP
+显示 \fIace\fR 和 除了 \fIhelios\fR 以外的 所有 主机 的 IP报文:
+.RS
+.nf
+\fBtcpdump ip host ace and not helios\fP
+.fi
+.RE
+.LP
+显示 本地的主机 和 Berkeley的主机 之间 的 网络数据:
+.RS
+.nf
+.B
+tcpdump net ucb-ether
+.fi
+.RE
+.LP
+显示 所有 通过 网关 \fIsnup\fP 的 ftp 报文
+(注意 这个 表达式 被 单引号 括起, 防止 shell 解释 园括弧):
+.RS
+.nf
+.B
+tcpdump 'gateway snup and (port ftp or ftp-data)'
+.fi
+.RE
+.LP
+显示 既不是 来自 本地主机, 也不是 传往 本地主机 的 网络数据
+(如果 报文 通过 网关 进入 其他网络, 那么 它 绝不可能 到达 你的 本地网络).
+.RS
+.nf
+.B
+tcpdump ip and not net \fIlocalnet\fP
+.fi
+.RE
+.LP
+显示 每个 TCP会话 的 起始 和 结束 报文 (SYN 和 FIN 报文), 而且 会话方 中
+有一个 远程主机.
+.RS
+.nf
+.B
+tcpdump 'tcp[13] & 3 != 0 and not src and dst net \fIlocalnet\fP'
+.fi
+.RE
+.LP
+显示 经过 网关 \fIsnup\fP 中 大于 576 字节的 IP 数据报:
+.RS
+.nf
+.B
+tcpdump 'gateway snup and ip[2:2] > 576'
+.fi
+.RE
+.LP
+显示 IP 广播 或 多目传送 的 数据报, 但这些 报文
+.I 不是
+通过 以太广播 或 以太多目传送 形式 传送的:
+.RS
+.nf
+.B
+tcpdump 'ether[0] & 1 = 0 and ip[16] >= 224'
+.fi
+.RE
+.LP
+显示 所有 不是 回响请求/应答 的 ICMP 报文 (也就是说, 不是 ping 报文):
+.RS
+.nf
+.B
+tcpdump 'icmp[0] != 8 and icmp[0] != 0"
+.fi
+.RE
+.SH 输出格式 (OUTPUT FORMAT)
+.LP
+\fItcpdump\fP 的 输出格式 取决于 协议. 下面的 描述 给出 大多数 格式 的
+简要说明 和 范例.
+.de HD
+.sp 1.5
+.B
+..
+.HD
+链路层报头 (Link Level Headers)
+.LP
+如果 给出 '-e' 选项 就 显示 链路层报头.
+
+在 以太网上, 显示 报文的 源目地址, 协议 和 报文长度.
+.LP
+在 FDDI 网络上, '-e' 选项 导致 \fItcpdump\fP 显示出 `帧控制(frame control)'
+域,  源目地址 和 报文长度. (`帧控制' 域 负责 解释 其余的 报文.
+普通报文 (例如 装载 IP数据报 的 报文) 是 `异步' 报文, 优先级 介于 0 到 7
+(例如, `\fBasync4\fR').  那些 被认为 携带了 802.2 逻辑链路控制(LLC) 报文;
+如果 它们 \fI不是\fR ISO 数据报 或者 所谓的 SNAP 报文, 就显示 LLC 报头.
+.LP
+\fI(注意: 以下 描述中 假设 你 熟悉 RFC-1144 中说明的 SLIP 压缩算法.)\fP
+.LP
+在 SLIP 链路上, \fItcpdump\fP 显示出 方向指示 (``I'' 指 inbound(进入), 
+``O'' 指 outbound(离开)), 报文类型 和 压缩信息.
+首先显示的 是 报文类型. 有三种 类型 \fIip\fP, \fIutcp\fP 和 \fIctcp\fP.
+对于 \fIip\fR 报文 不再 显示 更多的 链路信息.
+对于 TCP 报文, 在 类型 后面 显示 连接标识.
+如果 报文 是 压缩过的, 就显示出 它的 编码报头.
+这种 特殊情况 以 \fB*S+\fIn\fR 和 \fB*SA+\fIn\fR 的 形式 显示, 这里的
+\fIn\fR 是 流序号 (或者 流序号 和 ack) 的 变化总量.
+如果 不是 特殊情况, 就显示出 0 或 多个 变化.
+变化 由 U (urgent pointer), W (window), A (ack), S (sequence number) 
+和 I (packet ID) 指明, 后跟 一个 变化量(+n or -n), 或者 是一个 新值(=n).
+最后显示 报文中 的 数据总量, 以及 压缩报头 的 长度.
+.LP
+例如, 下面一行 显示了 一个 传出的 压缩的 TCP 报文, 有一个 隐含的 连接标识;
+确认(ack)的 变化量是 6, 流序号 增加 49, 报文ID 增加 6; 有三个字节的数据 和
+六个字节 的 压缩报头:
+.RS
+.nf
+\fBO ctcp * A+6 S+49 I+6 3 (6)\fP
+.fi
+.RE
+.HD
+ARP/RARP 报文
+.LP
+Arp/rarp 报文 的 输出 是 请求类型 及其 参数. 输出格式 大体上 能够 自我解释.
+这里 是一个 简单的例子, 来自 主机 \fIrtsg\fP 到 主机 \fIcsam\fP 的 'rlogin' 
+开始 部分:
+.RS
+.nf
+.sp .5
+\f(CWarp who-has csam tell rtsg
+arp reply csam is-at CSAM\fP
+.sp .5
+.fi
+.RE
+第一行 说明 rtsg 发出 一个 arp 报文 询问 internet 主机 csam 的 以太网地址.
+Csam 用 它的 以太地址 作应答 (这个例子中, 以太地址 是 大写的, internet 地址
+为 小写).
+.LP
+如果 用 \fBtcpdump \-n\fP 看 就 清楚一些:
+.RS
+.nf
+.sp .5
+\f(CWarp who-has 128.3.254.6 tell 128.3.254.68
+arp reply 128.3.254.6 is-at 02:07:01:00:01:c4\fP
+.fi
+.RE
+.LP
+如果 用 \fBtcpdump \-e\fP, 可以 看到 实际上 第一个 报文 是 广播, 第二个
+报文 是 点到点 的:
+.RS
+.nf
+.sp .5
+\f(CWRTSG Broadcast 0806  64: arp who-has csam tell rtsg
+CSAM RTSG 0806  64: arp reply csam is-at CSAM\fP
+.sp .5
+.fi
+.RE
+这里 第一个 报文 指出 以太网源地址是 RTSG, 目的地址 是 以太网广播地址,
+类型域 为 16进制数 0806 (类型 ETHER_ARP), 报文全长 64 字节.
+.HD
+TCP 报文
+.LP
+\fI(注意: 以下的描述中 假设 你 熟悉 RFC-793 中 说明的 TCP 协议, 如果 你
+不了解 这个 协议, 无论是 本文 还是 tcpdump 都对你 用处 不大)\fP
+.LP
+一般说来 tcp 协议的 输出格式是:
+.RS
+.nf
+.sp .5
+\fIsrc > dst: flags data-seqno ack window urgent options\fP
+.sp .5
+.fi
+.RE
+\fISrc\fP 和 \fIdst\fP 是 源目IP地址和端口.  \fIFlags\fP 是 S (SYN),
+F (FIN), P (PUSH) 或 R (RST) 或 单独的 `.'(无标志), 或者是 它们的 组合.
+\fIData-seqno\fP 说明了 本报文中的数据 在 流序号 中的 位置 (见下例).
+\fIAck\fP 是 在这条连接上 信源机 希望 下一个 接收的 字节的 流序号
+(sequence number).
+\fIWindow\fP 是 在这条连接上 信源机 接收缓冲区 的 字节大小.
+\fIUrg\fP 表明 报文内 是 `紧急(urgent)' 数据.
+\fIOptions\fP 是 tcp 选项, 用 尖括号 括起 (例如, <mss 1024>).
+.LP
+\fISrc, dst\fP 和 \fIflags\fP 肯定 存在.  其他域 依据 报文的 tcp 报头 内容,
+只输出 有必要 的 部分.
+.LP
+下面 是 从 主机 \fIrtsg\fP rlogin 到 主机 \fIcsam\fP 的 开始部分.
+.RS
+.nf
+.sp .5
+\s-2\f(CWrtsg.1023 > csam.login: S 768512:768512(0) win 4096 <mss 1024>
+csam.login > rtsg.1023: S 947648:947648(0) ack 768513 win 4096 <mss 1024>
+rtsg.1023 > csam.login: . ack 1 win 4096
+rtsg.1023 > csam.login: P 1:2(1) ack 1 win 4096
+csam.login > rtsg.1023: . ack 2 win 4096
+rtsg.1023 > csam.login: P 2:21(19) ack 1 win 4096
+csam.login > rtsg.1023: P 1:2(1) ack 21 win 4077
+csam.login > rtsg.1023: P 2:3(1) ack 21 win 4077 urg 1
+csam.login > rtsg.1023: P 3:4(1) ack 21 win 4077 urg 1\fP\s+2
+.sp .5
+.fi
+.RE
+第一行 是说 从 rtsg 的 tcp 端口 1023 向 csam 的 \fIlogin\fP 端口 发送 报文.
+\fBS\fP 标志 表明 设置了 \fISYN\fP 标志.
+报文 的 流序号 是 768512, 没有 数据.
+(这个写成 `first:last(nbytes)',  意思是 `从 流序号 \fIfirst\fP 到 \fIlast\fP,
+不包括 \fIlast\fP, 有 \fInbytes\fP 字节的 用户数据'.)
+此时 没有 捎带确认(piggy-backed ack), 有效的 接收窗口 是 4096 字节,
+有一个 最大分段长度(max-segment-size) 的 选项, 请求 设置 mss 为 1024 字节.
+.LP
+Csam 用类似的 形式 应答, 只是 增加了 一个 对 rtsg SYN 的 捎带确认.
+然后 Rtsg 确认 csam 的 SYN.  `.' 意味着 没有 设置 标志.
+这个 报文 不包含 数据, 因此 也就 没有 数据的流序号.
+注意这个 确认流序号 是一个 小整数(1).  当 \fBtcpdump\fP 第一次 发现 一个
+tcp 会话时, 它 显示 报文 携带的 流序号. 在 随后收到的 报文里, 它 显示 当前
+报文 和 最初那个 报文 的 流序号 之 差.
+这 意味着 从第一个报文 开始, 以后的 流序号 可以 理解成 数据流 中的 相对位移
+(每个报文 的 第一个 数据字节 从 '1' 计数).
+`-S' 选项 能够 改变 这个 特性, 直接 显示 原始的 流序号.
+.LP
+在 第六行, rtsg 传给 csam 19 个字节 的 数据 (字节 2 到 20).
+报文中 设置了 PUSH 标志. 第七行 csam 表明 它 收到了 rtsg 的 数据, 字节序号
+是 21, 但不包括 第21个 字节.
+显然 大多数 数据 在 socket 的 缓冲区内, 因为 csam 的 接收窗口 收到的 数据
+小于 19 个 字节. 同时 csam 向 rtsg 发送了 一个字节 的 数据.
+第八和第九行 显示 csam 发送了 两个字节 的 紧急数据 到 rtsg.
+.LP
+如果 捕捉区 设置的 过小, 以至于 \fBtcpdump\fP 不能 捕捉到 完整的 TCP 报头, 
+\fBtcpdump\fP 会 尽可能的 翻译 已捕获的 部分, 然后 显示 ``[|\fItcp\fP]'',
+表明 无法 翻译 其余 部分. 如果 报头 包含 有问题的 选项 (选项表 长度
+太小 或者 超出 报头范围), tcpdump 显示
+``[\fIbad opt\fP]'' 并且 不再 翻译 其他 选项部分 (因为 它 不可能 判断出
+从哪儿 开始).  如果 报头长度 表明 存在 选项, 但是 IP 数据报 长度 不够,
+不可能 真的 保存 选项, tcpdump 就显示 ``[\fIbad hdr length\fP]''.
+.HD
+.B
+UDP 报文
+.LP
+UDP 格式 就象 这个 rwho 报文 显示的:
+.RS
+.nf
+.sp .5
+\f(CWactinide.who > broadcast.who: udp 84\fP
+.sp .5
+.fi
+.RE
+就是说 把一个 udp 数据报 从 主机 \fIactinide\fP 的 \fIwho\fP 端口 发送到
+\fIbroadcast\fP, Internet 广播地址 的 \fIwho\fP 端口.
+报文 包含 84字节 的 用户数据.
+.LP
+某些 UDP 服务 能够 识别出来(从 源目端口号 上), 因而 显示出 更高层的 协议信息.
+特别是 域名服务请求(RFC-1034/1035) 和 NFS 的 RPC 调用(RFC-1050).
+.HD
+UDP 名字服务请求 (Name Server Requests)
+.LP
+\fI(注意: 以下的描述中 假设 你 熟悉 RFC-1035 说明的 域名服务协议. 
+如果你 不熟悉 这个协议, 下面的内容 可能 看起来是 天书.)\fP
+.LP
+名字服务请求 的 格式 是
+.RS
+.nf
+.sp .5
+\fIsrc > dst: id op? flags qtype qclass name (len)\fP
+.sp .5
+\f(CWh2opolo.1538 > helios.domain: 3+ A? ucbvax.berkeley.edu. (37)\fP
+.sp .5
+.fi
+.RE
+主机 \fIh2opolo\fP 访问 \fIhelios\fP 上的 域名服务, 询问
+和 \fIucbvax.berkeley.edu.\fP 关联的 地址记录(qtype=A).
+查询号是 `3'.  `+' 表明 设置了 \fI递归请求\fP 标志.
+查询长度是 37 字节, 不包括 UDP 和 IP 头.  
+查询操作 是 普通的 \fIQuery\fP 操作, 因此 op 域 可以 忽略.  
+如果 op 设置成 其他什么东西, 它应该 显示在 `3' 和 `+' 之间.
+类似的, qclass 是 普通的 \fIC_IN\fP 类型, 也被 忽略了.  
+其他类型的 qclass 应该 在 `A' 后面 显示.
+.LP
+Tcpdump 会检查 一些 不规则 情况, 相应的 结果 作为 补充域 放在 方括号内: 
+如果 某个 查询 包含 回答, 名字服务 或 管理机构部分,
+就把
+.IR ancount ,
+.IR nscount ,
+或
+.I arcount
+显示成 `[\fIn\fPa]', `[\fIn\fPn]' 或  `[\fIn\fPau]',  这里的 \fIn\fP
+代表 相应的 数量.
+如果 在 第二和第三字节 中, 任何一个 回答位(AA, RA 或 rcode) 或 任何一个
+`必须为零' 的位 被 置位, 就显示 `[b2&3=\fIx\fP]',
+这里的 \fIx\fP 是 报头 第二和第三字节 的 16进制数.
+.HD
+UDP 名字服务回答
+.LP
+名字服务回答的 格式 是
+.RS
+.nf
+.sp .5
+\fIsrc > dst:  id op rcode flags a/n/au type class data (len)\fP
+.sp .5
+\f(CWhelios.domain > h2opolo.1538: 3 3/3/7 A 128.32.137.3 (273)
+helios.domain > h2opolo.1537: 2 NXDomain* 0/1/0 (97)\fP
+.sp .5
+.fi
+.RE
+第一个例子里, \fIhelios\fP 回答了 \fIh2opolo\fP 发出的 标识为3 的 询问,
+一共是 3 个 回答记录, 3 个 名字服务记录 和 7 个管理结构记录.
+第一个 回答纪录 的 类型是 A (地址), 数据是 internet 地址 128.32.137.3.  
+回答的 全长 为 273 字节, 不包括 UDP 和 IP 报头.  作为 A 记录的 class(C_IN)
+可以 忽略 op (询问) 和 rcode (NoError).
+.LP
+在第二个例子里, \fIhelios\fP 对 标识为2 的 询问 作出 域名不存在 (NXDomain)
+的 回答, 没有 回答记录, 一个 名字服务记录, 没有 管理结构部分.
+ `*' 表明 设置了 \fI权威回答(authoritative answer)\fP. 
+由于 没有 回答记录, 这里就 不显示 type, class 和 data.
+.LP
+其他 标志 字符 可以 显示为 `\-' (\fI没有\fP设置递归有效(RA)) 和 `|' 
+(设置 消息截短(TC)). 如果 `问题' 部分 没有 有效的 内容, 就 显示 `[\fIn\fPq]'.
+.LP
+注意 名字服务的 询问和回答 一般说来 比较大, 68 字节的 \fIsnaplen\fP 可能
+无法 捕捉到 足够的 报文内容. 如果 你 的确 在 研究 名字服务 的 情况, 可以
+使用 \fB\-s\fP 选项 增大 捕捉缓冲区. `\fB\-s 128\fP' 应该 效果 不错了.
+
+.HD
+NFS 请求和响应
+.LP
+Sun NFS (网络文件系统) 的 请求和响应 显示格式 是:
+.RS
+.nf
+.sp .5
+\fIsrc.xid > dst.nfs: len op args\fP
+\fIsrc.nfs > dst.xid: reply stat len op results\fP
+.sp .5
+\f(CW
+sushi.6709 > wrl.nfs: 112 readlink fh 21,24/10.73165
+wrl.nfs > sushi.6709: reply ok 40 readlink "../var"
+sushi.201b > wrl.nfs:
+        144 lookup fh 9,74/4096.6878 "xcolors"
+wrl.nfs > sushi.201b:
+        reply ok 128 lookup fh 9,74/4134.3150
+\fP
+.sp .5
+.fi
+.RE
+在第一行, 主机 \fIsushi\fP 向 \fIwrl\fP 发送 号码为 \fI6709\fP 的 交互会话 
+(注意 源主机 后面的 数字 是 交互号, \fI不是\fP 端口).  
+这项请求 长 112 字节, 不包括 UDP 和 IP 报头.  在 文件句柄 (\fUfh\fP) 
+21,24/10.731657119 上执行 \fIreadlink\fP (读取 符号连接) 操作.
+(如果 运气 不错, 就象 这种情况, 文件句柄 可以 依次翻译成 主次设备号,
+i 节点号, 和 事件号(generation number). )
+\fIWrl\fP 回答 `ok' 和 连接的 内容.
+.LP
+在第三行, \fIsushi\fP 请求 \fIwrl\fP 在 目录文件 9,74/4096.6878 中 查找
+`\fIxcolors\fP'. 注意 数据的 打印格式 取决于 操作类型.  格式 应该 可以
+自我说明.
+.LP
+给出 \-v (verbose) 选项 可以 显示 附加信息.
+例如:
+.RS
+.nf
+.sp .5
+\f(CW
+sushi.1372a > wrl.nfs:
+        148 read fh 21,11/12.195 8192 bytes @ 24576
+wrl.nfs > sushi.1372a:
+        reply ok 1472 read REG 100664 ids 417/0 sz 29388
+\fP
+.sp .5
+.fi
+.RE
+(\-v 同时 使它 显示 IP 报头的 TTL, ID, 和 分片域, 在 这个例子里 把它们
+省略了.)  在第一行, \fIsushi\fP 请求 \fIwrl\fP 从 文件 21,11/12.195
+的 偏移位置 24576 开始, 读取 8192 字节. \fIWrl\fP 回答 `ok'; 第二行 显示的 
+报文 是 应答的 第一个 分片, 因此 只有 1472 字节 (其余数据 在 后续的 分片中
+传过来, 但由于 这些分片里 没有 NFS 甚至 UDP 报头, 因此 根据 所使用的 
+过滤器表达式, 有可能 不再显示). \-v 选项 还会 显示 一些 文件属性 (它们 作为 
+文件数据 的 附带部分 传回来): 文件类型 (普通文件 ``REG''), 存取模式
+(八进制数), uid 和 gid, 以及 文件大小.
+.LP
+如果再给一个 \-v 选项 (\-vv), 还能 显示 更多的细节.
+.LP
+注意 NFS 请求 的 数据量 非常大, 除非 增加 \fIsnaplen\fP, 否则 很多细节 
+无法显示. 试一试 `\fB\-s 192\fP' 选项.
+.LP
+NFS 应答报文 没有明确 标明 RPC 操作.  因此 \fItcpdump\fP 保留有 ``近来的'' 
+请求 记录, 根据 交互号 匹配 应答报文. 如果 应答报文 没有 相应的 请求报文,
+它 就 无法分析.
+.HD
+KIP Appletalk (UDP 上的 DDP)
+.LP
+Appletalk DDP 报文 封装在 UDP 数据报 中, 解包后 按 DDP 报文 转储 
+(也就是说, 忽略 所有的 UDP 报头 信息). 文件
+.I /etc/atalk.names
+用来 把 appletalk 网络和节点号 翻译成 名字. 这个文件 的 行格式 是
+.RS
+.nf
+.sp .5
+\fInumber       name\fP
+
+\f(CW1.254              ether
+16.1            icsd-net
+1.254.110       ace\fP
+.sp .5
+.fi
+.RE
+前两行 给出了 appletalk 的 网络名称. 第三行 给出 某个主机 的 名字
+(主机和网络 依据 第三组 数字 区分 \- 网络号 \fI一定\fP 是 两组数字,
+主机号 \fI一定\fP 是 三组 数字.)  号码 和 名字 用 空白符(空格或tab) 隔开.
+.I /etc/atalk.names
+文件 可以 包含 空行 或 注释行(以`#'开始的行).
+.LP
+Appletalk 地址 按 这个格式 显示
+.RS
+.nf
+.sp .5
+\fInet.host.port\fP
+
+\f(CW144.1.209.2 > icsd-net.112.220
+office.2 > icsd-net.112.220
+jssmag.149.235 > icsd-net.2\fP
+.sp .5
+.fi
+.RE
+(如果 不存在
+.I /etc/atalk.names ,
+或者 里面 缺少 有效项目, 就以 数字形式 显示 地址.)
+第一个例子里, 网络 144.1 的 209 节点的 NBP (DDP 端口 2) 向 网络 icsd 的 
+112 节点 的 220 端口 发送数据.
+第二行 和 上面 一样, 只是 知道了 源节点 的 全称 (`office').  
+第三行 是从 网络 jssmag 的 149 节点 的 235 端口 向 icsd-net 的 NBP 端口
+广播 (注意 广播地址 (255) 隐含在 无主机号的 网络名字 中 \- 所以 在
+/etc/atalk.names 中 区分 节点名 和 网络名 是个 好主意).
+.LP
+Tcpdump 可以 翻译 NBP (名字联结协议) 和 ATP (Appletalk 交互协议) 的 报文
+内容. 其他协议 只转储 协议名称 (或号码, 如果 还 没给 这个协议 注册 名称) 
+和 报文大小.
+
+\fBNBP 报文\fP 的 输出格式 就象 下面的 例子:
+.RS
+.nf
+.sp .5
+\s-2\f(CWicsd-net.112.220 > jssmag.2: nbp-lkup 190: "=:LaserWriter@*"
+jssmag.209.2 > icsd-net.112.220: nbp-reply 190: "RM1140:LaserWriter@*" 250
+techpit.2 > icsd-net.112.220: nbp-reply 190: "techpit:LaserWriter@*" 186\fP\s+2
+.sp .5
+.fi
+.RE
+第一行 是 网络 icsd 的 112 主机 在 网络 jssmag 上的 广播, 对 名字 
+laserwriter 做 名字查询请求. 名字查询请求 的 nbp 标识号 是 190.
+第二行 显示的是 对 这个请求 的 回答 (注意 它们 有 同样的 标识号),
+主机 jssmag.209 表示 在它的 250 端口 注册了 一个 laserwriter 的 资源,
+名字是 "RM1140". 第三行 是 这个请求 的 其他回答, 主机 techpit 的
+186 端口 有 laserwriter 注册的 "techpit".
+
+\fBATP 报文\fP 格式 如 下例 所示:
+.RS
+.nf
+.sp .5
+\s-2\f(CWjssmag.209.165 > helios.132: atp-req  12266<0-7> 0xae030001
+helios.132 > jssmag.209.165: atp-resp 12266:0 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:1 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:2 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:3 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:4 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:5 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:6 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp*12266:7 (512) 0xae040000
+jssmag.209.165 > helios.132: atp-req  12266<3,5> 0xae030001
+helios.132 > jssmag.209.165: atp-resp 12266:3 (512) 0xae040000
+helios.132 > jssmag.209.165: atp-resp 12266:5 (512) 0xae040000
+jssmag.209.165 > helios.132: atp-rel  12266<0-7> 0xae030001
+jssmag.209.133 > helios.132: atp-req* 12267<0-7> 0xae030002\fP\s+2
+.sp .5
+.fi
+.RE
+Jssmag.209 向 主机 helios 发起 12266 号 交互操作, 请求 8 个 报文(`<0-7>'). 
+行尾的 十六进制数 是 请求中 `userdata' 域 的 值.
+.LP
+Helios 用 8 个 512字节 的 报文 应答.  跟在 交互号 后面的 `:digit' 
+给出了 交互过程中 报文的 序列号, 括弧内的 数字 是 报文的 数据量,
+不包括 atp 报头.  报文 7 的 `*' 表明 设置了 EOM 位.
+.LP
+然后 Jssmag.209 请求 重传 第 3 & 5 报文.  Helios 做了 重传后 jssmag.209 
+结束 这次 交互操作. 最后, jssmag.209 发起 下一次 交互请求.  请求中的 `*' 
+表明 \fI没有\fP 设置 XO (exactly once) 位.
+
+.HD
+IP 分片
+.LP
+分片的 Internet 数据报 显示为
+.RS
+.nf
+.sp .5
+\fB(frag \fIid\fB:\fIsize\fB@\fIoffset\fB+)\fR
+\fB(frag \fIid\fB:\fIsize\fB@\fIoffset\fB)\fR
+.sp .5
+.fi
+.RE
+(第一种 形式 表明 还有 更多的 分片. 第二种 形式 表明 这是 最后 一片.)
+.LP
+\fIId\fP 是 分片 标识号.  \fISize\fP 是 分片 大小 (字节), 不包括 IP 报头.
+\fIOffset\fP 是 该分片 在 原数据报 中 的 偏移 (单位是字节).
+.LP
+每一个 分片 的 信息 都可以 打印出来.  第一个 分片 包含了 高层 协议 报头,
+显示 协议信息 后 显示 分片 的 信息. 第一个 分片 以后的 分片 不再 含有
+高层协议 报头, 所以 在 源目地址 后面 只显示 分片 信息.
+例如, 下面是 从 arizona.edu 到 lbl-rtsg.arpa 的 一部分 ftp 传输, 途经的
+CSNET 看上去 处理不了 576 字节的 数据报:
+.RS
+.nf
+.sp .5
+\s-2\f(CWarizona.ftp-data > rtsg.1170: . 1024:1332(308) ack 1 win 4096 (frag 595a:328@0+)
+arizona > rtsg: (frag 595a:204@328)
+rtsg.1170 > arizona.ftp-data: . ack 1536 win 2560\fP\s+2
+.sp .5
+.fi
+.RE
+这里 有几点 需要注意:  首先, 第二行的 地址 不包括 端口号.  这是因为 TCP
+协议 信息 全部 装到了 第一个 分片内, 所以 显示 后续分片的 时候 不可能 知道
+端口 或 流序号. 其次, 第一行的 tcp 流序号部分 看上去有 308 字节的 用户数据, 
+实际上 是 512 字节 (第一个 分片的 308 和 第二个 分片的 204 字节).  如果
+你 正在 寻找 流序号中 的 空洞, 或者 试图 匹配 报文 的 确认(ack), 那你上当了.
+.LP
+如果 报文的 IP 标有 \fI不要分片\fP 标志, 那么 在尾部 显示 \fB(DF)\fP.
+.HD
+时戳
+.LP
+缺省情况下, 所有 输出行 的 前面 都有 时戳. 时戳 就是 当前时间, 显示格式为
+.RS
+.nf
+\fIhh:mm:ss.frac\fP
+.fi
+.RE
+精度 和 内核时钟 一样. 时戳 反映了 内核 收到 报文 的 时间. 从 以太接口 
+收到 报文 到 内核 响应 '报文就绪' 中断 有一个 滞后, 该 滞后 不被考虑.
+
+.SH "另见 (SEE ALSO)"
+traffic(1C), nit(4P), bpf(4), pcap(3)
+
+.SH 作者 (AUTHORS)
+Van Jacobson,
+Craig Leres and
+Steven McCanne, all of the
+Lawrence Berkeley National Laboratory, University of California, Berkeley, CA.
+.LP
+当前 版本 可以 从 匿名ftp 获得:
+.LP
+.RS
+.I ftp://ftp.ee.lbl.gov/tcpdump.tar.Z
+.RE
+
+.SH BUGS
+请把 臭虫 报告 传往 tcpdump@ee.lbl.gov.
+.LP
+NIT 不允许 监视 你自己的 传出数据, BPF 可以. 我们 建议 你 使用 后者.
+.LP
+应该 试着 重组 IP 分片, 至少可以 为 更高层的 协议 计算出 正确的 长度.
+.LP
+名字服务逆向询问 转储的 不正确: 打印出 (空的)问题部分, 而实际上 询问 放在了
+回答部分. 有人 认为 这种 逆向询问 本身就是 bug, 应该 修改 产生问题 的 程序, 
+而非 tcpdump.
+.LP
+苹果 Ethertalk DDP 的 报文 应该 象 KIP DDP 的 报文 一样 容易 转储, 事实
+却 不是 这样. 即使 我们 有意 作点什么 来 促销 Ethertalk (我们没有), 
+LBL 也不允许 Ethertalk 出现在 它的 任何网络上, 所以 我们 没办法 测试 
+这些代码.
+.LP
+如果 报文的 路径上 出现 夏时制时间 变化, 可能 导致 时戳 混乱.
+(这个时间变化将忽略)
+.LP
+操作 FDDI 报头的 过滤器表达式 假设 所有的 FDDI 报文 被封装在 以太报文 中.
+这对 IP, ARP 和 DECNET Phase IV 无疑是 正确的, 但对 某些 协议 如 ISO CLNS
+不正确. 因此, 过滤器 有可能会 糊里糊涂的 的 接收 一些 并不真正 匹配
+过滤器表达式 的 报文.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

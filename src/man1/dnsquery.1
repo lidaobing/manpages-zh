@@ -1,0 +1,181 @@
+.\"Copyright (c) 1995,1996,1999 by Internet Software Consortium
+.\"
+.\"Permission to use, copy, modify, and distribute this software for any
+.\"purpose with or without fee is hereby granted, provided that the above
+.\"copyright notice and this permission notice appear in all copies.
+.\"
+.\"THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
+.\"ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+.\"OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
+.\"CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+.\"DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+.\"PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+.\"ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+.\"SOFTWARE.
+.\"
+.Dd 1990年3月10日
+.Dt DNSQUERY 1
+.Os BSD 4
+.Sh NAME(名称)
+.Nm dnsquery
+.Nd 使用解析程序查询域名服务器
+.Sh SYNOPSIS(总览)
+.Nm dnsquery
+.Op Fl n Ar nameserver
+.Op Fl t Ar type
+.Op Fl c Ar class
+.Op Fl r Ar retry
+.Op Fl p Ar period
+.Op Fl d
+.Op Fl s
+.Op Fl v
+.Ar host
+.Sh DESCRIPTION(描述)
+.Ic dnsquery
+程序是一个通过BIND解析程序库调用到域名服务器的通用接口.
+该程序支持使用一些查询操作码来查询域名服务器.
+该程序意在作为程序如nstest,nsquery和nslookup的替换或补充.
+所有参数,除了
+.Ar host
+和
+.Ar nameserver
+之外都是不区分大小写的.
+.Sh OPTIONS(选项)
+.Bl -tag -width Fl
+.It Fl n Ar nameserver
+查询中使用的域名服务器.域名服务器可以表示为
+Internet地址格式
+.Ar w.x.y.z 
+也可以表示为域名的形式.
+(默认情况:取
+.Pa /etc/resolv.conf
+中指定的.)
+.It Fl t Ar type
+所关心的资源记录的类型.类型包括:
+.Bl -tag -width "AFSDB  " -compact -offset indent
+.It Ar A
+地址
+.It Ar NS
+域名服务器
+.It Ar CNAME
+标准名
+.It Ar SOA
+起始授权记录
+.It Ar WKS
+众所周知的服务
+.It Ar HINFO
+主机信息
+.It Ar MINFO
+邮箱信息
+.It Ar MX
+邮件网关
+.It Ar RP
+负责人信息
+.It Ar MG
+邮件组成员信息
+.It Ar AFSDB
+DCE或AFS服务器
+.It Ar ANY
+所有的信息
+.El
+.Pp
+注意可以使用任意大小写形式.(默认情况:
+.Ar ANY . )
+.It Fl c Ar class
+所关心的资源纪录的等级.
+等级包括:
+.Bl -tag -width "CHAOS  " -compact -offset indent
+.It Ar IN
+Internet等级
+.It Ar HS
+Hesiod等级
+.It Ar CHAOS
+Chaos等级
+.It Ar ANY
+所有的等级
+.El
+.Pp
+注意可以使用任意大小写形式.(默认情况:
+.Ar IN . )
+.It Fl r Ar retry
+名字服务器无响应下的重试次数.(默认情况: 4.)
+.It Fl p Ar period
+超时等待的时间周期.(默认情况:
+.Dv RES_TIMEOUT . )
+.It Fl d
+打开调试环境.这会设置
+解析程序的
+.Ft options
+字段的
+.Dv RES_DEBUG
+位.(默认情况:不作调试.)
+.It Fl s
+使用
+.Em 信息流
+而不是信息包的形式.这将对名字服务器使用TCP流连接,而不是
+UDP数据报连接.
+它会设置
+解析程序的
+.Ft options
+字段的
+.Dv RES_USEVC
+位.(默认情况:UDP数据报.)
+.It Fl v
+与
+.Dq Fl s
+标识同义.
+.It Ar host
+所关心的主机(或域)的名字.
+.El
+.Sh FILES(相关文件)
+.Bl -tag -width "<arpa/nameser.h>  " -compact
+.It Pa /etc/resolv.conf 
+用来获取默认的域名服务器以及搜索列表
+.It Pa <arpa/nameser.h>
+可用的RR(资源纪录)的类型和等级的列表
+.It Pa <resolv.h>
+解析程序标识的列表
+.El
+.Sh DIAGNOSTICS(诊断)
+如果解析程序不能响应查询,并且调试环境又没有打开,那么
+.Ic dnsquery
+会简单地显示如下信息:
+.Dl Query failed (rc = 1) : Unknown host
+.Pp
+返回代码的值由
+.Ft h_errno
+提供.
+.Sh SEE ALSO(另见)
+.Xr nslookup 8 , 
+.Xr nstest 1 , 
+.Xr nsquery 1 , 
+.Xr named 8 , 
+.Xr resolver 5 .
+.Sh AUTHOR(作者)
+Bryan Beecher
+.Sh BUGS
+除了等级
+.Ar IN
+之外的查询会得到有趣的结果,
+因为通常名字服务器只会有针对等级为
+.Ar IN
+的资源记录的一组根域名服务器.
+.Pp
+.Ic Dnsquery
+通过调用
+.Fn inet_addr
+来确定针对
+.Dq Fl n
+选项的参数是否为有效的
+Internet地址.不幸的是,
+.Fn inet_addr
+可能会在判别一些(错误的)IP地址(如1.2.3.4.5)时引发segmentation(分段)
+错误.
+
+
+.Sh "[中文版维护人]"
+riser <boomer@ccidnet.com>
+.Sh "[中文版最新更新]"
+2001/7/13
+.Sh "《中国Linux论坛man手册页翻译计划》"
+http://cmpp.linuxforum.net

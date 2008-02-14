@@ -1,0 +1,452 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: string.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: string.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH string n 8.1 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+string \- 操纵字符串
+.SH "总览 SYNOPSIS"
+\fBstring \fIoption arg \fR?\fIarg ...?\fR
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+依赖于 \fIoption\fR (选项)进行某种字符串操作。合法的 \fIoption\fR (可以是缩写)有:
+.VS 8.1
+.TP
+\fBstring bytelength \fIstring\fR
+返回一个十进制字符串，给出在内存中表示 \fIstring\fR 用的字节数。因为 UTF-8 使用一到三字节来表示 Unicode  字符，字节长度可能与通常的字符长度不同。一个脚本关心字节长度的情况较少见。多数情况下，你应该使用  \fBstring length\fR 操作。关于 UTF-8 表示的详情请参考 \fBTcl_NumUtfChars\fR 手册页。
+.TP
+\fBstring compare\fR ?\fB\-nocase\fR? ?\fB\-length int\fR? \fIstring1 string2\fR
+.VE 8.1
+对字符串 \fIstring1\fR 和 \fIstring2\fR\fI \fR进行逐个字符的比较。依赖于     \fIstring1\fR 在词典顺序上(lexicographically)小于、等于、大于  \fIstring2\fR，返回 -1、0、或 1。
+.VS 8.1
+如果指定了 \fB-length\fR     ，则在比较中只使用前 \fIlength\fR 个字符。如果 \fB-length\fR     是负数，则被忽略。如果指定了 \fB-nocase\fR     ，则使用大小写不敏感方式比较字符串。
+.TP
+\fBstring equal\fR ?\fB\-nocase\fR? ?\fB-length int\fR? \fIstring1 string2\fR
+对字符串 \fIstring1\fR 和 \fIstring2\fR\fI \fR进行逐个字符的比较。如果     \fIstring1\fR 和 \fIstring2\fR 等同则返回 1，否则返回 0。如果指定了     \fB-length\fR ，则在比较中只使用前 \fIlength\fR     个字符。如果 \fB-length\fR 是负数，则被忽略。如果指定了     \fB-nocase\fR ，则使用大小写不敏感方式比较字符串。
+.TP
+\fBstring first \fIstring1 string2\fR ?\fIstartIndex\fR?
+.VE 8.1
+在 \fIstring2\fR 中查找精确的匹配 \fIstring1 \fR中的字符的一个字符序列。如果找到，返回     \fIstring2 \fR中的第一个这样的匹配的第一个字符的索引。如果未找到，返回     -1。
+.VS 8.1
+如果指定了 \fIstartIndex\fR (以可被 \fBindex\fR     方法接受的任何形式)，则约束查找为在 \fIstring2\fR     中从用索引指定的字符开始。例如，
+.RS
+.CS
+\fBstring first a 0a23456789abcdef 5\fR
+.CE
+将返回 \fB10\fR, but
+.CS
+\fBstring first a 0123456789abcdef 11\fR
+.CE
+将返回 \fB\-1\fR.
+.RE
+.VE 8.1
+.TP
+\fBstring index \fIstring charIndex\fR
+返回 \fIstring\fR 参数的第 \fIcharIndex \fR个字符。\fIcharIndex\fR     中 0 对应着字符串的第一个字符。
+.VS 8.1
+ \fIcharIndex\fR     可以被指定如下:
+.RS
+.IP \fIinteger\fR 10
+用整数索引指定字符。
+.IP \fBend\fR 10
+字符串的最后一个字符。
+.IP \fBend\-\fIinteger\fR 10
+字符串最后一个字符减去指定整数偏移量(例如， \fBend-1\fR 将参照“abcd”中的“c”)。
+.PP
+.VE 8.1
+如果 \fIcharIndex\fR 小于 0     或大于等于字符串的长度则返回一个空串。
+.VS 8.1
+.RE
+.TP
+\fBstring is \fIclass\fR ?\fB\-strict\fR? ?\fB\-failindex \fIvarname\fR? \fIstring\fR
+如果 \fIstring\fR 是指定字符类的一个有效成员则返回 1，否则返回     0。如果指定了 \fB-strict\fR，则对一个空串返回 0，否则在任何类上对一个空串返回     1。如果指定了 \fB-failindex\fR，则若函数返回 0，把字符串中类不再有效的地方的索引存储到叫做     \fIvarname\fR 的变量中。如果函数返回 1则不设置 \fIvarname\fR     。识别下列字符类(类的名字可以被缩写):
+.RS
+.IP \fBalnum\fR 10
+任何 Unicode 字母或数字字符。
+.IP \fBalpha\fR 10
+任何 Unicode 字母字符。
+.IP \fBascii\fR 10
+值小于 \\u0080 的任何字符(这是 7-bit ascii 的范围)。
+.IP \fBboolean\fR 10
+\fBTcl_GetBoolean\fR 所允许的任何形式。
+.IP \fBcontrol\fR 10
+任何 Unicode 控制字符。
+.IP \fBdigit\fR 10
+任何 Unicode 数字字符。注意这包括在 [0-9] 范围外的字符。
+.IP \fBdouble\fR 10
+双精度数在 Tcl  中的任何有效形式，可以有可选的围绕白空格。在值下溢/上溢的情况下，返回 0 并且 \fIvarname\fR 将包含 -1。
+.IP \fBfalse\fR 10
+\fBTcl_GetBoolean\fR 允许的任何形式，这里的值是假。
+.IP \fBgraph\fR 10
+除了空格之外的任何 Unicode 打印字符。
+.IP \fBinteger\fR 10
+整数在 Tcl 中的任何有效形式，可以有可选的围绕白空格。在值下溢/上溢的情况下，返回 0 并且 \fIvarname\fR 将包含 -1。
+.IP \fBlower\fR 10
+任何 Unicode 小写字母字符。.
+.IP \fBprint\fR 10
+包括空格在内的任何 Unicode 打印字符。
+.IP \fBpunct\fR 10
+任何 Unicode 标点字符。
+.IP \fBspace\fR 10
+任何 Unicode 空格字符。
+.IP \fBtrue\fR 10
+\fBTcl_GetBoolean\fR 所允许的任何形式，这里的值是真。
+.IP \fBupper\fR 10
+在 Unicode 中的任何大写字符。
+.IP \fBwordchar\fR 10
+任何 Unicode 单字字符。它是任何字母字符和 Unicode  连接符标点字符(例如，下划线)。
+.IP \fBxdigit\fR 10
+任何十六进制数字字符 ([0\-9A\-Fa\-f]).
+.PP
+在 \fBboolean\fR、\fBtrue\fR 和 \fBfalse\fR 的情况下，如果函数将返回 0，则 \fIvarname\fR 总是被设置为 0，原因是一个有效 boolean 值有多种本地(表示)。
+.RE
+.TP
+\fBstring last \fIstring1 string2\fR ?\fIstartIndex\fR?
+.VE 8.1
+在 \fIstring2\fR 中查找精确的匹配在 \fIstring1 \fR中的字符的一个字符序列。如果找到，返回在     \fIstring2 \fR中最后一个这样的匹配的第一个字符的索引。如果没有匹配，则返回     -1。
+.VS 8.1
+如果指定了 \fIstartIndex\fR(以可被 \fBindex\fR     方法接受的任何形式)， 则查找只针对 \fIstring2\fR 中用 \fIstartIndex\fR     指定的和此前的字符。例如，
+.RS
+.CS
+\fBstring last a 0a23456789abcdef 15\fR
+.CE
+将返回 \fB10\fR, 而
+.CS
+\fBstring last a 0a23456789abcdef 9\fR
+.CE
+将返回 \fB1\fR.
+.RE
+.VE 8.1
+.TP
+\fBstring length \fIstring\fR
+返回一个十进制字符串，给出在 \fIstring \fR中字符的数目。注意这不是必须与用于存储这个字符串的字节的数目相同。
+.VS 8.1
+.TP
+\fBstring map\fR ?\fB\-nocase\fR? \fIcharMap string\fR
+基于在 \fIcharMap \fR中的键-值对替代 \fIstring\fR     中的字符。\fIcharMap\fR 是形如 \fIkey value key value\fR ...  的一个列表，同于从 \fBarray get \fR返回的那种形式。在字符串中这些键的每个实例将被替代为相应的值。如果指定了 \fB-nocase\fR，则进行匹配时不区别大小写。\fIkey\fR 和 \fIvalue\fR  二者都可以是多字节的。以一种有次序的方式进行替代，所以在列表中出现在最前面的键将被首先检查，以此类推。\fIstring\fR 只被重复操作(iterate)一次，所以早先的键替代将不影响以后的键匹配。例如，
+.RS
+.CS
+\fBstring map {abc 1 ab 2 a 3 1 0} 1abcaababcabababc\fR
+.CE
+将返回字符串 \fB01321221\fR.
+.RE
+.TP
+\fBstring match\fR ?\fB\-nocase\fR? \fIpattern\fR \fIstring\fR
+.VE 8.1
+查看 \fIpattern\fR 是否匹配 \fIstring\fR；如果是则返回 1，不是则返回 0。
+.VS 8.1
+如果指定了 \fB-nocase\fR，则针对字符串的模式匹配采用大小写不敏感的方式。
+.VE 8.1
+对于要进行匹配的这两个字符串，除了在 \fIpattern \fR中可以出现的下列特殊序列之外它们的内容必须相同:
+.RS
+.IP \fB*\fR 10
+匹配 \fIstring \fR中任何字符的一个序列，包括一个空字符。
+.IP \fB?\fR 10
+匹配 \fIstring\fR 中的一个单一字符。
+.IP \fB[\fIchars\fB]\fR 10
+匹配在用 \fIchars \fR给出的集合中的任何字符。如果在 \fIchars\fR 中出现一个形式是 \fIx\fB\-\fIy\fR 的一个序列，则匹配在 \fIx\fR 和 \fIy\fR,之间的任何字符，包括二者。
+.VS 8.1
+当与 \fB\-nocase \fR一起使用的时候，范围的端点首先被转换为小写。所以在大小写敏感匹配时 {[A\-z]} 匹配‘_’(‘_’位于‘Z’和‘a’之间)，加上 \fB-nocase\fR 则将被象 {[A\-Za\-z]} 那样对待(并可能是前者的真实意图)。
+.VE 8.1
+.IP \fB\e\fIx\fR 10
+匹配单一字符 \fIx\fR。这提供了一种方式避免在 \fIpattern \fR中对字符 \fB*?[]\e\fR 做特殊解释。
+.RE
+.TP
+\fBstring range \fIstring first last\fR
+从 \fIstring \fR返回一个范围的连续字符，从索引是 \fIfirst\fR 的字符开始并结束于索引是 \fIlast\fR 的字符。 索引 0 参照字符串的
+.VS 8.1
+第一个字符。可以按 \fBindex\fR 方法的方式指定 \fIfirst\fR 和 \fIlast\fR 。
+.VE 8.1
+如果 \fIfirst\fR 小于零，则把它作为零对待，而如果 \fIlast\fR 大于等于字符串的长度，则把它作为 \fBend\fR 对待。如果 \fIfirst\fR 大于 \fIlast\fR 则返回空串。
+.VS 8.1
+.TP
+\fBstring repeat \fIstring count\fR
+把 \fIstring \fR重复 \fIcount\fR 次后返回。
+.TP
+\fBstring replace \fIstring first last\fR ?\fInewstring\fR?
+从 \fIstring\fR 删除一个范围的连续字符，范围从索引是 \fIfirst\fR  的字符开始并结束于索引是 \fIlast\fR 的字符。索引 0     参照字符串的第一个字符。可以按 \fBindex\fR     方法的方式指定 \fIfirst\fR 和 \fIlast\fR 。如果指定了 \fInewstring\fR     ，则把它放置在删除的字符范围中。如果 \fIfirst\fR     小于零，则把它作为零对待，而如果 \fIlast\fR     大于等于字符串的长度，则把它作为 \fBend\fR 对待。如果 \fIfirst\fR     大于 \fIlast \fR或最初的字符串的长度 ，或者 \fIlast\fR     小于 0，则不做变动的返回最初的字符串。
+.TP
+\fBstring tolower \fIstring\fR ?\fIfirst\fR? ?\fIlast\fR?
+返回一个等同于 \fIstring\fR 的值，但所有大写(或标题)字母都被转换为小写。如果指定了     \fIfirst\fR，则它参照字符串中开始修改的第一个字符的索引。如果指定了     \fIlast\fR，则它参照字符串中修改停止到(包括它)的那个字符的索引。按     \fBindex\fR 方法的方式指定 \fIfirst\fR 和 \fIlast\fR。
+.TP
+\fBstring totitle \fIstring\fR ?\fIfirst\fR? ?\fIlast\fR?
+返回等同于 \fIstring\fR 的一个值，但把 \fIstring\fR     的第一个字符转换成它的 Unicode 标题大写变体(如果没有标题大写变体则为大写)而把字符串的其余部分转换成小写。如果指定了     \fIfirst\fR，则它参照字符串中开始修改的第一个字符的索引。如果指定了     \fIlast\fR，则它参照字符串中修改停止到(包括它)的那个字符的索引。按     \fBindex\fR 方法的方式指定 \fIfirst\fR 和 \fIlast\fR。
+.TP
+\fBstring toupper \fIstring\fR ?\fIfirst\fR? ?\fIlast\fR?
+返回一个等同于 \fIstring\fR 的值，但所有小写(或标题)字母都被转换为大写。如果指定了     \fIfirst\fR，则它参照字符串中开始修改的第一个字符的索引。如果指定了     \fIlast\fR，则它参照字符串中修改停止到(包括它)的那个字符的索引。按     \fBindex\fR 方法的方式指定 \fIfirst\fR 和 \fIlast\fR。
+.VE 8.1
+.TP
+\fBstring trim \fIstring\fR ?\fIchars\fR?
+返回一个等同于 \fIstring\fR     的值，但删除了任何前导或尾随的用 \fIchars\fR     给出的字符集合中字符。如果未指定 \fIchars\fR     则删除白空格(空格、tab、换行、回车)。
+.TP
+\fBstring trimleft \fIstring\fR ?\fIchars\fR?
+返回一个等同于 \fIstring\fR     的值，但删除了任何前导的用 \fIchars\fR     给出的字符集合中字符。如果未指定 \fIchars\fR     则删除白空格(空格、tab、换行、回车)。
+.TP
+\fBstring trimright \fIstring\fR ?\fIchars\fR?
+返回一个等同于 \fIstring\fR     的值，但删除了任何尾随的用 \fIchars\fR     给出的字符集合中字符。如果未指定 \fIchars\fR     则删除白空格(空格、tab、换行、回车)。
+.VS 8.1
+.TP
+\fBstring wordend \fIstring charIndex\fR
+返回包含 \fIstring \fR的第 \fIcharIndex\fR     个字符的那个字最后的字符后面的那个字符的索引。按 \fBindex\fR     方法的方式指定 \fIcharIndex\fR     。一个字被认为是任何连续范围的 alphanumeric (Unicode 字母或十进制数字)或下划线(Unicode 连接符标点)字符，或除了这些之外的任何单一字符。
+.TP
+\fBstring wordstart \fIstring charIndex\fR
+返回包含 \fIstring \fR的第 \fIcharIndex\fR 个字符的那个字的第一个字符的索引。按 \fBindex\fR  方法的方式指定 \fIcharIndex\fR 。一个字被认为是任何连续范围的 alphanumeric (Unicode 字母或十进制数字)或下划线(Unicode 连接符标点)字符，或除了这些之外的任何单一字符。
+.VE 8.1
+
+.SH "参见 SEE ALSO"
+expr(n), list(n)
+
+.SH "关键字 KEYWORDS"
+case conversion, compare, index, match, pattern, string, word, equal, ctype
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/11/15
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

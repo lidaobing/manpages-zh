@@ -1,0 +1,145 @@
+.ig
+Copyright (C) 1989-2001 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in
+translations approved by the Free Software Foundation instead of in
+the original English.
+..
+.TH NROFF 1 "23 September 2003" "Groff Version 1.18.1"
+.SH NAME
+nroff \- 用 groff 模拟 nroff 命令
+.SH "总览 SYNOPSIS"
+.nr a \n(.j
+.ad l
+.nr i \n(.i
+.in +\w'\fBnroff 'u
+.ti \niu
+.B nroff
+.de OP
+.ie \\n(.$-1 .RI "[\ \fB\\$1\fP" "\\$2" "\ ]"
+.el .RB "[\ " "\\$1" "\ ]"
+..
+.OP \-h
+.OP \-i
+.OP \-m name
+.OP \-n num
+.OP \-o list
+.OP \-p
+.OP \-r cn
+.OP \-S
+.OP \-t
+.OP \-T name
+.OP \-U
+.OP \-v
+.RI "[\ " "file" "\ .\|.\|.\ ]"
+.br
+.ad \na
+.SH "描述 DESCRIPTION"
+.B nroff
+shell 脚本用 groff 来模拟
+.B nroff
+命令。
+.B -T
+选项允许的有效参数是
+.BR ascii ,
+.BR ascii8 ,
+.BR latin1 ,
+.BR utf8 ,
+.BR nippon ,
+以及
+.B cp1047
+。如果参数无效，或者没有给出
+.BR \-T
+选项，
+.B nroff
+检测当前语言环境来选择一个默认的输出设备。它首先使用
+.B locale
+程序，然后检测环境变量
+.BR LC_ALL ,
+.BR LC_CTYPE ,
+和
+.BR LANG ,
+最后是
+.B LESSCHARSET
+环境变量。
+.PP
+.B \-h
+和
+.B \-c
+选项与
+.BR grotty 
+的
+.B \-h
+(在输出中使用tab) 和
+.B \-c
+(使用老式的输出方案而不是 SGR 转义序列) 选项等价。
+.BR \-C ,
+.BR \-i ,
+.BR \-n ,
+.BR \-m ,
+.BR \-o ,
+和
+.B \-r
+选项的效果在
+.BR troff (1)
+中详述。另外，
+.B nroff
+忽略
+.BR \-e ,
+.BR \-q ,
+和
+.BR \-s
+(在
+.BR troff 
+中没有实现) 选项，没有任何提示。
+.B \-p
+(pic),
+.B \-t
+(tbl),
+.B \-S
+(safer), 和
+.B \-U
+(unsafe) 选项被传给
+.BR groff . 
+.B \-v
+显示版本号。
+.SH "环境 ENVIRONMENT"
+.TP
+.SM
+.B GROFF_BIN_PATH
+一个冒号分隔的路径列表，在搜索 PATH 之前从中搜索
+.B groff
+可执行文件。如果没有设置，将使用 `/usr/bin'.
+.SH "注意 NOTES"
+这个 shell 脚本一般用于配合
+.BR man (1)
+使用，所以不输出警告信息。nroff 样式的字符定义 (在文件 tty-char.tmac 中) 会被读取，来模拟不可显示的符号。
+.SH "参见 SEE ALSO"
+.BR groff (1),
+.BR troff (1),
+.BR grotty (1)
+.SH "[中文版维护人]"
+.\" 译者
+.\" 唐友 <tony_ty@263.net>
+.\" 翻译日期
+.\" 2001.08.28
+.B bbbush <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 2003.11.22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 
+.
+.\" Local Variables:
+.\" mode: nroff
+.\" End:

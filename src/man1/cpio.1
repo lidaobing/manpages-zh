@@ -1,0 +1,326 @@
+.TH CPIO 1L \" -*- nroff -*-
+.SH NAME
+cpio \- 存取归档包中的文件
+.SH 总览 (SYNOPSIS)
+.B cpio
+{\-o|\-\-create} [\-0acvABLV] [\-C bytes] [\-H format] [\-M message]
+[\-O [[user@]host:]archive] [\-F [[user@]host:]archive]
+[\-\-file=[[user@]host:]archive] [\-\-format=format] [\-\-message=message]
+[\-\-null] [\-\-reset-access-time] [\-\-verbose] [\-\-dot] [\-\-append]
+[\-\-block-size=blocks] [\-\-dereference] [\-\-io-size=bytes] [\-\-quiet]
+[\-\-force\-local] [\-\-help] [\-\-version] < name-list [> archive]
+
+.B cpio
+{\-i|\-\-extract} [\-bcdfmnrtsuvBSV] [\-C bytes] [\-E file] [\-H format]
+[\-M message] [\-R [user][:.][group]] [\-I [[user@]host:]archive]
+[\-F [[user@]host:]archive] [\-\-file=[[user@]host:]archive]
+[\-\-make-directories] [\-\-nonmatching] [\-\-preserve-modification-time]
+[\-\-numeric-uid-gid] [\-\-rename] [\-\-list] [\-\-swap-bytes] [\-\-swap] [\-\-dot]
+[\-\-unconditional] [\-\-verbose] [\-\-block-size=blocks] [\-\-swap-halfwords]
+[\-\-io-size=bytes] [\-\-pattern-file=file] [\-\-format=format]
+[\-\-owner=[user][:.][group]] [\-\-no-preserve-owner] [\-\-message=message]
+[\-\-force\-local] [\-\-no\-absolute\-filenames] [\-\-sparse] [\-\-only\-verify\-crc]
+[\-\-quiet] [\-\-help] [\-\-version] [pattern...] [< archive]
+
+.B cpio
+{\-p|\-\-pass-through} [\-0adlmuvLV] [\-R [user][:.][group]]
+[\-\-null] [\-\-reset-access-time] [\-\-make-directories] [\-\-link] [\-\-quiet]
+[\-\-preserve-modification-time] [\-\-unconditional] [\-\-verbose] [\-\-dot]
+[\-\-dereference] [\-\-owner=[user][:.][group]] [\-\-no-preserve-owner]
+[\-\-sparse] [\-\-help] [\-\-version] destination-directory < name-list
+
+.SH 描述 (DESCRIPTION)
+本手册页 描述 GNU 版本 的
+.BR cpio .
+
+.B cpio
+可以 从 cpio 或 tar 格式 的 归档包(archive) 中 读写 文件, 归档包 是 
+一种文件, 它 由 归档文件 及其 相关信息 组成, 例如 文件名, 属主, 时标
+(timestamp), 和 访问权限. 归档包 可以 是 磁盘上的 文件, 也可以 是 
+磁带或管道.
+
+.B cpio
+有 三种 操作模式.
+.PP
+在 copy-out 模式中,
+.B cpio
+把 文件 复制到 归档包 中. 它 从 标准输入 读取 文件名列表, 每行一个文件名.
+生成的 归档包 写到 标准输出. 产生 文件名列表 的 典型方法 是 使用
+.B find
+命令; 你 可能 要在
+.B find
+后面 用上 \-depth 选项, 减少 因为 进入 没有 访问权限 的 目录 引起 的 麻烦.
+
+.PP
+在 copy-in 模式中,
+.B cpio
+从 归档包 读取 文件, 或者 列出 归档包 的 内容, 归档包 来自 标准输入.
+任何 非选项 命令行参数 被视为 shell 的 通配符模式串 (globbing pattern);
+在 归档包 中, 只 读取 文件名 匹配 这些 模式串 的 文件.
+和 shell 环境 不一样, 文件名 起始处 的 '.' 可以 匹配 模式串 
+起始处 的 通配符, 文件名中 的 '/' 也可以 匹配 通配符. 如果 没有 给出 
+模式串, 那么 读取 所有 文件.
+
+.PP
+在 copy-pass 模式中,
+.B cpio
+把 文件 从 一棵目录树 复制到 另一棵, 它 结合了 copy-in 和 copy-out 的 操作,
+但是 没有 使用 归档包. 
+.B cpio
+从 标准输入 读取 欲复制的 文件名列表; 目标目录 是 非选项命令行参数.
+
+.PP
+.B cpio
+支持 下列的 归档 格式:
+binary, old ASCII, new ASCII, crc, HPUX binary, HPUX old ASCII, old tar, 
+和 POSIX.1 tar.  
+
+"binary" 格式 是 过时 格式, 因为 它 保存 文件信息 的 方法 无法 应用在 
+不同体系 的 机器 上.
+"old ASCII" 格式 可以 跨平台 使用, 但是 不能 用于 超过 65536 个 i 节点 的
+文件系统 中.
+"new ASCII" 格式 可以 跨平台 使用, 也 适用于 任意大小 的 文件系统 上, 但
+不是 所有 版本 的 
+.BR cpio
+都 支持, 目前 只有 GNU 和 System VR4 的 cpio 能够 支持 "new ASCII" 格式.
+"crc" 格式 类似于 "new ASCII" 格式, 而且 对每个 文件 计算 校验和;
+.B cpio
+在 创建 归档包 时 计算 校验和, 解开 文件 时 进行 校验.
+"HPUX" 格式 用于 兼容 HP UNIX 的 cpio, 它 用了 独特的方法 保存 设备文件.
+
+.PP
+"tar" 格式 用以 兼容 
+.B tar
+程序. 它 不能 对 文件名 超过 100 个 字符 的 文件 归档, 也 不能 对 特殊文件
+(块设备 或 字符设备) 归档.
+"POSIX.1 tar" 格式 不能 对 文件名 超过 255 个 字符 的 文件 归档 (小于 255,
+除非 文件名 的 最右边 有一个 "/").
+
+.PP
+缺省情况下,
+.B cpio
+为了 兼容 老式的
+.B cpio
+程序, 创建 "binary" 格式 的 归档包.
+当展开 归档包 时,
+.B cpio
+能够 自动识别 归档包 的 格式, 而且 能够 读取 不同 字节顺序 的 机器 上
+创建 的 归档包.
+
+.PP
+.B cpio 
+的 某些 选项 只能 用在 相应的 操作模式 上; 参见 总览 小节, 里面 列出了
+什么模式 可以用 什么选项.
+
+.SS 选项 (OPTIONS)
+.TP
+.I "\-0, \-\-null"
+在 copy-out 和 copy-pass 模式中, 认为 输入的 文件名 以 null 字符 结尾, 
+而不是 换行符, 这样 即使 文件名 中 包含 换行符, 也 不影响 归档. GNU
+.B find
+是 生成 null 结尾 文件名 列表 的 方法 之一.
+
+.TP
+.I "\-a, \-\-reset-access-time"
+读取完 文件 后 重置 文件的访问时间, 这样 看上去 就象 没有 访问 过 这个 文件.
+
+.TP
+.I "\-A, \-\-append"
+添加到 现存的 归档包 中. 仅用于 copy-out 模式. 该 归档包 必须是 用
+.I \-O
+或
+.I "\-F (\-\-file)"
+选项 生成的 磁盘文件.
+
+.TP
+.I "\-b, \-\-swap"
+在 copy-in 模式中, 颠倒 数据中 字 的 字节 顺序. 相当于
+.IR "\-sS" .
+使用 这个 选项 可以 在 大端数 和 小端数 机器 之间 转换 32 位 整数.
+
+.TP
+.I "\-B"
+把 I/O 块 大小 设置成 5120 字节. 最初的 块大小 是 512 字节.
+
+.TP
+.I "\-\-block-size=BLOCK-SIZE"
+设置 I/O 块 大小 为 BLOCK-SIZE * 512 字节.
+
+.TP
+.I "\-c"
+使用 老式的 跨平台 (ASCII) 归档 格式.
+
+.TP
+.I "\-C IO-SIZE, \-\-io-size=IO-SIZE"
+设置 I/O 块 大小 为 IO-SIZE 字节.
+
+.TP
+.I "\-d, \-\-make-directories"
+在 需要的地方 创建 起始目录.
+
+.TP
+.I "\-E FILE, \-\-pattern-file=FILE"
+在 copy-in 模式中, 从 FILE 里 读取 用于 匹配 文件名 的 模式串. 
+FILE 的 内容 如同
+.BR cpio
+的 非选项 参数.
+
+.TP
+.I "\-f, \-\-nonmatching"
+只复制 那些 不匹配 给定的 模式串 的 文件.
+
+.TP
+.I "\-F, \-\-file=archive"
+使用 归档包文件, 而不是 标准输入或输出. 如果 把 其他 机器上 的 磁带机
+作成 归档包文件, 文件名 要用 "HOSTNAME:" 开始. 主机名 前面 可以 加上 用户名
+和 一个 '@', 作为 访问 远程 磁带机 的 用户 (如果 你有 这样的 权限, 一般
+在 用户的 ~/.rhosts 文件中 会有 这么 一项).
+
+.TP
+.I "\-\-force-local"
+和
+.IR \-F ,
+.IR \-I ,
+或
+.IR \-O ,
+一起用, 可以 把 归档包文件 看作 本地文件, 即使 文件名 中 含有 冒号,
+一般说来 冒号 指出 一个 远程主机 的 存在.
+
+.TP
+.I "\-H FORMAT, \-\-format=FORMAT"
+使用 归档格式 FORMAT. 有效 的 格式 列在 下面, 大小写 均可. "copy-in"
+模式 的 缺省动作 是 自动检测 归档格式, "copy-out" 的 缺省格式 是 "bin".
+
+.RS
+.IP bin
+老式的 binary 格式.
+.IP odc
+老式的 (POSIX.1) 跨平台 格式.
+.IP newc
+新型 (SVR4) 跨平台 格式, 支持 大于 65536 i节点 的 文件系统.
+.IP crc
+新型 (SVR4) 跨平台 格式, 并且 计算 校验和.
+.IP tar
+老式的 tar 格式.
+.IP ustar
+POSIX.1 tar 格式, 也能 识别 GNU 
+.B tar
+归档文件, 它们 相似 但不全相同.
+.IP hpbin
+HP UNIX 上的 cpio 使用的 老式的 binary 格式. (用 独特的方法 储存 设备文件)
+.IP hpodc
+HP UNIX 上的 cpio 使用的 跨平台 格式. (用 独特的方法 储存 设备文件)
+.RE
+.TP
+.I "\-i, \-\-extract"
+进入 copy-in 模式.
+
+.TP
+.I "\-I archive"
+使用 归档包文件, 而不是 标准输入. 如果 把 其他 机器上 的 磁带机
+作成 归档包文件, 文件名 要用 "HOSTNAME:" 开始. 主机名 前面 可以 加上 用户名
+和 一个 '@', 作为 访问 远程 磁带机 的 用户 (如果 你有 这样的 权限, 一般
+在 用户的 ~/.rhosts 文件中 会有 这么 一项).
+.TP
+.I \-k
+无效操作; 只是 用来 兼容 其他 版本 的
+.BR cpio .
+
+.TP
+.I "\-l, \-\-link"
+如果有可能, 连接 文件, 而不是 复制.
+.TP
+.I "\-L, \-\-dereference"
+解除 符号连接 的 关联 (复制 符号连接 指向的 文件, 而不是 连接 本身).
+.TP
+.I "\-m, \-\-preserve-modification-time"
+当 创建 文件 时, 保留 以前的 文件修改时间.
+.TP
+.I "\-M MESSAGE, \-\-message=MESSAGE"
+当 备份 媒体 (例如 磁带或软盘) 到达 卷尾时, 显示 一条 消息, 提醒 用户
+插入 下一卷. 如果 MESSAGE 包含 字符串 "%d", 它 替换成 当前 卷号
+(从 1 开始).
+.TP
+.I "\-n, \-\-numeric-uid-gid"
+以 繁琐模式 (verbose) 显示 内容 时, 用 数字 显示 UID 和 GID, 而 不是 名称.
+.TP
+.I " \-\-no-absolute-filenames"
+在 copy-in 模式中, 在 当前目录中 创建 所有 相关 文件, 即使 它们 在
+归档包中 有 绝对路径名.
+.TP
+.I " \-\-no-preserve-owner"
+在 copy-in 和 copy-pass 模式中, 不改变 文件 的 属主关系 (译注: 疑为不保留); 
+使 它们 属于 展开 它们 的 用户. 这是 普通用户 的 缺省行为, 因此 System V
+的 用户 不致于 无意中 把 文件 送人.
+.TP
+.I "\-o, \-\-create"
+进入 copy-out 模式.
+.TP
+.I "\-O archive"
+使用 归档包文件, 而不是 标准输出. 如果 把 其他 机器上 的 磁带机
+作成 归档包文件, 文件名 要用 "HOSTNAME:" 开始. 主机名 前面 可以 加上 用户名
+和 一个 '@', 作为 访问 远程 磁带机 的 用户 (如果 你有 这样的 权限, 一般
+在 用户的 ~/.rhosts 文件中 会有 这么 一项).
+
+.TP
+.I " \-\-only-verify-crc"
+当以 copy-in 模式 读入 CRC 格式 的 归档包 时, 不展开 里面的文件, 
+只是 测试 文件的 CRC 码.
+
+.TP
+.I "\-p, \-\-pass-through"
+进入 copy-pass 模式.
+.TP
+.I "\-\-quiet"
+不显示 复制的 块数.
+.TP
+.I "\-r, \-\-rename"
+交互式 文件 改名.
+.TP
+.I "\-R [user][:.][group], \-\-owner [user][:.][group]"
+在 copy-out 和 copy-pass 模式中, 把 所有文件 的 属主 设置为 指定的
+用户 和/或 用户组. 无论 用户 还是 用户组 都必须 存在. 如果 省略 用户组,
+但却 给出了 分隔符 ":" 或 ".', 则 使用 该 用户 的 登录用户组. 只有
+超级用户 能够 改变 文件的属主.
+
+.TP
+.I "\-\-sparse"
+在 copy-out 和 copy-pass 模式中, 把 大块 数据0 的 文件 写成 稀疏文件 
+(sparse file).
+.TP
+.I "\-s, \-\-swap-bytes"
+在 copy-in 模式中, 交换 文件中 每一个 半字(字节对) 中的 字节.
+.TP
+.I "\-S, \-\-swap-halfwords"
+在 copy-in 模式中, 交换 文件中 每一个 字(4字节) 中的 半字.
+.TP
+.I "\-t, \-\-list"
+显示 输入(归档包) 的 内容.
+.TP
+.I "\-u, \-\-unconditional"
+替换 所有 文件, 不再提问 是否 用 旧文件 替换 已经存在的 新文件.
+.TP
+.I "\-v, \-\-verbose"
+列出 处理的文件, 加上
+.IR \-t
+选项 可以 列出 一个 'ls \-l' 风格的列表. 在一个 归档包 的 内容 详细列表
+(verbose) 中, 如果 本地系统 不存在 归档文件的 用户和用户组 名称,
+就用 其数字 UID和GID 对应于 本地系统的 用户和用户组 名称 代替.
+
+.TP
+.I "\-V \-\-dot"
+每处理一个文件, 显示一个 ".".
+.TP
+.I "\-\-version"
+显示
+.B cpio
+程序 的 版本号, 然后退出.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/09/25
+.SH "《中国Linux论坛man手册页翻译计划》"
+.B http://cmpp.linuxforum.net
+
+

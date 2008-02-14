@@ -1,0 +1,288 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: uplevel.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: uplevel.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH uplevel n "" Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+uplevel \- 在一个不同的栈桢中执行一个脚本
+.SH "总览 SYNOPSIS"
+\fBuplevel \fR?\fIlevel\fR?\fI arg \fR?\fIarg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+串联所有 \fIarg\fR 参数如同把它们传递给 \fBconcat\fR 一样；接着在用 \fIlevel\fR 指示出的变量上下文中对结果进行求值。\fBUplevel\fR 返回这次求值的结果。
+.PP
+如果 \fIlevel\fR 是一个整数则它给出执行这个命令之前要移动的距离(在过程调用栈上)。如果\fIlevel\fR 由 \fB#\fR 和随后的一个数字组成，则这个数字给出一个绝对的层次数。如果省略了 \fIlevel\fR 则它缺省为 \fB1\fR。如果第一个 \fIcommand\fR 参数以一个数字或 \fB#\fR 则不能缺省 \fILevel\fR。
+.PP
+例如，假设从顶层调用过程 \fBa\fR，而它调用 \fBb\fR，接着\fBb\fR 调用 \fBc\fR。假设 \fBc\fR 调用了 \fBuplevel\fR 命令。如果 \fIlevel\fR 是 \fB1\fR 或 \fB#2\fR 或被省略了，则命令将在 \fBb\fR 的变量上下文中在执行。如果 \fIlevel\fR 是 \fB2\fR 或 \fB#1\fR 则命令将在 \fBa\fR 的变量上下文中执行。如果 \fIlevel\fR 是 \fB3\fR 或 \fB#0\fR 则命令将在顶层执行(只有全局变量是可见的)。
+.PP
+\fBuplevel\fR 命令导致调用它的过程在命令执行的时候从过程调用栈中消失。在上面的例子中，假设 \fBc\fR 调用了命令
+.CS
+\fBuplevel 1 {set x 43; d}\fR
+.CE
+这里的 \fBd\fR 是另一个 Tcl 过程。\fBset\fR 命令将修改在 \fBb \fR的上下文中的变量 \fBx\fR ，而 \fBd\fR 将在层次 3 上执行，如同从 \fBb\fR 调用它一样。如果 \fBd\fR 接着执行命令
+.CS
+\fBuplevel {set x 42}\fR
+.CE
+则 \fBset\fR 命令将修改在 \fBb \fR的上下文中的同一个变量 \fBx\fR: 在 \fBd\fR 执行的时候过程 \fBc\fR 在调用栈上不出现。可以使用命令“\fBinfo level\fR”来获得当前过程的层次。
+.PP
+\fBUplevel\fR 使实现如同 Tcl 过程的新控制结构成为可能(例如，可以使用 \fBuplevel\fR 把 \fBwhile\fR 构造实现为一个 Tcl 过程)。
+.PP
+namespace eval 是改变 Tcl 命令上下文的另一种方式(除了过程调用之外)。它向栈增加一个调用桢来表示名字空间上下文。这意味着每个 namespace eval 命令被视为给 \fBuplevel\fR 和 \fBupvar\fR 命令的另一个调用层次。例如，info level 1 将返回描述一个命令的列表，它要么是最外的过程要么是最外的 namespace eval 命令。还有，uplevel #0 在最外面的名字空间(全局名字空间)中的顶层求值一个脚本。
+
+.SH "参见 SEE ALSO"
+namespace(n), upvar(n)
+
+.SH "关键字 KEYWORDS"
+context, level, namespace, stack frame, variables
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/11/21
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

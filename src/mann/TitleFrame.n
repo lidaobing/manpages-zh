@@ -1,0 +1,45 @@
+.TH TitleFrame "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B TitleFrame - 有一个标题的框架
+
+.SH 创建 CREATION
+.B TitleFrame pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+TitleFrame 使用户能建立带有象 XmFrame Motif 组件那样的框架。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+.TP
+.TP
+-baseline  
+指定标题的垂直对齐: top、center 或 bottom。 
+
+.TP
+-ipad  
+指定在这个框架和用户框架之间的填充(pad)。值使用屏幕单位。 
+
+.TP
+-side  
+指定标题的水平对齐: left、center 或 right。
+
+.SH 组件命令
+
+.TP
+pathName cget option  
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。 
+
+.TP
+pathName getframe  
+返回用户可以建立任何其他组件的那个框架。
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/05/08
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

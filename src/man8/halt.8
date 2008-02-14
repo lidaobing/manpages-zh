@@ -1,0 +1,70 @@
+.TH HALT 8 "Aug 24, 1999" "" "Linux 系统管理员手册"
+.SH NAME
+halt, reboot, poweroff \- 中止系统运行
+.SH SYNOPSIS
+.B /sbin/halt
+.RB [ \-n ]
+.RB [ \-w ]
+.RB [ \-d ]
+.RB [ \-f ]
+.RB [ \-i ]
+.RB [ \-p ]
+.br
+.B /sbin/reboot
+.RB [ \-n ]
+.RB [ \-w ]
+.RB [ \-d ]
+.RB [ \-f ]
+.RB [ \-i ]
+.br
+.B /sbin/poweroff
+.RB [ \-n ]
+.RB [ \-w ]
+.RB [ \-d ]
+.RB [ \-f ]
+.RB [ \-i ]
+.SH 描述
+\fBHalt\fP 将系统正在关机的信息写入
+\fI/var/log/wtmp\fP 文件，然后通知内核停止重启或关机系统。
+如果 \fBhalt\fP 或 \fBreboot\fP 是在系统
+\fI没有\fP 运行在运行级别 \fB0\fP 或 \fB6\fP ，
+系统将调用
+\fBshutdown\fP(8) 命令（使用参数 \fB-h\fP 或 \fB-r\fP ）。
+.SH 选项
+.IP \fB\-n\fP
+在关机或重启之前不对系统缓存进行同步。
+.IP \fB\-w\fP
+不真正重启或关机，而仅仅将关机信息写入 wtmp
+（在 \fI/var/log/wtmp\fP 文件里）。
+.IP \fB\-d\fP
+不记录此次关机情况。当使用 \fB\-n\fP 参数时隐含 \fB\-d\fP。
+.IP \fB\-f\fP
+强制执行 halt 或 reboot 而不去调用 \fBshutdown\fP(8)。
+.IP \fB\-i\fP
+在关闭或重启系统之前关闭所有网络界面。
+.IP \fB\-p\fP
+当关闭系统时执行关闭电源操作。当以 \fBpoweroff\fP 方式调用
+halt 时，此为缺省参数。
+.SH DIAGNOSTICS
+If you're not the superuser, you will get the message `must be superuser'.
+.SH 注意
+在先前的 \fBsysvinit\fP 发布中，\fBreboot\fP 和 \fBhalt\fP 不能直接调用。
+从版本 2.74 开始，当系统不是运行在运行级别0或6的时侯，执行
+\fBhalt\fP 和 \fBreboot\fP 后实际调用的是 \fBshutdown\fP(8) 。
+这就意味着如果在当前运行级别的环境中无法找到
+ \fBhalt\fP 或 \fBreboot\fP 的时候（比如，在 \fI/var/run/utmp\fP 
+还没有正确初始化的时候），将会调用 \fBshutdown\fP，这个结果也许非你所想。
+如果你想做一此硬的 \fBhalt\fP 或 \fBreboot\fP，那么使用 \fB-f\fP 参数。
+.PP
+.SH 作者
+Miquel van Smoorenburg, miquels@cistron.nl
+.SH "参见"
+.BR shutdown (8),
+.BR init (1)
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH [中文版最新更新]
+.B 2001/05/01
+.SH 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net
+

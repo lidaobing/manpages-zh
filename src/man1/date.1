@@ -1,0 +1,181 @@
+.TH DATE "1" "August 1999" "GNU sh-utils 2.0" FSF
+.SH NAME
+date \- 打印或设置系统日期和时间
+.SH 总览
+.B date
+[\fI选项\fR]... [\fI+格式\fR]
+.br
+.B date
+[\fI选项\fR] [\fIMMDDhhmm\fR[[\fICC\fR]\fIYY\fR][\fI.ss\fR]]
+.SH 描述
+.PP
+.\" Add any additional description here
+.PP
+根据指定格式显示当前时间或设置系统时间.
+.TP
+\fB\-d\fR, \fB\-\-date\fR=\fISTRING\fR
+显示由 STRING 指定的时间, 而不是当前时间
+.TP
+\fB\-f\fR, \fB\-\-file\fR=\fIDATEFILE\fR
+显示 DATEFILE 中每一行指定的时间, 如同将 DATEFILE 中的每行作为
+\fB\-\-date\fR 的参数一样
+.IP
+\fB\-I\fR, \fB\-\-iso\-8601\fR[=\fITIMESPEC\fR] 按照 ISO-8601
+的日期/时间格式输出时间.
+.IP
+TIMESPEC=`date' (或者不指定时)仅输出日期,等于
+`hours', `minutes', 或`seconds' 时按照指定精度输出日期及时间.
+.TP
+\fB\-r\fR, \fB\-\-reference\fR=\fIFILE\fR
+显示 FILE 的最后修改时间
+.TP
+\fB\-R\fR, \fB\-\-rfc\-822\fR
+根据 RFC-822 指定格式输出日期
+.TP
+\fB\-s\fR, \fB\-\-set\fR=\fISTRING\fR
+根据 STRING 设置时间
+.TP
+\fB\-u\fR, \fB\-\-utc\fR, \fB\-\-universal\fR
+显示或设置全球时间(格林威治时间)
+.TP
+\fB\-\-help\fR
+显示本帮助文件并退出
+.TP
+\fB\-\-version\fR
+显示版本信息并退出
+.PP
+格式 FORMAT 控制着输出格式. 仅当选项指定为全球时间时本格式才有效。
+分别解释如下:
+.TP
+%%
+文本的 %
+.TP
+%a
+当前区域的星期几的简写 (Sun..Sat)
+.TP
+%A
+当前区域的星期几的全称 (不同长度) (Sunday..Saturday)
+.TP
+%b
+当前区域的月份的简写 (Jan..Dec)
+.TP
+%B
+当前区域的月份的全称(变长) (January..December)
+.TP
+%c
+当前区域的日期和时间 (Sat Nov 04 12:02:33 EST 1989)
+.TP
+%d
+(月份中的)几号(用两位表示) (01..31)
+.TP
+%D
+日期(按照 月/日期/年 格式显示) (mm/dd/yy)
+.TP
+%e
+(月份中的)几号(去零表示) ( 1..31)
+.TP
+%h
+同 %b
+.TP
+%H
+小时(按 24 小时制显示，用两位表示) (00..23)
+.TP
+%I
+小时(按 12 小时制显示，用两位表示) (01..12)
+.TP
+%j
+(一年中的)第几天(用三位表示) (001..366)
+.TP
+%k
+小时(按 24 小时制显示，去零显示) ( 0..23)
+.TP
+%l
+小时(按 12 小时制显示，去零表示) ( 1..12)
+.TP
+%m
+月份(用两位表示) (01..12)
+.TP
+%M
+分钟数(用两位表示) (00..59)
+.TP
+%n
+换行
+.TP
+%p
+当前时间是上午 AM 还是下午 PM
+.TP
+%r
+时间,按 12 小时制显示 (hh:mm:ss [A/P]M)
+.TP
+%s
+从 1970年1月1日0点0分0秒到现在历经的秒数 (GNU扩充)
+.TP
+%S
+秒数(用两位表示)(00..60)
+.TP
+%t
+水平方向的 tab 制表符
+.TP
+%T
+时间,按 24 小时制显示(hh:mm:ss)
+.TP
+%U
+(一年中的)第几个星期，以星期天作为一周的开始(用两位表示) (00..53)
+.TP
+%V
+(一年中的)第几个星期，以星期一作为一周的开始(用两位表示) (01..52)
+.TP
+%w
+用数字表示星期几 (0..6); 0 代表星期天
+.TP
+%W
+(一年中的)第几个星期，以星期一作为一周的开始(用两位表示) (00..53)
+.TP
+%x
+按照 (mm/dd/yy) 格式显示当前日期 
+.TP
+%X
+按照 (%H:%M:%S) 格式显示当前时间
+.TP
+%y
+年的后两位数字 (00..99)
+.TP
+%Y
+年(用 4 位表示) (1970...)
+.TP
+%z
+按照 RFC-822 中指定的数字时区显示(如, -0500) (为非标准扩充)
+.TP
+%Z
+时区(例如, EDT (美国东部时区)), 如果不能决定是哪个时区则为空
+.PP
+默认情况下,用 0 填充数据的空缺部分.  
+GNU 的 date 命令能分辨在 `%'和数字指示之间的以下修改.
+.IP
+`-' (连接号) 不进行填充
+`_' (下划线) 用空格进行填充
+.SH "BUG报告"
+请向<bug-sh-utils@gnu.org>报告BUG.
+.SH "参考"
+关于
+.B date
+的详细说明是个 Texinfo 手册. 如果在你的计算机上已经成功安装了
+.B info
+和
+.B date
+程序,你可以使用
+.IP
+.B info date
+.PP
+命令访问完全手册.
+.SH 版权
+Copyright \(co 1999 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "[中文版维护人]"
+.B liguoping <email>
+.SH "[中文版最新更新]"
+.B 2001/07/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

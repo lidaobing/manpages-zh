@@ -1,0 +1,67 @@
+.TH HEAD "1" "1999年12月" "GNU textutils 2.0a" FSF
+.SH NAME(名称)
+head \- 输出文件的开始部分
+.SH SYNOPSIS(总览)
+.B ../src/head
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION(描述)
+.\" Add any additional description here
+.PP
+在标准输出上显示每个FILE的起始10行.
+如果多于一个FILE,则一个接一个地显示,
+并且在每个文件显示的首部给出文件名.
+如果没有FILE,或者FILE为-,
+那么就从标准输入上读取.
+.TP
+\fB\-c\fR, \fB\-\-bytes\fR=\fISIZE\fR
+打印起始的SIZE字节
+.TP
+\fB\-n\fR, \fB\-\-lines\fR=\fINUMBER\fR
+显示起始的NUMBER行,而非默认的起始10行
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR, \fB\-\-silent\fR
+从不显示给出文件名的首部
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+总是显示给出文件名的首部
+.TP
+\fB\-\-help\fR
+显示帮助后退出
+.TP
+\fB\-\-version\fR
+输出版本信息后退出
+.PP
+SIZE可以有一个倍数后缀:
+b表示512,k表示1K,m表示1M.
+如果第一个OPTION(选项)为\fB\-VALUE\fR,
+当后面连接着倍数bkm之一时,则读为\fB\-c\fR VALUE,
+否则读为\fB\-n\fR VALUE.
+.SH AUTHOR(作者)
+David MacKenzie.
+.SH "REPORTING BUGS"(报告bugs)
+请报告bugs到<bug-textutils@gnu.org>.
+.SH COPYRIGHT(版权)
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"(另见)
+.B head
+的完整文档是以Texinfo手册形式维护的.
+如果
+.B info
+和
+.B head
+程序在你那儿都已经安装好了,那么命令
+.IP
+.B info head
+.PP
+应该会让你访问到整篇手册.
+
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2000/12/14
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

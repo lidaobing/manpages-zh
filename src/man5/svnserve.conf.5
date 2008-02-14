@@ -1,0 +1,49 @@
+.\" You can view this file with:
+.\" nroff -man [filename]
+.\"
+.TH svnserve.conf 5
+.SH NAME
+svnserve.conf \- snvserve 的仓库配置文件
+.SH "SYNOPSIS 总览"
+.TP
+\fIrepository-path\fP\fB/conf/svnserve.conf\fP
+.SH "DESCRIPTION 描述"
+每个代码仓库都有一个 \fBsvnserve.conf\fP 文件来控制 \fBsvnserve\fP 守护进程的行为。这个文件位于仓库的 \fBconf\fP 子目录。
+.PP
+文件的结构与 Subversion 用户配置文件的结构类似。顶层是段落 (section)，以方括号中的词指定；每个段落之中是 ``variable=value'' 形式的变量定义。以 `#' 开头的行被忽略。\fBsvnserve.conf\fP 当前只使用一个段落，称为 ``general''，并且支持如下变量：
+.PP
+.TP 5
+\fBanon-access\fP = \fBnone\fP|\fBread\fP|\fBwrite\fP
+决定非授权用户的访问级别。\fBwrite\fP 访问允许所有的仓库操作。\fBread\fP 访问允许所有操作，除了提交和修改版本属性。\fBnone\fP 不允许任何访问。默认级别是 \fBread\fP。
+.PP
+.TP 5
+\fBauth-access\fP = \fBnone\fP|\fBread\fP|\fBwrite\fP
+决定授权用户的访问级别，使用与上面相同的访问级别。默认级别是 \fBwrite\fP。
+.PP
+.TP 5
+\fBpassword-db\fP = \fIfilename\fP
+设置密码数据库的位置。\fIfilename\fP 可能是相对仓库中 conf 目录的位置。没有默认值。密码数据库的格式与本文件相似。它只有一个段落 ``users''；段落中的每个变量是一个用户名，每个值是一个密码。
+.PP
+.TP 5
+\fBrealm\fP = \fIrealm\-name\fP
+设置仓库的授权域 (realm)。如果两个仓库拥有相同的密码数据库，它们应当在同一个域中，反之亦然；这样的关联可以允许客户端为多个仓库使用单一的密码缓存。默认域的值是仓库的路径，相对于服务器进程的虚根目录。
+.SH "EXAMPLE 范例"
+下列范例 \fBsvnserve.conf\fP 允许认证用户的读访问，禁止匿名用户的访问，指向相同目录中的密码数据库，定义了一个授权域名。
+.PP
+.nf
+ [general]
+ anon-access = none
+ auth-access = read
+ password-db = passwd
+ realm = My First Repository
+.fi
+.PP
+``passwd'' 文件可能是这样：
+.PP
+.nf
+ [users]
+ joeuser = joepassword
+ jayrandom = randomjay
+.fi
+.SH "SEE ALSO 参见"
+.BR svnserve (8)

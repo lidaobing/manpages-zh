@@ -1,0 +1,390 @@
+'\"
+'\" Copyright (c) 1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" RCS: @(#) $Id: resource.n,v 1.1 2003/12/20 03:31:54 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: resource.n,v 1.1 2003/12/20 03:31:54 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH resource n 8.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+resource \- Manipulate Macintosh resources
+.SH SYNOPSIS
+\fBresource \fIoption\fR ?\fIarg arg ...\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+The \fBresource\fR command provides some generic operations for
+dealing with Macintosh resources.  This command is only supported on
+the Macintosh platform.  Each Macintosh file consists of two
+\fIforks\fR: a \fIdata\fR fork and a \fIresource\fR fork.  You use the
+normal open, puts, close, etc. commands to manipulate the data fork.
+You must use this command, however, to interact with the resource
+fork.  \fIOption\fR indicates what resource command to perform.  Any
+unique abbreviation for \fIoption\fR is acceptable.  The valid options
+are:
+.TP
+\fBresource close \fIrsrcRef\fR
+Closes the given resource reference (obtained from \fBresource
+open\fR).  Resources from that resource file will no longer be
+available.
+.TP
+\fBresource delete\fR ?\fIoptions\fR? \fIresourceType\fR
+This command will delete the resource specified by \fIoptions\fR and
+type \fIresourceType\fR (see RESOURCE TYPES below).  The options
+give you several ways to specify the resource to be deleted.
+.RS
+.TP
+\fB\-id\fR \fIresourceId\fR
+If the \fB-id\fR option is given the id \fIresourceId\fR (see RESOURCE
+IDS below) is used to specify the resource to be deleted.  The id must 
+be a number - to specify a name use the \fB\-name\fR option.
+.TP
+\fB\-name\fR \fIresourceName\fR
+If \fB-name\fR is specified, the resource named
+\fIresourceName\fR will be deleted.  If the \fB-id\fR is also
+provided, then there must be a resource with BOTH this name and
+this id.  If no name is provided, then the id will be used regardless
+of the name of the actual resource.
+.TP
+\fB\-file\fR \fIresourceRef\fR
+If the \fB-file\fR option is specified then the resource will be
+deleted from the file pointed to by \fIresourceRef\fR.  Otherwise the
+first resource with the given \fIresourceName\fR and or
+\fIresourceId\fR which is found on the resource file path will be 
+deleted.  To inspect the file path, use the \fIresource files\fR command.
+.RE
+.TP
+\fBresource files ?\fIresourceRef\fR?
+If \fIresourceRef\fRis not provided, this command returns a Tcl list
+of the resource references for all the currently open resource files.
+The list is in the normal Macintosh search order for resources.  If 
+\fIresourceRef\fR is specified, the command will
+return the path to the file whose resource fork is represented by that
+token.
+.TP
+\fBresource list \fIresourceType\fR ?\fIresourceRef\fR?
+List all of the resources ids of type \fIresourceType\fR (see RESOURCE
+TYPES below).  If \fIresourceRef\fR is specified then the command will
+limit the search to that particular resource file.  Otherwise, all
+resource files currently opened by the application will be searched.
+A Tcl list of either the resource name's or resource id's of the found
+resources will be returned.  See the RESOURCE IDS section below for
+more details about what a resource id is.
+.TP
+\fBresource open \fIfileName\fR ?\fIaccess\fR?
+Open the resource for the file \fIfileName\fR.  Standard file access
+permissions may also be specified (see the manual entry for \fBopen\fR
+for details).  A resource reference (\fIresourceRef\fR) is returned
+that can be used by the other resource commands.  An error can occur
+if the file doesn't exist or the file does not have a resource fork.
+However, if you open the file with write permissions the file and/or
+resource fork will be created instead of generating an error.
+.TP
+\fBresource read \fIresourceType\fR \fIresourceId\fR ?\fIresourceRef\fR?
+Read the entire resource of type \fIresourceType\fR (see RESOURCE
+TYPES below) and the name or id of \fIresourceId\fR (see RESOURCE IDS
+below) into memory and return the result.  If \fIresourceRef\fR is
+specified we limit our search to that resource file, otherwise we
+search all open resource forks in the application.  It is important to
+note that most Macintosh resource use a binary format and the data
+returned from this command may have embedded NULLs or other non-ASCII
+data.
+.TP
+\fBresource types ?\fIresourceRef\fR?
+This command returns a Tcl list of all resource types (see RESOURCE
+TYPES below) found in the resource file pointed to by
+\fIresourceRef\fR.  If \fIresourceRef\fR is not specified it will
+return all the resource types found in every resource file currently
+opened by the application.
+.TP
+\fBresource write\fR ?\fIoptions\fR? \fIresourceType\fR \fIdata\fR
+This command will write the passed in \fIdata\fR as a new resource of
+type \fIresourceType\fR (see RESOURCE TYPES below).  Several options
+are available that describe where and how the resource is stored.
+.RS
+.TP
+\fB\-id\fR \fIresourceId\fR
+If the \fB-id\fR option is given the id \fIresourceId\fR (see RESOURCE
+IDS below) is used for the new resource, otherwise a unique id will be
+generated that will not conflict with any existing resource.  However,
+the id must be a number - to specify a name use the \fB\-name\fR option.
+.TP
+\fB\-name\fR \fIresourceName\fR
+If \fB-name\fR is specified the resource will be named
+\fIresourceName\fR, otherwise it will have the empty string as the
+name.
+.TP
+\fB\-file\fR \fIresourceRef\fR
+If the \fB-file\fR option is specified then the resource will be
+written in the file pointed to by \fIresourceRef\fR, otherwise the
+most resently open resource will be used.
+.TP
+\fB\-force\fR
+If the target resource already exists, then by default Tcl will not
+overwrite it, but raise an error instead.  Use the -force flag to
+force overwriting the extant resource.
+.RE
+
+.SH "RESOURCE TYPES"
+Resource types are defined as a four character string that is then
+mapped to an underlying id.  For example, \fBTEXT\fR refers to the
+Macintosh resource type for text.  The type \fBSTR#\fR is a list of
+counted strings.  All Macintosh resources must be of some type.  See
+Macintosh documentation for a more complete list of resource types
+that are commonly used.
+
+.SH "RESOURCE IDS"
+For this command the notion of a resource id actually refers to two
+ideas in Macintosh resources.  Every place you can use a resource Id
+you can use either the resource name or a resource number.  Names are
+always searched or returned in preference to numbers.  For example,
+the \fBresource list\fR command will return names if they exist or
+numbers if the name is NULL.
+
+.SH "PORTABILITY ISSUES"
+The resource command is only available on Macintosh.
+
+.SH "SEE ALSO"
+open(n)
+
+.SH KEYWORDS
+open, resource

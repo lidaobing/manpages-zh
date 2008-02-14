@@ -1,0 +1,76 @@
+.TH TESTPARM 1 "11 Nov 1999" "testparm 2.0.6"
+.SH NAME
+testparm \- 检查smb.conf配置文件的内部正确性
+.PP
+.SH 总览
+.PP
+testparm [-s] [-h] [-L servername] [configfilename] [hostname hostIP] 
+.PP
+.SH 描述
+.PP
+此程序是samba套件的一部分。 
+.PP
+testparm是个非常简单的程序，用于检查smbd配置文件的内部正确性。如果程序报告没有什么
+问题，那么你可以放心地使用这个配置文件，并且smbd也会非常顺利地装入它。
+.PP
+注意，这并不保证配置文件中指定的服务可以获得或者如你所愿地那样进行操作。 
+.PP
+如果在它的命令上指定可选的主机名和主机IP地址的话，测试程序将通过服务接口运行并报告是否
+指定的主机可以访问每个服务。
+.PP
+如果testparm在smb.conf文件中找到一个错误的话，它会向调用程序返回退出代码1，否则返回
+退出代码0。这样shell脚本可以测试testparm的输入。
+.PP
+.SH 选项 
+.PP 
+.IP 
+.IP "\fB-s\fP" 
+如果不带这个参数，testparm将提示在列出服务名和服务定义项之间打一个回车。 
+.IP 
+.IP "\fB-h\fP" 
+列出用法信息 
+.IP 
+.IP "\fB-L servername\fP" 
+对服务项名字设定%L这样的宏值。对于测试包含这样的宏值的文件非常有用。 
+.IP 
+.IP "\fBconfigfilename\fP" 
+指定要检查的配置文件名。如果不指定的话，程序对默认的smb.conf文件进行检查。 
+.IP 
+.IP "\fBhostname\fP" 
+如果命令行带有这个参数时，测试程序将检查smb.conf文件中的“hosts allow”和“hosts 
+deny”参数用以测试这些IP地址对应的主机名是否可以访问smbd服务器。如果用这样的参数时，
+hostIP参数也必须一并使用。 
+.IP 
+.IP "\fBhostIP\fP" 
+这个参数用于指定前面给出的主机名相对应的IP地址。如上说述，主机名参数和这个地址必须一并
+使用。 
+.PP
+.SH 相关文件
+.PP
+smb.conf，通常这是smbd使用的配置文件名。
+.SH 诊断
+程序运行的结果将给出装入的配置文件是否正确的信息。如果文件没有被装入时可能显示的是错误和警
+告信息。反之，装入文件正确的话，程序会在标准输出上列出所有可知的服务细节。
+.SH 版本
+.PP
+此手册页是针对samba套件版本2.0的。 
+.SH 另见
+.PP 
+\fBsmb\&.conf (5)\fP, \fBsmbd (8)\fP
+.PP 
+.SH 作者
+.PP
+samba软件和相关工具最初由Andrew Tridgell samba-bugs@samba.org创建。samba现在由开发
+组作为类似Linux内核开发采用的开放源代码计划方式来发展。 
+.PP
+samba手册页最初由Karl Auer撰写。它的源码已被转换成YODL(一种极好的开放源代码软件，可以在
+ftp://ftp.icce.rug.nl/pub/unix/处获得)格式并已由Jeremy Allison更新到samba2.0版本。 
+.PP
+请参见samba (7)查找如何获得一份完整的维护者列表以及如何提交错误报告及注解等等。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

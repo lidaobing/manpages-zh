@@ -1,0 +1,121 @@
+.TH MAILADDR 7 "June 24, 1995" linux "Linux User's Manual" \" -*- nroff -*-
+.\"
+.\" Copyright (c) 1983, 1987 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms are permitted
+.\" provided that the above copyright notice and this paragraph are
+.\" duplicated in all such forms and that any documentation,
+.\" advertising materials, and other materials related to such
+.\" distribution and use acknowledge that the software was developed
+.\" by the University of California, Berkeley. The name of the
+.\" University may not be used to endorse or promote products derived
+.\" from this software without specific prior written permission.
+.\" THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+.\"
+.\" @(#)mailaddr.7 6.5 (Berkeley) 2/14/89
+.\"
+.\" Extensively rewritten by Arnt Gulbrandsen . My
+.\" changes are placed under the same copyright as the original BSD page.
+.\"
+.\" fool hilith19: "
+.UC 5
+.SH NAME
+mailaddr \- 关于邮件地址的描述
+
+.SH DESCRIPTION 描述
+本手册给出的是 Internet 使用的 SMTP 邮件地址的简要描述。
+这些地址的通常的格式是
+.PP
+user@domain
+.PP
+这里的域 (domain) 是分级的子域的列表，子域间用点来分隔。
+例如下面的地址
+.PP
+eric@monet.berkeley.edu
+.br
+Eric Allman 
+.br
+eric@monet.berkeley.edu (Eric Allman)
+.PP
+都是同一个地址的有效的格式。
+.PP
+地址中的域部分 (``monet.berkeley.edu'') 
+可以是一个 internet 上的主机的名字，
+或者是一个逻辑上的邮件地址。域的部分大小写不敏感。
+.PP
+地址中的本地部分 (``eric'') 通常是一个用户名，
+但它的实际意义是由本地软件定义的。
+这部分可以大小写敏感，但通常大小写不敏感。
+如果你发现某个地址的本地部分象一堆乱码，
+原因通常是在不同的内部的电子邮件 (e-mail) 系统和网络
+间存在着网关。下面是一些例子:
+.PP
+"surname/admd=telemail/c=us/o=hp/prmd=hp"@some.where
+USER%SOMETHING@some.where
+machine!machine!name@some.where
+I2461572@some.where
+.PP
+(它们分别是：一个 X.400 网关，一个到任意的没有适当的 internet 支持的内
+部邮件系统的网关 ，一个 UUCP 网关，最后一个是令人讨厌的用户命名策略)
+.PP
+真实姓名部分 (``Eric Allman'') 可放在最前面，在 < > 的外面；也可以在最后面
+在 ( ) 的里面。(严格的说两者是不一样的，但是论述两者的不同超出了本手册页的
+范围。)如果名字包含某些特定的字符，可以用" "括起来。特定的字符中最常见的
+是``.'':
+.PP
+"Eric P. Allman" 
+.SS Abbreviation. 缩略写法.
+.PP
+许多邮件系统允许用户略写域名。举个实例，在 berkeley.edu 的用户可以用
+``eric@monet''来给 Eric Allman 发邮件并侥幸成功。\fI这种做法是废弃了的。\fP
+.SS 路由地址
+.PP
+在某些环境下，可能必须给出一个消息到达最终目的地所要经过的主机的路径。
+正常的情况下这是自动的和不可见的，但有时不是，特别是在一些老的和破损的
+软件上出现。显示这些中继的地址在术语上叫``路由地址''。路由地址使用下面
+的语法：
+.PP
+<@hosta,@hostb:user@hostc>
+.PP
+这指定消息要被送到 hosta，从 hosta 到 hostb，最后到达 hostc。一些主机
+忽略路由地址并直接发送的 hostc。
+.PP
+路由地址经常发生在返回地址上，因为通常路过的每个主机上的软件都要增补路
+由地址。最常见的可能是忽略地址中除了``user@hostc''的部分，``user@hostc''
+部分确定了真正的发送者。
+.SS 邮件主管.
+.PP
+要求每一个站点都要有一个用户或用户别名被指定为"邮件主管"，对于邮件系
+统的问题可以向此"邮件主管"发表。"邮件主管"的地址是大小写不敏感的。
+.SS "FREQUENTLY ASKED QUESTIONS 常见问题"
+rtfm.mit.edu 和许多镜像站点存储了一系列常见问题。请找到并使用这些文档，
+这些文档遍布世界。
+.I mail/inter-network-guide
+解说如何在不同的网络间发送邮件。
+.I mail/country-codes
+顶级域的列表(例如 ``no'' 是 Norway ，``ea'' 是 Eritrea).
+.I mail/college-email/part*
+给出一些关于怎样找出邮件地址的位置的小技巧。
+.SH FILES 相关文件
+.I /etc/aliases
+.br
+.I ~/.forward
+.SH "SEE ALSO 参见"
+.BR binmail (1),
+.BR mail (1),
+.BR mconnect (1),
+.BR forward (5),
+.BR aliases (5),
+.BR sendmail (8),
+.BR vrfy (8),
+RFC822 (Arpa Internet 文本消息格式的标准).
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,48 @@
+.\" Copyright (c) 1996 Free Software Foundation, Inc.
+.\" This program is distributed according to the Gnu General Public License.
+.\" See the file COPYING in the kernel source directory
+.\"
+.TH MODINFO 8 "11 Nov 1997" Linux "模块支持"
+.SH NAME
+modinfo \- 显示当前内核模块信息
+.SH 总览
+.B modinfo
+[ options ] <module_file>
+.SH 描述
+.B modinfo
+工具软件用来对内核模块的目标文件
+.I module_file
+进行测试并打印输出相关信息。
+.SS 选项
+.TP
+.BR \-a ", " \-\-author
+显示模块的开发人员
+.TP
+.BR \-d ", " \-\-description
+显示此模块的描述说明
+.TP
+.BI \-f format_string ", \-\-format " format_string
+由用户定义任意格式字符串，可以通过该字符串从内核模块
+.I module_file
+的 ELF 段中获得该模块相应的值，其中包含该模块的信息。
+替换由一个百分号后跟一个由花括号括起来的标签名组成。
+.TP
+.BR \-p ", " \-\-parameters
+显示模块所支持的有类型的参数
+.TP
+.BR \-h ", " \-\-help
+显示帮助信息
+.TP
+.BR \-V ", " \-\-version
+显示
+.BR modinfo 的版本信息
+.SH "参见"
+.BR insmod "(8), " modprobe "(8), " depmod "(8), " rmmod "(8), "
+.BR lsmod "(8), " ksyms "(8), " modules "(2) "
+.SH ”[中文版维护人]”
+.B 所罗门 <solomen@email.com.cn>
+.SH ”[中文版最新更新]”
+.B 2001/05/01
+.SH 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net
+

@@ -1,0 +1,41 @@
+.\"             -*-Nroff-*-
+.\"
+.TH UPTIME 1 "1993年1月26日" "Cohesive Systems" "Linux User's Manual"
+.SH NAME(名称)
+uptime \- 告知系统运行了多久时间.
+.SH SYNOPSIS(总览)
+.B uptime
+.br
+.BR uptime " [" "\-V" ]
+.SH DESCRIPTION(描述)
+.B uptime
+给出下列信息的一行显示.
+当前时间,
+系统运行了多久时间,
+当前登陆的用户有多少,
+以及前1,5和15分钟系统的平均负载.
+.sp
+这与通过
+.BR w (1)
+显示的首行包括的信息相同.
+.SH FILES(相关文件)
+.IR /var/run/utmp "     关于当前谁在登录的信息"
+.br
+.IR /proc "     进程信息"
+.SH AUTHORS(作者)
+Larry Greenfield <greenfie@gauss.rutgers.edu>和
+Michael K. Johnson <johnsonm@sunsite.unc.edu>.
+
+请将bug的报告发到<procps-bugs@redhat.com>
+.SH "SEE ALSO"(另见)
+.BR ps (1),
+.BR top (1),
+.BR utmp (5),
+.BR w (1)
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

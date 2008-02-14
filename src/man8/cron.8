@@ -1,0 +1,22 @@
+.TH cron 8
+.SH NAME
+.B cron \- 定期执行指定命令的守护程序 (Vixie Cron)
+.SH 总览
+.B cron
+.SH 描述
+Cron 应该由 /etc/rc 或者 /etc/rc.local 启动（译注：有很多发行版与此不同的，如 RedHat6.x 使用 /etc/rc.d/init.d/crond ）。系统会立即返回提示符状态，因此没有必要后缀 '&' 来启动。
+Cron 在目录 /var/spool/cron 下搜索以 /etc/passwd 中账户名命名的 crontab 文件，将找到的文件内容加载到内存中。 Cron 还搜索 /etc/crontab 和目录 /etc/cron.d/ 下的文件，但这些文件使用另外的格式。（见 crontab(5) ）。 Cron 平时出于休眠状态，每分钟醒来一次，检查所有储存的 crontab 文件，检查其中的每一条命令并适时执行。执行命令时，任何输出通过邮件发往 crontab 的拥有者（如果 crontab 中设置了 MAILTO 环境变量，就发往此变量所指的用户）。
+.PP
+另外, cron 每分钟检查它的 spool 目录以及 /etc/crontab) 的 modtime 【译注：即文件的最新修改时间，在文件系统的 i-node 中以 mtime 标记】，如果发生变化， cron 将检查所有 crontab 文件的 modtime ，并重新加载已改变的。这意味着即使修改 crontab 文件也没有必要重新启动 cron 守护程序。注意当 Crontab(1) 命令改变 crontab 时会刷新 spool 目录的 modtime 标记。
+.PP
+.SH 另见
+crontab(1), crontab(5)
+.SH 作者
+Paul Vixie
+
+.SH "[中文版维护人]"
+.B Wang Dong <wangdong@163.net>
+.SH "[中文版最新更新]"
+2000年12月23日
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

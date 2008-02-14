@@ -1,0 +1,125 @@
+.\" Copyright Andries Brouwer, 2000
+.\" Chinese Version Copyright Scorpio, www.linuxforum.net, 2000
+.\"
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH CHGRP 1 "August 2000" "GNU fileutils 4.0"
+.SH NAME
+chgrp \- 改变文件的组所有权
+.SH 总览
+.BI "chgrp [" 选项 "] " "组文件..."
+.sp
+POSIX 选项:
+.B "[\-R] [\-\-]"
+.sp
+Austin 草拟选项:
+.B [\-hHLPR]
+.sp
+GNU 团体指示:
+.BI [\-\-reference= rfile ]
+.sp
+GNU 选项 (简易格式):
+.B [\-cfvR]
+.B "[\-\-help] [\-\-version]"
+.SH  描述
+.B chgrp
+为给出的
+.B "file(文件)"
+改变它的组所有权.
+.IR group(组) ,
+可以是组名和组ID数字两者之一.
+.SH "POSIX 选项"
+.TP
+.B \-R
+递归的改变目录和它的内容的组所有权
+(即使遇到错误也继续.)
+.TP
+.B "\-\-"
+结束选项列表.
+.SH "AUSTIN 草拟选项"
+.TP
+.B \-h
+对于给出的文件是符号链接的, 就改变符号链接的本身,这
+比改变它指乡的对象更好.如果系统不支持符号链接的组所
+有权,那就对它不起作用.
+.TP
+.BR \-H " (half-logical[半逻辑？])"
+(当和
+.BR \-R
+一起给出)
+给出的文件操作数书指向目录的符号链接时,改变这个目录
+和目录中文件的组所有权
+.TP
+.BR \-L " (logical[(全)逻辑,想来是和上面的对应的])"
+(当和
+.BR \-R
+一起给出.)
+给出的文件,不论是命令行操作数还是遍历整个树,操作数书
+指向目录的符号链接时, 改变这个目录和目录中文件的组所
+有权.
+.TP
+.BR \-P " (physical)"
+(当和
+.BR \-R
+一起给出.)
+对于一个文件,不论是命令行操作数还是遍历整个树, 是符号
+链接的,只改变它本身, 优于(改变)指向的对象如果系统不支
+持符号链接的组所有权,那就对它不起作用.这是默认值.
+.TP
+.BR \-R
+递归的改变目录和它的内容的组所有权
+.SH "额外的 GNU 描述"
+一个 GNU 扩展(最新的在fileutils 4.0里)允许
+.BI "\-\-reference=" "rfile"
+作为组的描述:和
+.IR rfile
+一样的组.
+.SH "GNU 选项"
+.TP
+.B "\-c, \-\-changes"
+详细描述对每一个文件的动作:实际上改变了哪个组。
+.TP
+.B "\-f, \-\-silent, \-\-quiet"
+不列出错误信息.(那些组不能被改变).
+.TP
+.B "\-h, \-\-no\-dereference"
+作用于符号链接本身代替它所指向的.
+仅可用于
+.B lchown
+系统调用被提供时.
+.TP
+.B "\-v, \-\-verbose"
+详细描述作用或没作用的所有
+.IR 文件 .
+.TP
+.B "\-R, \-\-recursive"
+递归的改变目录和它的内容的组所有权
+.SH "GNU 标准选项"
+.TP
+.B "\-\-help"
+显示使用方法到标准输出并退出.
+.TP
+.B "\-\-version"
+显示版本信息到标准输出并退出.
+.SH 环境变量
+有以下变量是有通常的意义的 LANG, LC_ALL, LC_CTYPE 和 
+LC_MESSAGES.对于XSI-conforming系统:NLSPATH有通常的意
+义.
+.SH "符合到"
+POSIX 1003.2 仅要求 \-R 选项.使用其它选项不一定有效.
+.SH 注意
+这份
+.B chgrp
+描述同样可以在fileutils-4.0 包中找到;
+其它版本也许些微有些差别.
+把修正和更新邮到 aeb@cwi.nl.
+漏洞报告邮到 fileutils-bugs@gnu.ai.mit.edu.
+
+.SH "[中文版维护人]"
+.B Scorpio <rawk@chinese.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

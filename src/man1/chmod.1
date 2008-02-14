@@ -1,0 +1,121 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Chinese version Copyright 王炎,BitBIRD,Scorpio,www.linuxforum.net 2000.
+.\" Modifier: Scorpio,BitBIRD.
+.\"
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH CHMOD 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+chmod \- 改变文件的访问权限
+
+.SH 总揽
+.BI "chmod [" options "] " "mode file..."
+.sp
+.SH POSIX 选项:
+.B [-R]
+.sp
+GNU 选项 (最短方式): 
+.B [-cfvR] 
+.BI [--reference=rfile]
+.B "[--help] [--version] [--]"
+.SH 描述
+使用chmod命令改变指定文件访问权限有两种方式:一种是用符号
+标记所进行更改,另一种方式是采用8进制数指定新的访问权限。
+使用下面的语法格式来使用符号改变方式
+.br
+\&`[ugoa...][[+-=][rwxXstugo...]...][,...]'.
+.PP
+在这种格式下,所带参数是一个用逗号分隔的字符列表.每个符号方式的
+改变命令以零或者字'ugoa'开始;'ugoa'控制哪些用户对该文件访问权
+限将被改变:文件的所有者(u),与文件所有者同组的用户(g),其他组的
+用户(o),所有用户(a).因此,a在这里等同于ugo.如果没有带参数,则缺
+省设置为a,运行效果相同,但是在umask中设置的位将不会受影响.
+.PP
+操作符'+'使得用户选择的权限被追加到每个指定文件，（操作给
+指定文件添加所选权限）;操作符'-'使得这些权限被撤消;'='使得
+指定文件只具有这些权限。
+.PP
+字符串'rwxXstugo' 给用户选择新的属性:(r)读权限、(w)写权限、
+(x)执行权(或对目录的访问权)，（X）只有目标文件对某些用户是
+可执行的或该目标文件是目录时才追加x属性，（s）同时设定用户
+或组ID，(t)粘滞位（保存程序的文本到交换设备上），(u)目标文件
+属主，(g)目标文件属主所在的组，(o)其他用户。（因此，'chmod g-s file'
+撤消sgid位,'chmod ug+s file'同时设置了suid和sgid位,'chmod o+s file'
+则没有进行任何设置）
+.PP
+POSIX并没有粘滞位的描述。它最初是指在交换设备上保留程序文本。
+现在，如果设置了目录的粘滞位，
+那么只有文件和目录的所有者可以删除该目录下的文件。
+(一般使用于类似于/tmp这样有基本写权限的目录)
+.PP
+数字模式是一到4个八进制数,每个数由位权为4,2,1的3位叠加而得.
+被省略掉的数字缺省设置为零. 第一位为4时为suid,2时为sgid,1时
+为粘滞位,.第二位设置文件所有者的权限:可读(4),可写(2),可执行(1);
+第三位设置了文件所在组其他用户的权限,值如上;第四位设置了其
+他组的用户的权限,值同上.
+.PP .
+由于chmod的系统调用不支持,chomd命令不能改变符号链接的权限.
+由于符号链接的权限从不使用,所以这也不成问题.无论如何,由于
+每个符号连接都可在命令行中列出,chmod改变了所指文件的属性.
+相反,chmod在递归目录遍历时忽略所碰到的符号连接.
+
+.SH POSIX 选项
+.B "\-R"
+改变目录及目录下的内容的访问权限.
+
+.SH "GNU 选项"
+.TP
+.B "\-c, \-\-changes"
+只有在文件的权限确实改变时才进行详细的说明
+.TP
+.B "\-f, \-\-silent, \-\-quiet"
+不输出权限不能改变的文件的错误信息
+.TP
+.B "\-v, \-\-verbose"
+详细说明权限的变化
+.TP
+.B "\-R, \-\-recursive"
+改变目录及其所有子目录的文件的权限
+.TP
+.BI "\-\-reference=" "rfile"
+(更新在fileutils 4.0上) 改变文件的模式到rfile.
+
+.SH "GNU 标准选项"
+.TP
+.B "\-\-help"
+在标准输出上输出帮助信息并退出
+.TP
+.B "\-\-version"
+在标准输出上输出版本信息并退出
+.TP
+.B "\-\-"
+终端选项列表
+.SH 环境变量
+变量LANG, LC_ALL, LC_CTYPE ,LC_MESSAGES与一般情况相同.
+
+.SH 遵循
+POSIX 1003.2 只需要-R参数。使用其他选项可能无法移植。该标准没有描述
+'t'权限位。该标准没有特别要求chmod命令是否必须通过拒绝或清除suid,sgid位
+来保持一致性，也就是说，当所有的可执行位都被清除了以后，
+chomd 是否还完全保留`s'位．
+
+.SH 非标准模式
+在上面的内容中我们讨论了't'位在目录上的用法。不同的系统对这些
+位的组合有特殊的定义。特别是Linux，继System V之后（参考System V
+接口描述（SVID）第三卷），给一个文件设置 sgid 位但又不给它设置组执行权限，
+那么就标志该文件被强制锁住．详细内容,参照文件
+/usr/src/linux/Docu-mentation/mandatory.txt
+
+.SH 注意
+此页描述的chmod基于fileutils-4.0 package;其他版本可能会有细微
+的差别.请将修正和增加发送到aeb@cwi.nl.
+程序中的错误报告到fileutils-bugs@gnu.ai.mit.edu.
+
+.SH "[中文版维护人]"
+.B 王炎 <wyd@263.net>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

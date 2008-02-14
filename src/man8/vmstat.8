@@ -1,0 +1,113 @@
+.\"  This page Copyright (C) 1994 Henry Ware <al172@yfn.ysu.edu>
+.\"; 中文版版权所有 soloman, Laser www.linuxforum.net 2000
+.\"  Distributed under the GPL, Copyleft 1994.
+.TH VMSTAT 8 "27 July 1994 " "Throatwobbler Ginkgo Labs" "Linux 系统管理员手册"
+.SH NAME
+vmstat \- 报告虚拟内存的统计信息
+.SH 总览
+vmstat [\-n] [延时[次数]]
+.br
+vmstat [\-V]
+.SH 描述
+vmstat 对系统的进程情况、内存使用情况、交换页和 I/O 块使用情况、
+中断以及 CPU 使用情况进行统计并报告相应的信息。
+
+第一个显示内容指出了计算机自上次重启至今的平均使用情况。
+后面的每一行信息是按
+.I 延时
+定期地显示系统的各部分信息。
+进程信息和内存信息都是即时产生的。
+
+.SS 选项
+\fB-n\fP 开关令第一次的信息只显示一次而不是周期地产生。
+.PP
+.I 延时
+是以秒为单位的刷新时间间隔。
+如果没有给出此延时时间，则仅显示系统启动至今的平均值。
+.PP
+.I 次数
+指的是更新的次数。
+如果没有指定此数而又定义了延时时间，则次数的默认值是无穷次。
+.PP
+\fB-V\fP 开关可以用来输出该命令的版本信息。
+.SH 输出信息简介
+.SS
+.B "Procs"
+.NF
+r: 等待运行的进程数
+b: 处在非中断睡眠状态的进程数
+w: 被交换出去的可运行的进程数。
+此数由 linux 计算得出，但 linux 并不耗尽交换空间
+.fi
+.PP
+.SS
+.B "Memory"
+.nf
+swpd: 虚拟内存使用情况，单位：KB
+free: 空闲的内存，单位KB
+buff: 被用来做为缓存的内存数，单位：KB
+.fi
+.PP
+.SS
+.B Swap
+.nf
+si: 从磁盘交换到内存的交换页数量，单位：KB/秒
+so: 从内存交换到磁盘的交换页数量，单位：KB/秒
+.fi
+.PP
+.SS
+.B "IO"
+.nf
+bi: 发送到块设备的块数，单位：块/秒
+bo: 从块设备接收到的块数，单位：块/秒
+.fi
+.PP
+.SS
+.B "System"
+.nf
+in: 每秒的中断数，包括时钟中断
+cs: 每秒的环境（上下文）切换次数
+.fi
+.PP
+.SS
+.B "CPU"
+按 CPU 的总使用百分比来显示
+.nf
+us: CPU 使用时间
+sy: CPU 系统使用时间
+id: 闲置时间
+.nf
+.SH 注意
+运行
+.B "vmstat "
+不须要特别的使用权限
+.PP
+这些系统信息是用来向用户提供分析系统瓶颈问题信息的。
+linux在计算进程情况时不将正在运行的
+.B "vmstat "
+自己计算进去。
+.PP
+当前所在的 linux 块的大小都是 1K，而 CD-ROM 文件系统的块大小为 2K。
+.SH 相关文件
+.ta
+.nf
+/proc/meninfo
+/proc/stat
+/proc/*/stat
+.fi
+
+.SH 又见
+ps(1),top(1),free(1)
+.SH 臭虫
+该命令不会对系统的每个设备的块输入输出进行列表，也不对系统调用进行计数。
+.SH 作者
+该程序由 Henry Ware &lt;all72@yfn.ysu.edu&gt;完成
+
+Throatwobbler Ginkgo Labs 27 July 1994
+
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+2000/11/26
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

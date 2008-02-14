@@ -1,0 +1,125 @@
+.TH QUOTA 1
+.SH NAME
+quota \- display disk usage and limits
+.SH SYNOPSIS
+.B quota
+[
+.B -F
+.I format-name
+] [
+.BR -guvs \ |
+.B q
+]
+.br
+.B quota
+[
+.B -F
+.I format-name
+] [
+.BR -uvs \ |
+.B q
+]
+.I user
+.br
+.B quota
+[
+.B -F
+.I format-name
+] [
+.BR -gvs \ |
+.B q
+]
+.I group
+.SH DESCRIPTION
+.B quota
+displays users' disk usage and limits.
+By default only the user quotas are printed.
+.PP
+.B quota
+reports the quotas of all the filesystems listed in
+.BR /etc/mtab .
+For filesystems that are NFS-mounted a call to the rpc.rquotad on
+the server machine is performed to get the information.
+.SH OPTIONS
+.TP
+.B \-F \f2format-name\f1
+Show quota for specified format (ie. don't perform format autodetection).
+Possible format names are:
+.B vfsold
+(version 1 quota),
+.B vfsv0
+(version 2 quota),
+.B rpc
+(quota over NFS),
+.B xfs
+(quota on XFS filesystem)
+.TP
+.B \-g
+Print group quotas for the group 
+of which the user is a member.
+The optional
+.TP
+.B \-u
+flag is equivalent to the default.
+.TP
+.B \-v
+will display quotas on filesystems
+where no storage is allocated.
+.TP
+.B \-s
+flag will make
+.BR quota (1)
+try to choose units for showing limits, used space and used inodes.
+.TP
+.B \-q
+Print a more terse message,
+containing only information
+on filesystems where usage is over quota.
+.LP
+Specifying both
+.B \-g
+and
+.B \-u
+displays both the user quotas and the group quotas (for
+the user).
+.LP
+Only the super-user may use the
+.B \-u
+flag and the optional
+.B user
+argument to view the limits of other users.
+Non-super-users can use the the
+.B \-g
+flag and optional
+.B group
+argument to view only the limits of groups of which they are members.
+.LP
+The
+.B \-q
+flag takes precedence over the
+.B \-v
+flag.
+.SH DIAGNOSTICS
+If
+.B quota
+exits with a non-zero status, one or more filesystems
+are over quota.
+.SH FILES
+.PD 0
+.TP 20
+.B aquota.user " or " aquota.group
+quota file at the filesystem root (version 2 quota, non-XFS filesystems)
+.TP 20
+.B quota.user " or " quota.group
+quota file at the filesystem root (version 1 quota, non-XFS filesystems)
+.TP
+.B /etc/mtab
+default filesystems
+.PD
+.SH SEE ALSO
+.BR quotactl (2),
+.BR fstab (5),
+.BR edquota (8),
+.BR quotacheck (8),
+.BR quotaon (8),
+.BR repquota (8)

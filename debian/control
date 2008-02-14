@@ -1,0 +1,17 @@
+Source: cman
+Section: doc
+Priority: optional
+Maintainer: bbbush <bbbush@163.com>
+
+Package: manpages-zh
+Architecture: any
+Suggests: man-browser
+Conflicts: zh-trans
+Replaces: zh-trans
+Provides: zh-trans
+Description: Chinese manual pages
+ This package contains the Chinese manual pages translated by the
+ Chinese Manual Pages Project (CMPP). 
+ Only zh_CN.UTF-8 and zh_CN.GB* are provided. Any body convert it to zh_TW ?
+ .
+ Home Page: http://cmpp.linuxforum.net

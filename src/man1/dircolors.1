@@ -1,0 +1,58 @@
+.TH DIRCOLORS "1" "January 2000" "GNU fileutils 4.0p" FSF
+.SH NAME
+dircolors \- 设置 ls 的颜色
+.SH "总览 (SYNOPSIS)"
+.B dircolors
+[\fIOPTION\fR]... [\fIFILE\fR]
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+输出 用于 设置 LS_COLORS 环境变量 的 命令.
+.SS "确定输出格式:"
+.TP
+\fB\-b\fR, \fB\-\-sh\fR, \fB\-\-bourne\-shell\fR
+输出 用于 设置 LS_COLORS 的 Bourne shell 命令
+.TP
+\fB\-c\fR, \fB\-\-csh\fR, \fB\-\-c\-shell\fR
+输出 用于 设置 LS_COLORS 的 C shell 命令
+.TP
+\fB\-p\fR, \fB\-\-print\-database\fR
+输出 缺省命令
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+如果 指定了 文件 FILE, dircolors 读取 该文件 的 内容 以 决定 什么 颜色 对应
+什么 文件类型 和 文件扩展名, 否则 就 使用 预编译 的 数据. 欲知 格式 细节, 
+请 运行 命令 `dircolors \fB\-\-print\-database\fR'.
+.SH "作者 (AUTHOR)"
+H. Peter Anvin.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-fileutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B dircolors
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B dircolors
+程序, 使用 命令
+.IP
+.B info dircolors
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/10
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

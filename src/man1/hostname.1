@@ -1,0 +1,215 @@
+.TH HOSTNAME "1" "1996年1月28日" "net-tools(网络工具)" "Linux Programmer's Manual(Linux程序员手册)"
+
+.SH NAME(名称)
+hostname \- 显示或设置系统的主机名
+.br
+domainname \- 显示或设置系统的NIS/YP域名
+.br
+dnsdomainname \- 显示系统的DNS域名
+.br
+nisdomainname \- 显示或设置系统的NIS/YP域名
+.br
+ypdomainname \- 显示或设置系统的NIS/YP域名
+.br
+nodename \- 显示或设置系统的DECnet节点名
+
+.SH SYNOPSIS(总览)
+.B hostname
+.RB [ \-v ]
+.RB [ \-a ]
+.RB [ \-\-alias ]
+.RB [ \-d ]
+.RB [ \-\-domain ]
+.RB [ \-f ]
+.RB [ \-\-fqdn ]
+.RB [ \-i ]
+.RB [ \-\-ip-address ]
+.RB [ \-\-long ]
+.RB [ \-s ]
+.RB [ \-\-short ]
+.RB [ \-y ]
+.RB [ \-\-yp ]
+.RB [ \-\-nis ]
+.RB [ \-n ]
+.RB [ \-\-node ]
+
+.PP
+.B hostname
+.RB [ \-v ]
+.RB [ \-F\ filename ]
+.RB [ \-\-file\ filename ]
+.RB [ hostname ]
+
+.PP
+.B domainname
+.RB [ \-v ]
+.RB [ \-F\ filename ]
+.RB [ \-\-file\ filename ]
+.RB [ name ]
+
+.PP 
+.B nodename
+.RB [ \-v ]
+.RB [ \-F\ filename ]
+.RB [ \-\-file\ filename ]
+.RB [ name ]
+
+.PP
+.B hostname
+.RB [ \-v ]
+.RB [ \-h ]
+.RB [ \-\-help ]
+.RB [ \-V ]
+.RB [ \-\-version ]
+
+.PP
+.B dnsdomainname
+.RB [ \-v ]
+.br
+.B nisdomainname
+.RB [ \-v ]
+.br
+.B ypdomainname
+.RB [ \-v ]
+
+.SH DESCRIPTION(描述)
+.B Hostname
+是一个用来设置或显示当前主机,域或者系统的节点名的程序.许多联网程序使用这些名字来
+标识机器.NIS/YP同样也使用域名.
+
+.SS "GET NAME"(获取名字)
+如果不调用任何参数,程序即显示当前的名字:
+
+.LP
+.B hostname
+会打印系统的名字为通过
+.BR gethostname (2)
+函数返回的值.
+
+.LP
+.B "domainname,nisdomainname,ypdomainname"
+会打印系统的名字为通过
+.BR getdomainname (2)
+函数返回的值.这同时也被看作系统的YP/NIS域名.
+
+.LP
+.B nodename
+会打印系统的DECnet节点名为通过
+.BR getnodename (2)
+函数返回的值.
+
+.LP
+.B dnsdomainname
+会打印FQDN(完全资格域名)的域部分.系统的完整的FQDN可使用
+.BR "hostname \-\-fqdn"
+返回.
+
+.SS "SET NAME"(设置名字)
+如果带一个参数或者带
+.B \-\-file
+选项调用的话,命令即设置主机名,NIS/YP域名或者节点名.
+
+.LP
+注意,只有超级用户才可以修改这些名字.
+
+.LP
+不可能使用
+.B dnsdomainname
+命令(参看下面的
+.B "THE FQDN" )
+来设置FQDN或者DNS域名.
+
+.LP
+每次系统启动时,主机名通常在
+.I /etc/rc.d/rc.inet1
+或
+.I /etc/init.d/boot
+(一般通过读取文件的内容,其中包括了主机名,例如,
+.IR /etc/hostname
+)中设置.
+
+.SS THE FQDN
+你不能使用该命令修改FQDN(通过
+.BR "hostname \-\-fqdn"
+返回)
+或者DNS域名(通过
+.BR "dnsdomainname"
+返回).系统的FQDN是一个由
+.BR resolver (3)
+返回的主机名.
+
+.LP
+从技术上说:FQDN指的是使用
+.BR gethostbyname (2)
+以返回
+gethostname (2)
+所返回主机名的名字.
+DNS域名是第一个圆点之后的部分.
+.LP
+因此它依赖于你修改方式的配置(通常在
+.IR /etc/host.conf
+中).通常(如果hosts文件在DNS或NIS之前解析)你可以在
+.IR /etc/hosts
+中修改.
+
+
+.SH OPTIONS(选项)
+.TP
+.I "\-a,\-\-alias"
+显示主机的别名(如果使用了的话).
+.TP
+.I "\-d,\-\-domain"
+显示DNS域名.不要使用命令
+.B domainname
+来获得DNS域名,因为这会显示NIS域名而非DNS域名.可使用
+.B dnsdomainname
+替换之.
+.TP
+.I "\-F,\-\-file filename"
+从指定文件中读取主机名.注释(以一个`#'开头的行)可忽略.
+.TP
+.I "\-f,\-\-fqdn,\-\-long"
+显示FQDN(完全资格域名).一个FQDN包括一个短格式主机名和DNS域名.除非你正在使用bind或
+者NIS来作主机查询,否则你可以在\fI/etc/hosts\fR文件中修改FQDN和DNS域名(这是FQDN的一
+部分).
+.TP
+.I "\-h,\-\-help"
+打印用法信息并退出.
+.TP
+.I "\-i,\-\-ip-address"
+显示主机的IP地址(组).
+.TP
+.I "\-n,\-\-node"
+显示DECnet节点名.如果指定了参数(或者指定了
+.B \-\-file name
+),那么root也可以设置一个新的节点名.
+.TP
+.I "\-s,\-\-short"
+显示短格式主机名.这是一个去掉第一个圆点后面部分的主机名.
+.TP
+.I "\-V,\-\-version"
+在标准输出上打印版本信息并以成功的状态退出.
+.TP
+.I "\-v,\-\-verbose"
+详尽说明并告知所正在执行的.
+.TP
+.I "\-y,\-\-yp,\-\-nis"
+显示NIS域名.如果指定了参数(或者指定了
+.B \-\-file name
+),那么root也可以设置一个新的NIS域.
+.SH FILES(相关文件)
+.B /etc/hosts
+.SH AUTHOR(作者)
+Peter Tobias, <tobias@et-inf.fho-emden.de>
+.br
+ernd Eckenfels, <net-tools@lina.inka.de> (NIS and manpage).
+.br
+Steve Whitehouse, <SteveW@ACM.org> (DECnet support and manpage).
+
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2000/12/14
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

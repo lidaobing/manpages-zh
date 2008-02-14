@@ -1,0 +1,386 @@
+'\"
+'\" Copyright (c) 1991-1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: library.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: library.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH library n "8.0" Tcl "Tcl Built-In Commands"
+.BS
+.SH NAME
+auto_execok, auto_import, auto_load, auto_mkindex, auto_mkindex_old, auto_qualify, auto_reset, tcl_findLibrary, parray, tcl_endOfWord, tcl_startOfNextWord, tcl_startOfPreviousWord, tcl_wordBreakAfter, tcl_wordBreakBefore \- standard library of Tcl procedures
+.SH "总览 SYNOPSIS"
+.nf
+\fBauto_execok \fIcmd\fR
+\fBauto_import \fIpattern\fR
+\fBauto_load \fIcmd\fR
+\fBauto_mkindex \fIdir pattern pattern ...\fR
+\fBauto_mkindex_old \fIdir pattern pattern ...\fR
+\fBauto_qualify \fIcommand namespace\fR
+\fBauto_reset\fR
+\fBtcl_findLibrary \fIbasename version patch initScript enVarName varName\fR
+\fBparray \fIarrayName\fR
+.VS
+\fBtcl_endOfWord \fIstr start\fR
+\fBtcl_startOfNextWord \fIstr start\fR
+\fBtcl_startOfPreviousWord \fIstr start\fR
+\fBtcl_wordBreakAfter \fIstr start\fR
+\fBtcl_wordBreakBefore \fIstr start\fR
+.VE
+.BE
+
+.SH "介绍 INTRODUCTION"
+.PP
+Tcl 为公共需求的功能包含了一个 Tcl 过程库。在 Tcl 库中定义的过程是适用于多种不同的应用的通用过程。用 \fBinfo library\fR 命令返回 Tcl 库的位置。除了这个 Tcl 库之外，每个应用通常都有它自己的支持过程库；这个库的位置通常用 \fB$\fIapp\fB_library\fR 全局变量的值给出，这里 \fIapp\fR 是应用的名字。例如，Tk 库的位置保持在变量 \fB$tk_library\fR 中。
+.PP
+要访问在 Tcl 库中的过程，一个应用应该 source (载入)库中的文件 \fBinit.tcl\fR，例如，Tcl 命令
+.CS
+\fBsource [file join [info library] init.tcl]\fR
+.CE
+如果在一个应用的 \fBTcl_AppInit \fR过程中调用了库过程 \fBTcl_Init\fR，则这(个加载)将自动发生。在 \fBinit.tcl\fR 中的代码将定义 \fBunknown\fR 过程和使用下面定义的自动装载机制安排其他过程在需要时装载。
+
+.SH "命令过程 COMMAND PROCEDURES"
+.PP
+在 Tcl 库中提供了下列过程:
+.TP
+\fBauto_execok \fIcmd\fR
+确定是否有一个叫 \fIcmd \fR的一个可执行文件或 shell     内置命令。如果有，它返回要传递给 \fBexec\fR     来执行这个叫 \fIcmd\fR\fI \fR的可执行文件或 shell     内置命令的那些参数的一个列表。如果没有，它返回一个空串。这个命令检查在当前查找路径中目录(由     PATH 环境变量给出)，在其中查找叫 \fIcmd\fR     的一个可执行文件。在 Windows     平台上，查找被展开为相同的目录和与 \fBexec\fR     使用相同的文件名扩展。 \fBAuto_exec\fR 在一个叫 \fBauto_execs\fR\fB     \fR的数组中记住以前查找的信息；这避免在将来调用相同的     \fIcmd\fR 时进行路径查找。可以使用命令 \fBauto_reset\fR     来强迫 \fBauto_execok\fR 忘掉缓存的信息。
+.TP
+\fBauto_import \fIpattern\fR
+在 \fBnamespace import\fR 期间调用 \fBAuto_import\fR 来查看用 \fIpattern\fR 指定的导入命令是否驻留在一个 自动装载的库中。如果是，则装载这个命令，这样要建立导入连接的解释器就可以获得它们。如果这个命令不驻留在自动装载库中，\fBauto_import\fR 什么都不做。
+.TP
+\fBauto_load \fIcmd\fR
+这个命令尝试装载一个叫做 \fIcmd\fR 的 Tcl  命令的定义，它查找一个\fB自动装载路径\fR，它是一个或多个目录的一个列表。如果全局变量     \fB$auto_path\fR     存在的话，则它给出这个自动装载路径。如果没有 \fB$auto_path\fR     变量，则若 TCLLIBPATH     环境变量存在则使用它。否则自动装载路径只包含 Tcl     库目录。在自动装载路径中的每个目录中必须有描述在这个目录中定义的一个或多个命令的一个文件     \fBtclIndex\fR，和要被求值来装载每个命令的一个脚本。应当使用     \fBauto_mkindex\fR 命令来自动生成 \fBtclIndex\fR     文件。如果在一个索引文件中找到 \fIcmd\fR     ，则求值适当的脚本来建立这个命令。如果成功的建立了 \fIcmd\fR，则     \fBauto_load\fR 命令返回 1。如果没有给 \fIcmd\fR     的索引条目或这个脚本实际上定义的不是 \fIcmd\fR(例如，因为索引信息过时了)，这个命令返回     0。如果在处理这个脚本的时候发生了一个错误，则返回这个错误。\fBAuto_load\fR     只读这个索引文件一次并把它保存到数组 \fBauto_index\fR\fB \fR中；以后对     \fBauto_load\fR 的调用将在这个数组中检查 \fIcmd\fR     而不是重读索引文件。可以用命令 \fBauto_reset \fR删除缓存的索引信息。这将强制下一个     \fBauto_load\fR 命令从磁盘重新装载索引数据库。
+.TP
+\fBauto_mkindex \fIdir pattern pattern ...\fR
+生成适合于 \fBauto_load \fR使用的一个索引。这个命令在 \fIdir\fR   中查找名字匹配任何 \fIpattern\fR 参数的所有文件(使用 \fBglob\fR  命令进行匹配)，生成在所有匹配的文件的中定义的所有  Tcl 命令过程的一个索引，并且在 \fIdir\fR 中的一个叫 \fBtclIndex \fR的文件中存储索引信息。如果未给出模式，则假定模式是 \fB*.tcl\fR，例如
+.RS
+.CS
+\fBauto_mkindex foo *.tcl\fR
+.CE
+.LP
+将在子目录读 \fBfoo\fR 中读取所有 \fB.tcl\fR 文件并生成一个新索引文件 \fBfoo/tclIndex\fR。
+.PP
+\fBAuto_mkindex\fR 通过把 Tcl 脚本载入(source)到一个从解释器中来分析它们并监视执行的     proc 和 namespace 命令。扩展可以使用(没有文档)     auto_mkindex_parser 包来注册对 auto_load     索引有所贡献的其他命令。你必须阅读 auto.tcl     来查看这是如何工作的。
+.PP
+\fBAuto_mkindex_old\fR 在一个相对不复杂的方式分析 Tcl     脚本: 如果任何一行包含字 \fBproc\fR     为它的第一个字，则假定它为一个过程定义并接受这一行的下一个字为这个过程的名字。不是以这种方式出现的过程定义(比如，在     \fBproc \fR前面有空格)将不被编排索引。如果你的脚本包含“危险”代码，比如全局初始化代码或有特殊字符如     \fB$\fR、\fB*\fR、\fB[\fR 或 \fB]\fR 的过程名字，则你使用     auto_mkindex_old 是更安全的。
+.RE
+.TP
+\fBauto_reset\fR
+销毁被 \fBauto_execok\fR 和 \fBauto_load \fR缓存的所有信息。下次需要这些信息的时候将从磁盘重新读取。\fBAuto_reset\fR     还删除在 auto-load     中列出的所有过程，这样下次使用它们的时候将装载它们的刷新了的复本。
+.TP
+\fBauto_qualify \fIcommand namespace\fR
+计算 \fIcommand \fR的完全限定的名字的一个列表。这个列表镜像标准     Tcl 解释器用以查找命令的那个路径:     首先它在当前名字空间中查找这个命令，接着在全局名字空间中。相应的，如果     \fIcommand\fR 是相对的并且 \fInamespace\fR 不是 \fB::\fR，则返回的这个列表两个元素:     一个是由 \fInamespace\fR 界定范围的\fIcommand\fR，如同它是一个在     \fInamespace\fR 名字空间中的命令一样；而另一个 \fIcommand\fR     如同在全局名字空间中的一个命令一样。否则，如果 \fIcommand\fR     是绝对的(它以 \fB:: \fR为开始)，或者 \fInamespace\fR 是 \fB::\fR，则这个列表只包含一个     \fIcommand\fR     ，如同它是一个在全局名字空间中的命令一样。
+.RS
+.PP
+在 Tcl 中自动装载设施使用 \fBAuto_qualify\fR，用来生成自动装载索引如     \fIpkgIndex.tcl\fR，和用来在运行时进行实际的函数自动装载。
+.RE
+.TP
+\fBtcl_findLibrary \fIbasename version patch initScript enVarName varName\fR
+这个命令是扩展在它们的初始化期间使用的一个标准查找过程。扩展调用这个过程来在多个标准路径中查找它们的过程。目录名字的最后的构成部分通常是     \fIbasenameversion\fR (例如，tk8.0)，但在建造等级上他可能是“库”。一旦找到就把     \fIinitScript\fR 文件 source(加载)到解释器中。把在其中找到文件的那个目录保存到全局变量     \fIvarName\fR 中。如果已经定义这个变量(比如，在应用初始化期间用     C 代码)，则不进行查找。否则在以下这些目录中进行查找:     由环境变量 \fIenVarName \fR给出名字的目录；相对于 Tcl     库的目录；相对于(??? relative to)在标准安装 bin 或 bin/\fIarch\fR     中的可执行文件的目录；相对于在当前建造树中的可执行文件的目录；相对于在并行建造树中的可执行文件的目录。
+.TP
+\fBparray \fIarrayName\fR
+把数组 \fIarrayName\fR    中的所有元素的名字和值输出到标准输出上。\fBArrayName\fR   必须是一个对于 \fBparray \fR的调用者是可以访问的一个数组。它可以是局部的或全局的。
+.TP
+\fBtcl_endOfWord \fIstr start\fR
+.VS
+返回字符串 \fIstr\fR 中在起始索引 \fIstart\fR  之后出现的第一个字结束(end-of-word)位置的的索引。定义字结束位置为在起始点之后跟随在第一个单字字符后面的第一个非字字符。如果在起始点之后没有字结束位置则返回     -1。关于 Tcl  如何确定哪个字符是单字字符的详情参见下面对 \fBtcl_wordchars\fR  和 \fBtcl_nonwordchars\fR 的描述。
+.TP
+\fBtcl_startOfNextWord \fIstr start\fR
+返回字符串 \fIstr\fR 中在起始索引 \fIstart\fR  之后出现的第一个字开始(start-of-word)位置的的索引。定义字开始位置为跟随在一个非字字符后面的第一个单字字符。如果在起始点之后没有字开始位置则返回 -1。
+.TP
+\fBtcl_startOfPreviousWord \fIstr start\fR
+返回字符串 \fIstr\fR 中在起始索引 \fIstart\fR  之前出现的第一个字开始(start-of-word)位置的的索引。如果在起始点之前没有字开始位置则返回  -1。
+.TP
+\fBtcl_wordBreakAfter \fIstr start\fR
+返回字符串 \fIstr\fR 中在起始索引 \fIstart\fR  之后出现的第一个字边界的索引。如果在给定字符串中在起始点之后没有边界则返回  -1。返回的索引参照组成一个边界(字符)对的第二个字符。
+.TP
+\fBtcl_wordBreakBefore \fIstr start\fR
+返回字符串 \fIstr\fR 中在起始索引 \fIstart\fR  之前出现的第一个字边界的索引。如果在给定字符串中在起始点之前没有边界则返回 -1。返回的索引参照组成一个边界(字符)对的第二个字符。
+.VE
+
+.SH "变量 VARIABLES"
+.PP
+在 Tcl 库中的过程定义或使用下列全局变量:
+.TP
+\fBauto_execs\fR
+用它来记录关于特定命令是否存在为可执行文件的信息。
+.TP
+\fBauto_index\fR
+\fBauto_load\fR 用它来保存从磁盘读来的索引信息。
+.TP
+\fBauto_noexec\fR
+如果设置了任何值，则 \fBunknown\fR     不尝试自动执行任何命令。
+.TP
+\fBauto_noload\fR
+如果设置了任何值，则 \fBunknown\fR     不尝试自动装载任何命令。
+.TP
+\fBauto_path\fR
+如果设置了它，则它必须包含一个有效的 Tcl     列表，给出在自动装载操作中要查找的目录。在启动期间初始化这个变量为依次包含:     在 TCLLIBPATH 环境变量中列出的目录，由 $tcl_library     变量命名的目录，$tcl_library 的父目录，在 $tcl_pkgPath     变量中列出的目录。
+.TP
+\fBenv(TCL_LIBRARY)\fR
+如果设置了它，则它指定包含库脚本的目录的位置(这个变量的值将被赋予     \fBtcl_library\fR 变量并被 \fBinfo library \fR命令所返回)。如果这个变量未被设置，则使用缺省的值。
+.TP
+\fBenv(TCLLIBPATH)\fR
+如果设置了它，则它必须包含一个有效的 Tcl     列表，给出在自动装载操作期间要查找的目录。必须用 Tcl     格式指定目录，使用“/”作为分隔符而不管是在什么平台上。只在初始化     \fBauto_path\fR 的时候使用这个变量。
+.TP
+\fBtcl_nonwordchars\fR
+.VS
+这个变量包含一个正则表达式，用于象 \fBtcl_endOfWord\fR     这样的例程来识别一个字符是否是一个字的一部分。如果这个模式匹配一个字符，则把这个字符作为一个非字(non-word)字符对待。在     Windows 平台上，空格、tab、和换行被作为非字字符对待。在     Unix     下，除了数字、字母和下划线之外，所有字符都是非字字符。
+.TP
+\fBtcl_wordchars\fR
+这个变量包含一个正则表达式，用于象 \fBtcl_endOfWord\fR     这样的例程来识别一个字符是否是一个字的一部分。如果这个模式匹配一个字符，则把这个字符作为一个单字字符对待。在     Windows 平台上，字有任何不是空格、tab、或换行的字符组成。在     Unix 下，字由数字、字母或下划线组成。
+.VE
+.TP
+\fBunknown_pending\fR
+\fB unknown\fR     用它来记录正在查找的命令。在 \fBunknown\fR     在自身上无穷递归的地方，使用它来检测错误。在 \fBunknown\fR     返回前删除它的值。
+
+.SH "参见 SEE ALSO"
+info(n), re_syntax(n)
+
+.SH "关键字 KEYWORDS"
+auto-exec, auto-load, library, unknown, word, whitespace 
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/12/06
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

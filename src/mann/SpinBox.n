@@ -1,0 +1,79 @@
+.TH SpinBox "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B SpinBox - SpinBox 组件
+
+.SH 创建 CREATION
+.B SpinBox pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+SpinBox 组件使用户能在用 values 选项给出的一个列表，或用一个最小值、一个最大值和一个增量定义的一组值中选择一个值。注意 range 选项定义值的一个列表，所以 getvalue 和 setvalue 能操作 values 和 range 二者。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+.TP
+-modifycmd  
+指定在用户修改 SpinBox 的值的时候调用的 Tcl 命令。 
+
+.TP
+-range  
+指定描述 SpinBox 的最小值、最大值和增量的三个整数的一个列表。 
+
+.TP
+-values  
+指定 SpinBox 接受的值。这个选项优先于 range 选项。 
+
+.SH 组件命令
+
+.TP
+pathName bind ?arg...? 
+在录入组件上设置绑定。 
+
+.TP
+pathName cget option  
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。 
+
+.TP
+pathName getvalue  
+返回 SpinBox 当前文本在值的列表中的索引，如果它不匹配任何值则返回 -1。 
+
+.TP
+pathName setvalue index  
+把 SpinBox 的文本设置成用在值的列表中的索引指示的值。index 可以被指定为任何下列形式:
+
+last
+指定值的列表的最后一个元素。 
+
+first
+指定值的列表的第一个元素。 
+
+next
+指定值的列表的当前元素(就是 getvalue 返回的那个)的下一个元素。 
+
+previous
+指定值的列表的当前元素(就是 getvalue 返回的那个)的上一个元素。 
+
+@number
+指定在值的列表的整数索引。 
+
+.SH 绑定
+
+在 SpinBox 的录入组件获得输入聚焦的时候，除了缺省的录入组件绑定之外，它还有下列绑定:
+
+* Page up 把 SpinBox 的值设置为最后一个值。
+
+* Page down 把 SpinBox 的值设置为第一个值。
+
+* Arrow up 把 SpinBox 的值设置为下一个值。
+
+* Arrow down 把 SpinBox 的值设置为上一个值。 
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/05/17
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

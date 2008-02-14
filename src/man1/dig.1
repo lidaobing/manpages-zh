@@ -1,0 +1,681 @@
+.\" ++Copyright++ 1993
+.\" -
+.\" Copyright (c) 1993
+.\"    The Regents of the University of California.  All rights reserved.
+.\" 
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\" 	This product includes software developed by the University of
+.\" 	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\" -
+.\" Portions Copyright (c) 1993 by Digital Equipment Corporation.
+.\" 
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies, and that
+.\" the name of Digital Equipment Corporation not be used in advertising or
+.\" publicity pertaining to distribution of the document or software without
+.\" specific, written prior permission.
+.\" 
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
+.\" WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
+.\" OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
+.\" CORPORATION BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+.\" DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+.\" PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+.\" ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+.\" SOFTWARE.
+.\" -
+.\" --Copyright--
+.\"
+.\" Distributed with 'dig' version 2.0 from University of Southern
+.\" California Information Sciences Institute (USC-ISI).
+.\"
+.\"       dig.1   2.0 (USC-ISI) 8/30/90
+.\"
+.Dd 1990年8月30日
+.Dt DIG 1
+.Os BSD 4
+.Sh NAME(名称)
+.Nm dig
+.Nd 发送域名查询信息包到域名服务器
+.Sh SYNOPSIS(总览)
+.Nm dig
+.Op Ic @ Ns Ar server
+.Ar domain
+.Op Aq Ar query-type
+.Op Aq Ar query-class
+.Op Ic + Ns Aq Ar query-option
+.Op Fl Aq Ar dig-option
+.Op Ar %comment
+.Sh DESCRIPTION(描述)
+.Ic Dig
+(domain information groper 域名信息搜索)是一个灵活的
+命令行工具,
+它可以用来从域名系统服务器中收集信息.
+.Ic Dig
+有两种模式:简单交互模式
+用于简单的查询,而批处理模式则可以对
+包含多个查询条目的列表执行查询.
+所有查询选项都可以从命令行输入.
+.Pp
+通常简单的
+.Ic dig
+用法为下列格式:
+.Pp
+.Bd -ragged -offset indent-two
+.Ic dig @ Ns Ar server  domain   query-type  query-class
+.Ed
+.Pp
+这里:
+.Bl -tag -width Fl
+.It Ar server
+可为域名或者以点分隔的Internet地址.
+如果省略该可选字段,
+.Ic dig
+会尝试使用你机器的默认域名服务器.
+.sp 1
+.Em 注意:
+如果指定了一个域名,那么将使用域名系统解析程序
+(即BIND)来进行解析.
+如果你的系统不支持DNS,那么可能
+.Em 必须
+指定一个以点分隔的地址.另外一种选择是,
+如果在你配置的某个地方有一台这样的服务器,
+那么你所要做的就是建立
+.Pa /etc/resolv.conf
+并在其中指明默认域名服务器的位置,这样
+.Ar server
+自身就可以解析了.参看
+.Xr resolver 5
+以获得
+.Pa /etc/resolv.conf
+相关的信息.
+.Sy 警告:
+修改
+.Pa /etc/resolv.conf
+同样会对标准的解析程序库产生影响,而
+.Pq 潜在地
+某些程序会要用到它.
+作为一种选择,用户可设置环境变量
+.Ev LOCALRES
+为指定的文件,这将用来取代
+.Pa /etc/resolv.conf
+.Po Ns Ev LOCALRES
+是特定针对
+.Ic dig
+解析程序的,并不会牵涉到标准解析程序
+.Pc .
+如果
+.Ev LOCALRES
+变量未设置或者指定的文件不能读,那么就使用
+.Pa /etc/resolf.conf .
+.It Ar domain
+是指一个你请求信息的域名.
+参看
+.Fl x
+选项(在该部分的
+.Sx OTHER OPTIONS
+节中有介绍)以获知指定反向地址查询的便捷方法.
+.It Ar query-type
+是指你所请求的信息类型(DNS查询类型).
+如果省略,默认为
+.Dq Ar a
+.Pq Dv T_A = Ar address .
+以下类型是可识别的:
+.Pp
+.Bl -hang -width "hinfo  T_HINFO   " -compact
+.It Ar a\ \ \ \ \ \  Dv T_A
+网络地址
+.It Ar any\ \ \ \  Dv T_ANY
+所有/任何与指定域相关的信息
+.It Ar mx\ \ \ \ \  Dv T_MX
+该域的邮件网关
+.It Ar ns\ \ \ \ \  Dv T_NS
+域名服务器
+.It Ar soa\ \ \ \  Dv T_SOA
+区域的授权记录
+.It Ar hinfo\ \  Dv T_HINFO
+主机信息
+.It Ar axfr\ \ \  Dv T_AXFR
+区域传输记录(必须是询问一台授权的服务器)
+.It Ar txt\ \ \ \  Dv T_TXT
+任意的字符串信息
+.El
+.Pp
+(参看RFC 1035以获得完整的列表.)
+.It Ar query-class
+是指在查询中请求的网络等级.如果省略,默认为
+.Dq Ar in
+.Pq Dv C_IN = Ar Internet .
+以下的等级是可识别的:
+.Pp
+.Bl -tag -width "hinfo  T_HINFO   " -compact
+.It Ar in\ \ \ \ \  Dv C_IN
+Internet等级的域
+.It Ar any\ \ \ \  Dv C_ANY
+所有/任何等级的信息
+.El
+.Pp
+(参看RFC 1035以获得完整的列表.)
+.Pp
+.Em 注意:
+.Dq Ar Any
+可以用来指定一个
+.Em 等级
+和/或查询的一种
+.Em 类型 .
+.Ic Dig
+会将第一次出现的
+.Dq Ar any
+解释为
+.Ar query-type = Dv T_ANY .
+为了指明
+.Ar query-class = Dv C_ANY ,
+你必须或者指定
+.Dq any
+两次,或者使用
+.Fl c
+选项(见下面)设置
+.Ar query-class .
+.El
+.Ss OTHER OPTIONS(其它选项)
+.Bl -tag -width Fl
+.It % Ns Ar ignored-comment
+.Dq %
+用来引用一个不用作解释的参数.
+如果正以批处理的模式运行
+.Ic dig
+这可能很有用.
+因为不用对一组查询中的每个
+.Ar @server-domain-name
+进行解析,你就可以避免这样做的额外开销,
+并且仍然能够在命令行上以域名作为参数.
+例如:
+.Pp
+.Bd -ragged -offset indent-two
+.Ic dig  @128.9.0.32  %venera.isi.edu  mx  isi.edu
+.Ed
+.Pp
+.It Fl Aq Ar dig option
+.Dq Fl
+用来指定一个影响
+.Ic dig
+操作的选项.
+当前可用的选项有(尽管不能保证都有用):
+.Bl -tag -width Fl
+.It Fl x Ar dot-notation-address
+这是指定反向地址映射的便捷的方法.
+不用写
+.Dq Ic dig 32.0.9.128.in-addr.arpa , 
+你可以简单地写成
+.Dq Ic dig -x 128.9.0.32 .
+.It Fl f Ar file
+.Ic dig
+批处理模式的文件.该文件包含了一组查询清单
+(
+.Ns Ic dig
+命令行),它们将一个接一个地执行.以
+.Sq \&; ，
+.Sq #
+或
+.Sq \en
+开头的行将忽略.其它选项
+仍然可以在命令行上出现,而且对
+每个批处理查询都有效.
+.It Fl T Ar time
+当运行于批处理模式下时,两次接着的查询之间的
+时间间隔,以秒计.
+可以用来保持两个或多个批处理
+.Ic dig
+命令大致同步运行.默认为零.
+.It Fl p Ar port
+端口号.通过监听非标准端口号来查询
+域名服务器.默认为53.
+.It Fl P Ns Bq Ar ping-string
+在查询返回之后,执行一次
+.Xr ping 8
+命令以获得响应时间的对照关系.这在调用shell上
+显得不那么自然.
+该命令显示的最后三行统计信息为:
+.Pp
+.Bd -ragged -offset indent-two
+.Ic ping Fl s server_name 56 3
+.Ed 
+.Pp
+如果可选的
+.Dq Ar ping_string
+存在,那么
+会覆盖shell命令中的
+.Dq Ic ping Fl s .
+.It Fl t Ar query-type
+指定查询类型.可以指定为一个将包含在类型字段
+中的整数值,也可以使用
+上面讨论的缩写助记符(即
+.Ar mx  = Dv T_MX ) .
+.It Fl c Ar query-class
+指定查询等级.可以指定为一个将包含在等级字段
+中的整数值,也可以使用
+上面讨论的缩写助记符(即in = C_IN).
+.It Fl k Ar keydir:keyname
+用TSIG密钥指定的的密钥名来签署这次查询,
+该密钥名在目录keydir下.
+.It Fl envsav
+该标识指定
+.Ic dig
+的环境变量
+(默认的,显示选项,等等.),在所有参数都解释了之后,
+应保存它们到
+一个文件中以使之成为默认的环境变量.
+如果你不喜欢默认的标准设置而又不想在每次使用
+.Ic dig
+时带大量的选项,那么这很有用.
+环境变量包括解析程序状态变量标识,超时和重试次数
+以及详细控制
+.Ic dig
+输出的标识(见下面).
+如果shell环境变量
+.Ev LOCALDEF
+设置为一个文件的名字,那么此即为默认的
+.Ic dig
+环境变量所保存的地方.如果没有,那么会在当前
+工作目录下创建
+.Dq Pa DiG.env .
+.Pp
+.Em 注意:
+.Ev LOCALDEF
+是特定针对
+.Ic dig
+解析程序,
+而它不会影响标准解析程序库的操作.
+.Pp
+每当
+.Ic dig
+执行时,它会查找
+.Dq Pa ./DiG.env
+或者在shell环境变量
+.Ev LOCALDEF
+中指定的文件.
+如果这样的文件存在而且可读,那么在解释
+任何参数之前,
+先从
+该文件中
+恢复环境变量.
+.It Fl envset
+该标识只影响批处理查询的运行.当在
+.Ic dig
+的批处理文件一行上指定了
+.Dq Fl envset
+时,在参数之后的
+.Ic dig
+环境变量会被解释为批处理文件执行期间
+默认的环境变量,
+或者
+直到指定了
+.Dq Fl envset 
+的下一行为止.
+.It Xo
+.Fl Op Cm no
+.Ns cm stick
+.Xc
+该标识只影响批处理查询的运行.
+它指定
+.Ic dig
+环境变量(通过
+.Dq Fl envset
+开关变量初始化读入或设置)会在
+.Ic dig
+批处理文件每次查询(行)之前重建.
+默认的
+.Dq Fl nostick
+表示
+.Ic dig
+环境变量不是固定的,因而在
+.Ic dig
+批处理文件中单行上指定的选项将对剩余的行
+继续产生作用(也即,它们不会恢复成
+.Dq sticky(固定的)
+默认值).
+.El
+.It Ic + Ns Aq Ar query-option
+.Dq +
+用来指定一个在查询信息包中需修改的或者
+需用来修改
+.Ic dig
+输出细节的选项.这些选项中的许多与
+.Xr nslookup 8
+所承认的参数相同.
+如果一个选项需带参数,那么格式如下:
+.Pp
+.Bd -ragged -offset indent-two
+.Ic + 
+.Ns Ar keyword 
+.Ns Op = Ns Ar value
+.Ed
+.Pp
+绝大多数关键字可简写.
+.Dq +
+选项的解释是非常直白的 \(em 值与它的关键字之间
+千万不能用空格分隔.
+当前可用的关键字有:
+.Pp
+Keyword      Abbrev.  Meaning [default]
+.Pp
+(关键字)     (缩写)   (含义) [默认值]
+.Pp
+.Bl -tag -width "[no]primary  (ret)    " -compact
+.It Xo
+.Op Cm no 
+.Ns Cm debug\ \ \ \ 
+.Pq Cm deb
+.Xc
+打开/关闭调试模式
+.Bq Cm deb
+.It Xo
+.Op Cm no 
+.Ns Cm d2\ \ \ \ \ \ \ \ \ \ 
+.Xc
+打开/关闭特殊的调试模式
+.Bq Cm nod2
+.It Xo
+.Op Cm no 
+.Ns Cm recurse\ \ 
+.Pq Cm rec
+.Xc
+使用/不使用递归查询
+.Bq Cm rec
+.It Xo
+.Cm retry= Ns Ar #
+.Cm \ \ \ \ \ 
+.Pq Cm ret
+.Xc 
+设置重试次数为#
+.Bq 4
+.It Xo
+.Cm time= Ns Ar #
+.Cm \ \ \ \ \ \ 
+.Pq Cm ti
+.Xc
+设置超时长度为#秒
+.Bq 4
+.It Xo
+.Op Cm no 
+.Ns Cm ko
+.Xc
+保留公开的选项(keep open options)(隐含vc)
+.Bq Cm noko
+.It Xo
+.Op Cm no 
+.Ns Cm vc
+.Xc
+使用/不使用虚拟电路
+.Bq Cm novc
+.It Xo
+.Op Cm no 
+.Ns Cm defname\ \ 
+.Pq Cm def
+.Xc
+使用/不使用默认的域名
+.Bq Cm def
+.It Xo
+.Op Cm no 
+.Ns Cm search\ \ \ 
+.Pq Cm sea
+.Xc
+使用/不使用域搜索列表
+.Bq Cm sea
+.It Xo
+.Cm domain= Ns Ar NAME\ \ 
+.Pq Cm do
+.Xc
+设置默认的域名为
+.Ar NAME
+.It Xo
+.Op Cm no 
+.Ns Cm ignore\ \ \ 
+.Pq Cm i
+.Xc
+忽略/不忽略截断(trunc.)错误
+.Bq Cm noi
+.It Xo
+.Op Cm no 
+.Ns Cm primary\ \ 
+.Pq Cm pr
+.Xc
+使用/不使用主服务器
+.Bq Cm nopr
+.It Xo
+.Op Cm no 
+.Ns Cm aaonly\ \ \ 
+.Pq Cm aa
+.Xc
+表示只包含授权查询的标识
+.Bq Cm noaa
+.It Xo
+.Op Cm no 
+.Ns Cm cmd
+.Xc
+重复(echo)解释的参数
+.Bq Cm cmd
+.It Xo
+.Op Cm no 
+.Ns Cm stats\ \ \ \ 
+.Pq Cm st
+.Xc
+显示查询统计信息
+.Bq Cm st
+.It Xo
+.Op Cm no 
+.Ns Cm Header\ \ \ 
+.Pq Cm H
+.Xc
+显示基本的包头
+.Bq Cm H
+.It Xo
+.Op Cm no 
+.Ns Cm header\ \ \ 
+.Pq Cm he
+.Xc
+显示包头的标识
+.Bq Cm he
+.It Xo
+.Op Cm no 
+.Ns Cm ttlid\ \ \ \ 
+.Pq Cm tt
+.Xc
+显示TTLs(Time to Live)
+.Bq Cm tt
+.It Xo
+.Op Cm no 
+.Ns Cm cl
+.Xc
+显示等级信息
+.Bq Cm nocl
+.It Xo
+.Op Cm no 
+.Ns Cm qr
+.Xc
+显示向外的查询
+.Bq Cm noqr
+.It Xo
+.Op Cm no 
+.Ns Cm reply\ \ \ \ 
+.Pq Cm rep
+.Xc
+显示响应信息
+.Bq Cm rep
+.It Xo
+.Op Cm no 
+.Ns Cm ques\ \ \ \ \ 
+.Pq Cm qu
+.Xc
+显示询问部分
+.Bq Cm qu
+.It Xo
+.Op Cm no 
+.Ns Cm answer\ \ \ 
+.Pq Cm an
+.Xc
+显示应答部分
+.Bq Cm an
+.It Xo
+.Op Cm no 
+.Ns Cm author\ \ \ 
+.Pq Cm au
+.Xc
+显示授权的部分
+.Bq Cm au
+.It Xo
+.Op Cm no 
+.Ns Cm addit\ \ \ \ 
+.Pq Cm ad
+.Xc
+显示附加的部分
+.Bq Cm ad
+.It Cm pfdef 
+设置为默认显示位
+.It Cm pfmin
+设置为最小的默认显示位
+.It Cm pfset= Ns Ar # 
+设置显示位为#
+(#可以为十六进制/八进制/十进制)
+.It Cm pfand= Ns Ar #
+位和显示位设为#(bitwise and print flags with #)
+.It Cm pfor= Ns Ar #
+位或显示位设为#(bitwise or print flags with #)
+.El
+.Pp
+当发送数据报查询时,
+.Cm retry
+和
+.Cm time
+选项会影响解析程序库的重传策略.其算法如下:
+.Pp
+.Bd -literal -offset indent
+for i = 0 to retry - 1
+    for j = 1 to num_servers
+	send_query
+	wait((time * (2**i)) / num_servers)
+    end
+end
+.Ed
+.Pp
+(注意:
+.Ic dig
+通常取
+.Dq Li num_servers
+的值为1 . )
+.El
+.Ss DETAILS(细节)
+.Ic Dig
+以前要求BIND的
+.Xr resolver 3
+库的版本作一些细微的修改.
+从BIND 4.9起,BIND的解析程序已经修补好
+并可以正常地与
+.Ic dig
+一起工作.
+实质上,
+.Ic dig
+在解释参数和设置适合的参数时是
+直来直去的
+(虽然并不巧妙)
+.Ic Dig
+会用到
+.Xr resolver 3
+的例程
+.Fn res_init , 
+.Fn res_mkquery ,
+.Fn res_send 
+以及访问
+.Ft _res
+结构.
+.Sh ENVIRONMENT(环境变量)
+.Bl -tag -width "LOCALRES  " -compact
+.It Ev LOCALRES
+用来替换Pa /etc/resolv.conf的文件
+.It Ev LOCALDEF
+默认的环境变量文件
+.El
+.Pp
+另见上面对
+.Fl envsav ,
+.Fl envset ,
+和
+.Xo
+.Fl Op Cm no 
+.Ns Cm stick
+.Xc
+选项的说明.
+.Sh FILES(相关文件)
+.Bl -tag -width "/etc/resolv.conf  " -compact
+.It Pa /etc/resolv.conf	
+初始化的域名和域名服务器地址
+.It Pa \./DiG.env
+默认的保存默认选项的文件
+.El
+.Sh SEE ALSO(另见)
+.Xr named 8 , 
+.Xr resolver 3 , 
+.Xr resolver 5 ,  
+.Xr nslookup 8 . 
+.Sh STANDARDS(标准)
+RFC 1035.
+.Sh AUTHOR(作者)
+Steve Hotz 
+hotz@isi.edu
+.Sh ACKNOWLEDGMENTS(致谢)
+.Ic Dig
+使用了源自
+.Xr nslookup 8
+的函数,
+其作者为Andrew Cherenson.
+.Sh BUGS
+.Ic Dig
+是蠕变特色("creeping featurism")的一个
+典型实例 -- 这是因在其开发
+过程中就考虑到了一些潜在应用而导致的结果.
+它可能会从这种严格的限定中受益.同样,
+他们设立的显示位以及条目的间隔尺寸
+很明显地也是一种十分特别的创意.
+.Pp
+当问题出在解析程序身上时,
+.Ic Dig
+不会总是能够正常地退出(在适合的状况下)
+.Po Sy 注意:
+绝大多数一般的exit情况是能够处理的
+.Pc .
+当运行于批处理模式下时尤其恼火.
+如果不能正常退出(又无法俘获)的话,
+那么整个批处理将终止;如果俘获了这样的事件,
+.Ic dig
+就只是继续下一个查询罢了.
+.Sh [中文版维护人]
+riser <boomer@ccidnet.com>
+.Sh [中文版最新更新]
+2001/7/19
+.Sh "《中国Linux论坛man手册页翻译计划》"
+http://cmpp.linuxforum.net

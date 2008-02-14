@@ -1,0 +1,74 @@
+.TH MD5SUM "1" "December 1999" "GNU textutils 2.0a" FSF
+
+.SH NAME
+md5sum \- 计算检验MD5效验码
+
+.SH "总览 (SYNOPSIS)"
+.B ../src/md5sum
+[\fIOPTION\fR] [\fIFILE\fR]...
+.br
+.B ../src/md5sum
+[\fIOPTION\fR] \fI--check \fR[\fIFILE\fR]
+
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+显示 或 检验 MD5 效验码. 如果 没有 FILE 或者 FILE 是 - 时, 就从 标准 输入 读入.
+.TP
+\fB\-b\fR, \fB\-\-binary\fR
+以 二进制 模式 读入 文件 (DOS/Windows 下 默认)
+.TP
+\fB\-c\fR, \fB\-\-check\fR
+对 给定 的 文件 检验 MD5 效验码
+.TP
+\fB\-t\fR, \fB\-\-text\fR
+以 文本 模式 读入 文件 (默认)
+.SS "下面 的 两个 选项 只在 检验 效验码 时用:"
+.TP
+\fB\-\-status\fR
+不显示 任何 输出, 用 返回码 表示 成功 与否
+.TP
+\fB\-w\fR, \fB\-\-warn\fR
+对于 错误 的 MD5 效验码 行 的 格式 发出 警告
+.TP
+\fB\-\-help\fR
+显示 这个 帮助 然后 退出
+.TP
+\fB\-\-version\fR
+显示 版本 信息 然后 退出
+.PP
+效验码 用 RFC 1321 中 描述 的 算法 生成. 当 检验 的 时候, 输入 必需 是 这个
+程序 以前 的 输出. 默认 的 模式 是 显示 一行 数据, 包括 效验码, 一个 指示 类型
+的 字符 (`*' 表示 二进制, ` ' 表示 文本), 和 每个 文件 的 名字.
+
+.SH "作者 (AUTHOR)"
+Ulrich Drepper
+
+.SH "错误报告 (REPORTING BUGS)"
+把 错误 报告 给 <bug-textutils@gnu.org>.
+
+.SH "版权 (COPYRIGHT)"
+版权所有 \(co 1999 自由软件基金会
+.br
+这一程序是自由软件； 拷贝条件见源文件。
+没有任何担保； 甚至没有适合特定目的的隐含的担保。 
+
+.SH "参见 (SEE ALSO)"
+完整的 
+.B md5sum
+文档 用 Texinfo 手册页 的 形式 写成. 如果
+.B info
+和
+.B md5sum
+程序 都 正确 的 安装 在 你的 机子 上, 用
+.IP
+.B info md5sum
+.PP
+命令 能够 查看 完整 的 手册页.
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/10/31
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

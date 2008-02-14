@@ -1,0 +1,48 @@
+.\" 版权所有 The USENET Community Trust, 1988-1995.
+.\" 中文版版权所有 Liu JingSong, www.linuxforum.net 2000
+.\" 本文档可在遵照LDP GENERAL PUBLIC LICENSE，Version 1, September 1998
+.\" 中描述的条件下进行复制,且该文件发布时必须包含该文档．
+.TH LISTALIAS 1L "Elm Version 2.5" "USENET Community Trust"
+.SH NAME
+listalias \- 列出用户和系统别名
+.SH 总揽
+.B listalias
+[ -s | -u ] [ 正则表达式]
+.SH 描述
+.I Listalias
+按用户及系统别名每个输出一行。每行具有下列格式：
+.nf
+   
+   <别名>     <地址>  (<注解>)
+
+.fi
+如果采用了正则表达式选项，则只有与指定表达式匹配的别名才被列出，
+如果未采用正则表达式，所有别名将被列出。
+.sp
+在两种方式下，命令的输出都被排序。
+.SH 选项
+.TP
+.B \-s
+只输出系统别名。  
+.BR \ \-s \ 和 \ \-u
+两个选项为互斥关系，即两个选项只能选一个。
+.TP
+.B \-u
+只输出用户别名  
+.BR \ \-s \ 和 \ \-u
+两个选项为互斥关系。
+.SH 作者
+Elm 开发小组
+.SH 参见
+checkalias(1L), elm(1L), elmalias(1L), newalias(1L)
+.SH 缺陷
+由于该程序通过管道调用了另一个程序egrep, 因此表达式的检查结果由egrep决定，而非这个程序自己决定！
+.SH 程序错误报告至
+Bill Pemberton  flash@virginia.edu
+
+.SH "[中文版维护人]"
+.B Liu JingSong <js-liu@263.net>
+.SH "[中文版最新更新]"
+.B 2001/05/02
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

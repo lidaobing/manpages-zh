@@ -1,0 +1,439 @@
+.\" Date: Fri, 11 Sep 1998 19:13:45 +0100
+.\" From: Edward Betts 
+.\" Chinese Version Copyrighted Scorpino, www.linuxforum.net 2000
+.\" Derived from the GNU diff info page.
+.\" May be distributed under the GPL.
+.TH DIFF 1 "22sep1993" "GNU Tools" "GNU Tools"
+.SH NAME
+diff \- 找出两个文件的不同点
+.SH 总览
+.B diff
+[选项] 源文件 目标文件
+.SH 描述
+在最简单的情况是, 
+.I diff
+比较两个文件的内容
+.I （源文件
+和
+.IR 目标文件） .
+文件名可以是
+.B \-
+由标准输入设备读入的文本.
+作为特别的情况是,
+.B "diff \- \-"
+比较一份标准输入的它自己的拷贝
+如果 
+.I 源文件
+是一个目录和
+.I 目标文件
+不是（目录）,
+.I diff
+会比较在
+.I 源文件（目录）
+里的文件的中和
+.IR 目标文件同名的（文件）,
+反过来也一样. 非目录文件不能是
+.BR \- .
+
+如果
+.I 源文件
+和
+.I 目标文件
+都是目录,
+.I diff
+比较两个目录中相应的文件，
+依照字母次序排序；这个比较是不会递归的，除非给出
+.B \-r
+或者
+.B \-\-recursive.
+.I diff
+不把一个目录的内容看为它是一个文件来比较。被指定的文件不
+能是标准的输入, 因为标准的输入是无名的并且＂有一样的名字的文
+件＂的观点不适用。
+.B diff
+的选项由
+.BR \- ,
+开始
+所以正常地
+.I 源文件（名）
+和
+.I 目标文件（名）
+不可以用
+.BR \- 
+开头.
+然而,
+.B \-\-
+可以被它视为保留的即使作为文件名的开头（
+they begin with
+.BR \- . ）
+.SS 选项
+下面是 GNU所接受的
+.I diff
+的所有选项的概要.
+大多数的选项有两个相同的名字,一个是单个的
+跟在 
+.BR \- 
+后面字母,
+另一个是由
+.BR \-\- 
+引出的长名字.
+多个单字母选项（除非它们产生歧义）能够组合为单行的命令行语法
+.B \-ac
+是等同于
+.BR "\-a \-c" .
+长命名的选项能被缩短到他们的名字的任何唯一的前缀.
+用
+.RB ( [
+和
+.BR ] )
+括起来显示选项产生歧义的选项
+.TP
+.BI \- 行数（一个整数）
+显示上下文
+.I 行数
+(一个整数).
+这个选项自身没有指定输出格式，这是没有效果的，除非和
+.B \-c
+或者
+.BR \-u 
+组合使用.
+这是已废置的选项，对于正确的操作,
+上下文至少要有两行。
+.TP
+.B \-a
+所有的文件都视为文本文件来逐行比较，甚至他们似乎不是文本文件.
+.TP
+.B \-b
+忽略空格引起的变化.
+.TP
+.B \-B
+忽略插入删除空行引起的变化.
+.TP
+.B \-\-brief
+仅报告文件是否相异,在乎差别的细节.
+.TP
+.B \-c
+使用上下文输出格式.
+.TP
+.BI "\-C " 行数（一个整数）
+.br
+.ns
+.TP
+.BI \-\-context[= lines ]
+使用上下文输出格式，显示以指定
+.I 行数
+(一个整数), 或者是三行（当
+.I 行数
+没有给出时.
+对于正确的操作,
+上下文至少要有两行.
+.TP
+.BI \-\-changed\-group\-format= format
+使用
+.I format
+输出一组包含两个文件的不同处的行，其格式是 if\-then\-else .
+.TP
+.B \-d
+改变算法也许发现变化的一个更小的集合.这会使
+.I diff
+变慢 (有时更慢).
+.TP
+.BI "\-D " name
+合并 if\-then\-else 格式输出, 预处理宏（由name参数提供）条件.
+.TP
+.B \-e
+.br
+.ns
+.TP
+.B \-\-ed
+输出为一个有效的
+.I ed
+脚本.
+.TP
+.BI \-\-exclude= pattern
+比较目录的时候，忽略和目录中与
+.IR pattern （样式）
+相配的.
+.TP
+.BI \-\-exclude\-from= file
+比较目录的时候，忽略和目录中与任何包含在
+.IR file （文件）
+的样式相配的文件和目录.
+.TP
+.B \-\-expand\-tabs
+在输出时扩展tab为空格，保护输入文件的tab对齐方式
+.TP
+.B \-f
+产生一个很象
+.I ed
+脚本的输出，但是但是在他们在文件出现的顺序有改变
+.TP
+.BI "\-F " regexp
+在上下文和统一格式中，对于每一大块的不同，显示出匹配
+.IR regexp .
+的一些前面的行.
+.TP
+.B \-\-forward\-ed
+产生象
+.B ed
+脚本的输出，但是它们在文件出现的顺序有改变。
+.TP
+.B \-h
+这选项现在已没作用，它呈现Unix的兼容性.
+.TP
+.B \-H
+使用启发规则加速操作那些有许多离散的小差异的大文件.
+.TP
+.BI \-\-horizon\-lines= lines
+比较给定行数的有共同前缀的最后行，和有共同或缀的最前行.
+.TP
+.B \-i
+忽略大小写.
+.TP
+.BI "\-I " regexp
+忽略由插入，删除行（由regexp 参数提供参考）带来的改变.
+.TP
+.BI \-\-ifdef= name
+合并 if\-then\-else 格式输出, 预处理宏（由name参数提供）条件.
+.TP
+.B \-\-ignore\-all\-space
+在比较行的时候忽略空白.
+.TP
+.B \-\-ignore\-blank\-lines
+忽略插入和删除空行
+.TP
+.B \-\-ignore\-case
+忽略大小写.
+.TP
+.BI \-\-ignore\-matching\-lines= regexp
+忽略插入删除行（由regexp 参数提供参考）.
+.TP
+.B \-\-ignore\-space\-change
+忽略空白的数量.
+.TP
+.B \-\-initial\-tab
+在文本行（无论是常规的或者格式化的前后文关系）前输出tab代替空格.
+引起的原因是tab对齐方式看上去象是常规的一样.
+.TP
+.B \-l
+产生通过
+.I pr
+编码的输出.
+.TP
+.BI "\-L " label
+.br
+.ns
+.TP
+.BI \-\-label= label
+使用
+.I label
+给出的字符在文件头代替文件名输出.
+.TP
+.B \-\-left\-column
+以并列方式印出两公共行的左边
+.TP
+.BI \-\-line\-format= format
+使用
+.I format
+输出所有的行，在
+if\-then\-else 格式中.
+.TP
+.B \-\-minimal
+改变算法也许发现变化的一个更小的集合.这会使
+.I diff
+变慢 (有时更慢).
+.TP
+.B \-n
+输出 RC\-格式 diffs; 
+除了每条指令指定的行数受影响外 象
+.B \-f
+一样。
+.TP
+.B \-N
+.br
+.ns
+.TP
+.B \-\-new\-file
+在目录比较中，如果那个文件只在其中的一个目录中找到，那么它被视为在
+另一个目录中是一个空文件.
+.TP
+.BI \-\-new\-group\-format= format
+使用
+.I format
+以if\-then\-else 格式输出只在第二个文件中取出的一个行组
+.TP
+.BI \-\-new\-line\-format= format
+使用
+.I format
+以if\-then\-else 格式输出只在第二个文件中取出的一行
+.TP
+.BI \-\-old\-group\-format= format
+使用
+.I format
+以if\-then\-else 格式输出只在第一个文件中取出的一个行组
+.TP
+.BI \-\-old\-line\-format= format
+使用
+.I format
+使用
+.I format
+以if\-then\-else 格式输出只在第一个文件中取出的一行
+.TP
+.B \-p
+显示带有c函数的改变.
+.TP
+.B \-P
+在目录比较中，如果那个文件只在其中的一个目录中找到，那么它被视为在
+另一个目录中是一个空文件.
+.TP
+.B \-\-paginate
+产生通过
+.I pr
+编码的输出.
+.TP
+.B \-q
+仅报告文件是否相异,不报告详细的差异.
+.TP
+.B \-r
+当比较目录时，递归比较任何找到的子目录.
+.TP
+.B \-\-rcs
+输出 RC\-格式 diffs; 
+除了每条指令指定的行数受影响外 象
+.B \-f
+一样。
+.TP
+.B \-\-recursive
+当比较目录时，递归比较任何找到的子目录.
+.TP
+.B \-\-report\-identical\-files
+.br
+.ns
+.TP
+.B \-s
+报告两个文件相同.
+.TP
+.BI "\-S " file
+当比较目录时，由
+.IR file 
+开始.
+这用于继续中断了的比较.
+.TP
+.B \-\-sdiff\-merge\-assist
+打印附加的信息去帮助
+.IR sdiff .
+.I sdiff
+在运行
+.IR diff 
+时使用这些选项.
+这些选项不是特意为使用者直接使用而准备的。
+.TP
+.B \-\-show\-c\-function
+显示带有c函数的改变.
+.TP
+.BI \-\-show\-function\-line= regexp
+在上下文和统一的格式，对于每一大块的差别，显示出匹配
+.IR regexp .
+的一些前面的行
+
+.TP
+.B \-\-side\-by\-side
+使用并列的输出格式.
+.TP
+.B \-\-speed\-large\-files
+使用启发规则加速操作那些有许多离散的小差异的大文件.
+.TP
+.BI \-\-starting\-file= file
+当比较目录时，由
+.IR file 
+开始.
+这用于继续中断了的比较.
+.TP
+.B \-\-suppress\-common\-lines
+在并列格式中不印出公共行。
+.TP
+.B \-t
+在输出时扩展tab为空格，保护输入文件的tab对齐方式
+.TP
+.B \-T
+在文本行（无论是常规的或者格式化的前后文关系）前输出tab代替空格.引起的原因
+是tab对齐方式看上去象是常规的一样.
+.TP
+.B \-\-text
+所有的文件都视为文本文件来逐行比较，甚至他们似乎不是文本文件.
+.TP
+.B \-u
+使用统一的输出格式.
+.TP
+.BI \-\-unchanged\-group\-format= format
+使用
+.I format
+输出两个文件的公共行组，其格式是if\-then\-else.
+.TP
+.BI \-\-unchanged\-line\-format= format
+使用
+.I format
+输出两个文件的公共行，其格式是if\-then\-else.
+.TP
+.B \-\-unidirectional\-new\-file
+在目录比较中，如果那个文件只在其中的一个目录中找到，那么它被视为在
+另一个目录中是一个空文件.
+.TP
+.BI "\-U " lines
+.br
+.ns
+.TP
+.BI \-\-unified[= lines ]
+使用前后关系格式输出，显示以指定
+.I 行数
+(一个整数), 或者是三行（当
+.I 行数
+没有给出时.
+对于正确的操作,
+上下文至少要有两行.
+.TP
+.B \-v
+.br
+.ns
+.TP
+.B \-\-version
+输出
+.IR diff 
+版本号.
+.TP
+.B \-w
+在比较行时忽略空格
+.TP
+.BI "\-W " columns
+.br
+.ns
+.TP
+.BI \-\-width= columns
+在并列格式输出时，使用指定的列宽.
+.TP
+.BI "\-x " pattern
+比较目录的时候，忽略和目录中与
+.IR pattern （样式）
+相配的.
+.TP
+.BI "\-X " file
+比较目录的时候，忽略和目录中与任何包含在
+.IR file （文件）
+的样式相配的文件和目录.
+.TP
+.B \-y
+使用并列格式输出
+.SH 参考
+cmp(1), comm(1), diff3(1), ed(1), patch(1), pr(1), sdiff(1).
+.SH DIAGNOSTICS
+退出状态为0意味着没有差别，
+1意味着有一些不同。
+2意味很有问题（许多差异）
+.br
+
+.SH "[中文版维护人]"
+.B Scorpio <rawk@chinese.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国Linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

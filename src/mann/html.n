@@ -1,0 +1,323 @@
+'\" -*- tcl -*- doctools manpage
+'\"
+'\" Generated from ./modules/html/html.man by mpexpand with fmt.nroff
+'\"
+.so man.macros
+.TH "html" n 1.2.1 html "HTML Generation"
+.BS
+.SH NAME
+html \- 产生 HTML 框架的子程序
+.SH "总览 SYNOPSIS"
+package require \fBTcl 8.2\fR
+.sp
+package require \fBhtml ?1.2.1?\fR
+.sp
+\fB::html::author\fR \fIauthor\fR\fR
+.sp
+\fB::html::bodyTag\fR \fIargs\fR\fR
+.sp
+\fB::html::cell\fR \fIparam value\fR ?\fItag\fR?\fR
+.sp
+\fB::html::checkbox\fR \fIname value\fR\fR
+.sp
+\fB::html::checkSet\fR \fIkey sep list\fR\fR
+.sp
+\fB::html::checkValue\fR \fIname\fR ?\fIvalue\fR?\fR
+.sp
+\fB::html::closeTag\fR \fR
+.sp
+\fB::html::default\fR \fIkey\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::description\fR \fIdescription\fR\fR
+.sp
+\fB::html::end\fR \fR
+.sp
+\fB::html::eval\fR \fIarg\fR ?\fIargs\fR?\fR
+.sp
+\fB::html::extractParam\fR \fIparam key\fR ?\fIvarName\fR?\fR
+.sp
+\fB::html::font\fR \fIargs\fR\fR
+.sp
+\fB::html::for\fR \fIstart test next body\fR\fR
+.sp
+\fB::html::foreach\fR \fIvarlist1 list1\fR ?\fIvarlist2 list2 ...\fR? \fIbody\fR\fR
+.sp
+\fB::html::formValue\fR \fIname\fR ?\fIdefvalue\fR?\fR
+.sp
+\fB::html::getFormInfo\fR \fIargs\fR\fR
+.sp
+\fB::html::getTitle\fR \fR
+.sp
+\fB::html::h\fR \fIlevel string\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::h1\fR \fIstring\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::h2\fR \fIstring\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::h3\fR \fIstring\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::h4\fR \fIstring\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::h5\fR \fIstring\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::h6\fR \fIstring\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::hdrRow\fR \fIargs\fR\fR
+.sp
+\fB::html::head\fR \fItitle\fR\fR
+.sp
+\fB::html::headTag\fR \fIstring\fR\fR
+.sp
+\fB::html::if\fR \fIexpr1 body1\fR ?\fBelseif\fR \fIexpr2 body2 ...\fR? ?\fBelse\fR \fIbodyN\fR?\fR
+.sp
+\fB::html::keywords\fR \fIargs\fR\fR
+.sp
+\fB::html::mailto\fR \fIemail\fR ?\fIsubject\fR?\fR
+.sp
+\fB::html::meta\fR \fIargs\fR\fR
+.sp
+\fB::html::minorMenu\fR \fIlist\fR ?\fIsep\fR?\fR
+.sp
+\fB::html::minorList\fR \fIlist\fR ?\fIordered\fR?\fR
+.sp
+\fB::html::openTag\fR \fItag args\fR\fR
+.sp
+\fB::html::passwordInput\fR ?\fIname\fR?\fR
+.sp
+\fB::html::passwordInputRow\fR \fIlabel\fR ?\fIname\fR?\fR
+.sp
+\fB::html::quoteFormValue\fR \fIvalue\fR\fR
+.sp
+\fB::html::radioSet\fR \fIkey sep list\fR\fR
+.sp
+\fB::html::radioValue\fR \fIname value\fR\fR
+.sp
+\fB::html::refresh\fR \fIseconds url\fR\fR
+.sp
+\fB::html::init\fR ?\fIlist\fR?\fR
+.sp
+\fB::html::row\fR \fIargs\fR\fR
+.sp
+\fB::html::paramRow\fR \fIlist\fR ?\fIrparam\fR? ?\fIcparam\fR?\fR
+.sp
+\fB::html::select\fR \fIname param choices\fR ?\fIcurrent\fR?\fR
+.sp
+\fB::html::selectPlain\fR \fIname param choices\fR ?\fIcurrent\fR?\fR
+.sp
+\fB::html::submit\fR \fIlabel\fR ?\fIname\fR?\fR
+.sp
+\fB::html::set\fR \fIvar val\fR\fR
+.sp
+\fB::html::tableFromArray\fR \fIarrname\fR ?\fIparam\fR? ?\fIpat\fR?\fR
+.sp
+\fB::html::tableFromList\fR \fIquerylist\fR ?\fIparam\fR?\fR
+.sp
+\fB::html::textarea\fR \fIname\fR ?\fIparam\fR? ?\fIcurrent\fR?\fR
+.sp
+\fB::html::textInput\fR \fIname args\fR\fR
+.sp
+\fB::html::textInputRow\fR \fIlabel name args\fR\fR
+.sp
+\fB::html::title\fR \fItitle\fR\fR
+.sp
+\fB::html::varEmpty\fR \fIname\fR\fR
+.sp
+\fB::html::while\fR \fItest body\fR\fR
+.sp
+.BE
+.SH "描述 DESCRIPTION"
+.PP
+\fBhtml\fR 包提供了产生 HTML 的命令。这些命令一般返回 HTML 字符串作为结果。特殊的是，它们不向 \fBstdout\fR 输出结果。
+.PP
+\fB::html::init\fR 命令应当最早调用，从而初始化整个模块。也可以使用这个子程序来定义 HTML 标记参数的默认值。
+.TP
+\fB::html::author\fR \fIauthor\fR\fR
+\fBSide effect only\fR.  在调用 \fB::html::head\fR 之前调用它，来定义页面的作者。作者以 HEAD 段中的注释形式给出。
+.TP
+\fB::html::bodyTag\fR \fIargs\fR\fR
+产生一个 BODY 标签。标签参数来自 \fIargs\fR 或是在 \fB::html::init\fR 中定义的 body.* 属性。
+.TP
+\fB::html::cell\fR \fIparam value\fR ?\fItag\fR?\fR
+产生一个 TD (或 TH) 标签，一个值，和一个关闭 TD (或 TH) 标签。标签参数来自\fIparam\fR 或是在 \fB::html::init\fR 中定义的 TD.* 属性。它使用 \fB::html::font\fR 来在表格单元中插入一个标准的 FONT 标签。 \fItag\fR 参数默认是 "td".
+.TP
+\fB::html::checkbox\fR \fIname value\fR\fR
+产生一个 CHECKBOX 表单元素，使用指定的名称和值。这使用了 \fB::html::checkValue\fR.
+.TP
+\fB::html::checkSet\fR \fIkey sep list\fR\fR
+产生一个 CHECKBOX 表单元素和相关标签的集合。\fIlist\fR 应当包含一个可选标签和值的列表。这使用了 \fB::html::checkbox\fR.
+.TP
+\fB::html::checkValue\fR \fIname\fR ?\fIvalue\fR?\fR
+为一个 CHECKBOX 表单元素产生一个 "name=\fIname\fR value=\fIvalue\fR" . 如果 CGI 变量 \fIname\fR
+的值是 \fIvalue\fR，那么 SELECTED 将加入到返回值中。\fIvalue\fR 默认值是 "1".
+.TP
+\fB::html::closeTag\fR \fR
+从 \fB::html::openTag\fR 创建的栈中弹出一个标签，产生相应的关闭标签 (例如，/BODY)。
+.TP
+\fB::html::default\fR \fIkey\fR ?\fIparam\fR?\fR
+这个子程序由 \fB::html::tagParam\fR 用来产生标签的参数名称和值列表。\fB::html::default\fR 子程序用来为那些不在 \fIparam\fR 中的项目产生默认值。如果 \fIkey\fR 代表的值匹配 \fIparam\fR 中的一个值，那么这个子程序返回孔字符串。否则，它为 \fIkey\fR 代表的表单元素返回一个 "parameter=value" 字符串。\fIkey\fR 的形式是 "tag.parameter" (例如，body.bgcolor)。使用 \fB::html::init\fR 来注册默认值。\fIparam\fR 默认是空字符串。
+.TP
+\fB::html::description\fR \fIdescription\fR\fR
+\fBSide effect only\fR.  在调用 \fB::html::head\fR 前调用它来为页面定义一个 META 标签。这个标签在随后调用  \fB::html::head\fR 时产生。
+.TP
+\fB::html::end\fR \fR
+从栈中弹出所有开标签，产生相应的关闭标签 (例如，</body></html>)。
+.TP
+\fB::html::eval\fR \fIarg\fR ?\fIargs\fR?\fR
+这个子程序类似于内置的 Tcl \fBeval\fR 命令，唯一的区别是它返回 "", 因此可以在一个 HTML 模板文件中调用，不会添加不需要的结果。
+.TP
+\fB::html::extractParam\fR \fIparam key\fR ?\fIvarName\fR?\fR
+这是一个解释程序，从 \fIparam\fR ，一个 HTML 式样的 "name=quotedvalue" 列表中得到所有 \fIkey\fR 的值。\fIvarName\fR 用作一个 Tcl 变量名，赋以参数中找到的值。这个函数返回 1，如果 \fIparam\fR 中找到了参数，否则返回 0。如果没有指定 \fIvarName\fR ，将使用 \fIkey\fR 作为变量名。
+.TP
+\fB::html::font\fR \fIargs\fR\fR
+产生一个标准的 FONT 标签。标签的参数来自 \fIargs\fR 和 \fB::html::init\fR 定义的 HTML 默认值。
+.TP
+\fB::html::for\fR \fIstart test next body\fR\fR
+这个子程序与内置的 Tcl \fBfor\fR 控制结构相似。但它返回联接的 (subst'ed) \fIbody\fR 而不是去计算 body 的值。循环的每一次都会在返回值中联接另外一个字符串。
+.TP
+\fB::html::foreach\fR \fIvarlist1 list1\fR ?\fIvarlist2 list2 ...\fR? \fIbody\fR\fR
+这个子程序与内置的 Tcl \fBforeach\fR 控制结构相似。但它返回联接的 \fIbody\fR 而不是去计算 body 的值。循环的每一次都会将另外一个字符串联接到返回值中。
+.TP
+\fB::html::formValue\fR \fIname\fR ?\fIdefvalue\fR?\fR
+返回一个名称-值对，使用现有的 CGI 数据来初始化值。结果有以下形式：
+.sp
+.nf
+  name="fred" value="freds value"
+.fi
+.TP
+\fB::html::getFormInfo\fR \fIargs\fR\fR
+产生隐藏的字段来捕获表单值。如果 \fIargs\fR 是空，那么为所有 CGI 值创建隐藏字段。否则 \fIargs\fR 是一个匹配表单元素名称的字符串模式的列表。
+.TP
+\fB::html::getTitle\fR \fR
+返回 title 字符串，没有包围的 TITLE 标签。title 以一个先前调用的 \fB::html::title\fR 定义。
+.TP
+\fB::html::h\fR \fIlevel string\fR ?\fIparam\fR?\fR
+产生一个标题 (例如, H1) 标签。\fIstring\fR 嵌于标题中，\fIparam\fR 用作标签参数。
+.TP
+\fB::html::h1\fR \fIstring\fR ?\fIparam\fR?\fR
+产生一个 H1 标签。参见 \fB::html::h\fR.
+.TP
+\fB::html::h2\fR \fIstring\fR ?\fIparam\fR?\fR
+产生一个 H2 标签。参见 \fB::html::h\fR.
+.TP
+\fB::html::h3\fR \fIstring\fR ?\fIparam\fR?\fR
+产生一个 H3 标签。参见 \fB::html::h\fR.
+.TP
+\fB::html::h4\fR \fIstring\fR ?\fIparam\fR?\fR
+产生一个 H4 标签。参见 \fB::html::h\fR.
+.TP
+\fB::html::h5\fR \fIstring\fR ?\fIparam\fR?\fR
+产生一个 H5 标签。参见 \fB::html::h\fR.
+.TP
+\fB::html::h6\fR \fIstring\fR ?\fIparam\fR?\fR
+产生一个 H6 标签。参见 \fB::html::h\fR.
+.TP
+\fB::html::hdrRow\fR \fIargs\fR\fR
+产生一个表格行，包含 TR 和 TH 标签。\fIargs\fR 中的每个值都置入自己的表格单元中。这使用了 \fB::html::cell\fR.
+.TP
+\fB::html::head\fR \fItitle\fR\fR
+产生一个 HEAD 段，包含页面的 TITLE。如果先前调用了
+\fB::html::author\fR,
+\fB::html::keywords\fR,
+\fB::html::description\fR,
+或
+\fB::html::meta\fR
+那么附加的标签将插入到 HEAD 段中。它使用 \fB::html::openTag\fR 将一个开 HTML 标签入栈.
+.TP
+\fB::html::headTag\fR \fIstring\fR\fR
+保存一个包含于 \fB::html::head\fR 产生的 HEAD 段中的标签。\fIstring\fR 是一个标签中除了尖括号之外的所有东西。
+.TP
+\fB::html::if\fR \fIexpr1 body1\fR ?\fBelseif\fR \fIexpr2 body2 ...\fR? ?\fBelse\fR \fIbodyN\fR?\fR
+这个子程序与内置的 Tcl \fBif\fR 控制结构相似。但它返回联接的 \fIbody\fR 而不是去计算它每个分支 body 的值。注意这个语法与内置的 Tcl \fBif\fR 控制结构相比稍有限制。
+.TP
+\fB::html::keywords\fR \fIargs\fR\fR
+\fBSide effect only\fR.  在调用 \fB::html::head\fR 之前调用它来定义一个页面的关键字 META 标签。在 \fB::html::head\fR 结果中将包含这个 META 标签。
+.TP
+\fB::html::mailto\fR \fIemail\fR ?\fIsubject\fR?\fR
+产生一个到 mailto: URL 的超链接。
+.TP
+\fB::html::meta\fR \fIargs\fR\fR
+\fBSide effect only\fR.  在调用 \fB::html::head\fR 之前调用它来定义一个页面的 META 标签。  \fIargs\fR 是一个 Tcl 样式的名称和值列表，用作 META 标签的 name= 和 value= 参数。在 \fB::html::head\fR 结果中将包含这个 META 标签。
+.TP
+\fB::html::minorMenu\fR \fIlist\fR ?\fIsep\fR?\fR
+产生一系列超链接。\fIlist\fR 是一个 Tcl 样式的名称和值列表，内容是链接的标签和地址。\fIsep\fR 是分隔每个链接的文本，默认是 " | ".
+.TP
+\fB::html::minorList\fR \fIlist\fR ?\fIordered\fR?\fR
+产生一个排序的或未排序的链接列表。\fIlist\fR 是一个 Tcl 样式的名称和值列表，内容是链接的标签和地址。\fIordered\fR 是一个布尔值，用来选择有序表或无序表，默认是 \fBfalse\fR.
+.TP
+\fB::html::openTag\fR \fItag args\fR\fR
+将 \fItag\fR 入栈，为它产生一个开标签。使用 \fB::html::closeTag\fR 来从栈中弹出标签。
+.TP
+\fB::html::passwordInput\fR ?\fIname\fR?\fR
+产生一个 PASSWORD 类型的 INPUT 标签。 \fIname\fR 默认为 "password".
+.TP
+\fB::html::passwordInputRow\fR \fIlabel\fR ?\fIname\fR?\fR
+格式化一个包含一个标签和一个 PASSWORD 类型的 INPUT 标签的表格行。\fIname\fR 默认为 "password".
+.TP
+\fB::html::quoteFormValue\fR \fIvalue\fR\fR
+使用 HTML 实体 (quotes, ampersand, and angle brackets.) 来替换 \fIvalue\fR 中的特殊字符，从而可以引用它们。
+.TP
+\fB::html::radioSet\fR \fIkey sep list\fR\fR
+产生一个 RADIO 类型的 INPUT 标签集合以及一个相关的文本标签。所有单选按钮共享同样的 \fIkey\fR 作为它们的名字。\fIsep\fR 是用来分隔各元素的文本。\fIlist\fR 是一个 Tcl 风格的标签，值列表。
+.TP
+\fB::html::radioValue\fR \fIname value\fR\fR
+为一个 RADIO 表单元素产生一个 "name=\fIname\fR value=\fIvalue\fR" .如果 CGI 变量 \fIname\fR 值为 \fIvalue\fR, 那么 SELECTED 将被加入返回值中。
+.TP
+\fB::html::refresh\fR \fIseconds url\fR\fR
+建立一个刷新 META 标签。在调用 \fB::html::head\fR 之前调用它，HEAD 段中将包含一个 META 标签使得页面每 \fIseconds\fR 刷新一次。 \fIurl\fR 是可选的，如果指定的话它指定了刷新间隔之后读取的新页面。
+.TP
+\fB::html::init\fR ?\fIlist\fR?\fR
+\fB::html::init\fR 接受一个 Tcl 样式的 name-value 列表，定义了名称是 "tag.parameter" 形式的对象的值。例如， "body.bgcolor" 默认将为 BODY 标签定义背景色。
+.TP
+\fB::html::row\fR \fIargs\fR\fR
+产生一个表格行，包含 TR 和 TD 标签。\fIargs\fR 的每个值都置入各自的表格单元中。它使用了 \fB::html::cell\fR.
+.TP
+\fB::html::paramRow\fR \fIlist\fR ?\fIrparam\fR? ?\fIcparam\fR?\fR
+产生一个表格行，包含 TR 和 TD 标签。\fIargs\fR 的每个值都置入各自的表格单元中。它使用了 \fB::html::cell\fR.  \fIrparam\fR  用作 TR 标签的参数，\fIcparam\fR  的值被传给 \fB::html::cell\fR，作为 TD 标签的参数。
+.TP
+\fB::html::select\fR \fIname param choices\fR ?\fIcurrent\fR?\fR
+产生一个 SELECT 表单元素以及内置的 OPTION 标签。 \fIname\fR 和 \fIparam\fR 用来产生 SELECT 标签。 \fIchoices\fR 列表是一个 Tcl 样式的 name-value 列表。
+.TP
+\fB::html::selectPlain\fR \fIname param choices\fR ?\fIcurrent\fR?\fR
+类似 \fB::html::select\fR 但 \fIchoices\fR 是一个 Tcl 值的列表，用于 OPTION 标签。每个 OPTION 的标签和值是相同的。
+.TP
+\fB::html::submit\fR \fIlabel\fR ?\fIname\fR?\fR
+产生一个 SUBMIT 类型的 INPUT 标签。 \fIname\fR 默认是 "submit".
+.TP
+\fB::html::set\fR \fIvar val\fR\fR
+这个子程序与内置的 Tcl \fBset\fR 控制结构相似。主要区别是它返回 "" 因此可以在一个 HTML 模板文件中调用，不会产生奇怪的结果。另外的区别是它需要两个参数。
+.TP
+\fB::html::tableFromArray\fR \fIarrname\fR ?\fIparam\fR? ?\fIpat\fR?\fR
+产生一个 TABLE 和内置的行，来显示一个 Tcl 数组。\fIparam\fR 是为 TABLE 标签准备的。\fIpat\fR 是一个 \fBstring match\fR 模式，用来选择数组元素，默认是 "*".
+.TP
+\fB::html::tableFromList\fR \fIquerylist\fR ?\fIparam\fR?\fR
+产生一个 TABLE 和内置的行来显示 \fIquerylist\fR, 一个 Tcl 样式的名称和值列表。\fIparam\fR 是为 TABLE 标签设置的。
+.TP
+\fB::html::textarea\fR \fIname\fR ?\fIparam\fR? ?\fIcurrent\fR?\fR
+产生一个 TEXTAREA 标签，包围 (wrapped) 在它的当前值
+.TP
+\fB::html::textInput\fR \fIname args\fR\fR
+产生一个 TEXT 类型的 INPUT 表单标签。这使用了 \fB::html::formValue\fR.  参数是你想在 INPUT 标签中添加的任何附加标签属性。
+.TP
+\fB::html::textInputRow\fR \fIlabel name args\fR\fR
+产生一个 TEXT 类型的 INPUT 标签，和一个相关标签一起格式化到一个表格行中。参数是你想在 INPUT 标签中添加的任何附加标签属性。
+.TP
+\fB::html::title\fR \fItitle\fR\fR
+\fBSide effect only\fR. 在调用 \fB::html::head\fR 调用它来定义页面的 TITLE。
+.TP
+\fB::html::varEmpty\fR \fIname\fR\fR
+如果指定名称的变量不存在或者为空值则返回 1 。
+.TP
+\fB::html::while\fR \fItest body\fR\fR
+这个子程序类似于内置的 Tcl \fBwhile\fR 空值结构。但它返回联接的 \fIbody\fR 而不是计算 body。循环的每一次都将另一个字符串联接到返回值中。
+
+.SH "参见 SEE ALSO"
+ncgi, htmlparse
+.SH "关键字 KEYWORDS"
+html, form, table, checkbox, radiobutton, checkbutton
+
+.SH "[中文版维护人]"
+.B 袁乙钧
+.SH "[中文版最新更新]"
+.B 2003/11/10
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

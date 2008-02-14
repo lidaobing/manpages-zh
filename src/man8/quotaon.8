@@ -1,0 +1,133 @@
+.TH QUOTAON 8 "Fri Mar 09 2001"
+.UC 4
+.SH NAME
+quotaon \- 开启关闭文件系统配额
+.SH "总览 (SYNOPSIS)"
+.B quotaon
+[
+.B -e
+|
+.B d
+]
+[
+.B -vug
+]
+.IR filesystem .\|.\|.
+.br
+.B quotaon
+[
+.B -e
+|
+.B d
+]
+[
+.B -avug
+]
+.PP
+.B quotaoff
+[
+.B -e
+|
+.B d
+]
+[
+.B -vug
+]
+.IR filesystem .\|.\|.
+.br
+.B quotaoff
+[
+.B -e
+|
+.B d
+]
+[
+.B -avug
+]
+.SH "描述 (DESCRIPTION)"
+.IX  "quotaon 命令"  ""  "\fLquotaon\fP \(em 打开文件系统配额"
+.IX  "用户配额"  "quotaon 命令"  ""  "\fLquotaon\fP \(em 打开文件系统配额"
+.IX  "磁盘配额"  "quotaon 命令"  ""  "\fLquotaon\fP \(em 打开文件系统配额"
+.IX  "配额"  "quotaon 命令"  ""  "\fLquotaon\fP \(em 打开文件系统配额"
+.IX  "文件系统"  "quotaon 命令"  ""  "\fLquotaon\fP \(em 打开文件系统配额"
+.IX  "quotaoff 命令"  ""  "\fLquotaoff\fP \(em 关闭文件系统配额"
+.IX  "用户配额"  "quotaoff 命令"  ""  "\fLquotaoff\fP \(em 关闭文件系统配额"
+.IX  "磁盘配额"  "quotaoff 命令"  ""  "\fLquotaoff\fP \(em 关闭文件系统配额"
+.IX  "配额"  "quotaoff c命令"  ""  "\fLquotaoff\fP \(em 关闭文件系统配额"
+.IX  "文件系统"  "quotaoff 命令"  ""  "\fLquotaoff\fP \(em 关闭文件系统配额"
+.LP
+.B quotaon
+通知系统在一个或者几个文件系统上使用磁盘配额。
+.B quotaoff
+通知系统取消某一个特定的文件系统的所有磁盘配额。 被指定的文件系统必须已经装载。
+.B quotaon
+要求在指定的文件系统的根目录下有相应的配额文件， 用户配额文件是
+.IR aquota.user ，
+组配额文件是
+.IR aquota.group 。
+这些文件可以是用
+.BR convertquota (8)
+命令转换旧的配额文件而来， 也可以是用
+.BR quotacheck (8)
+命令创建的一个全新的文件。 默认是用户和组配额
+都被允许。
+.SH "选项 (OPTIONS)"
+.TP
+.B -e
+开启指定文件系统配额。 当程序名是
+.B quotaon
+时， 此选项是默认的。
+.
+.TP
+.B -d
+关闭指定文件系统配额。 当程序名是
+.B quotaoff
+时， 此选项是默认的。
+.
+.TP
+.B -a
+当用在任何文件系统名称的地方时，
+.B quotaon/quotaoff
+将允许/禁止所有在
+.B /etc/mtab
+中指定的文件系统为有磁盘配额的读-写。 这个选项一般被用在系统启动时开启配额。
+.TP
+.B -v
+为每个开启或关闭配额的文件系统显示一条消息。
+.TP
+.B -u
+处理用户配额。 这是默认选项。
+.TP
+.B -g
+处理组配额。
+.LP
+.SH "文件 (FILES)"
+.PD 0
+.TP 20
+.B aquota.user
+文件系统根目录下的用户配额文件
+.TP
+.B aquota.group
+文件系统根目录下的组配额文件
+.TP
+.B /etc/mtab
+已装载的文件系统表
+.PD
+.SH "参见 (SEE ALSO)"
+.BR quota (1),
+.BR quotactl (2),
+.BR fstab (5),
+.BR convertquota (8),
+.BR quotacheck (8),
+.BR setquota (8),
+.BR edquota (8),
+.BR repquota (8)
+.SH "作者 (AUTHOR)"
+Jan Kara \<jack@atrey.karlin.mff.cuni.cz\>
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/7/13
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

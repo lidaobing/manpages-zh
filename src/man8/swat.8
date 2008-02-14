@@ -1,0 +1,176 @@
+.TH "swat (8)" "23 Oct 1998" "Samba"
+3A
+.SH NAME
+swat - 基于web的samba管理工具
+.SH 总览
+.B swat [
+.B -s 
+.I smb config file
+] [
+.B -a
+]
+.SH 描述
+.PP
+此程序是
+.B samba
+套件的一部分。 
+.PP
+.B swat
+允许
+.B samba
+管理员通过web浏览器配置复杂的
+.BI smb.conf
+文件。另外，
+.B swat
+配置页可以帮助管理员检查链接所有在
+.BI smb.conf
+文件中的可配置项并可以简单地查看任何的改变效果。
+.PP
+.B swat
+在
+.B inetd
+中运行。
+.SH 选项 
+.TP
+.B -s 
+.I smb configuration file 
+
+检查编译时建立的默认配置文件路径。 
+
+指定的文件包含了
+.B smbd
+服务器所需的详细配置信息。
+.B swat
+可以修改这个文件。文件包含了服务
+器的特殊信息如使用的
+.BI printcap
+文件，还有所有提供的服务的描述。请参见
+.BI smb.conf (5)
+获得更
+多信息。
+.TP
+.B -a 
+用这个选项禁止授权验证并使
+.B swat
+在演示模式下运行。在此模式下任何人都可以修改
+.BI smb.conf
+配置文件。不要在正式的服务器上使用这个选项哦。 
+.SH 安装
+在编译完
+.BR SWAT
+后你需要运行
+.BI "make install"
+来安装
+.B swat
+二进制程序和各种帮助文件和图片。默认情况下这些东东都被放入以下目录中：
+.br
+/usr/local/samba/bin/swat
+.br
+/usr/local/samba/swat/images/*
+.br
+/usr/local/samba/swat/help/*
+
+.SH 关于INETD的安装
+.PP
+你需要编辑
+.BI /etc/inetd.conf
+和
+.BI /etc/services
+来允许通过
+.BI inetd
+来运行
+.BR SWAT。
+.PP
+在/etc/services中你需要象这样加入一行内容：
+.br
+.BI "swat 901/tcp"
+.PP
+注意对于NIS/YP的用户来说，可能需要重新建立NIS服务映射，因为这比修改本地/etc/services文件更好。
+.PP
+对于端口号的选择并不十分重要，除了它应该小于
+.B 1024
+以外就是不应该是当前正在使用的端口号(使用
+.B 1024
+以上的端口号可能出现未知的安全漏洞，这取决于你的
+.BI inetd
+守护程序的运行情况)。
+.PP
+在/etc/inetd.conf文件中你应该添加这样的内容：
+.br
+.B "swat stream tcp nowait.400 root /usr/local/samba/bin/swat swat "
+.PP
+在编辑
+.B /etc/services
+和
+.B /etc/inetd.conf
+文件时有件事需要做一下，就是向
+.B inetd
+发送一个
+.BR HUP
+信号。可以用“
+.BI kill -1 PID
+”命令来做这步操作，当然了，
+.BR PID
+就是
+.B inetd
+守护程序的进程号。
+.SH 运行
+.PP
+要运行
+.B swat
+你只要在自己的web浏览器中查看
+.BI "http://localhost:901/"
+地址。
+.PP
+注意你可以从任何可联网主机的IP上访问
+.B swat
+，但是从远程主机联接的话，在线的口令传送可以很容易地被监听。 
+.SH 相关文件
+.pp
+.B /etc/inetd.conf 
+.br
+此文件包含了超级守护程序所使用的适当的启动信息。
+.pp
+.B /etc/services 
+.br
+这个文件必须包含一系列服务名(如
+.B swa
+t)、服务端口(如
+.B 901
+)和协议类型(如
+.B tcp
+)的映射。 
+.PP
+.B /usr/local/samba/lib/smb.conf 
+.br
+默认情况下
+.B swat
+会编辑这个目录下的
+.BI smb.conf
+服务器配置文件。另外一些系统安装此文件的位置通
+常是
+.BI "/usr/samba/lib/smb.conf和/etc/smb.conf。"
+.PP
+这个配置文件描述了客户可以获得的所有服务。参见
+.BI smb.conf (5)
+获得详细信息。
+.SH 警告
+swat会重写你的smb.conf文件。它将重新安排各项内容并删掉所有注释，"include="和"copy="选项。如果你想谨慎一些的话先备份或者不要用swat！
+.SH 版本
+此手册页是针对samba套件版本2.0的。 
+.SH 另见
+inetd (8), nmbd (8), smb.conf (5). 
+.SH 作者
+.PP
+samba软件和相关工具最初由Andrew Tridgell samba-bugs@samba.org创建。samba现在由开发组作为类似Linux内核开发采用的开放源代码计划方式来发展。 
+.PP
+samba手册页最初由Karl Auer撰写。它的源码已被转换成YODL(一种极好的开放源代码软件，可以在ftp://ftp.icce.rug.nl/pub/unix/处获得)格式并已由Jeremy Allison更新到samba2.0版本。 
+.PP
+请参见samba (7)查找如何获得一份完整的维护者列表以及如何提交错误报告及注解等等。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

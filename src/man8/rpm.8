@@ -1,0 +1,543 @@
+.\" rpm - Red Hat Package Manager
+.TH rpm 8 "22 December 1998" "Red Hat Software" "Red Hat Linux"
+.SH NAME
+rpm \- Red Hat 包管理器
+.SH 总览
+\fBrpm\fP [选项] 
+.SH 描述
+\fBrpm\fP是一个很有用的\fI包管理器\fP, 可以用于生成, 安装, 查询, 核实, 
+更新以及卸载单个软件包. 一个\fI包\fP通常包括一个文件档以及关于包
+的信息, 比如名字, 版本, 描述等.
+
+必须选取下列基本模式中一个:
+\fI初始化数据库\fP, \fI重新生成数据库\fP, 
+\fI生成包\fP, \fI重新编译包\fP, \fI从Tar包生成RPM包\fP, 
+\fI查询\fP, \fI显示查询标签\fP, 
+\fI安装\fP, \fI更新\fP, \fI卸载\fP, 
+\fI核实\fP, \fI签名检查\fP, \fI再签名\fP, \fI添加签名\fP, 
+\fI设置所有者和组\fR 以及 \fI显示配置\fP.
+
+
+数据库维护:
+.br
+.I "\fB    rpm \-i [\-\-initdb]\fP"
+.br
+.I "\fB    rpm \-i [\-\-rebuilddb]\fP"
+
+生成:
+.br
+.I "\fB    rpm [\-b|t] [package_spec]+\fP"
+.br
+.I "\fB    rpm [\-\-rebuild] [sourcerpm]+\fP"
+.br
+.I "\fB    rpm [\-\-tarbuild] [tarredsource]+\fP"
+.br
+
+查询:
+.br
+.I "\fB    rpm [\-\-query] [queryoptions]\fP"
+.br
+.I "\fB    rpm [\-\-querytags]\fP"
+.br
+
+维护已安装的包:
+.br
+.I "\fB    rpm [\-\-install] [installoptions] [package_file]+\fP"
+.br
+.I "\fB    rpm [\-\-freshen|\-F] [installoptions] [package_file]+\fP"
+.br
+.I "\fB    rpm [\-\-uninstall|\-e] [uninstalloptions] [package]+\fP"
+.br
+.I "\fB    rpm [\-\-verify|\-V] [verifyoptions] [package]+\fP"
+.br
+
+签名:
+.br
+.I "\fB    rpm [\-\-verify|\-V] [verifyoptions] [package]+\fP"
+.br
+.I "\fB    rpm [\-\-resign] [package_file]+\fP"
+.br
+.I "\fB    rpm [\-\-addsign] [package_file]+\fP"
+.br
+
+Miscellaneous:
+.br
+.I "\fB    rpm [\-\-showrc]\fP"
+.br
+.I "\fB    rpm [\-\-setperms] [package]+\fP"
+.br
+.I "\fB    rpm [\-\-setgids] [package]+\fP"
+.br
+
+
+.SH 普通选项
+这些选项可以各种不同的方式使用.
+.IP "\fB\-vv\fP"
+将打印出许多难以阅读的调试信息.
+.IP "\fB\-\-quiet\fP"
+打印尽可能少的信息 \- 普通只展示错误信息.
+.IP "\fB\-\-help\fP"
+给出比常规更多的用法信息.
+.IP "\fB\-\-version\fP"
+在单独一个行里给出所用 \fBrpm\fP 的版本号
+.IP "\fB\-\-rcfile \fI<filelist>\fP"
+在\fI<filelist>\fP里列出了一些文件, 各文件之间以冒号分隔, 
+\fBrpm\fP 顺序读取这些文件以获得配置信息. \fI<filelist>\fP缺省
+是\fB/usr/lib/rpm/rpmrc:/etc/rpmrc:~/.rpmrc\fP.
+列表中的第一个文件(/usr/lib/rpm/rpmrc)且只有这个文件
+必须存在, 代字符~指向\fB$HOME\fP的值. 
+.IP "\fB\-\-root \fI<dir>\fP"
+对所有操作均将\fI<dir>\fP视为系统根目录. 注意这意味着对数
+据库的读或修改操作都将是在\fI<dir>\fP目录下进行, 并且脚本
+的\fIpre\fP或\fIpost\fP操作都是在做了以\fI<dir>\fP为根目录的chroot()
+之后进行.
+.IP "\fB\-\-dbpath \fI<path>\fP"
+依照\fI<path>\fP使用RPM的数据库.
+.IP "\fB\-\-justdb\fP"
+更新只针对数据库,而不是整个文件系统.
+.IP "\fB\-\-ftpproxy \fI<host>\fP, \fB\-\-httpproxy \fI<host>\fP"
+设\fI<host>\fP为FTP或HTTP的代理服务器. 参阅\fBFTP/HTTP 选项\fP.
+.IP "\fB\-\-ftpport \fI<port>\fP, \fB\-\-httpport \fI<port>\fP"
+设\fI<port>\fP为FTP或HTTP的代理服务器的端口. 参阅\fBFTP/HTTP 选项\fP.
+.IP "\fB\-\-pipe \fI<cmd>\fP"
+通过管道将\fBrpm\fP的输出输入到命令\fI<cmd>\fP.
+
+.SH 安装和升级选项
+通常的rpm安装命令如下:
+.PP
+	\fBrpm \-i [install\-options] \fI<package_file>+\fP
+.PP
+这样将安装一个新的包. 通常的rpm升级命令如下:
+.PP
+	\fBrpm \-U [install\-options] \fI<package_file>+\fP
+.PP
+这样将当前已安装的包升级或新安装到一个新的RPM版本. 升级和
+安装是一样的, 区别在于升级要将所有别的版本的包从系统移去.
+.PP
+	\fBrpm [\-F|--freshen] [install\-options] \fI<package_file>+\fP
+.PP
+这样也升级包, 但只有在系统存在一个更早版本的包时候才使用这
+种方式.
+
+
+如果包在安装之前要先进行下载, \fI<package_file>\fP应该指明为一个
+ftp或者http URL. 要得到关于RPM包生成的ftp和http支持的信息, 
+可以参阅\fBFTP/HTTP 选项\fP.
+.PP
+.IP "\fB\-\-force\fP"
+与使用\fB\-\-replacepkgs\fP, \fB\-\-replacefiles\fP, 以及\fB\-\-oldpackage\fP效果相同
+.IP "\fB\-h\fP, \fB\-\-hash\fP"
+包档如果没有被解包, 打印50个破折号. 配合\fB\-v\fP使用可以
+使得有更好的展示.
+.IP "\fB\-\-oldpackage\fP"
+允许用旧版本的包取代较新的版本.
+.IP "\fB\-\-percent\fP"
+给出文件从包档解包的百分比. 该项的作用是为了使rpm相
+比于别的工具更容易使用.
+.IP "\fB\-\-replacefiles\fP"
+即使要安装的包会取代别的已安装包的文件, 也安装该包.
+.IP "\fB\-\-replacepkgs\fP"
+即使包的部分内容已安装在系统里,也安装该包.
+.IP "\fB\-\-allfiles\fP"
+安装或升级包里所有的缺失文件,不管其是否存在.
+.IP "\fB\-\-nodeps\fP"
+在安装或升级包之前不做依赖检查.
+.IP "\fB\-\-noscripts\fP"
+不执行安装前或安装后脚本
+.IP "\fB\-\-notriggers\fP"
+不执行由该包的安装所激发的脚本
+.IP "\fB\-\-ignoresize\fP"
+安装该包前不检查mount文件系统是否有足够的磁盘空间.
+.IP "\fB\-\-excludepath \fI<path>\fP"
+不安装文件名以路径\fI<path>\fP开头的文件.
+.IP "\fB\-\-excludedocs\fP"
+不安装任何标记为文档的文件(包括手册页及文本信息档案).
+.IP "\fB\-\-includedocs\fP"
+安装文档文件, 这是缺省的操作.
+.IP "\fB\-\-test\fP"
+不安装包, 只是简单地检查并报告可能的冲突.
+.IP "\fB\-\-ignorearch\fP"
+允许安装或升级其体系与主机不匹配的二进制RPM包.
+.IP "\fB\-\-ignoreos\fP"
+允许安装或升级其操作系统与主机不匹配的二进制RPM包.
+.IP "\fB\-\-prefix \fI<path>\fP"
+对于可浮动包, 这将把安装前缀设置到\fI<path>\fP.
+.IP "\fB\-\-relocate \fI<oldpath>\fB=\fI<newpath>\fP"
+将文件从\fI<oldpath>\fP改置到\fI<newpath>\fP, 这使得可以浮动包.
+.IP "\fB\-\-badreloc\fP"
+与\-\-relocate配合使用, 强制改置不可浮动的包.
+.IP "\fB\-\-noorder\fP"
+安装时对包不重新排序, 正常在安装时应该重新排序包列
+表, 以满足依赖性.
+
+.SH 查询选项
+rpm的查询命令通常的格式如下:
+.PP
+	\fBrpm \-q [query\-options]\fP
+.PP
+可以制定包信息的打印格式, 这时要用\fB[\-\-queryformat|\-qf]\fP选项, 
+格式串跟在选项后面. 
+
+查询格式由标准\fBprintf(3)\fP格式的版本决定. 格式由静态字符串
+(包括除了换行符, tab, 以及其它的特殊字符之外的标准C字符), 
+以及\fBprintf(3)\fP类型格式符. 如果\fBrpm\fP已经知道打印类型, 
+则类型说明就必须被忽略, 并且以要打印的头部tag的名字取代, 
+该名字被括在\fB{}\fP之间. 而且tag的\fBRPMTAG_\fP部分也被忽略.
+
+可以用\fB:\fItypetag\fR来改变输出格式.当前支持的有如下类型:\fBoctal\fR,
+\fBdate\fR, \fBshescape\fR, \fBperms\fR, \fBfflags\fR, 以及 \fBdepflags\fR.
+
+例如,要只打印被查询包的名字,可以用\fB%{名称}\fP作为格式字符串.
+要在两个栏里打印包名及分布信息,可以用\fB%\-30{名称}%{分布}\fP.
+
+当被\fB\-\-querytags\fP参数激发时,\fBrpm\fP将列出所有tags.
+
+查询选项有两种子设置: 包选择和信息选择.
+
+包选择选项:
+.br
+.IP "\fB\fI<package_name>\fP"
+查询名为\fI<package_name>\fP的安装包.
+.IP "\fB\-a\fP, \fB\-\-all\fP"
+查询所有安装的包.
+.IP "\fB\-\-whatrequires \fI<capability>\fP"
+查询所有需要\fI<capability>\fP才能提供适当功能的包.
+.IP "\fB\-\-whatprovides \fI<virtual>\fP"
+查询所有提供\fI<virtual>\fP功能的包.
+.IP "\fB\-f \fI<file>\fP, \fB\-\-file \fI<file>\fP"
+查询拥有文件\fI<file>\fP的包.
+.IP "\fB\-g \fI<group>\fP, \fB\-\-group \fI<group>\fP"
+查询属于???组\fI<group>\fP的包
+.IP "\fB\-p \fI<package_file>\fP"
+查询一个没有安装的包\fI<package_file>\fP.
+\fI<package_file>\fP可以被说明为ftp或http URL,这时包头会被下载并被查询.
+要得到关于RPM生成的ftp和http客户端支持的信息,请参阅\fBFTP/HTTP OPTIONS\fP
+.IP "\fB\-\-specfile \fI<specfile>\fP"
+像对待一个包一样Parse并查询\fI<specfile>\fP.
+虽然不是所有的信息(例如文件列表)可用,这种查询类型
+允许rpm在不用写一个specfile parser的情况下从spec files提取信息.
+.IP "\fB\-\-querybynumber \fI<num>\fP"
+直接查询\fI<num>\fP数据库入口,该选项在调试时很有用处.
+.IP "\fB\-\-triggeredby \fI<pkg>\fP"
+查询由包\fI<pkg>\fP所激发的包.
+
+.P
+信息选择选项:
+.br
+.IP "\fB\-i\fP"
+展示包信息,包括名字,版本,以及描述.???
+.IP "\fB\-R\fP, \fB\-\-requires\fP"
+列出该包所依赖的别的包.
+.IP "\fB\-\-provides\fP"
+列出该包所提供的功能.
+.IP "\fB\-\-changelog\fP"
+展示该包的变更信息.
+.IP "\fB\-l\fP, \fB\-\-list\fP"
+列出该包的文件.
+.IP "\fB\-s\fP, \fB\-\-state\fP"
+展示该包各文件的状态信息,因此该选项实际隐含了\fB\-l\fP选项.
+文件状态可以是如下之一:
+\fInormal\fP, \fInot installed\fP, 或者 \fIreplaced\fP.
+.IP "\fB\-d\fP, \fB\-\-docfiles\fP"
+只列出文档文件(隐含\fB\-l\fP选项).
+.IP "\fB\-c\fP, \fB\-\-configfiles\fP"
+只列出配置文件(隐含\fB\-l\fP选项).
+.IP "\fB\-\-scripts\fP"
+如果有的话,就列出该包里作为安装或卸载过程一部分的特殊shell脚本.
+.IP "\fB\-\-triggers\fP, \fB\-\-triggerscripts\fP"
+如果有的话,展示该包包含的激发子脚本.
+.IP "\fB\-\-dump\fP"
+如下的哑文件信息: path size mtime md5sum mode
+owner group isconfig isdoc rdev symlink.
+该选项必须至少配合如下选项之一:\fB\-l\fP, \fB\-c\fP, \fB\-d\fP使用.
+.IP "\fB\-\-last\fP"
+按包的安装时间进行排序,这使得最新的包在序列顶部.
+.IP "\fB\-\-querybypkg\fP"
+列出每个包里的所有文件.
+.IP "\fB\-\-triggerscripts\fP"
+显示所选包的所有激发子脚本.
+
+.SH 核实选项
+.PP
+	\fBrpm \-V|\-y|\-\-verify [verify\-options]\fP
+.PP
+将所安装包的文件信息和源发包的文件信息以及在rpm数据库的文件信息做比较, 以此来核实包.
+对于别的东西,则???
+任何的差异都会展示.包的说明选项与查询选项相同.
+
+对于不是从包安装的文件,例如在安装的时候用"\fB\-\-excludedocs\fP"
+选项排除了的文档文件,将在没有提示的情况下被忽略掉.
+
+核实选项可以使用如下模式:
+
+.IP "\fB\-\-nofiles\fP"
+核实时忽略缺失文件
+.IP "\fB\-\-nomd5\fP"
+核实时忽略MD5校验错误
+.IP "\fB\-\-nopgp\fP"
+核实时忽略PGP校验错误
+.IP "\fB\-\-nofiles\fP"
+核实时忽略缺失文件
+
+
+输出的格式是一个八个字符的字符串,和一个可能有的"\fBc\fP",
+指明后面是一个配置文件,以及后面的文件名.
+八个字符中的每一个都代表着一个文件属性与保存在RPM的数据库中的属性纪录值的比较结果.
+单个的"\fB.\fP"(句号)表明检查通过.下列字符代表特定检查的失败:
+
+
+.IP "\fB5\fP"
+MD5校验和
+.IP "\fBS\fP"
+文件大小
+.IP "\fBL\fP"
+符号连接
+.IP "\fBT\fP"
+修改时间
+.IP "\fBD\fP"
+设备
+.IP "\fBU\fP"
+用户
+.IP "\fBG\fP"
+组
+.IP "\fBM\fP"
+模式(包括许可和文件类型)
+
+.SH 签名检查
+通常的rpm签名检查命令如下:
+.PP
+	\fBrpm \-\-checksig \fI<package_file>+\fP
+.PP
+这将检查包\fI<package_file>\fP的PGP签名以确保其完整性和源发性.
+可以从配置文件读取PGP配置信息.细节请查阅 PGP 签名 部分.
+
+.SH 卸载选项
+rpm卸载命令的通常格式如下:
+.PP
+	\fB    rpm \-e \fI<package_name>+\fP
+.PP
+.IP "\fB\-\-allmatches\fP"
+将移去与\fI<package_name>\fR相匹配的所有版本的包.正常的话,如果\fI<package_name>\fR与多个包相匹配,就会给出错误信息.
+.IP "\fB\-\-noscripts\fP"
+不执行安装前或安装后脚本.
+.IP "\fB\-\-notriggers\fP"
+不执行由移去该包所激发的脚本
+.IP "\fB\-\-nodeps\fP"
+卸载前不检查依赖性
+.IP "\fB\-\-test\fP"
+不真正卸载任何东西,只是遍历该动作.配合\fB\-vv\fP选项会很有用处.
+
+.SH 生成选项
+The general form of an rpm build command is
+.PP
+    \fBrpm \-[b|t]\fIO\fP [build\-options] \fI<package_spec>+\fP
+.PP
+The argument used is \fB-b\fR if a spec file is being used to build the package
+and \fB-t\fR if \fBRPM\fR should look inside of a gzipped (or compressed) tar
+file for the spec file to use. After the first argument, the next argument
+(\fIO\fR) specifies the stages of building and packaging to be done and
+is one of:
+rpm通常的生成选项如下:
+.PP
+    \fBrpm \-[b|t]\fIO\fP [build\-options] \fI<package_spec>+\fP
+.PP
+
+
+.IP "\fB\-bp\fP"
+Executes the "%prep" stage from the spec file.  Normally this
+involves unpacking the sources and applying any patches.
+
+.IP "\fB\-bl\fP"
+Do a "list check".  The "%files" section from the spec file
+is macro expanded, and checks are made to verify that each file
+exists.
+.IP "\fB\-bc\fP"
+Do the "%build" stage from the spec file (after doing the prep stage).
+This generally involves the equivalent of a "make".
+.IP "\fB\-bi\fP"
+Do the "%install" stage from the spec file (after doing the prep
+and build stages).  This generally involves the equivalent of a
+"make install".
+.IP "\fB\-bb\fP"
+生成一个二进制包(在完成prep, build, 以及 install阶段之后)
+.IP "\fB\-bs\fP"
+只生成源包(在完成prep, build, 以及 install阶段之后)
+.IP "\fB\-ba\fP"
+生成二进制包和源包(在完成prep, build, 以及 install阶段之后)
+.PP
+
+还可以使用的选项如下:
+.IP "\fB\-\-short\-circuit\fP"
+忽略导致specified阶段(比如,忽略所有导致specified阶段的阶段).
+只有与\fB\-bc\fP 以及 \fB\-bi\fP合用才有效.
+.IP "\fB\-\-timecheck\fP"
+设置"timecheck"的值(0-?).该值也可以通过定义宏"_timecheck"来配置.
+timecheck值以秒为单位,表示一个包生成的最大年龄.如果时间超过了该值,
+则对所有文件皆给出警告信息.
+.IP "\fB\-\-clean\fP"
+在包完成之后,移去生成树.
+.IP "\fB\-\-rmsource\fP"
+在完成包的生成之后移去源和spec文件
+(也可以单独使用,比如:"\fBrpm \-\-rmsource foo.spec\fP").
+.IP "\fB\-\-test\fP"
+不执行任何生成阶段.在测试spec文件时很有用处.
+.IP "\fB\-\-sign\fP"
+在包中嵌入一个PGP签名.该签名可以用来核实该包的完整性和源发性.
+配置细节可以察看 PGP 签名 一节.
+.IP "\fB\-\-buildroot \fI<dir>\fP"
+在生成包的时候,用目录\fI<dir>\fP覆盖包的生成根目录tag.
+.IP "\fB\-\-target \fI<platform>\fP"
+在生成包的时候,将\fI<platform>\fP解释为\fBarch-vendor-os\fP,并且相应地设置
+宏\fB_target\fP, \fB_target_arch\fP 以及 \fB_target_os\fP.
+.IP "\fB\-\-buildarch \fI<arch>\fP"
+在生成包的时候,将architecture设置到\fI<arch>\fP.
+该选项在RPM 3.0中由于\fB\-\-target\fI的出现而被抛弃.
+.IP "\fB\-\-buildos \fI<os>\fP"
+在生成包的时候,将architecture设置到\fI<os>\fP.
+该选项在RPM 3.0中由于\fB\-\-target\fI的出现而被抛弃.
+
+.SH 重新生成以及重新编译选项
+
+There are two other ways to invoke building with rpm:
+有两种不同的方法用rpm重新生成包:
+
+.I "\fBrpm \-\-recompile \fI<source_package_file>+\fP"
+
+.I "\fBrpm \-\-rebuild \fI<source_package_file>+\fP"
+
+当以这种方式激发的时候,\fBrpm\fP安装指明的源包,并且完成prep,compile,install工作.
+另外,\fB\-\-rebuild\fP生成一个新的二进制包.
+当包的生成完成的时候,生成所用目录被移去(就如同使用了\fB\-\-clean\fP),
+而且该包的源和spec文件也要移走.
+
+.SH 签名一个已存在的RPM
+
+.I "\fBrpm \-\-resign \fI<binary_package_file>+\fP"
+
+该选项生成并将新签名插入所列出的包里.已存在的签名会被移走.
+
+.I "\fBrpm \-\-addsign \fI<binary_package_file>+\fP"
+
+该选项生成并将新签名附加到所列出的包的签名之后.
+
+.SH PGP 签名
+
+要使用签名特性,RPM必须要能够运行PGP(要安装了PGP并且你可以访问它),
+而且还需PGP能找到一个带有RPM公钥的公钥环.
+缺省情况下,RPM使用PGP的缺省设置(著名的PGPPATH)来查找钥环.
+如果你的钥环并不在PGP所期望它们处在的地方,则你需要配置宏
+.IP "\fB_pgp_path\fP" ,
+将其设为要使用的PGP钥环所在的位置.
+.PP
+
+如果你想要签名一个你自己生成的包,你还必须创建自己的公钥和密钥对(请参阅PGP手册).
+还需要配置签名类型宏:
+.IP "\fB_signature\fP",
+目前只支持pgp.还有用户名宏:
+.IP "\fB_pgp_name\fP"
+指明想要使用其键去签名你的包的用户.
+
+在生成包的时候,可以将\-\-sign加到命令行里.这样只需给出你的口令短语,
+就可以在生成包的同时对其签名.
+
+比如,要想以用户\fp"John Doe <jdoe@foo.com>"\fP的身份,用在
+\fB/etc/rpm/.pgp\fP的钥环,去签名一个包,就应该将
+
+.IP "\fB%_signature\fP"
+\fBpgp\fP
+.IP "\fB%_pgp_name\fP"
+\fB/etc/rpm/.pgp\fP
+.IP "\fB%_pgp_name\fP"
+\fBJohn Doe <jdoe@foo.com>"
+.PP
+
+包括在一个宏配置文件里.
+对于系统的配置可以使用\fB/etc/rpm/macros\fP,
+而对于个人配置可以使用\fB~/.rpmmacros\fP.
+
+.SH 重新生成数据库选项
+
+rpm重建数据库的命令是
+.PP
+	\fBrpm \-\-rebuilddb\fP
+.PP
+
+要重建一个新的数据库,可以:
+.PP
+	\fBrpm \-\-initdb\fP
+.PP
+对这些模式唯一的选项是\fB-\-dbpath\fP 和 \fB-\-root\fP.
+
+.SH SHOWRC 
+
+运行
+.PP
+	\fBrpm \-\-showrc\fP
+
+.PP
+展示一些设置在\fIrpmrc\fP文件里的值,RPM所有选项都会利用这些值.
+
+.SH FTP/HTTP选项
+
+RPM包括简单的FTP和HTTP客户端程序,这样可以简化那些从internet取得的包的安装和查询.
+用于安装,升级,以及查询操作的包文件可以说明为ftp或者http格式的URL:
+
+.PP
+	\fBftp://<user>:<password>@hostname:<port>/path/to/package.rpm\fP
+.PP
+如果忽略掉\fB:password\fP部分,会提示要求给出口令(每个用户/主机名对一次)
+如果用户名和口令都忽略了,就使用匿名ftp. 
+总是使用消极(PASV) ftp传送. 
+
+RPM允许使用下列操作辅助ftp URLs
+
+.IP "\fB\--ftpproxy \fI<hostname>\fP"
+主机\fI<hostname>\fP将被作为所有ftp传输的代理服务器使用, 
+这样允许用户通过使用了代理系统的防火墙机器来做ftp传输. 
+该选项也可以通过配置宏\fB_ftpproxy\fP来指明. 
+
+.IP "\fB\--ftpport \fI<port>\fP"
+用该TCP\fI<端口>\fP号取代缺省的端口去连接代理ftp服务器. 
+该选项也可以通过配置宏\fB_ftpport\fP来指明. 
+.PP
+
+RPM允许使用下列操作辅助http URLs
+
+.IP "\fB\--httpproxy \fI<hostname>\fP"
+将主机\fI<主机名>\fP作为所有http传输的代理服务器使用. 
+该选项可以通过配置宏\fB_httpproxy\fP来指明. 
+
+.IP "\fB\--httpport \fI<port>\fP"
+用该TCP\fI<端口>\fP号取代缺省的端口去连接代理http服务器. 
+该选项也可以通过配置宏\fB_httpport\fP来指明. 
+.PP
+
+.SH 文件
+.nf
+/usr/lib/rpm/rpmrc
+/etc/rpmrc
+~/.rpmrc
+/var/lib/rpm/packages
+/var/lib/rpm/pathidx
+/var/lib/rpm/nameidx
+/tmp/rpm*
+.fi
+.El
+.SH 另见
+.IR glint (8) ,
+.IR rpm2cpio (8) ,
+.B http://www.rpm.org/
+.nf
+.SH 作者
+.nf
+Marc Ewing <marc@redhat.com>
+Jeff Johnson <jbj@redhat.com>
+Erik Troan <ewt@redhat.com>
+.fi
+
+.SH "[中文版维护人]"
+.B mapping <email>
+.SH "[中文版最新更新]"
+2001/7/21
+.SH  "《Linuxfourm 中文MAN-PAGE计划》"
+.BI http://cmpp.linuxforum.net

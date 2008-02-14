@@ -1,0 +1,45 @@
+.\" @(#)man.conf
+.TH MAN.CONF 5 "30 Mar 1994"
+.SH NAME
+man.conf \- man 的 设 定 资 料
+.SH "描述"
+.LP
+.BR man (1)
+man(1) 会 读 取 本 档 。 man.conf 的 内 容 包 含 了 (a) 如 何 建 立 man 搜 寻 路 径 的 资 讯 , (b) man 所 使 用 的 程 式 ( nroff, egn, tbl 等 等 ) 的 完 整 路 径 设 定 (c) 对 特 定 副 档 名 的 解 压 缩 程 式 。
+.PP
+ 若 需 特 别 指 定 设 定 档 可 利 用 :
+.LP
+.RS
+man -C private_man.conf ...
+.RE
+.LP
+man.conf 中 的 指 令 可 附 加 选 项 。 nroff 的 常 用 选 项 可 在 grotty(1) 找 到 。 例 如 , 为 了 取 代 默 认 值
+.LP
+.RS
+.nf
+NROFF /usr/bin/groff -mandoc -Tlatin1
+.fi
+.RE
+.LP
+我 们 可 以 用
+.LP
+.RS
+.nf
+NROFF /usr/bin/groff -mandoc -Tlatin1 -P-u -P-b
+.fi
+.RE
+.LP
+以 抑 制 底 线 与 重 打 的 功 能 。
+.SH "文件 FILES"
+.I "@man_config_file@"
+.SH "参见 SEE ALSO"
+col(1), (g)eqn(1), (g)pic(1), groff(1), grotty(1), (g)refer(1), (g)tbl(1),
+less(1), man (1) and compress(1), gzip(1).
+
+
+.SH "[中文版维护人]"
+.B 软件教程之Linux Man
+.SH "[中文版最新更新]"
+.B 2001.01.01
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

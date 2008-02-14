@@ -1,0 +1,84 @@
+.TH REPQUOTA 8 "1999年8月20日星期五"
+.UC 4
+.SH NAME(名称)
+repquota \- 文件系统配额的汇总
+.SH SYNOPSIS(总览)
+.B repquota
+[
+.B \-vugs
+]
+.IR filesystem .\|.\|.
+.LP
+.B repquota
+[
+.B \-avugs
+]
+.SH DESCRIPTION(描述)
+.IX  "repquota command"  ""  "\fLrepquota\fP \(em summarize quotas"
+.IX  "user quotas"  "repquota command"  ""  "\fLrepquota\fP \(em summarize quotas"
+.IX  "disk quotas"  "repquota command"  ""  "\fLrepquota\fP \(em summarize quotas"
+.IX  "quotas"  "repquota command"  ""  "\fLrepquota\fP \(em summarize quotas"
+.IX  "file system"  "repquota command"  ""  "\fLrepquota\fP \(em summarize quotas"
+.IX  "summarize file system quotas repquota"  ""  "summarize file system quotas \(em \fLrepquota\fP"
+.IX  "report file system quotas repquota"  ""  "report file system quotas \(em \fLrepquota\fP"
+.IX  display "file system quotas \(em \fLrepquota\fP"
+.LP
+.B repquota
+显示与配额文件相关的信息以及对于指定文件系统的磁盘使用情况和配额的汇总.
+对于每个用户,显示当前的文件数和空间大小(以千字节计),还有由
+.BR setquota (8)
+或
+.BR edquota (8)
+创建的任何配额.
+.SH OPTIONS(选项)
+.TP
+.B \-a
+包含对所有已挂载的文件系统的统计.
+.TP
+.B \-v
+对所有文件系统报告配额情况,即使该文件系统根本就没使用.
+.TP
+.B \-g
+报告组的配额.
+.TP
+.B \-u
+报告用户的配额.这是默认的选项.
+.TP
+.B \-s
+包含完全的统计信息.
+.LP
+只有超级用户可以浏览不属于他们的配额.
+.SH FILES(相关文件)
+.PD 0
+.TP 20
+.B aquota.user
+位于文件系统root下的用户配额文件.
+.TP
+.B aquota.group
+位于文件系统root下的组配额文件.
+.TP
+.B /etc/mtab
+已挂载的文件系统表
+.PD
+.SH SEE ALSO(另见)
+.BR quota (1),
+.BR quotactl (2),
+.BR fstab (5),
+.BR setquota (8),
+.BR edquota (8),
+.BR quotacheck (8),
+.BR quotaon (8)
+.SH AUTHOR(作者)
+Jan Kara \<jack@atrey.karlin.mff.cuni.cz\>
+.br
+用户界面取自老的应用文档,它的作者是:
+.br
+Marco van Wieringen \<mvw@planets.elm.net\>\
+
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+2001/7/19
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

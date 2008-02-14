@@ -1,0 +1,56 @@
+.TH CONVERTQUOTA 8 "Fri Mar 09 2001"
+.UC 4
+.SH NAME
+convertquota \- 把老的配额文件转换为新的格式
+.SH "总览 (SYNOPSIS)"
+.B convertquota
+[
+.B -ug
+]
+.I filesystem
+.SH "描述 (DESCRIPTION)"
+.B convertquota
+把老的配额文件
+.BR quota.user
+和
+.BR quota.group
+转换为Red Hat Linux内核2.4以及更新的
+.IR 文件系统
+所用的
+.BR aquota.user
+和
+.BR aquota.group 。
+.PP
+新的格式可以允许为32位uids/gids设定配额， 为root设定配额，
+以字节(byte)为单位统计所用空间(可以在ReiserFS中使用配额)， 并且与结构无关。 
+新的格式用Radix树(一种简单的树结构)为配额文件中存储信息的主要方式。
+.SH "选项 (OPTIONS)"
+.TP
+.B -u
+转换用户配额文件。 此选项是默认的。
+.TP
+.B -g
+转换组配额文件。
+.SH "文件 (FILES)"
+.TP 20
+.B aquota.user
+新的用户配额文件
+.TP
+.B aquota.group
+新的组配额文件
+.SH "参见 (SEE ALSO)"
+.BR quota (1),
+.BR setquota (8),
+.BR edquota (8),
+.BR quotacheck (8),
+.BR quotaon (8),
+.BR repquota (8)
+.SH "作者 (AUTHOR)"
+Jan Kara \<jack@atrey.karlin.mff.cuni.cz\>
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/7/18
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

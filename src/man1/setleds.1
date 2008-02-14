@@ -1,0 +1,79 @@
+.TH SETLEDS 1 "09 Oct 1997" "Console tools" "Linux User's Manual"
+
+.SH NAME
+setleds \- 设置键盘 led 标志
+
+.SH "总览 (SYNOPSIS)"
+.B setleds
+.BI [ "-v" "] [" "-L" "] [" "-D" "] [" "-F" ]
+.BI [ {+|-}num "] [" {+|-}caps "] [" {+|-}scroll ]
+.IX "setleds 命令" "" "\fLsetleds\fR 命令"  
+
+.SH "描述 (DESCRIPTION)"
+.PP
+.B setleds
+显示 改变 当前 虚拟终端 的 led 标志 （就是 NumLock， CapsLock 和
+ScrollLock）。 如果 没有 参数
+.B setleds
+显示 当前设置。 如果 有参数， 它 设置 或 清除 相应的 标志 （不改变
+其它的 标志）。 如果有
+.B \-v
+选项， 显示 修改前后 的 状态。
+
+.SH "选项 (OPTIONS)"
+.TP
+.I \-F
+这是 默认 选项。 它 只改变 虚拟 终端 的 标志 （它的 状态 可能 同 键盘的
+led 一样）。
+.TP
+.I \-D
+同时 改变 虚拟 终端 的 标志 和 默认 设置 （这样 之后 恢复 默认 设置 时
+不会 影响 现在的 更改）。 这对 那些 想 让 NumLock 总是 开着 的人 很有用。
+.TP
+.I \-L
+不改变 虚拟终端 的 状态， 只改变 键盘的 led。 这样 led 就和 虚拟终端的
+标志 不一样了 （它 只显示 它自己 的 状态）。
+.B "setleds \-L"
+命令（没有 更多的 参数了） 会 再次 改变 led 使它 能 反映 虚拟终端的 状态。
+.TP
+.I \-num \+num
+清除 或者 设置 NumLock。 （现在， NumLock 的 状态 只影响 小键盘，
+NumLock 设置 相当于 NumLock 键）
+.TP
+.I \-caps \+caps
+清除 或者 设置 CapsLock。
+(现在, 当 用于 字符 时 CapsLock 设置 相当于 Shift 键。
+CapsLock 设置 相当于 CapsLock 键）
+.TP
+.I \-scroll \+scroll
+清除 或者 设置 ScrollLock。
+(现在， 按 ScrollLock 键 (或者 ^S/^Q) 会停止/开始终端输出。)
+
+.SH "例子 (EXAMPLE)"
+.PP
+可以 在 /etc/rc 中用
+.B setleds
+来 设置 NumLock 的 初始 和 缺省 状态， 比如
+.PP
+.RS
+INITTY=/dev/tty[1\-8]
+.br
+for tty in $INITTY; do
+.RS
+setleds \-D \+num < $tty
+.RE
+done
+.RE
+
+.SH "错误 (BUGS)"
+在 键盘 应用 模式 NumLock 键 并不反映 NumLock 标志的 状态。
+
+.SH "参见 (SEE ALSO)"
+.BR loadkeys (1).
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/9/13
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

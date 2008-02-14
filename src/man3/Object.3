@@ -1,0 +1,367 @@
+'\"
+'\" Copyright (c) 1996-1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH Tcl_Obj 3 8.0 Tcl "Tcl Library Procedures"
+.BS
+.SH NAME
+Tcl_NewObj, Tcl_DuplicateObj, Tcl_IncrRefCount, Tcl_DecrRefCount, Tcl_IsShared, Tcl_InvalidateStringRep \- 操纵 Tcl 对象
+.SH 总览 SYNOPSIS
+.nf
+\fB#include <tcl.h>\fR
+.sp
+Tcl_Obj *
+\fBTcl_NewObj\fR()
+.sp
+Tcl_Obj *
+\fBTcl_DuplicateObj\fR(\fIobjPtr\fR)
+.sp
+\fBTcl_IncrRefCount\fR(\fIobjPtr\fR)
+.sp
+\fBTcl_DecrRefCount\fR(\fIobjPtr\fR)
+.sp
+int
+\fBTcl_IsShared\fR(\fIobjPtr\fR)
+.sp
+\fBTcl_InvalidateStringRep\fR(\fIobjPtr\fR)
+.SH 参数 ARGUMENTS
+.AS Tcl_Obj *objPtr in
+.AP Tcl_Obj *objPtr in
+指向一个对象；必须是以前调用 \fBTcl_NewObj\fR 返回的结果。
+.BE
+
+.SH 介绍 INTRODUCTION
+.PP
+这个手册页提供了对 Tcl 对象以及如何使用它们的一个概述。它还描述了管理 Tcl 对象的一些一般过程。使用这些过程来建立和复制对象，和增加和减少到对象的引用(指针)计数。这些过程与那些在特定类型的对象如 \fBTcl_GetIntFromObj\fR 和 \fBTcl_ListObjAppendElement\fR 上进行操作的过程联合使用。单独的过程和它们所操纵的数据结构被放在一起描述。
+.PP
+Tcl 的双端口(\fIdual-ported\fR)对象为存储和交换 Tcl 值提供了一个通用的机制。它们在很大程度上替代了 Tcl 中字符串的使用。例如，它们被用来存储变量值、命令参数、命令结果、和脚本。Tcl 对象外在表现很象字符串，但它还持有可以被更加有效的操纵的内部表示。例如，现在一个 Tcl 列表被表示为持有列表的字符串表示的一个对象，如同到每个列表元素的指针的一个数组。双端口对象避免了运行时的类型转换。它们还提高了许多操作的速度，原因是可以立即获得一个适当的表示。编译器自身使用 Tcl 对象来缓存(cache)作为编译脚本的结果的字节码指令。
+.PP
+这两种表示互为缓存并且被以懒惰方式计算。就是说，每个表示都只在需要时才被计算，它被从另一种表示计算出来，而一旦被计算出来了，它就被保存起来。除此之外，其中一个表示的改变将使另一个表示成为无效 。举个例子，一个做整数运算的 Tcl 程序可以在一个变量的内部机器整数表示上进行直接操作，而不需要经常性的在整数和字符串之间进行转换。只有在需要这个变量的值的一个字符串表示的时候，比如打印它，程序才重新生成这个整数的字符串表示。尽管对象包含一个内部表示，但它们的语义仍是依据字符串定义的: 总是可以获取最新的字符串，在取回对象的字符串表示的时候，对对象的任何改变都将反映到取回的那个字符串上。因为这个表示是无效的并被重新生成了，扩展作者直接访问 \fBTcl_Obj\fR 的字段是很危险的。最好使用 \fBTcl_GetStringFromObj\fR 和 \fBTcl_GetString\fR 这样的过程来访问 \fBTcl_Obj\fR 信息。
+.PP
+在堆上分配对象，使用到它们的 \fBTcl_Obj\fR 结构的指针引用对象。对象要尽可能的共享。这将显著的缩减存储需求，原因是一些对象比如长列表是非常大的。还有，多数 Tcl 值只是被读而从不被修改。尤其是过程参数，它们可以在调用和被调用的过程之间共享。赋值和参数绑定是通过简单的赋予到这个值的一个指针完成的。使用引用计数来确定什么时候归还一个对象的存储是安全的。
+.PP
+Tcl 对象是有类型的(typed)。一个对象的内部表示由它自己的类型来控制。在 Tcl 核心中预定义了七种类型，其中包括：整数、双精度浮点数、列表、和字节码。扩展作者可是使用 \fBTcl_RegisterObjType\fR  过程来扩展类型的集合。
+
+.SH "对象结构 THE TCL_OBJ STRUCTURE"
+.PP
+每个 Tcl 对象都被表示为一个 \fBTcl_Obj\fR 结构，其定义如下。
+.CS
+typedef struct Tcl_Obj {
+	int \fIrefCount\fR;
+	char *\fIbytes\fR;
+	int \fIlength\fR;
+	Tcl_ObjType *\fItypePtr\fR;
+	union {
+		long \fIlongValue\fR;
+		double \fIdoubleValue\fR;
+		VOID *\fIotherValuePtr\fR;
+		struct {
+			VOID *\fIptr1\fR;
+			VOID *\fIptr2\fR;
+		} \fItwoPtrValue\fR;
+	} \fIinternalRep\fR;
+} Tcl_Obj;
+.CE
+\fIbytes\fR 和 \fIlength\fR 成员一起持有一个对象的字符串表示，这是一个已计数的 (\fIcounted\fR) 字符串或二进制串 (\fIbinary string\fR)，二进制串可能包含有嵌入的 null 字节的二进制串。\fIbytes\fR 指向这个字符串表示的第一个字节。\fIlength\fR 成员给出字节数。字节数组的在偏移量 \fIlength\fR 上，也就是最后一个字节后面必须总是有一个 null；这允许不包含 null 的字符串表示被作为一个常规的用 null 终结的 C 语言字符串来对待。 C 程序使用 \fBTcl_GetStringFromObj\fR 和 \fBTcl_GetString\fR 来得到一个对象的字符串表示。如果 \fIbytes\fR 是 NULL，则字符串表示无效。
+.PP
+一个对象的类型管理它的内部表示。成员 \fItypePtr\fR 指向描述类型的 Tcl_ObjType 结构。如果 \fItypePtr\fR is 是 NULL，则内部表示无效。
+.PP
+\fIinternalRep\fR 联合成员持有一个对象的内部表示。它可以是一个(长)整数，一个双精度浮点数，或者一个指针、它指向包含这个类型的对象要表示对象所需要的补充信息的值，或者是两个任意的指针。
+.PP
+使用 \fIrefCount\fR 成员来通告在什么时候释放一个对象的存储是安全的。它持有到这个对象的活跃引用的计数。维护正确的引用计数是扩展作者的一个关键性的责任。在下面的对象的存储管理 (\fBSTORAGE MANAGEMENT OF OBJECTS\fR) 章节中讨论了引用计数。
+.PP
+尽管扩展的作者可以直接访问一个 Tcl_Obj 结构的成员，但最好还是使用恰当的过程和宏。例如，扩展作者永远不要直接读或修改 \fIrefCount\fR；作为替代，他们应当使用象 \fBTcl_IncrRefCount\fR  和 \fBTcl_IsShared\fR 这样的宏。
+.PP
+Tcl 对象的一个关键属性是它持有两个表示。典型的，一个对象开始时只包含一个字符串表示: 它是无类型的并且\fItypePtr\fR 是一个 NULL。分别使用 \fBTcl_NewObj\fR 或 \fBTcl_NewStringObj\fR 建立包含一个空串的一个对象或一个指定字符串的一个复件。一个对象的字符串值可以使用 \fBTcl_GetStringFromObj\fR 或 \fBTcl_GetString\fR 来获取并使用 \fBTcl_SetStringObj\fR 来改变它。如果如果这个对象以后被传递给象 \fBTcl_GetIntFromObj\fR 这样的要求一个特定的内部表示的过程，则这个过程将建立一个内部表示并设置这个对象的 \fItypePtr\fR。从字符串表示来计算它的内部表示。一个对象的两个表示是双重的: 对一个的改变也将反映到另一个上。例如，\fBTcl_ListObjReplace\fR 将修改一个对象的内部表示，下一个到 \fBTcl_GetStringFromObj\fR 或 \fBTcl_GetString\fR 的调用将反映这个改变。
+.PP
+出于效率的原因以懒惰方式重计算表示。一个过程如 \fBTcl_ListObjReplace\fR 对一个表示的改变不立即反映到另一个表示上。作为替代，把另一个表示标记为无效，如果以后需要的话再重新生成。多数 C 程序员永远无须关心这是如何完成的，他们只是简单的使用象 \fBTcl_GetBooleanFromObj\fR 或 \fBTcl_ListObjIndex\fR 这样的过程。而实现自己的对象类型的程序员必须检查无效表示和在需要时标记一个表示为无效。使用过程 \fBTcl_InvalidateStringRep\fR 来标记一个对象的字符串表示为无效并释放与这个字符串表示相关联的存储。
+.PP
+对象在它的一生当中通常保持一种类型，但是有时一个对象必须从一种类型转换成另一种类型。例如，一个 C 程序可以通过重复调用 \fBTcl_AppendToObj\fR 来在一个对象中建造一个字符串，并接着调用 \fBTcl_ListObjIndex\fR 来从一个对象中提取一个列表元素。持有相同字符串的同样的对象在不同的时候可能有多种不同的内部表示。扩展作者可以使用 \fBTcl_ConvertToType\fR 过程强制把一个对象从一种类型转换成另一种类型。只有建立新对象类型的程序员才需要关心这是如何作的。作为对象类型实现的一部分，需要定义为一个对象建立一个新的内部表示和改变它 \fItypePtr\fR 的一个过程。如何建立一个新对象类型请参见 \fBTcl_RegisterObjType\fR 手册页。
+
+.SH "对象生命周期示例 EXAMPLE OF THE LIFETIME OF AN OBJECT"
+.PP
+作为一个对象生命周期的一个例子，考虑下列命令序列:
+.CS
+\fBset x 123\fR
+.CE
+这里把一个未知类型的对象赋值给 \fIx\fR，这个对象的 \fIbytes\fR 成员指向 \fB123\fR 而 \fIlength\fR 成员包含 3。对象的 \fItypePtr\fR 成员是 NULL。
+.CS
+\fBputs "x is $x"\fR
+.CE
+\fIx\fR 的字符表示是有效的(因为 \fIbytes\fR 是非 NULL)并被这个命令取回。
+.CS
+\fBincr x\fR
+.CE
+\fBincr\fR 命令首先通过调用 \fBTcl_GetIntFromObj\fR 从 x (所引用的)的对象的得到一个整数。这个过程检查这个对象是否已经是一个整数对象。由于它不是，就通过把这个对象的 \fIinternalRep.longValue\fR 成员设置为整数 \fB123\fR，并把这个对象的 \fItypePtr\fR 设置为指向整数的 Tcl_ObjType 结构，此过程把这个对象转换成了整数对象。两个表示现在都是有效的。\fBincr\fR 增加这个对象的整数内部表示，接着使它的字符串表示无效(通过调用 \fBTcl_InvalidateStringRep\fR)，原因是这个字符串表示不再与内部表示相对应了。
+.CS
+\fBputs "x is now $x"\fR
+.CE
+现在需要 \fIx\fR (所引用的)的对象的字符串表示，要重新计算它。字符串表示现在是 \fB124\fR。两个表示又都是有效的了。
+
+.SH "对象的存储管理 STORAGE MANAGEMENT OF OBJECTS"
+.PP
+Tcl 对象在堆上分配，并且要尽可能的共享对象来缩减存储需求。使用引用计数来确定何时一个对象不再被需要并可以被安全的释放。刚用  \fBTcl_NewObj\fR 或 \fBTcl_NewStringObj\fR 建立的对象的  \fIrefCount\fR 是 0。当建立到这个对象的一个新引用时，使用宏 \fBTcl_IncrRefCount\fR 增加引用计数。当不再需要一个引用的时候 ，使用 \fBTcl_DecrRefCount\fR 减少引用计数，而且如果这个对象的引用计数下降到零，就释放它的存储。被不同的代码或数据结构共享的一个对象的 \fIrefCount\fR 大于 1。增加一个对象的引用计数来确保它不会被过早释放或者它的值被意外的改变。
+.PP
+举个例子，字节码解释器在调用者和被调用的过程之间共享参数对象，以避免复制对象。它把调用者的实际参数的对象赋值给过程的形式参数变量。此时，它调用 \fBTcl_IncrRefCount\fR 来增加每个实际参数(所引用的)的对象的引用计数，原因是有了从形式参数到这个对象的一个新引用。在被调用的过程返回的时候，解释器调用 \fBTcl_DecrRefCount\fR 来减少每个参数的引用计数。当一个对象的引用下降到小于等于零的时候， \fBTcl_DecrRefCount\fR 归还它的存储。多数命令过程不是必须关心引用计数的，原因是它们立即使用一个对象的值并且在它们返回之后不保留到这个对象的指针。但是，如果它们把到一个对象的指针保留到一个数据结构中，则他们必须注意要增加它的引用计数，原因是这个保留的指针是一个新引用。
+.PP
+象 \fBlappend\fR 和 \fBlinsert\fR 这样的直接修改对象的命令过程必须注意要在修改一个共享的对象之前复制它。 他们必须首先调用 \fBTcl_IsShared\fR 来检查这个对象是否是共享的。如果对象是共享的，则他们必须使用  \fBTcl_DuplicateObj\fR 复制这个对象；它返回原始对象的一个新复制品，其 \fIrefCount\fR 是 0。如果对象未被共享，则命令过程“拥有”这个对象并可以安全的直接修改它。例如，下列代码出现在实现 \fBlinsert\fR 的命令过程当中。通过在  \fIindex\fR 的前面插入 \fIobjc-3\fR 新元素，这个过程修改在 \fIobjv[1]\fR 中传递给它的列表对象 。
+
+.CS
+listPtr = objv[1];
+if (Tcl_IsShared(listPtr)) {
+	listPtr = Tcl_DuplicateObj(listPtr);
+}
+result = Tcl_ListObjReplace(interp, listPtr, index, 0, (objc-3), &(objv[3]));
+.CE
+
+另一个例子，\fBincr\fR 的命令过程在增加变量(所引用的)对象内部表示中的整数之前，必须检查这个变量(所引用的)对象是否是共享的。如果它是共享的，则需要复制这个对象，目的是避免意外的改变在其他数据结构中值。
+
+
+.SH "参见 SEE ALSO"
+Tcl_ConvertToType, Tcl_GetIntFromObj, Tcl_ListObjAppendElement, Tcl_ListObjIndex, Tcl_ListObjReplace, Tcl_RegisterObjType
+
+.SH 关键字 KEYWORDS
+internal representation, object, object creation, object type, reference counting, string representation, type conversion
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/10/30
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

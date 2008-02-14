@@ -1,0 +1,66 @@
+.TH SMBSTATUS 1 "11 Nov 1999" "smbstatus 2.0.6"
+.PP 
+.SH NAME
+smbstatus  \- 报告当前 samba 的联接状态
+.PP
+.SH 总览
+.PP 
+\fBsmbstatus\fP [-b] [-d] [-L] [-p] [-S] [-s configuration file] [-u username]
+.PP 
+.SH 描述
+.PP
+此程序是 samba 套件的一部分。 
+.PP
+smbstatus 是个非常简单的程序，用于列示当前 samba 的联接状态。
+.PP
+.SH 选项 
+.PP 
+.IP 
+.IP "\fB-b\fP" 
+指定只输出简短的内容。 
+.IP 
+.IP "\fB-d\fP" 
+指定以详细方式输出内容。 
+.IP 
+.IP "\fB-L\fP" 
+让 smbstatus 只列出 /var 目录中的被锁定项。 
+.IP 
+.IP "\fB-p\fP" 
+用这个参数来列出 smbd 进程的列表然后退出。对脚本编程很有用。 
+.IP 
+.IP "\fB-S\fP" 
+让 smbstatus 只列出共享资源项。 
+.IP 
+.IP "\fB-s configuration file\fP" 
+用这个参数指定一个配置文件。 当然在编译时已做好了默认的配置文件。
+文件中包含了服务需要的详细配置信息。 参见 smb.conf(5) 获得更多信息。
+.IP 
+.IP "\fB-u username\fP" 
+用这个参数来查看只与 username 用户对应的信息。 
+.PP
+.SH 版本
+.PP
+此手册页是针对 samba 套件版本 2.0 的。
+.PP
+.SH 另见
+.PP 
+\fBsmb\&.conf (5)\fP, \fBsmbd (8)\fP
+.PP 
+.SH 作者
+.PP
+samba 软件和相关工具最初由 Andrew Tridgell samba-bugs@samba.org 创建。
+samba 现在由开发组以类似开发 Linux 内核采用的开放源代码项目方式来发展。
+.PP
+samba 手册页最初由 Karl Auer 撰写。它的源码已被转换成 YODL
+(另外一种极好的开放源代码软件，可以在 ftp://ftp.icce.rug.nl/pub/unix/ 
+处获得)格式并已由 Jeremy Allison 更新到 samba2.0 版本。
+.PP
+请参见 samba (7) 查找如何获得一份完整的维护者列表以及如何提交错误报告及
+注解等等。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2001/02/28
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

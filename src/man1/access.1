@@ -1,0 +1,74 @@
+.TH ACCESS 1 "4 January 1998" "Kpathsea 3.3.1"
+.\"=====================================================================
+.if n .ds MP MetaPost
+.if t .ds MP MetaPost
+.if n .ds MF Metafont
+.if t .ds MF M\s-2ETAFONT\s0
+.if t .ds TX \fRT\\h'-0.1667m'\\v'0.20v'E\\v'-0.20v'\\h'-0.125m'X\fP
+.if n .ds TX TeX
+.ie t .ds OX \fIT\v'+0.25m'E\v'-0.25m'X\fP\" for troff
+.el .ds OX TeX\" for nroff
+.\" the same but obliqued
+.\" BX definition must follow TX so BX can use TX
+.if t .ds BX \fRB\s-2IB\s0\fP\*(TX
+.if n .ds BX BibTeX
+.\" LX definition must follow TX so LX can use TX
+.if t .ds LX \fRL\\h'-0.36m'\\v'-0.15v'\s-2A\s0\\h'-0.15m'\\v'0.15v'\fP\*(TX
+.if n .ds LX LaTeX
+.\"=====================================================================
+.SH NAME(名称)
+access \- 确定文件是否可以存取访问
+
+.SH SYNOPSIS(总览)
+.B access
+.I -mode
+.I file
+
+.\"=====================================================================
+.SH DESCRIPTION (描述)
+如果
+.I file
+可以在特定模式下存取访问,那么成功退出.
+.I mode
+为
+.IR rwx
+中的一个或多个字符,
+这里的
+.I r
+表示可读,
+.I w
+表示可写,而
+.I x
+表示可执行.
+.PP
+.B access
+和
+.B test
+之间的区别在于
+后者查看权限位,而前者使用
+.BR access (2)
+系统调用进行检查.当文件系统以只读方式被挂载时,两者就有区别了.
+
+.\"=====================================================================
+.SH OPTIONS(选项)
+.B access
+接受以下附加的选项:
+.TP
+.B --help
+.rb
+打印帮助信息并退出.
+.TP
+.B --version
+.rb
+打印版本信息并退出.
+
+.\"=====================================================================
+.SH "SEE ALSO"(另见)
+.BR access (2)
+
+.SH "[中文版维护人]"
+.B riser <email>
+.SH "[中文版最新更新]"
+.BR 2003.11.22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

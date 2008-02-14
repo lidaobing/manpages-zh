@@ -1,0 +1,528 @@
+.TH locale 5 "09 Nov 1994" "National Language Support" "Linux用户手册"
+.SH NAME
+locale \- 地域定义文件的描述
+.SH 描述
+.B 地域
+定义文件含有
+.B localedef(1) 
+命令所需的全部信息.
+
+定义文件由几个小节组成, 一个小节详细地描述地域的一个范畴.
+.SH 语法
+地域定义文件以一个包含有如下关键字的文件头开头:
+.TP
+.I <escape_char>
+其后所跟字符在文件的其余部分被特别解释为逃逸字符, 
+逃逸字符缺省为反斜杠(
+.B \\\\  
+).
+.TP
+.I <comment_char>
+后面所跟字符在文件的其余部分要特别解释为注释符, 注
+释符缺省为数字符号(
+.B #
+).
+
+.PP
+地域定义分成几个部分, 每个部分对应一个地域范畴, 每个部分都
+可以复制别的地域范畴的内容, 也可以自己重新新定义一个, 如果
+一个范畴想要复制别的范畴, 则在该范畴的定义里唯一有效的关键
+字是
+.BR copy ,
+其后跟随要复制的地域范畴的名字.
+
+.SS LC_CTYPE
+.B LC_CTYPE
+范畴的定义以第一栏的
+.I LC_CTYPE 
+字符串开始.
+
+可以有如下关键字:
+
+.TP
+.I upper
+跟随一个大写字母列表. 字母
+.B A
+到
+.B Z
+自动包括. 被说明
+为
+.B cntrl, digit, punct,
+或
+.B space
+的字符则不允许包括.
+
+.TP
+.I lower
+跟随一个小写字母列表. 字母
+.B a
+到
+.B z
+自动包括. 同样也
+不允许如下字符:
+.B cntrl, digit, punct,
+或者
+.B space.
+
+.TP
+.I alpha
+跟随一个字母列表. 所有被说明为
+.B upper
+或 
+.B lower
+的字符
+都自动包括. 但如下字符仍然不允许:
+.B cntrl, digit, punct,
+或
+.B space
+
+.TP
+.I digit
+后面跟随的字符被划分为数字. 只允许数字
+.B 0 
+到
+.B 9 ,
+并且
+缺省它们也被包括进来了.
+
+.TP
+.I space
+跟随一列被定义为空格的字符. 那些被说明为
+.B upper, lower, alpha, digit, graph,
+或者
+.B xdigit
+的字符是不被允许的. 而字符
+.B <space>, <form-feed>, <newline>, <carriage-return>, <tab>,
+以及
+.B <vertical-tab>
+则被自动包括进来.
+
+.TP
+.I cntrl
+跟随一个控制字符列表.那些被说明为
+.B upper, lower, alpha, digit, punct, graph, print
+或者
+.B xdigit
+的字符不允许包括.
+
+.TP
+.I punct
+跟随一个标点符号的列表. 不允许包括那些被说明为
+.B upper, lower, alpha, digit, cntrl, xdigit
+或者
+.B <space>
+字符.
+
+.TP
+.I graph
+跟随一个可打印字符列表, 但不包括空格符
+.BR <space> .
+被
+说明为
+.B upper, lower, alpha, digit, xdigit
+或
+.B punct 
+的字符自动包括, 而被说明为
+.B cntrl
+的字符则不允许包括.
+
+.TP
+.I print
+跟随一个可打印字符列表, 包括空格符
+.BR <space> .
+被定义
+为
+.B upper, lower, alpha, digit, xdigit, punct
+或
+.B <space>
+的字符自动包括. 而被说明为
+.B cntrl
+的字符则
+不被允许.
+
+.TP
+.I xdigit
+跟随一个被归类为十六进制数的字符的列表. 十进制数字必
+须被包括, 其后还有一个或多个的升序顺序的六字符集, 缺
+省包括下列字符:
+.B 0
+到
+.B 9,
+.B a
+到
+.B f,
+.B A
+到
+.B F.
+
+.TP
+.I blank
+跟随一个被归类为
+.B blank
+字符的列表. 自动包括的字符有
+.B <space>
+和
+.B <tab>.
+
+.TP
+.I toupper
+跟随一个从小写字母到大写字母的映射列表. 每个映射都是
+一个小写-大写字母对, 中间以
+.B ,
+分隔, 并且用圆括号括起
+来. 各个映射之间则用分号分隔.
+
+.TP
+.I tolower
+跟随一个从大写字母到小写字母的映射列表. 如果没有出现
+关键字tolower的话, 就使用它的逆toupper.
+
+.PP
+.B LC_CTYPE
+定义以字符串
+.I END LC_CYTPE
+结束.
+
+.SS LC_COLLATE
+.B LC_COLLATE
+范畴定义了校对字符的规则. 由于libc的局限性, 所以
+并没有实现所有的POSIX选项. 
+
+该定义以第一栏的字符串
+.B LC_COLLATE
+为开始标记.
+
+允许如下关键字:
+
+.TP
+.I collating-element
+
+.TP
+.I collating-symbol
+
+.PP
+order-definition以下列行开始:
+.TP
+.I order_start
+.PP
+后随一个如下关键字的列表:
+.B forward,
+.B backward
+或者
+.B position.
+顺序定义由一些描述顺序的行组成, 并以如下关键字终止,
+.TP
+.I order_end.
+.PP
+
+要得到更多细节请查阅在
+.B /usr/lib/nls/src
+里的源代码. 请注意
+几个例子:
+.B POSIX,
+.B Example
+以及 
+.B Example2.
+
+.PP 
+.B LC_COLLATE
+的定义以字符串
+.I END LC_COLLATE
+结束.
+
+.SS LC_MONETARY
+该定义以第一栏里的字符串
+.B LC_MONETARY
+开始.
+
+可以有如下关键字:
+
+.TP
+.I int_curr_symbol
+其后跟随国际货币符号. 必须是一个四字符的字符串, 包含
+有ISO 4217标准所定义的国际货币符号(三字符)以及一个
+分隔符号.
+
+.TP
+.I currency_symbol
+其后跟随当地的货币符号.
+
+.TP
+.I mon_decimal_point
+其后跟随一个字符串, 该字符串在格式化货币的数额时用做
+十进制定界符号.
+
+.TP
+.I mon_thousands_sep
+其后跟随一个字符串, 该字符串在格式化货币的数额时用做
+组分隔符号.
+
+.TP
+.I mon_grouping
+其后跟随一个字符串, 该字符串描述货币数额格式.
+
+.TP
+.I positive_sign
+其后跟随一个字符串, 该字符串被用于指示货币数额的正号.
+
+.TP
+.I negative_sign
+其后跟随一个字符串, 该字符串被用于指示货币数额的负号.
+
+.TP
+.I int_frac_digits
+其后跟随货币数额的小数部分的数字位数, 该数在用
+.B int_curr_symbol
+格式化货币数额时要用到.
+
+.TP
+.I frac_digits
+其后跟随货币数额的小数部分的数字位数, 该数在用
+.B currency_symbol
+格式化货币数额时要用到.
+
+.TP
+.I p_cs_precedes
+其后跟随一个整数, 如果
+.I currency_symbol
+或者
+.I int_curr_symbol
+要置于格式化的货币数额前面, 该整数就为
+.BR 1 , 
+否则为
+.BR 0 .
+
+.TP
+.I p_sep_by_space
+跟随一个整数,
+.RS
+.TP
+.B 0
+表明在货币符号和数额之间不打印空格,
+.TP
+.B 1
+表明在货币符号和数额之间打印一个空格,
+.TP
+.B 2 
+的意思是如果货币符号与数额的正号相邻的话, 其间打印一个空格,
+.RE
+
+.TP
+.I n_cs_precedes
+.RS
+.TP
+.B 0 
+- 负号跟随于数额,
+.TP
+.B 1
+- 负号领先于数额,
+.RE
+
+.TP
+.I n_sep_by_space
+一个整数,设为
+.B 0
+要求在
+.I currency_symbol
+或者 
+.I int_curr_symbol
+和一个负的货币数额之间没有空格分隔, 设为
+.B 1
+则要求在两者之间有一个空格分隔, 而设为
+.B 2
+则要求在货币符号和负号之间有一个空格分隔, 如果这两者相邻的话,
+
+.TP
+.I p_sign_posn
+.RS
+.TP
+.B 0
+意思是要用括号括住
+.I currency_symbol
+或
+.I int_curr_symbol.
+和货币数额,
+.TP
+.B 1
+正号要领先于货币数额和货币符号
+.I currency_symbol
+或
+.I int_curr_symbol.
+.TP
+.B 2
+正号跟在货币数额和货币符号
+.I currency_symbol
+或
+.I int_curr_symbol
+的后面.
+.TP
+.B 3
+正号领先于货币符号
+.I currency_symbol
+或
+.I int_curr_symbol.
+.TP
+.B 4
+正号跟在货币符号
+.I currency_symbol
+或
+.I int_curr_symbol
+的后面.
+.RE
+
+.TP
+.I n_sign_posn
+.RS
+.TP
+.B 0
+意思是要用括号括住
+.I currency_symbol
+或
+.I int_curr_symbol.
+和货币数额,
+.TP
+.B 1
+负号领先于货币数额及货币符号
+.I currency_symbol
+或
+.I int_curr_symbol.
+.TP
+.B 2
+负号跟在货币数量及货币符号
+.I currency_symbol
+或
+.I int_curr_symbol
+的后面.
+.TP
+.B 3
+负号领先于货币符号
+.I currency_symbol
+或
+.I int_curr_symbol.
+.TP
+.B 4
+负号跟在货币符号
+.I currency_symbol
+或
+.I int_curr_symbol
+的后面.
+.RE
+
+.PP
+.B LC_MONETARY
+定义以字符串
+.I END LC_MONETARY.
+结束,
+
+.SS LC_NUMERIC
+该定义以第一栏的字符串
+.B LC_NUMERIC
+开始.
+
+可有如下关键字:
+
+.TP
+.I decimal_point
+跟随一个字符串, 该串在格式化数量值时用作十进制定界符,
+.TP
+.I thousands_sep
+跟随一个字符串, 该串在格式化数量值时用作群组分隔符,
+.TP
+.I grouping
+跟随一个字符串, 该串描述数量值的格式化,
+
+.PP
+.B LC_NUMERIC
+定义以字符串
+.I END LC_NUMERIC.
+结束,
+
+.SS LC_TIME
+该定义以第一栏的字符串
+.B LC_TIME
+开始,
+
+可以有如下关键字:
+
+.TP
+.I abday
+跟随一个简写星期名列表, 该列表以Sunday或其译名开头,
+.TP
+.I day
+跟随一个星期名列表, 该列表以Sunday开头,
+.TP
+.I abmon
+跟随一个简写的月名列表,
+.TP
+.I mon
+跟随一个月名列表,
+.TP
+.I am_pm
+对
+.B am
+和
+.B pm
+的适当表示,
+.TP
+.I d_t_fmt
+适当的日期加时间格式,
+.TP
+.I d_fmt
+适当的日期格式,
+.TP
+.I t_fmt
+适当的时间格式,
+.TP
+.I t_fmt_ampm
+适当的时间格式(12小时格式),
+
+.PP
+.B LC_TIME
+定义以字符串
+.I END LC_TIME.
+结束,
+
+.SS LC_MESSAGES
+该定义以第一栏的字符串
+.B LC_MESSAGES
+开始,
+
+可以有如下关键字:
+
+.TP
+.I yesexpr
+跟随一个正则表达式, 描述可能的yes-responses. 
+
+.TP
+.I noexpr
+跟随一个正则表达式, 描述可能的no-responses. 
+
+.PP
+.B LC_MESSAGES
+定义以字符串 
+.I END LC_MESSAGES
+结束.
+
+要得到更多细节, 请查阅POSIX.2标准.
+.SH 文件
+/usr/lib/locale/	\- 当前地域范畴设置数据库
+/usr/lib/nls/charmap/*	\- 字符映射文件
+.SH BUGS
+该手册页并不完全.
+.SH 作者
+Jochen Hein (Hein@Student.TU-Clausthal.de)
+.SH CONFORMING TO
+POSIX.2
+.SH 另见
+.BR setlocale (3),
+.BR localeconv (3),
+.BR charmap (5),
+.BR locale (1),
+.BR localedef (1)
+
+.SH "[中文版维护人]"
+.B <email>
+.SH "[中文版最新更新]"
+2001/7/15
+.SH  "《Linuxfourm 中文MAN-PAGE计划》"
+.BI http://cmpp.linuxforum.net

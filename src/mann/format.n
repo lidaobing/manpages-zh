@@ -1,0 +1,351 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: format.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: format.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH format n 8.1 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+format \- 按 sprintf 的式样格式化一个字符串    
+.SH "总览 SYNOPSIS"
+\fBformat \fIformatString \fR?\fIarg arg ...\fR?
+.BE
+
+.SH INTRODUCTION
+.PP
+这个命令按与ANSI C \fBsprintf \fR过程相同的方式生成一个格式化了的字符串(在它的实现中使用了 \fBsprintf\fR)。\fIFormatString\fR      指示如何格式化结果，与 \fBsprintf \fR一样使用      \fB%\fR  转换指定符(specifier)，如果有增添的参数，则它们提供要被替换到结果中的值。\fBformat\fR      的返回值是格式化了的字符串。
+
+.SH "格式化细节 DETAILS ON FORMATTING"
+.PP
+命令按从左到右的检索(scan) \fIformatString\fR 的方式操作。除了百分号之外的在格式字符串中的每个字符都要添加到结果字符串上。如果字符是一个 \fB%\fR则它不被复制到结果字符串中。转而，在 \fB%\fR  后面的字符被作为一个转换指定符对待。转换指定符控制把下一个连续的(successive) \fIarg\fR 转换成一个特定的格式，并把结果添加到结果字符串中转换指定符的位置上。如果在格式字符串中有多个转换指定符，则每一个控制一个增添的参数 \fIarg\fR。\fBformat\fR   命令必须给出足够的 \fIarg\fRs 来满足在 \fIformatString \fR中的所有转换指定符的需要。
+.PP
+每个转换指定符可以由六部分组成: 一个 XPG3 位置指定符，一系列标志(flag)，一个最小字段宽度，一个精度，一个长度修饰符(modifier)，和一个转换字符。除了转换字符之外可以省略这些字段中的任何一个。存在的字段必须按上面给出的次序出现。下面的段落依次讨论所有这些字段。
+.PP
+如果 \fB%\fR    跟随着一个十进制数值和一个 \fB$\fR, 比如“\fB%2$d\fR”，则要转换的值不接受下一个顺序的参数。转而，它接受由这个数字指示的参数，这里 1  对应于第一个 \fIarg\fR。如果因为在指定符中有 \fB*\fR  字符而转换指定符要求多个参数，则使用连续的参数，开始的参数由这个数值给出。这依从 XPG3 定位指定符约定。如果在 \fIformatString\fR      中有任何定位的指定符则所有指定符必须定位。
+.PP
+一个转换指定符的第二部分可以按任意次序包含任何下列的标志字符:    
+.TP 10
+\fB\-\fR
+指定被转换的参数在它的字段中左对齐(数值一般右对齐，如果需要的话，有前导的空格)。  
+.TP 10
+\fB+\fR
+指定输出的数值必须有符号，即使是正数。    
+.TP 10
+\fIspace\fR
+指定如果数值的第一个字符不是一个符号则向数值的开始处添加空格。    
+.TP 10
+\fB0\fR
+指定应当在数值的左侧填充零而不是空格。    
+.TP 10
+\fB#\fR
+要求一中替代的输出形式。对于 \fBo\fR 和 \fBO\fR 转换它保证第一个数字总是 \fB0\fR。对于 \fBx\fR 或 \fBX\fR 转换，除了零之外，在结果的开始处(分别)添加 \fB0x\fR 或 \fB0X\fR。对于所有浮点数转换(\fBe\fR、\fBE\fR、\fBf\fR、\fBg\fR、和 \fBG\fR) 它保证结果总是一个小数点。对于 \fBg\fR 和 \fBG\fR 转换它指定删除尾部的零。    
+.PP
+一个转换指定符的第三部分是给出这个转换的最小字段宽度的一个数字。它典型的被用来按列表的(tabular)输出形式排列(line up)各列(column)。如果被转换的参数包含的字符比这个最小字段宽度少，则填充它来达到这个最小的字段宽度。填充通常是在被转换的参数的左侧添加额外的空格，但是可以使用 \fB0\fR和 \fB-\fR 标志来分别指定在左侧填充零或在右侧填充空格。如果指定最小字段宽度为 \fB*\fR 而不是一个数值，则用给 \fBformat\fR 命令的下一个参数确定最小字段宽度；它必须是一个数值字符串。
+.PP
+一个转换指定符的第四部分是一个精度，它由一个点号和随后的一个数值组成。在不同的转换中按不同的方式使用这个数值。对于 \fBe\fR、\fBE\fR、和 \fBf\fR 转换它指定出现在小数点右侧的数字的位数。对于 \fBg\fR 和 \fBG\fR 转换它指定出现的数字的总数，包括在小数点两侧的数字(但是，除非指定了 \fB#\fR  标志，省略在小数点后面的尾部的零)。对于正数转换，它指定输出的最小的数字位数(如果需要的话添加前导的零)。对于 \fBs\fR  转换它指定输出的最大的字符数；如果字符串比它长则删除尾部的字符。如果用 \fB*\fR  而不是一个数值来指定精度，则用给 \fBformat\fR  命令的下一个参数来确定精度；它必须是一个数值字符串。
+.PP
+一个转换指定符的第五部分是一个长度修饰符，它必须是 \fBh\fR 或 \fBl\fR。如果它是 \fBh\fR  则指定数值值在转换之前必须被截断(truncate)成16位值。这个选项很少有用。忽略 \fBl\fR 修饰符。
+.PP
+一个转换指定符的最后一部分是确定进行那种转换的一个字母字符。当前支持下列转换字符:     
+.TP 10
+\fBd\fR
+把整数转换成有符号的十进制字符串。     
+.TP 10
+\fBu\fR
+把整数转换成无符号的十进制字符串。     
+.TP 10
+\fBi\fR
+把整数转换成有符号的十进制字符串；整数可以是十进制的，八进制的(有一个前导的 \fB0\fR) 或十六进制的(有一个前导的 \fB0x\fR)。    
+.TP 10
+\fBo\fR
+把整数转换成无符号八进制字符串。     
+.TP 10
+\fBx\fR or \fBX\fR
+把整数转换成无符号十六进制字符串，对 \fBx\fR 使用数字“0123456789abcdef”而对 \fBX\fR 使用数字 “0123456789ABCDEF”。  
+.VS
+.TP 10
+\fBc\fR
+把整数转换成它代表的 Unicode 字符。  
+.VE
+.TP 10
+\fBs\fR
+不转换，只是插入字符。     
+.TP 10
+\fBf\fR
+浮点数转换成有符号的 \fIxx.yyy \fR形式的十进制字符串，这里的 \fIy \fR的位数由精度确定(缺省: 6)。如果精度是 0 则不输出小数点。     
+.TP 10
+\fBe\fR or \fBe\fR
+把浮点数转换成 \fIx.yyy\fR\fBe&#177;\fR\fIzz \fR形式的科学记数法，这里的 \fIy \fR的位数由精度确定(缺省: 6)。如果精度是 0 则不输出小数点。如果使用 \fBE\fR  式样则输出 \fBE\fR  而不是 \fBe\fR。     
+.TP 10
+\fBg\fR or \fBG\fR
+如果指数小于 -4 或大于等于精度，则把富点数按 \fB%e\fR 或 \fB%E\fR 来转换。否则按 \fB%f\fR 转换。省略尾部的零和尾部的小数点。     
+.TP 10
+\fB%\fR
+不转换: 只是插入 \fB%\fR。     
+.LP
+数值转换，被转换的参数必须是一个正数或浮点数字符串；format 把参数转换成二进制接着依照转换指定符把它再转换成一个字符串。
+
+.SH "与 ANSI SPRINTF 的区别 DIFFERENCES FROM ANSI SPRINTF"
+.PP
+除了下列区别之外，format 命令的行为与 ANSI C \fBsprintf\fR  过程相同:     
+.IP [1]
+当前不支持 \fB%p\fR 和 \fB%n\fR  指定符。     
+.IP [2]
+对于 \fB%c\fR  转换，参数必须是一个十进制字符串，它将被转换成相应的字符值。    
+.IP [3]
+忽略 \fBl\fR  修饰符；转换整数值总是有如没有修饰符存在，而转换实数值总是有如存在 \fBl\fR  修饰符(例如， 使用类型     \fBdouble\fR  作为内部表示)。如果指定了 \fBh\fR   
+修饰符则在转换前截断整数值。    
+
+.SH "参见 SEE ALSO"
+sprintf(3), string(n)
+
+.SH "关键字 KEYWORDS"
+conversion specifier, format, sprintf, string, substitution
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/08/29
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

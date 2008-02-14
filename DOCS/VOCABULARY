@@ -1,0 +1,151 @@
+关键词 v 0.2 还没有zh_TW 的版本
+建议在翻译时使用标准词汇
+
+.SH 标题的翻译应当这样将英文放在后面的括号中，比较美观。
+-----------------------------------------------------------
+SYNOPSIS			总览 (SYNOPSIS)
+NAME				NAME
+COPYRIGHT			版权所有 (COPYRIGHT)
+COPYING				版权 (COPYING)
+DESCRIPTION			描述 (DESCRIPTION)
+OPTIONS				选项 (OPTIONS)
+ARGUMENTS			参数 (ARGUMENTS)
+INVOCATION			执行 (INVOCATION)
+DEFINITIONS			定义 (DEFINITIONS)
+RESERVED WORDS			保留字 (RESERVED WORDS)
+GRAMMAR				语法 (GRAMMAR)
+COMMENTS			注释 (COMMENTS)
+QUOTING				引用 (QUOTING)
+PARAMETERS			参数 (PARAMETERS)
+EXPANSION			扩展 (EXPANSION)
+REDIRECTION			重定向 (REDIRECTION)
+ALIASES				别名 (ALIASES)
+FUNCTIONS			函数 (FUNCTIONS)
+ARITHMETIC EVALUATION		数学运算 (ARITHMETIC EVALUATION)
+CONDITIONAL EXPRESSION		条件表达式 (CONDITIONAL EXPRESSION)
+COMMAND EXECUTION		命令执行 (COMMAND EXECUTION)
+ENVIRONMENT			环境 (ENVIRONMENT)
+EXIT STATUS			退出状态 (EXIT STATUS)
+SIGNALS				信号 (SIGNALS)
+JOB CONTROL			作业控制 (JOB CONTROL)
+PROMPTING			提示符 (PROMPTING)
+HISTORY				历史 (HISTORY)
+SEE ALSO			参见 (SEE ALSO)
+FILES				文件 (FILES)
+AUTHORS				作者 (AUTHORS)
+BUGS				BUGS
+WARNING				警告 (WARNING)
+DIAGNOSTICS			诊断 (DIAGNOSTICS)
+-----------------------------------------------------------
+
+
+
+下面是一般的词汇
+==========================================================
+ Abort          | 放弃          |   
+ Aborting       | 正在退出      |   
+ Alert          | 警报          |   
+ ARGUMENTS      | 参数          |   
+ AUTHOR         | 作者          |   
+ Aviability	| 可用性,可得性 |
+ block          | 阻塞          |   
+ BrowseClusters	| 流览集群      |   
+ BUGS		| BUGS		|   
+ cache          | 缓存          |   
+ callback       | 回调          |   
+ Clear          | 清除          |   
+ COMMENT        | 注释          |   
+ CONFORMING TO  | 遵循          |   
+ DEBUG          | 调试          |   
+ DECLARATION    | 声明          |   
+ default        | 缺省          |   
+ DEFINITION     | 定义          |   
+ DESCRIPTION    | 描述          |   
+ Destination	| 目的地	|
+ DIAGNOSTICS    | 诊断          |   
+ disable        | 关闭          |   
+ disk		| 磁盘		|
+ enable         | 打开          |   
+ entity         | 记录          |   
+ entry		| 记录		|
+ ENVIRONMENT    | 环境          |   
+ ERROR HANDLING | 错误处理      |   
+ ERRORS         | 常见错误      |   
+ EXAMPLE	| 例子		|
+ EXIT STATUS    | 退出状态      |   
+ Expand         | 扩展          |   
+ FILES          | 相关文件      |   
+ forward        | 转发          |   
+ Gateway	| 网关		|
+ Grid           | 网格          |   
+ HISTORY	| 历史		|
+ hit		| 命中		|
+ Host           | 主机          |   
+ interface      | 接口          |   
+ INVOCATION     | 激活/调用     |   
+ key            | 键            |   
+ keyword        | 关键字        |   
+ LITERAL        | 文本          |   
+ mask           | 掩码          |   
+ metric		| 步跳		|
+ miss		| 脱靶		|
+ modifier	| 修饰词	|
+ mount          | 装配,装载     |   
+ NAME           | 名字          |   
+ named pipe     | 命名管道      |   
+ number		| 号码，数字	|
+ NOTES          | 注意          |   
+ OPTIONS        | 选项          |   
+ OUTPUT		| 输出		|
+ packet         | 包,报文       |   
+ PARAMETER      | 参数          |   
+ pipe           | 管道          |   
+ Port           | 移植          |   
+ Portable       | 可移植的      |   
+ privileges     | 权限          |   
+ PROMPT         | 提示符        |   
+ quota		| 限额,配额	|
+ RESERVED WORD  | 保留字        |   
+ RETURN VALUE   | 返回值        |   
+ Route		| 路由		|
+ Sectors        | 扇区          |   
+ SECURITY       | 安全          |   
+ SEE ALSO       | 另见          |   
+ SEGMENT        | 段            |   
+ specification	| 规范，声明	|
+ stderr         | 标准错误      |   
+ stdin          | 标准输入      |   
+ stdout         | 标准输出      |   
+ switch         | 开关          |   
+ SYNOPSIS       | 总览          |   
+ Task           | 任务          |   
+ thread         | 线程          |   
+ TIP            | 小技巧        |   
+ token          | 记号          |   
+ umask          | umask         |   
+ umount		| 卸载		|
+ unrestricted	| 无限制	|
+ USAGE          | 用法          |   
+ value          | 值            |   
+ verbose	| 冗长		|
+ work           | 运转          |   
+=====================================================
+
+
+文件应保留原来作者和版权的信息，不能随意删掉。
+在文件的最后是翻译者署名，应当是这样的格式(可以将这六行复制到你翻译的文件中，加以修改）：
+.SH "[中文版维护人]"
+.B 姓名 <email>
+.SH "[中文版最新更新]"
+.BR yyyy.mm.dd
+.SH "[中国linux论坛中文手册页翻译计划]"
+.BI http://cmpp.linuxforum.net 
+
+=============================================
+
+其他约定
+电子邮件应当是<a@b> 的形式
+
+示例
+请查看man9/cmanexample.9 示例文档
+

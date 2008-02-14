@@ -1,0 +1,112 @@
+.TH MINGETTY 8 "6 Apr 1996" "Debian-Local" "Linux Programmer's Manual"
+.SH NAME
+mingetty \- minimal getty for consoles
+.SH SYNOPSIS
+.B mingetty
+[\-\-noclear] [\-\-nonewline] [\-\-noissue] [\-\-nohangup] [\-\-nohostname]
+[\-\-long\-hostname] [\-\-loginprog=/bin/login] [\-\-nice=10] [\-\-delay=5]
+[\-\-chdir=/home] [\-\-chroot=/chroot] [\-\-autologin username]
+.I tty
+.PP
+.SH DESCRIPTION
+.B mingetty 
+is a minimal getty for use on virtual consoles.
+Unlike 
+.BR agetty (8),
+.B mingetty
+is not suitable for serial lines.
+I recommend using
+.BR mgetty (8) 
+for this purpose.
+.PP
+.SH OPTIONS
+.TP
+.B \-\-noclear
+Do not clear the screen before prompting for the login name (the screen
+is normally cleared).
+.TP
+.B \-\-nonewline
+Do not print a newline before writing out /etc/issue.
+.TP
+.B \-\-noissue
+Do not output /etc/issue.
+.TP
+.B \-\-nohangup
+Do not call vhangup() to disable writing to this tty by
+other applications.
+.TP
+.B \-\-nohostname
+Do not print the hostname before the login prompt.
+.TP
+.B \-\-long\-hostname
+By default the hostname is only printed until the first dot.
+With this option enabled, the full text from gethostname() is shown.
+.TP
+.B \-\-loginprog /bin/login
+Change the login app.
+.TP
+.B \-\-nice 10
+Change the priority by calling nice().
+.TP
+.B \-\-delay 5
+Sleep this many seconds after startup of mingetty.
+.TP
+.B \-\-chdir /home
+Change into this directory before calling the login prog.
+.TP
+.B \-\-chroot /chroot
+Call chroot() with this directory name.
+.TP
+.B \-\-autologin username
+Log the specified user automatically in without asking for
+a login name and password. Check the \-f option from
+.B /bin/login
+for this.
+.PP
+.SH "ISSUE ESCAPES"
+.B mingetty 
+recognizes the following escapes sequences which might be embedded in the 
+.I /etc/issue
+file:
+.IP \fB\ed\fP
+insert current day (localtime),
+.IP \fB\el\fP
+insert line on which 
+.B mingetty 
+is running,
+.IP \fB\em\fP
+inserts machine architecture (uname -m),
+.IP \fB\en\fP
+inserts machine's network node hostname (uname -n),
+.IP \fB\eo\fP
+inserts domain name,
+.IP \fB\er\fP
+inserts operating system release (uname -r),
+.IP \fB\et\fP
+insert current time (localtime),
+.IP \fB\es\fP
+inserts operating system name,
+.IP \fB\eu\fP
+resp. \fB\eU\fP
+the current number of users which are currently logged in.
+\\U inserts "\fIn\fP users", where as \\u only inserts "\fIn\fP".
+.IP \fB\ev\fP
+inserts operating system version (uname -v).
+.PP
+.SH EXAMPLE
+"\fBLinux\ eos\ i386\ #1\ Tue\ Mar\ 19\ 21:54:09\ MET\ 1996\fP" was produced
+by putting "\fB\\s\ \\n\ \\m\ \\v\fP" into
+.IR /etc/issue .
+.PP
+.SH FILES
+.IR /etc/issue ,
+.IR /var/run/utmp .
+.PP
+.SH "SEE ALSO"
+.BR mgetty (8),
+.BR agetty (8).
+.PP
+.SH AUTHOR
+Copyright \(co 1996 Florian La Roche <laroche@redhat.com>.
+Man-page written by David Frey <David.Frey@eos.lugs.ch> and
+Florian La Roche.

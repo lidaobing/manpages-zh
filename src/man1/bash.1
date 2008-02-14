@@ -1,0 +1,6961 @@
+.\"
+.\" MAN PAGE COMMENTS to
+.\"
+.\"	Chet Ramey
+.\"	Information Network Services
+.\"	Case Western Reserve University
+.\"	chet@ins.CWRU.Edu
+.\"
+.\"	Last Change: Mon Jul 15 15:20:56 EDT 2002
+.\"
+.\" bash_builtins, strip all but Built-Ins section
+.if \n(zZ=1 .ig zZ
+.if \n(zY=1 .ig zY
+.TH BASH 1 "2002 July 15" "GNU Bash-2.05b"
+.\"
+.\" There's some problem with having a `@'
+.\" in a tagged paragraph with the BSD man macros.
+.\" It has to do with `@' appearing in the }1 macro.
+.\" This is a problem on 4.3 BSD and Ultrix, but Sun
+.\" appears to have fixed it.
+.\" If you're seeing the characters
+.\" `@u-3p' appearing before the lines reading
+.\" `possible-hostname-completions
+.\" and `complete-hostname' down in READLINE,
+.\" then uncomment this redefinition.
+.\"
+.de }1
+.ds ]X \&\\*(]B\\
+.nr )E 0
+.if !"\\$1"" .nr )I \\$1n
+.}f
+.ll \\n(LLu
+.in \\n()Ru+\\n(INu+\\n()Iu
+.ti \\n(INu
+.ie !\\n()Iu+\\n()Ru-\w\\*(]Xu-3p \{\\*(]X
+.br\}
+.el \\*(]X\h|\\n()Iu+\\n()Ru\c
+.}f
+..
+.\"
+.\" File Name macro.  This used to be `.PN', for Path Name,
+.\" but Sun doesn't seem to like that very much.
+.\"
+.de FN
+\fI\|\\$1\|\fP
+..
+.SH NAME
+bash \- GNU Bourne-Again SHell (GNU 命令解释程序 “Bourne二世”)
+.SH "概述(SYNOPSIS)"
+.B bash
+[options]
+[file]
+.SH "版权所有(COPYRIGHT)"
+.if n Bash is Copyright (C) 1989-2002 by the Free Software Foundation, Inc.
+.if t Bash is Copyright \(co 1989-2002 by the Free Software Foundation, Inc.
+.SH "描述(DESCRIPTION)"
+.B Bash
+是一个与 \fIsh\fP 兼容的命令解释程序，可以执行从标准输入或者文件中读取的命令。
+.B Bash
+也整合了 \fIKorn\fP 和 \fIC\fP \fIShell\fP (\fBksh\fP 和 \fBcsh\fP) 中的优秀特性。
+.PP
+.B Bash
+的目标是成为遵循 IEEE POSIX Shell and Tools specification (IEEE Working Group 1003\.2，可移植操作系统规约： shell 和工具) 的实现。
+.SH "选项(OPTIONS)"
+除了在 \fBset\fR 内建命令的文档中讲述的单字符选项 (option) 之外，\fBbash\fR 在启动时还解释下列选项。
+.PP
+.PD 0
+.TP 10
+.BI \-c "\| string\^"
+如果有
+.B \-c
+选项，那么命令将从
+.IR string 
+中读取。如果
+.IR string 
+后面有参数 (argument)，它们将用于给位置参数 (positional parameter，以
+.BR $0 
+起始) 赋值。
+.TP
+.B \-i
+如果有
+.B \-i
+选项，shell 将交互地执行 (
+.IR interactive 
+)。
+.TP
+.B \-l
+选项使得
+.B bash
+以类似登录 shell (login shell) 的方式启动 (参见下面的
+.SM
+.B "启动(INVOCATION)"
+章节)。
+.TP
+.B \-r
+如果有
+.B \-r
+选项，shell 成为受限的 (
+.I restricted
+) (参见下面的
+.SM
+.B "受限的shell(RESTRICTED SHELL)"
+章节)。
+.TP
+.B \-s
+如果有
+.B \-s
+选项，或者如果选项处理完以后，没有参数剩余，那么命令将从标准输入读取。
+这个选项允许在启动一个交互 shell 时可以设置位置参数。
+.TP
+.B \-D
+向标准输出打印一个以 \fB$\fP 为前导的，以双引号引用的字符串列表。
+这是在当前语言环境不是 \fBC\fP 或 \fBPOSIX\fP 时，脚本中需要翻译的字符串。
+这个选项隐含了 \fB\-n\fP 选项；不会执行命令。
+.TP
+.B [\-+]O [\fIshopt_option\fP]
+\fIshopt_option\fP 是一个
+\fBshopt\fP 内建命令可接受的选项 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+如果有 \fIshopt_option\fP，\fB\-O\fP 将设置那个选项的取值；
+\fB+O\fP 取消它。
+如果没有给出 \fIshopt_option\fP，\fBshopt\fP 将在标准输出上打印设为允许的选项的名称和值。
+如果启动选项是 \fB+O\fP，输出将以一种可以重用为输入的格式显示。
+.TP
+.B \-\-
+.B \-\-
+标志选项的结束，禁止其余的选项处理。任何
+.B \-\-
+之后的参数将作为文件名和参数对待。参数
+.B \-
+与此等价。
+.PD
+.PP
+.B Bash
+也解释一些多字节的选项。在命令行中，这些选项必须置于需要被识别的单字符参数之前。
+.PP
+.PD 0
+.TP
+.B \-\-dump\-po\-strings
+等价于 \fB\-D\fP，但是输出是 GNU \fIgettext\fP
+\fBpo\fP (可移植对象) 文件格式
+.TP
+.B \-\-dump\-strings
+等价于 \fB\-D\fP
+.TP
+.B \-\-help
+在标准输出显示用法信息并成功退出
+.TP
+\fB\-\-init\-file\fP \fIfile\fP
+.PD 0
+.TP
+\fB\-\-rcfile\fP \fIfile\fP
+.PD
+如果 shell 是交互的，执行
+.I file
+中的命令，而不是标准的个人初始化文件
+.I ~/.bashrc
+(参见下面的
+.SM
+.B "启动(INVOCATION)"
+章节)
+.TP
+.B \-\-login
+等价于 \fB\-l\fP
+.TP
+.B \-\-noediting
+如果 shell 是交互的，不使用 GNU
+.B readline
+库来读命令行
+.TP
+.B \-\-noprofile
+不读取系统范围的启动文件
+.FN /etc/profile
+或者任何个人初始化文件
+.IR ~/.bash_profile ,
+.IR ~/.bash_login ,
+或
+.IR ~/.profile
+。默认情况下，
+.B bash
+在作为登录 shell 启动时读取这些文件 (参见下面的
+.SM
+.B "启动(INVOCATION)"
+章节)
+.TP
+.B \-\-norc
+如果 shell 是交互的，不读取/执行个人初始化文件
+.I ~/.bashrc
+这个选项在 shell 以
+.BR sh 
+命令启动时是默认启用的
+.TP
+.B \-\-posix
+如果默认操作与 POSIX 1003.2 标准不同的话，改变 \fBbash\fP 的行为来符合标准 (\fIposix mode\fP)
+.TP
+.B \-\-restricted
+shell 成为受限的 (参见下面的
+.SM
+.B "受限的shell(RESTRICTED SHELL)"
+章节)
+.TP
+.B \-\-rpm-requires
+产生一个为使脚本运行，需要的文件的列表。
+这个选项包含了 \fB\-n\fP 选项。
+它是为了避免进行编译期错误检测时的限制－－
+Backticks, [] tests,  还有 evals 不会被解释，一些依赖关系可能丢失
+.TP
+.B \-\-verbose
+等价于 \fB\-v\fP
+.TP
+.B \-\-version
+在标准输出显示此
+.B bash
+的版本信息并成功退出。
+.PD
+.SH 参数(ARGUMENTS)
+如果选项处理之后仍有参数剩余，并且没有指定
+.B \-c
+或
+.B \-s
+选项，第一个参数将假定为一个包含 shell 命令的文件的名字。
+如果
+.B bash
+是以这种方式启动的，
+.B $0
+将设置为这个文件的名字，位置参数将设置为剩余的其他参数。
+.B Bash
+从这个文件中读取并执行命令，然后退出。
+\fBBash\fP 的退出状态是脚本中执行的最后一个命令的退出状态。
+如果没有执行命令，退出状态是0。
+尝试的步骤是先试图打开在当前目录中的这个文件，接下来，
+如果没有找到，shell 将搜索脚本的
+.SM
+.B PATH
+环境变量中的路径。
+.SH "启动(INVOCATION)"
+\fIlogin shell\fP 登录 shell，参数零的第一个字符是
+.BR \-
+，或者启动时指定了
+.B \-\-login
+选项的 shell。
+.PP
+\fIinteractive\fP 交互的 shell，是一个启动时没有指定非选项的参数，并且没有指定
+.B \-c
+选项，标准输出和标准输入都连接到了终端 (在
+.IR isatty (3)
+中判定) 的shell，或者启动时指定了
+.B \-i
+选项的 shell。如果
+.B bash
+是交互的，
+.SM
+.B PS1
+环境变量将被设置，并且
+.B $\-
+包含
+.B i
+，允许一个 shell 脚本或者一个启动文件来检测这一状态。
+.PP
+下列段落描述了
+.B bash
+如何执行它的启动文件。如果这些启动文件中的任一个存在但是不可读取，
+.B bash
+将报告一个错误。文件名中的波浪号 (~,tilde) 将像
+.SM
+.B EXPANSION
+章节中
+.B "Tilde Expansion"
+段描述的那样展开。
+.PP
+当
+.B bash
+是作为交互的登录 shell 启动的，或者是一个非交互的 shell 但是指定了 \fB\-\-login\fP 选项，
+它首先读取并执行 \fI/etc/profile\fP 中的命令，只要那个文件存在。
+读取那个文件之后，它以如下的顺序查找 \fI~/.bash_profile\fP,
+\fI~/.bash_login\fP, 和 \fI~/.profile\fP, 从存在并且可读的第一个文件中读取并执行其中的命令。
+.B \-\-noprofile
+选项可以用来在 shell 启动时阻止它这样做。
+.PP
+当一个登录 shell 退出时，
+.B bash
+读取并执行文件 \fI~/.bash_logout\fP 中的命令，只要它存在。
+.PP
+当一个交互的 shell 但不是登录 shell 启动时，
+.B bash
+从文件 \fI~/.bashrc\fP 中读取并执行命令，只要它存在。可以用
+.B \-\-norc
+选项来阻止它这样做。
+\fB\-\-rcfile\fP \fIfile\fP 选项将强制
+.B bash
+读取并执行文件 \fIfile\fP 中的命令，而不是 \fI~/.bashrc\fP 中的。
+.PP
+当
+.B bash
+以非交互的方式启动时，例如在运行一个 shell 脚本时，它在环境中查找变量
+.SM
+.B BASH_ENV
+，如果它存在则将它的值展开，使用展开的值作为一个文件的名称，读取并执行。
+.B Bash
+运作的过程就如同执行了下列命令：
+.sp .5
+.RS
+.if t \f(CWif [ \-n "$BASH_ENV" ]; then . "$BASH_ENV"; fi\fP
+.if n if [ \-n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
+.RE
+.sp .5
+但是没有使用
+.SM
+.B PATH
+变量的值来搜索那个文件名。
+.PP
+如果
+.B bash
+以名称
+.BR sh
+启动，它试图模仿 (mimic)
+.B sh
+历史版本的启动过程，尽可能地相似，同时也遵循 POSIX 标准。
+.
+当作为交互式登录 shell 启动时,或者是非交互但使用了 \fB\-\-login\fP 选项
+启动的时候,它首先尝试读取并执行文件
+.I /etc/profile
+和
+.IR ~/.profile ,
+中的命令.
+选项
+.B \-\-noprofile
+用于避免这种行为.当使用命令
+.BR sh 
+来启动一个交互式的 shell 时,
+.B bash
+查找环境变量
+.SM
+.BR ENV ,
+如果有定义的话就扩展它的值,然后使用扩展后的值作为要读取和执行的文件
+的名称.由于使用
+.B sh
+启动的 shell 不会读取和执行任何其他的启动文件,选项
+.B \-\-rcfile
+没有意义.使用名称
+.B sh
+启动的非交互的 shell 不会读取任何其他启动文件.当以
+.BR sh 
+启动时,
+.B bash
+在读取启动文件之后进入
+.I posix
+模式.
+.PP
+当
+.B bash
+以
+.I posix
+模式启动时,(和使用
+.B \-\-posix
+命令行参数效果相同),它遵循 POSIX 标准.
+这种模式下,交互式 shell 扩展
+.SM
+.B ENV
+环境变量的值,读取并执行以扩展后值为文件名的配置文件.
+不会读取其他文件.
+.PP
+.B Bash
+试着检测它是不是由远程 shell 守护程序,通常为 \fIrshd\fP 启动的.如果
+.B bash
+发现它是由 \fIrshd\fP 启动的,它将读取并执行 \fI~/.bashrc\fP 文件中的命令,
+只要这个文件存在并且可读.如果以 \fBsh\fP 命令启动,它不会这样做.
+选项
+.B \-\-norc
+可以用来阻止这种行为,选项
+.B \-\-rcfile
+用来强制读取另一个文件,但是通常 \fIrshd\fP 不会允许它们,
+或者用它们来启动 shell.
+.PP
+如果 shell 是以与真实用户(组) id 不同的有效用户(组) id 来启动的,
+并且没有 \fB\-\fP 选项,那么它不会读取启动文件, 
+也不会从环境中继承 shell 函数. 环境变量中如果出现
+.SM
+.B SHELLOPTS，
+它将被忽略.有效用户 id 将设置为真实用户 id.
+如果启动时给出了 \fB\-\p\fP 选项,那么启动时的行为是类似的,
+但是不会重置有效用户 id.
+.SH "定义(DEFINITIONS)"
+.PP
+下列定义在文档余下部分中通用.
+.PD 0
+.TP
+.B blank 空白
+一个空格或是 tab .
+.TP
+.B word 词
+一个字符序列, shell 将它们视为一个结构单元. 也称为一个 
+.BR token 片段。
+.TP
+.B name 名称
+一个只由字母,数字和下划线构成的词,并且以字符或下划线起始. 也称为一个
+.I word 
+.BR identifier 标识符.
+.TP
+.B metacharacter 元字符
+一个字符, 如果不是引用的话, 将成为词的分隔符. 它是如下字符之一:
+.br
+.RS
+.PP
+.if t \fB|  &  ;  (  )  <  >  space  tab\fP
+.if n \fB|  & ; ( ) < > space tab\fP
+.RE
+.PP
+.TP
+.B control operator 控制操作符
+一个 \fItoken\fP(标识), 拥有控制功能. 它是如下符号之一:
+.RS
+.PP
+.if t \fB\(bv\(bv  &  &&  ;  ;;  (  )  |  <newline>\fP
+.if n \fB|| & && ; ;; ( ) | <newline>\fP
+.RE
+.PD
+.SH 保留字("RESERVED WORDS")
+\fIReserved words\fP(保留字) 是对 shell 有特殊意义的词.
+下列词被识别为保留的, 如果不是引用, 并且不是一个简单命令的起始词 (参见下面的
+.SM
+.B shell语法("SHELL GRAMMAR")
+), 也不是
+.B case 
+或者
+.B for
+命令的第三个词:
+.if t .RS
+.PP
+.B
+.if n ! case  do done elif else esac fi for function if in select then until while { } time [[ ]]
+.if t !    case    do    done    elif    else    esac    fi    for    function    if    in    select    then    until    while    {    }    time    [[    ]]
+.if t .RE
+.RE
+.SH shell语法("SHELL GRAMMAR")
+.SS Simple Commands 简单命令
+.PP
+\fIsimple command\fP(简单命令) 是(可选的)一系列变量赋值, 紧接着是
+\fBblank\fP(空格) 分隔的词和重定向, 然后以一个 \fIcontrol operator\fP 结束.
+第一个词指明了要执行的命令, 它被作为第 0 个参数. 其余词被作为这个命令的参数.
+.PP
+\fIsimple command\fP 简单命令的返回值是它的退出状态, 或是 128+\fIn\^\fP, 如果命令被 signal(信号) 
+.IR n
+结束的话.
+.SS Pipelines 管道
+.PP
+\fIpipeline\fP(管道) 是一个或多个命令的序列，用字符
+.BR | 
+分隔。管道的格式是这样:
+.RS
+.PP
+[\fBtime\fP [\fB\-p\fP]] [ ! ] \fIcommand\fP [ \fB|\fP \fIcommand2\fP ... ]
+.RE
+.PP
+命令
+.I command
+的标准输出通过管道连接到命令
+.IR command2
+的标准输入。连接是在命令指定的任何重定向之前进行的(参见下面的
+.SM
+.B REDIRECTION 重定向)。
+.PP
+如果保留字
+.B !
+作为管道前缀，管道的退出状态将是最后一个命令的退出状态的逻辑非值。
+否则，管道的退出状态就是最后一个命令的。
+shell 在返回退出状态值之前，等待管道中的所有命令返回。
+.PP
+如果保留字
+.B time
+作为管道前缀，管道中止后将给出执行管道耗费的用户和系统时间。
+选项 \fB\-p\fP 将使输出符合 POSIX 指定的格式。
+环境变量
+.SM
+.B TIMEFORMAT
+可以设置为一个格式字符串，指定时间信息应当如何显示；参见下面的
+.B "Shell Variables" 环境变量
+中
+.SM
+.B TIMEFORMAT
+的讲述。
+.PP
+管道中的每个命令都作为单独的进程来执行(即，在一个子 shell 中启动)。
+.SS Lists 序列
+.PP
+\fIlist\fP(序列)是一个或多个管道，用操作符
+.BR ; ,
+.BR & ,
+.BR && ,
+或
+.BR \(bv\(bv 
+分隔的序列, 并且可以选择用
+.BR ; ,
+.BR & ,
+或
+.BR <newline> 新行符结束.
+.PP
+这些序列操作符中，
+.B &&
+和
+.B \(bv\(bv
+优先级相同，其次是
+.B ;
+和
+.BR &,
+它们的优先级是相同的。
+.PP
+序列中可以有一个或多个新行符来分隔命令，而不是使用分号分隔。
+.PP
+如果一个命令是由控制操作符
+.BR & 
+结束的, shell 将在后台的子 shell 中执行这个命令。
+shell 不会等待命令执行结束，返回状态总是 0。以分号
+.B ;
+分隔的命令会被顺序执行；shell 会等待每个命令依次结束。返回状态是最后执行的命令的返回状态。
+.PP
+控制操作符
+.B &&
+和
+.B \(bv\(bv
+分别代表 AND 和 OR 序列。一个 AND 序列的形式是
+.RS
+.PP
+\fIcommand1\fP \fB&&\fP \fIcommand2\fP
+.RE
+.PP
+.I command2
+只有在
+.I command1
+返回 0 时才被执行。
+.PP
+一个 OR 序列的形式是
+.RS
+.PP
+\fIcommand1\fP \fB\(bv\(bv\fP \fIcommand2\fP
+.PP
+.RE
+.PP
+.I command2
+只有在
+.I command1
+返回非 0 状态时才被执行。AND 和 OR 序列的返回状态是序列中最后执行的命令的返回状态。
+.SS Compound Commands 复合命令
+.PP
+\fIcompound command\fP(复合命令) 是如下情况之一：
+.TP
+(\fIlist\fP)
+\fIlist\fP 序列将在一个子 shell 中执行。变量赋值和影响 shell 环境变量的内建命令在命令结束后不会再起作用。
+返回值是序列的返回值。
+.TP
+{ \fIlist\fP; }
+\fIlist\fP 序列将在当前 shell 环境中执行。序列必须以一个新行符或分号结束。
+这种做法也称为 \fIgroup command\fP(命令组)。返回值是序列的返回值。注意与元字符 \fB(\fP 和 \fB\)\fP 不同，
+\fB{\fP 和 \fB}\fP 是 \fIreserved words\fP(保留字)，必须出现在能够识别保留字的场合。
+由于它们不会产生断词(cause a word break)，它们和序列之间必须用空格分开。
+.TP
+((\fIexpression\fP))
+表达式 \fIexpression\fP 将被求值。求值规则在下面的
+.SM
+.BR "算术求值 (ARITHMETIC EVALUATION)" 
+章节中描述。如果表达式的值非零，返回值就是 0；否则返回值是 1。这种做法和
+\fBlet "\fIexpression\fP"\fR
+等价。
+.TP
+\fB[[\fP \fIexpression\fP \fB]]\fP
+返回 0 或 1，取决于条件表达式 \fIexpression\fP 求值的情况。
+表达式是由下面
+.SM
+.BR "CONDITIONAL EXPRESSIONS 条件表达式"
+章节中描述的原语(primaries) 组成。
+\fB[[\fP 和 \fB]]\fP 中的词不会进行词的拆分和路径的扩展处理；
+而tilde 扩展，参数和变量扩展，算术扩展，命令替换，函数替换和引用的去除则都将进行。
+.if t .sp 0.5
+.if n .sp 1
+当使用 \fB==\fP 和 \fB!=\fP 操作符时，操作符右边的字符串被认为是一个模式，根据下面
+\fBPattern Matching\fP(模式匹配) 章节中的规则进行匹配。
+如果匹配则返回值是 0，否则返回 1。模式的任何部分可以被引用，强制使它作为一个字符串而被匹配。
+.if t .sp 0.5
+.if n .sp 1
+表达式可以用下列操作符结合起来。根据优先级的降序列出如下：
+.if t .sp 0.5
+.if n .sp 1
+.RS
+.PD 0
+.TP
+.B ( \fIexpression\fP )
+返回表达式 \fIexpression\fP 的值。括号可以用来提升操作符的优先级。
+.TP
+.B ! \fIexpression\fP
+返回真，如果表达式
+.I expression
+返回假。
+.TP
+\fIexpression1\fP \fB&&\fP \fIexpression2\fP
+返回真，如果表达式
+.I expression1
+和
+.I expression2
+都返回真。
+.TP
+.if t \fIexpression1\fP \fB\(bv\(bv\fP \fIexpression2\fP
+.if n \fIexpression1\fP \fB||\fP \fIexpression2\fP
+返回真，如果表达式
+.I expression1
+或者
+.I expression2
+二者之一返回真。
+.PD
+.LP
+\fB&&\fP(与) 和
+.if t \fB\(bv\(bv\fP
+.if n \fB||\fP
+操作符不会对表达式 \fIexpression2\fP 求值，如果 \fIexpression1\fP 可以决定整个条件表达式的返回值的话。
+.RE
+.TP
+\fBfor\fP \fIname\fP [ \fBin\fP \fIword\fP ] ; \fBdo\fP \fIlist\fP ; \fBdone\fP
+\fBin\fP 之后的一系列词会被扩展，产生一个项目列表。变量 \fIname\fP 被依次赋以这个列表中的每个元素，
+序列 \fIlist\fP 每次都被执行。如果 \fBin\fP \fIword\fP 被忽略，那么 \fBfor\fP 命令遍历
+已设置的位置参数(positional parameter，参见下面的
+.SM
+.B PARAMETERS 参数)，
+为每一个执行一次序列 \fIlist\fP。
+返回值是最后一个命令的返回值。如果 \fBin\fP 之后的词扩展的结果是空列表，就不会执行任何命令，返回值是 0。
+.TP
+\fBfor\fP (( \fIexpr1\fP ; \fIexpr2\fP ; \fIexpr3\fP )) ; \fBdo\fP \fIlist\fP ; \fBdone\fP
+首先，算术表达式 \fIexpr1\fP 被根据下面
+.SM
+.BR "算术求值 (ARITHMETIC EVALUATION)“
+中的规则进行求值。
+然后算术表达式 \fIexpr2\fP 被循环求值，直到它等于 0。每次 \fIexpr2\fP 结果非零时，序列 \fIlist\fP 都被执行，
+算术表达式 \fIexpr3\fP 被求值。如果任何表达式被忽略，将被视为执行结果是 1。
+返回值是序列 \fIlist\fP 中被执行的最后一个命令的返回值；或者是 false，如果任何表达式非法的话。
+.TP
+\fBselect\fP \fIname\fP [ \fBin\fP \fIword\fP ] ; \fBdo\fP \fIlist\fP ; \fBdone\fP
+\fBin\fP 之后的一系列词会被扩展，产生一个项目列表。这个扩展后的词集合被输出到标准错误上，每个前面
+加上一个数字。如果 \fBin\fP \fIword\fP 被忽略，将输出位置参数 (参见下面的
+.SM
+.B PARAMETERS 参数
+章节)。
+.B PS3
+提示符将被显示出来，等待从标准输入得到一行输入。如果
+输入是一个数字且显示中有对应的词，那么变量
+.I name
+的值将设置为这个词。如果输入一个空行，那么词和提示符将再次显示出来。如果读入了一个 EOF，命令就结束。
+任何其他值将设置变量
+.I name
+为空。读入的行保存为变量
+.BR REPLY .
+序列
+.I list
+在每次选择之后都会执行，直到执行了一个
+.B break
+命令。
+.B select
+的退出状态是序列
+.IR list 
+中执行的最后一个命令的退出状态，如果没有执行命令就是 0。
+.TP
+\fBcase\fP \fIword\fP \fBin\fP [ [(] \fIpattern\fP [ \fB|\fP \fIpattern\fP ] ... ) \fIlist\fP ;; ] ... \fBesac\fP
+\fBcase\fP 命令首先扩展 \fIword\fP, 然后依次试着用每个 \fIpattern\fP 来匹配它，
+使用与路径扩展相同的匹配规则(参见下面的
+.B Pathname Expansion 路径扩展
+章节)。如果找到一个匹配，相应的序列将被执行。找到一个匹配之后，不会再尝试其后的匹配。
+如果没有模式可以匹配，返回值是 0。否则，返回序列中最后执行的命令的返回值。
+.TP
+\fBif\fP \fIlist\fP; \fBthen\fP \fIlist;\fP \
+[ \fBelif\fP \fIlist\fP; \fBthen\fP \fIlist\fP; ] ... \
+[ \fBelse\fP \fIlist\fP; ] \fBfi\fP
+序列
+.B if 
+.I list
+被执行。如果退出状态是 0，\fBthen\fP \fIlist\fP 将被执行。否则，每个 \fBelif\fP
+将被一次执行，如果退出状态是 0，相应的 \fBthen\fP \fIlist\fP 将被执行，命令结束。
+否则，\fBelse\fP \fIlist\fP 将被执行，如果存在的话。
+退出状态是最后执行的命令的退出状态，或者是 0，如果所有条件都不满足。
+.TP
+\fBwhile\fP \fIlist\fP; \fBdo\fP \fIlist\fP; \fBdone\fP
+.PD 0
+.TP
+\fBuntil\fP \fIlist\fP; \fBdo\fP \fIlist\fP; \fBdone\fP
+.PD
+\fBwhile\fP 命令不断地执行序列 \fBdo\fP \fIlist\fP，直到序列中最后一个命令返回 0。
+\fBuntil\fP 命令和 \fBwhile\fP 命令等价，除了对条件的测试恰好相反；序列
+.B do
+.I list
+执行直到序列中最后一个命令返回非零状态值。
+\fBwhile\fP 和 \fBuntil\fP 命令的退出状态是序列 \fBdo\fP \fIlist\fP 中最后一个命令的退出状态，
+或者是 0，如果没有执行任何命令。
+.TP
+[ \fBfunction\fP ] \fIname\fP () { \fIlist\fP; }
+这样可以定义一个名为 \fIname\fP 的函数。函数体 \fIbody\fP 是包含在 { 和 } 之间的命令序列 \fIlist\fP。
+在指定将 \fIname\fP 作为一个命令运行的场合，这个序列将被执行。
+函数的退出状态是函数体最后执行的命令的退出状态(参见下面的
+.SM
+.B "FUNCTIONS 函数"
+章节)。
+.SH 注释(COMMENTS)
+在非交互的 shell 中或者使用内建命令
+.B shopt
+启用了
+.B interactive_comments
+选项的交互的 shell 中，以
+.B #
+起始的词使得这个词和所有同一行上所有剩余的字符都被忽略。没有启用
+.B interactive_comments
+选项的交互式 shell 不允许出现注释。这个选项在交互式 shell 中是默认启用的
+(参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.SH 引用(QUOTING)
+引用 \fIQuoting\fP 用来去掉特定字符或词的特殊意义。引用可以用来禁止对特殊字符的处理，
+阻止保留字被识别，还用来阻止参数的扩展。
+.PP
+上面在
+.SM
+.B DEFINITIONS 定义
+中列出的每个元字符 \fImetacharacters\fP 对于 shell 都有特殊意义。如果要表达它的本义，必须引用它。
+.PP
+在使用命令行历史扩展功能时，\fIhistory expansion\fP 字符，通常是 \fB!\fP，必须被引用，才不会进行历史扩展。
+.PP
+有三种引用机制：转义字符
+.IR "(escape character)" ,
+单引号和双引号。
+.PP
+一个未被引用的反斜杠 (\fB\e\fP) 是转义字符
+.IR "escape character" 。
+它保留其后下一个字符的字面意义，除非那是一个新行符。
+如果 \fB\e\fP 和新行符成对出现，并且反斜杠自身没有被引用，那么 \fB\e\fP<newline>
+被视为续行标志 (意思是，它被从输入流中删除并忽略了)。
+.PP
+将字符放在单引号之中，将保留引用中所有字符的字面意义。单引号不能包含在单引号引用之中，即使前面加上了反斜杠。
+.PP
+将字符放在双引号中，同样保留所有字符的字面意义，例外的情况是
+.BR $ ,
+.BR ` ,
+和
+.BR \e 。
+字符
+.B $
+和
+.B `
+在双引号中仍然具有特殊意义。反斜杠只有后面是下列字符时才有特殊意义：
+.BR $ ,
+.BR ` ,
+\^\fB"\fP\^,
+.BR \e ,
+或
+.BR <newline> .
+双引号可以包含在双引号引用中，但要在前面加上一个反斜杠。
+.PP
+特殊的参数
+.B *
+和
+.B @
+在双引号中有特殊意义(参见下面的
+.SM
+.B PARAMETERS 参数
+章节)。
+.PP
+形式为 \fB$\fP'\fIstring\fP' 的词会被特殊处理。它被扩展为 \fIstring\fP，其中的反斜杠转义字符
+被替换为 ANSI C 标准中规定的字符。反斜杠转义序列，如果存在的话，将做如下转换：
+.RS
+.PD 0
+.TP
+.B \ea
+alert (bell) 响铃
+.TP
+.B \eb
+backspace 回退
+.TP
+.B \ee
+an escape character 字符 Esc
+.TP   
+.B \ef
+form feed 进纸
+.TP  
+.B \en
+new line 新行符
+.TP     
+.B \er
+carriage return 回车
+.TP
+.B \et
+horizontal tab 水平跳格
+.TP   
+.B \ev
+vertical tab 竖直跳格
+.TP
+.B \e\e
+backslash 反斜杠
+.TP
+.B \e'
+single quote 单引号
+.TP   
+.B \e\fInnn\fP
+一个八比特字符，它的值是八进制值 \fInnn\fP (一到三个数字)。
+.TP
+.B \ex\fIHH\fP
+一个八比特字符，它的值是十六进制值 \fIHH\fP (一到两个十六进制数字)。
+.TP
+.B \ec\fIx\fP
+一个 ctrl-\fIx\fP 字符
+.PD
+.RE
+.LP
+扩展结果是单引号引用的，就好像 $ 符号不存在一样。
+.PP
+双引号引用字符串前面加上一个 \fB$\fP 符号将使得这个字符串被根据当前语言环境 (locale) 来翻译。
+如果当前语言环境是 \fBC\fP 或者 \fBPOSIX\fP，这个符号将被忽略。
+如果这个字符串被翻译并替换了，那么替换结果是双引号引用的。
+.SH 参数(PARAMETERS)
+一个参数
+.I parameter
+是一个储存值的实体。它可以是一个名称
+.IR name ,
+一个数字或者是下面
+.BR "Special Parameters 特殊参数"
+章节中列出的特殊字符之一。从 shell 的角度来看，一个变量
+.I variable
+是一个由名称
+.IR name 
+代表的参数。一个变量有一个值 \fIvalue\fP 以及零个或多个属性 \fIattibutes\fP。属性可以使用内建命令
+.B declare
+来设置(参见下面
+.SM
+.BR "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节中对
+.B declare
+的描述)。
+.PP
+如果给一个参数赋值，那么它就被定义了。空字符串是有效的值。一旦一个变量被定义了，它只能用内建命令
+.B unset
+来取消(参见下面
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节).
+.PP
+一个变量
+.I variable
+可以用这样的语句形式来赋值：
+.RS
+.PP
+\fIname\fP=[\fIvalue\fP]
+.RE
+.PP
+如果没有给出值
+.I value，
+变量就被赋为空字符串。所有值
+.I values
+都经过了波浪线扩展，参数和变量扩展，命令替换，算术扩展和引用的删除(参见下面的
+.SM
+.B EXPANSION 扩展
+章节)。如果变量设置了
+.B integer 整数
+属性，那么值
+.I value
+将进行算术扩展，即使没有应用 $((...)) 扩展 (参见下面的
+.SM
+.B "Arithmetic Expansion 算术扩展"
+章节)。
+不会进行词的拆分，除非是下面
+.BR "Special Parameters 特殊参数"
+中提到的 \fB"$@"\fP。
+不会进行路径的扩展。赋值语句也出现在下列内建命令中，作为它们的参数：
+.BR declare ,
+.BR typeset ,
+.BR export ,
+.BR readonly ,
+和
+.B local
+。
+.SS Positional Parameters 位置参数
+.PP
+位置参数
+.I positional parameter
+是以一或多个数字代表的参数，除了 0。位置参数是在 shell 启动时，根据它的参数来赋值的，
+也可以用内建命令
+.B set
+来重新赋值。位置参数不能用赋值语句来赋值。在一个 shell 函数被执行的时候，位置参数会被暂时地替换掉
+(参见下面的
+.SM
+.B FUNCTIONS 函数
+章节)。
+.PP
+当位置参数由两个以上的数字构成时，它必须放在括号内 (参见下面的
+.SM
+.B EXPANSION 扩展
+章节)。
+.SS Special Parameters 特殊参数
+.PP
+shell 对一些参数做特殊处理。这些参数只能被引用而不能被赋值。
+.PD 0
+.TP
+.B *
+扩展为位置参数，从 1 开始。如果扩展发生在双引号中，它扩展为一个词，值是各个参数，以特殊变量
+.SM
+.B IFS
+的第一个字符分隔。也就是说，"\fB$*\fP" 等价于
+"\fB$1\fP\fIc\fP\fB$2\fP\fIc\fP\fB...\fP"，这里
+.I c
+是变量
+.SM
+.B IFS
+的第一个字符。如果没有设置
+.SM
+.B IFS，
+那么参数将用空格分隔。
+.SM
+.B IFS
+.TP
+.B @
+扩展为位置参数，从 1 开始。如果扩展发生在双引号中，每个参数都将扩展为一个词。也就是说，
+"\fB$@\fP" 等价于
+"\fB$1\fP" "\fB$2\fP" ...
+如果位置参数不存在，"\fB$@\fP" 和
+.B $@
+扩展为空 (即，它们被删除了)。
+.TP
+.B #
+扩展为位置参数的个数，以十进制表示。
+.TP
+.B ?
+扩展为最近执行的前台管道的状态。
+.TP
+.B \-
+扩展为当前选项标志。标志是在启动时或以内建命令
+.B set
+指定的，或者是 shell 自身设置的 (例如选项
+.B \-i
+)。
+.TP
+.B $
+扩展为 shell 的进程 ID。在一个 () 子 shell 中，它扩展为当前 shell 的
+进程 ID 而不是子 shell 的。
+.TP
+.B !
+扩展为最近一次执行的后台 (异步) 命令的进程号。
+.TP
+.B 0
+扩展为 shell 或者 shell 脚本的名称。这个变量是在 shell 初始化时设置的。如果
+.B bash
+是执行脚本文件时启动的，
+.B $0
+将设置为那个文件的名称。如果
+.B bash
+启动时的参数包含
+.B \-c，
+那么
+.B $0
+被设置为启动命令行被执行后的第一个参数，如果有的话。否则，它被设置为用来启动
+.BR bash 
+的文件名，就是参数 0。
+.TP
+.B _
+shell 启动时，设置为 shell 或参数中被执行的 shell 脚本的绝对路径名。
+然后，在扩展时扩展为上一个命令的最后一个参数。它也被设置为被执行的每个命令的文件全名并且
+被设置到这个命令执行的环境当中。当检查邮件时，这个参数保存着正在检查的邮件文件的名称。
+.PD
+.SS Shell Variables 变量
+.PP
+shell 定义了下列变量：
+.PP
+.PD 0
+.TP
+.B BASH
+扩展为用来启动当前
+.BR bash 
+实例的文件全名。
+.TP
+.B BASH_VERSINFO
+一个只读数组变量，成员保存着当前 
+.BR bash 
+实例的版本信息。赋予数组元素的值是如下这些：
+.sp .5
+.RS
+.PD 0
+.TP 24
+.B BASH_VERSINFO[\fR0\fP]
+主版本号 (\fIrelease\fP).
+.TP
+.B BASH_VERSINFO[\fR1\fP]
+次版本号 (\fIversion\fP).
+.TP
+.B BASH_VERSINFO[\fR2\fP]
+补丁版本
+.TP
+.B BASH_VERSINFO[\fR3\fP]
+编译信息
+.TP
+.B BASH_VERSINFO[\fR4\fP]
+发布时的状态 (例如, \fIbeta1\fP).
+.TP
+.B BASH_VERSINFO[\fR5\fP]
+\fBMACHTYPE\fP 平台类型
+.PD
+.RE
+.TP
+.B BASH_VERSION
+扩展为一个字符串，描述了这个
+.BR bash .
+实例的版本。
+.TP
+.B COMP_CWORD
+\fB${COMP_WORDS}\fP 的索引，指向当前光标位置所在的词。
+这个变量只有在被可编程补全功能 (参见下面的 \fBProgrammable Completion\fP 章节) 调用的 shell 函数中才可用。
+.TP
+.B COMP_LINE
+当前命令行。这个变量只有在被命令补全功能调用的 shell 函数和外部命令中才可用。
+.TP
+.B COMP_POINT
+相对于当前命令起始处的当前光标位置。如果当前光标位置是当前命令的末端，
+它的值就和 \fB${#COMP_LINE}\fP 相等。
+这个变量只有在被命令补全功能调用的 shell 函数和外部命令中才可用。
+.TP
+.B COMP_WORDS
+一个数组变量 (参见下面的 \fBArrays\fP(数组)一节)，由当前命令行的各个单词构成。
+这个变量只有在被命令补全功能调用的 shell 函数中才可用。
+.TP
+.B DIRSTACK
+一个数组变量，包含当前目录栈的内容。栈中的目录排列的顺序就是用内建命令
+.B dirs
+显示时的顺序。对这个数组变量的成员赋值可以用来修改栈中已有的目录，但是要添加和删除目录就必须使用
+内建命令
+.B pushd
+和
+.B popd。
+对它赋值不会改变当前目录。如果取消了
+.SM
+.B DIRSTACK
+的定义，它就失去了它的特殊意义，即使后来重新定义它。
+.TP
+.B EUID
+扩展为当前用户的有效用户 ID。它在 shell 启动时设置。它是只读的。
+.TP
+.B FUNCNAME
+当前执行的 shell 函数名。这个变量只有在执行一个 shell 函数时存在。向
+.SM
+.B FUNCNAME
+赋值没有效果并且返回一个错误。如果取消了
+.SM
+.B FUNCNAME
+的定义，它就失去了特殊的意义，即使后来重新定义它。
+.TP
+.B GROUPS
+一个数组变量，包含当前用户所属的组的列表。向
+.SM
+.B GROUPS
+赋值没有效果并且返回一个错误。如果取消了
+.SM
+.B GROUPS
+的定义，它就失去了特殊的意义，即使后来重新定义它。
+.TP
+.B HISTCMD
+当前命令的历史编号，或者历史列表中的索引。如果取消了
+.SM
+.B HISTCMD
+的定义，它就失去了特殊的意义，即使后来重新定义它。
+.TP
+.B HOSTNAME
+自动设置为当前的主机名。
+.TP
+.B HOSTTYPE
+自动设置为一个字符串，唯一地标识着正在运行
+.B bash
+的机器类型。默认值是系统相关的。
+.TP
+.B LINENO
+每次引用这个参数时，shell 将它替换为一个指示在脚本或函数中当前行号的十进制数字(从 1 开始)。
+如果不是在脚本或函数中，替换得到的值不一定有意义。如果取消了
+.SM
+.B LINENO
+的定义，它就失去了特殊的意义，即使后来重新定义它。
+.TP
+.B MACHTYPE
+自动设置为一个字符串，完整的描述了正在运行
+.B bash
+的系统类型，格式是标准的 GNU \fIcpu-company-system\fP 格式。默认值是系统相关的。
+.TP
+.B OLDPWD
+上一次命令
+.B cd
+设置的工作目录。
+.TP
+.B OPTARG
+内建命令
+.B getopts
+处理的最后一个选项参数值 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.TP
+.B OPTIND
+内建命令
+.B getopts
+将处理的下一个参数的索引 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.TP
+.B OSTYPE
+自动设置的一个字符串，描述了正在运行
+.B bash
+的操作系统。默认值是系统相关的。
+.TP
+.B PIPESTATUS
+一个数组变量 (参见下面的
+.B Arrays 数组
+章节)，包含最近执行的前台管道中的进程(可能只包含一个命令)的退出状态。
+.TP
+.B PPID
+shell 的父进程的进程号。这个变量是只读的。
+.TP
+.B PWD
+由
+.B cd
+命令设置的当前工作目录。
+.TP
+.B RANDOM
+每次引用这个参数时，都会产生一个 0 到 32767 之间的随机整数。可以通过向
+.SM
+.BR RANDOM 
+赋值来初始化随机数序列。如果取消了
+.SM
+.B RANDOM
+的定义，它就失去了特殊的意义，即使后来重新定义它。
+.TP
+.B REPLY
+变量的值将作为内建命令
+.B read
+的输入，如果命令没有参数的话。
+.TP
+.B SECONDS
+每次引用这个参数时，返回 shell 自运行以来的秒数。如果向
+.SM
+.BR SECONDS 
+赋值，此后对它的引用将返回自赋值时起的秒数加上所赋予的值。如果取消
+.SM
+.B SECONDS
+的定义，它就失去了特殊的意义，即使后来重新定义它。
+.TP
+.B SHELLOPTS
+一个冒号分隔的被允许的 shell 选项列表。列表中每个词都是内置命令
+.B set
+的
+.B \-o
+选项的有效参数。
+.SM
+.B SHELLOPTS
+中出现的选项也是 \fBset \-o\fP 显示为
+.I on
+的选项。如果
+.B bash
+启动时从环境中找到这个变量，那么在读取任何配置文件之前，列表中的每个选项都将被设置。这个变量是只读的。
+.TP
+.B SHLVL
+每次启动一个
+.B bash
+的实例时都会增加。
+.TP
+.B UID
+扩展为当前用户的 ID，在启动时初始化。这个变量是只读的。
+.PD
+.PP
+下列变量被 shell 使用。有时
+.B bash
+会为变量赋默认值；这些情况在下面会标出。
+.PP
+.PD 0
+.TP
+.B BASH_ENV
+如果 \fBbash\fP 在执行一个 shell 脚本时设定了这个变量，它的值将被解释为一个文件名，
+包含着初始化 shell 用到的命令，就像
+.IR ~/.bashrc 
+中一样。
+.SM
+.B BASH_ENV
+的值在被解释为一个文件名之前要经过参数扩展，命令替换和算术扩展。不会使用
+.SM
+.B PATH
+来查找结果文件名。
+.TP
+.B CDPATH
+命令
+.B cd
+的搜索路径。这是一个冒号分隔的目录列表，shell 从中查找
+.B cd
+命令的目标目录。可以是这样：
+.if t \f(CW".:~:/usr"\fP.
+.if n ".:~:/usr".
+.TP
+.B COLUMNS
+用在内建命令 \fBselect\fP 当中，用来判断输出选择列表时的终端宽度。
+自动根据 SIGWINCH 信号来设置。
+.TP
+.B COMPREPLY
+一个数组变量，\fBbash\fP 从中读取可能的命令补全。
+它是由命令补全功能调用的 shell 函数产生的。
+.TP
+.B FCEDIT
+内建命令
+.B fc
+默认的编辑器。
+.TP
+.B FIGNORE
+一个冒号分隔的后缀名列表，在进行文件名补全时被忽略 (参见下面的
+.SM
+.B READLINE
+章节)。一个后缀满足其中之一的文件名被排除在匹配的文件名之外。可以是这样：
+.if t \f(CW".o:~"\fP.
+.if n ".o:~".
+.TP
+.B GLOBIGNORE
+一个冒号分隔的模式列表，定义了路径名扩展时要忽略的文件名集合。
+如果一个文件名与路径扩展模式匹配，同时匹配
+.SM
+.BR GLOBIGNORE 
+中的一个模式时，它被从匹配列表中删除。
+.TP
+.B HISTCONTROL
+如果设置为
+.IR ignorespace ,
+以
+.B space
+开头的行将不会插入到历史列表中。如果设置为
+.IR ignoredups ,
+匹配上一次历史记录的行将不会插入。设置为
+.I ignoreboth
+会结合这两种选项。如果没有定义，或者设置为其他值，所有解释器读取的行都将存入历史列表，
+但还要经过
+.BR HISTIGNORE
+处理。这个变量的作用可以被
+.BR HISTIGNORE 
+替代。多行的组合命令的第二和其余行都不会被检测，不管
+.BR HISTCONTROL 
+是什么，都会加入到历史中。
+.TP
+.B HISTFILE
+保存命令历史的文件名 (参见下面的
+.SM
+.B HISTORY 历史
+章节)。默认值是 \fI~/.bash_history\fP。如果取消定义，在交互式 shell 退出时
+命令历史将不会保存。
+.TP
+.B HISTFILESIZE
+历史文件中包含的最大行数。当为这个变量赋值时，如果需要的话，历史文件将被截断
+来容纳不超过这个值的行。默认值是 500。历史文件在交互式 shell 退出时
+也会被截断到这个值。
+.TP
+.B HISTIGNORE
+一个冒号分隔的模式列表，用来判断那个命令行应当保存在历史列表中。每个模式
+都定位于行首，必须匹配整行 (没有假定添加 `\fB*\fP')。在
+.B HISTCONTROL
+指定的测试结束后，这里的每个模式都要被测试。除了平常的 shell 模式匹配字符，
+`\fB&\fP' 匹配上一个历史行。`\fB&\fP' 可以使用反斜杠来转义；反斜杠在
+尝试匹配之前将被删除。多行的组合命令的第二行以及后续行都不会被测试，不管
+.BR HISTIGNORE
+是什么，都将加入到历史中。
+.TP
+.B HISTSIZE
+命令历史中保存的历史数量 (参见下面的
+.SM
+.B HISTORY 历史
+章节)。默认值是 500。
+.TP
+.B HOME
+当前用户的个人目录；内建命令 \fBcd\fP 的默认参数。在执行波浪线扩展时也用到这个变量。
+.TP
+.B HOSTFILE
+包含一个格式和
+.FN /etc/hosts
+相同的文件名，当 shell 需要补全主机名时要读取它。shell 运行过程中
+可以改变可能的主机名补全列表；改变之后下一次需要主机名补全时
+.B bash
+会将新文件的内容添加到旧列表中。如果定义了
+.SM
+.B HOSTFILE
+但是没有赋值，\fBbash\fP 将尝试读取
+.FN /etc/hosts
+文件来获得可能的主机名补全列表。当取消
+.SM
+.B HOSTFILE
+的定义时，主机名列表将清空。
+.TP
+.B IFS
+内部字段分隔符
+.I Internal Field Separator
+用来在扩展之后进行分词，使用内部命令
+.B read
+将行划分成词。默认值是 
+``<space><tab><newline>''。
+.TP
+.B IGNOREEOF
+控制交互式 shell 接受到唯一一个
+.SM
+.B EOF
+字符时的行为。如果有定义，值是需要在一行的开始连续输入
+.SM
+.B EOF
+字符，直到可以使
+.B bash
+退出的字符个数。如果这个变量存在，但是值不是一个数字或者没有赋值，默认值是 10。
+如果变量没有定义，
+.SM
+.B EOF
+标志着输入的结束。
+.TP
+.B INPUTRC
+.B readline
+的启动配置文件，而不是默认的
+.FN ~/.inputrc
+(参见下面的
+.SM
+.B READLINE
+章节)。
+.TP
+.B LANG
+用来决定没有特地用 \fBLC_\fP 变量指定的语言环境项。
+.TP
+.B LC_ALL
+这个变量超越了 \fBLANG\fP 和所有其他指定语言环境项的 \fBLC_\fP 变量。
+.TP
+.B LC_COLLATE
+这个变量决定了为路径扩展的结果排序时的字母顺序，决定了范围表达式的行为，
+等价类，和路径扩展中的归并顺序以及模式匹配。 
+.TP
+.B LC_CTYPE
+这个变量决定了字符的解释和路径扩展以及模式匹配中字符类的行为。
+.TP
+.B LC_MESSAGES
+这个变量决定了翻译以 \fB$\fP 前导的双引号字符串时的语言环境。
+.TP
+.B LC_NUMERIC
+这个变量决定了格式化数字时的语言环境分类。
+.TP
+.B LINES
+内建命令 \fBselect\fP 用它来判断输出选择列表时的列宽度。在收到 SIGWINCH 信号时自动设置。
+.TP
+.B MAIL
+如果这个参数设置为一个文件名，并且没有设置环境变量
+.SM
+.B MAILPATH
+的话，
+.B bash
+将在这个文件中通知用户有邮件到达。
+.TP
+.B MAILCHECK
+指定
+.B bash
+检查邮件的频率是多少，以秒为单位。默认值是 60 秒。需要检查邮件的时候，shell 在显示提示符之前将进行检查。
+如果取消它的定义，或者设置为并非大于等于零的数值，shell 将禁止邮件检查。
+.TP
+.B MAILPATH
+一个冒号分隔的文件名列表，从中检查邮件。当邮件到达某个特殊文件中时，输出的特定消息可以
+通过将文件名与消息以 `?' 分隔来指定。
+在消息的文本中，\fB$_\fP 扩展为当前邮件文件的文件名。例如：
+.RS
+.PP
+\fBMAILPATH\fP='/var/mail/bfox?"You have mail":~/shell\-mail?"$_ has mail!"'
+.PP
+.B Bash
+为这个变量提供默认值，但是它使用的用户邮件文件的位置是系统相关的 (例如，/var/mail/\fB$USER\fP)。
+.RE
+.TP
+.B OPTERR
+如果设置为 1，
+.B bash
+显示内建命令
+.B getopts
+产生的错误消息 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。每次 shell 启动时或者一个 shell 脚本被执行时
+.SM
+.B OPTERR
+被初始化为 1。
+.TP
+.B PATH
+搜索命令的路径。它是一个冒号分割的目录列表，shell 从中搜索命令 (参见下面的
+.SM
+.B "命令执行(COMMAND EXECUTION)"
+段落)。默认的路径是系统相关的，是由安装
+.BR bash 
+的系统管理员设置的。通常它的值是
+.if t \f(CW/usr/gnu/bin:/usr/local/bin:/usr/ucb:/bin:/usr/bin:.\fP。
+.if n ``/usr/gnu/bin:/usr/local/bin:/usr/ucb:/bin:/usr/bin:.''。
+.TP
+.B POSIXLY_CORRECT
+如果 \fBbash\fP 启动环境中有这个变量，它将在读取启动配置文件之前进入 \fIposix mode\fP，就好像提供了
+.B \-\-posix
+启动参数一样。如果 shell 运行过程中设置了它，\fBbash\fP 就启用 \fIposix mode\fP，就好像执行了
+.if t \f(CWset -o posix\fP
+.if n \fIset -o posix\fP
+命令一样。
+.TP
+.B PROMPT_COMMAND
+如果有定义，它的值将作为一个命令，每次显示主提示符之前都会执行。
+.TP
+.B PS1
+这个参数的值被扩展 (参见下面的
+.SM
+.B PROMPTING 提示符
+段落)，用作主提示符字符串。默认值是
+``\fB\es\-\ev\e$ \fP''。
+.TP
+.B PS2
+这个参数的值同
+.B PS1
+一起被扩展，用作次提示符字符串。默认值是
+``\fB> \fP''。
+.TP
+.B PS3
+这个参数的值被用作内建命令
+.B select
+的提示符 (参见上面的
+.SM
+.B SHELL GRAMMAR 语法
+章节)。
+.TP
+.B PS4
+这个参数的值同
+.B PS1
+一起被扩展，在执行跟踪中在
+.B bash
+显示每个命令之前显示。需要的话，
+.SM
+.B PS4
+的第一个字符会被复制多次，来指示 indirection 的层数。默认值是 ``\fB+ \fP''。
+.TP
+.B TIMEFORMAT
+在前缀 time 保留字的管道中，这个参数的值用作格式字符串，
+指定计时信息如何显示。字符 \fB%\fP 引入的转义序列，被扩展为时间值
+或其他信息。转义序列和它们的含义如下所示；括号中是可选的成分。
+.sp .5
+.RS
+.PD 0
+.TP 10
+.B %%
+一个字面上的 \fB%\fP。
+.TP
+.B %[\fIp\fP][l]R
+经历的时间，以秒计算。
+.TP
+.B %[\fIp\fP][l]U
+CPU 在用户模式下执行的秒数。
+.TP
+.B %[\fIp\fP][l]S
+CPU 在系统模式下执行的秒数。
+.TP
+.B %P
+CPU 使用率，算法是 (%U + %S) / %R。
+.PD
+.RE
+.IP
+可选的 \fIp\fP 是指定精度 (小数点后数字位数) 的数值。
+如果是 0 就不输出小数点或小数值。最多指定到小数点后三位；
+如果 \fIp\fP 大于 3 就会被改为 3。如果没有指定 \fIp\fP，默认使用 3。
+.IP
+可选的 \fBl\fP 指定了长格式，包含分钟，格式是 \fIMM\fPm\fISS\fP.\fIFF\fPs。
+\fIp\fP 的值决定了是不是包含小数位。
+.IP
+如果没有设置这个值，\fBbash\fP 假定它的值是
+\fB$'\enreal\et%3lR\enuser\et%3lU\ensys\t%3lS'\fP。
+如果它是空值，就不会显示计时信息。显示格式字符串的时候，会加上
+一个前导的新行符。
+.TP
+.B TMOUT
+如果设置为大于 0 的值，\fBTMOUT\fP 被当作内建命令 \fBread\fP 的默认超时
+等待时间。如果等待终端输入时， \fBTMOUT\fP 秒之后仍然没有输入，
+\fBselect\fP 命令将终止。在交互的 shell 中，它的值被解释为显示了
+主提示符之后等待输入的秒数。如果经过这个秒数之后仍然没有输入，
+.B Bash
+将退出。
+.TP
+.B auto_resume
+这个变量控制了 shell 如何与用户和作业控制交互。如果设置了这个变量，
+一个不包含重定向的单个词的简单命令，将作为恢复被中断的作业的指示。
+不允许出现模棱两可的情况；如果有多个作业都以这个词起始，将恢复最近运行
+的作业。在这种情形下，被中断的作业的
+.I name
+是用于启动它的命令行。如果值设置为
+.IR exact，
+给出的字符串必须精确匹配被中断的作业名；如果设置为
+.IR substring ，
+给出的字符串需要匹配被中断的作业名的子串。值
+.I substring
+的功能与作业标识符
+.B %?
+功能类似 (参见下面的
+.SM
+.B JOB CONTROL 作业控制
+章节)。如果设置为任何其他值，给出的字符串必须是被中断的作业的前缀；
+这样做与作业标识符
+.B %
+功能类似。
+.TP
+.B histchars
+两到三个字符，控制着历史扩展和分段 (tokenization，参见下面的
+.SM
+.B HISTORY EXPANSION 历史扩展
+章节)。第一个字符是 \fIhistory expansion\fP(历史扩展) 字符，
+这个字符表明了历史扩展的开始，通常是 `\fB!\fP'。
+第二个字符是 \fIquick substitution\fP(快速替换) 字符，
+它是重新运行上次输入的命令，但将命令中的字符串替换为另一个的简写，
+默认是 `\fB^\fP'。可选的第三个字符是指示如果作为一个词的开始，那么
+一行中剩余字符是注释。通常这个字符是 `\fB#\fP'。历史注释字符使得
+对一行中剩余字符在历史替换中被跳过。它不一定使 shell 解释器将
+这一行的剩余部分当作注释。
+.PD
+.SS Arrays
+.B Bash
+提供了一维数组变量。任何变量都可以作为一个数组；内建命令
+.B declare
+可以显式地定义数组。数组的大小没有上限，也没有限制在连续对成员引用和
+赋值时有什么要求。数组以整数为下标，从 0 开始。
+.PP
+如果变量赋值时使用语法 \fIname\fP[\fIsubscript\fP]=\fIvalue\fP，
+那么就会自动创建数组。
+.I subscript
+被当作一个算术表达式，结果必须是大于等于 0 的值。要显式地定义一个数组，使用
+.B declare \-a \fIname\fP
+(参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。也可以用
+.B declare \-a \fIname\fP[\fIsubscript\fP]
+这时 \fI subscript\fP 被忽略。数组变量的属性可以用内建命令
+.B declare
+和
+.B readonly
+来指定。每个属性对于所有数组元素都有效。
+.PP
+数组赋值可以使用复合赋值的方式，形式是
+\fIname\fP=\fB(\fPvalue\fI1\fP ... value\fIn\fP\fB)\fP，这里每个
+\fIvalue\fP 的形式都是 [\fIsubscript\fP]=\fIstring\fP。\fIstring\fP 
+必须出现。如果出现了可选的括号和下标，将为这个下标赋值，否则
+被赋值的元素的下标是语句中上一次赋值的下标加一。下标从 0 开始。
+这个语法也被内建命令
+.B declare
+所接受。单独的数组元素可以用上面介绍的语法
+\fIname\fP[\fIsubscript\fP]=\fIvalue\fP 来赋值。
+.PP
+数组的任何元素都可以用 ${\fIname\fP[\fIsubscript\fP]} 来引用。
+花括号是必须的，以避免和路径扩展冲突。如果
+\fIsubscript\fP 是 \fB@\fP 或是 \fB*\fP，它扩展为 \fIname\fP 的所有成员。
+这两种下标只有在双引号中才不同。在双引号中，${\fIname\fP[*]} 扩展为一个词，
+由所有数组成员的值组成，用特殊变量
+.SM
+.B IFS
+的第一个字符分隔；${\fIname\fP[@]} 将 \fIname\fP 的每个成员扩展为一个词。
+如果数组没有成员，${\fIname\fP[@]} 扩展为空串。这种不同类似于特殊参数
+\fB*\fP 和 \fB@\fP 的扩展 (参见上面的
+.B Special Parameters
+段落)。${#\fIname\fP[\fIsubscript\fP]} 扩展为 
+${\fIname\fP[\fIsubscript\fP]} 的长度。如果 \fIsubscript\fP 是 \fB*\fP
+或者是 \fB@\fP，扩展结果是数组中元素的个数。引用没有下标数组变量等价于
+引用元素 0。
+.PP
+内建命令
+.B unset
+用于销毁数组。\fBunset\fP \fIname\fP[\fIsubscript\fP]
+将销毁下标是 \fIsubscript\fP 的元素。
+\fBunset\fP \fIname\fP, 这里 \fIname\fP 是一个数组，或者
+\fBunset\fP \fIname\fP[\fIsubscript\fP], 这里
+\fIsubscript\fP 是 \fB*\fP 或者是 \fB@\fP，将销毁整个数组。
+.PP
+内建命令
+.BR declare ,
+.BR local ,
+和
+.B readonly
+都能接受
+.B \-a
+选项，从而指定一个数组。内建命令
+.B read
+可以接受
+.B \-a
+选项，从标准输入读入一列词来为数组赋值。内建命令
+.B set
+和
+.B declare
+使用一种可以重用为输入的格式来显示数组元素。
+.SH 扩展(EXPANSION)
+命令行的扩展是在拆分成词之后进行的。有七种类型的扩展：
+.IR "brace expansion" (花括号扩展),
+.IR "tilde expansion" (波浪线扩展),
+.IR "parameter and variable expansion" (参数和变量扩展),
+.IR "command substitution" (命令替换),
+.IR "arithmetic expansion" (算术扩展),
+.IR "word splitting" (词的拆分),
+和
+.IR "pathname expansion" (路径扩展).
+.PP
+扩展的顺序是：brace expansion, tilde expansion,
+parameter, variable 和 arithmetic expansion 还有
+command substitution
+(按照从左到右的顺序), word splitting, 最后是 pathname
+expansion.
+.PP
+还有一种附加的扩展：\fIprocess subtitution\fP (进程替换) 只有在支持它
+的系统中有效。
+.PP
+只有 brace expansion, word splitting, 和 pathname expansion
+在扩展前后的词数会发生改变；其他扩展总是将一个词扩展为一个词。
+唯一的例外是上面提到的
+"\fB$@\fP" 和 "\fB${\fP\fIname\fP\fB[@]}\fP" (参见
+.SM
+.BR PARAMETERS 参数)。
+.SS Brace Expansion
+.PP
+.I "Brace expansion"
+是一种可能产生任意字符串的机制。这种机制类似于
+\fIpathname expansion\fP, 但是并不需要存在相应的文件。
+花括号扩展的模式是一个可选的
+.IR preamble (前导字符),
+后面跟着一系列逗号分隔的字符串，包含在一对花括号中，
+再后面是一个可选的
+.IR postscript (附言)。
+前导被添加到花括号中的每个字符串前面，附言被附加到每个结果字符串之后，
+从左到右进行扩展。
+.PP
+花括号扩展可以嵌套。扩展字符串的结果没有排序；而是保留了从左到右的顺序。
+例如， a\fB{\fPd,c,b\fB}\fPe 扩展为 `ade ace abe'。
+.PP
+花括号扩展是在任何其他扩展之前进行的，任何对其他扩展有特殊意义的字符
+都保留在结果中。它是严格字面上的。
+.B Bash
+不会对扩展的上下文或花括号中的文本做任何语义上的解释。
+.PP
+正确的花括号扩展必须包含没有引用的左括号和右括号，以及至少一个没有
+引用的逗号。任何不正确的表达式都不会被改变。可以用反斜杠来引用
+\fB{\fP 或 \fB,\fP 来阻止将它们识别为花括号表达式的一部分。
+为了避免与参数扩展冲突，字符串 \fB${\fP 不被认为有效的组合。
+.PP
+这种结构通常用来简写字符串的公共前缀远比上例中为长的情况，例如：
+.RS
+.PP
+mkdir /usr/local/src/bash/{old,new,dist,bugs}
+.RE
+或者：
+.RS
+chown root /usr/{ucb/{ex,edit},lib/{ex?.?*,how_ex}}
+.RE
+.PP
+花括号扩展导致了与历史版本的
+.BR sh 
+的一点不兼容。在左括号或右括号作为词的一部分出现时，
+.B sh
+不会对它们进行特殊处理，会在输出中保留它们。
+.B Bash
+将括号从花括号扩展结果的词中删除。例如，向
+.B sh
+输入 \fIfile{1,2}\fP 会导致不变的输出。同样的输入在
+.BR bash
+进行扩展之后，会输出
+.I file1 file2 .
+如果需要同
+.B sh
+严格地保持兼容，需要在启动
+.B bash
+的时候使用
+.B +B 
+选项，或者使用
+.B set
+命令加上
+.B +B
+选项来禁用花括号扩展 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.SS Tilde Expansion
+.PP
+如果一个词以没有引用的波浪线字符 (`\fB~\fP') 开始，所有
+在第一个没有引用的斜线 (`/') 之前的字符 (或者是这个词的所有字符，
+如果没有没引用的斜线的话) 都被认为是 \fItilde-prefix\fP(波浪线前缀)。
+如果 tilde-prefix 中没有被引用的字符，那么波浪线之后的字符串
+被认为是 \fIlogin name\fP(登录名)。如果登录名是空字符串，波浪线将
+被替换为 shell 参数
+.SM
+.BR HOME 
+的值。如果没有定义
+.SM
+.B HOME，
+将替换为执行此 shell 的用户的个人目录。否则，tilde-prefix 被替换为
+与指定登录名相联系的个人目录。
+.PP
+如果 tilde-prefix 是 `~+'，将使用 shell 变量
+.SM
+.B PWD
+的值来替换。如果 tilde-prefix 是 `~\-'，并且设置了 shell 变量
+.SM
+.BR OLDPWD ,
+将使用这个变量值来替换。如果在 tilde-prefix 中，波浪线之后的字符串
+由一个数字 \fIN\fP 组成，前缀可选的 `+' 或者 `\-'，那么 tilde-prefix
+将被替换为目录栈中相应的元素，就是将 tilde-prefix 作为参数执行内建命令
+.B dirs
+显示的结果。如果 tilde-prefix 中波浪线之后的字符是一个数字，没有前缀，
+那么就假定有一个 `+'。
+.PP
+如果登录名不合法，或者波浪线扩展失败，这个词将不会变化。
+.PP
+在变量赋值中，对于
+.B :
+或
+.BR =
+之后的字符串会立即检查未引用的 tilde-prefix。
+这种情况下，仍然会进行波浪线扩展。因此，可以使用带波浪线的文件名来为
+.SM
+.BR PATH ,
+.SM
+.BR MAILPATH ,
+和
+.SM
+.BR CDPATH 
+赋值，shell 将赋予扩展之后的值。
+.SS Parameter Expansion
+.PP
+字符 `\fB$\fP' 引入了参数扩展，命令替换和算术扩展。要扩展的参数名或符号
+可能包含在花括号中，花括号可选的，但是可以使得要扩展的变量不会与紧随其后
+的字符合并，成为新的名称。
+.PP
+使用花括号的时候，匹配的右括号是第一个 `\fB}\fP'，并且它没有被反斜杠引用
+或包含在一个引用的字符串中，也没有包含在一个嵌入的算术扩展，命令替换
+或是参数扩展中。
+.PP
+.PD 0
+.TP
+${\fIparameter\fP}
+被替换为 \fIparameter\fP 的值。如果
+.I parameter
+是一个位置参数，并且数字多于一位时；或者当紧随
+.I parameter
+之后有不属于名称一部分的字符时，都必须加上花括号。
+.PD
+.PP
+如果 \fIparameter\fP 的第一个字符是一个感叹号，将引进一层间接变量。
+\fBbash\fP 使用以 \fIparameter\fP 的其余部分为名的变量的值作为变量的名称；
+接下来新的变量被扩展，它的值用在随后的替换当中，而不是使用 
+\fIparameter\fP 自身的值。这也称为 \fIindirect expansion\fP(间接扩展).
+例外情况是下面讲到的 ${!\fIprefix\fP*}。
+.PP
+下面的每种情况中，\fIword\fP 都要经过波浪线扩展，参数扩展，命令替换和
+算术扩展。如果不进行子字符串扩展，\fBbash\fP 测试一个没有定义或值为空的
+参数；忽略冒号的结果是只测试未定义的参数。
+.PP
+.PD 0
+.TP
+${\fIparameter\fP\fB:\-\fP\fIword\fP}
+\fBUse Default Values\fP(使用默认值)。如果
+.I parameter
+未定义或值为空，将替换为
+.I word
+的扩展。否则，将替换为
+.I parameter
+的值。
+.TP
+${\fIparameter\fP\fB:=\fP\fIword\fP}
+\fBAssign Default Values\fP(赋默认值)。如果
+.I parameter
+未定义或值为空，
+.I word
+的扩展将赋予
+.IR parameter .
+.I parameter
+的值将被替换。位置参数和特殊参数不能用这种方式赋值。
+.TP
+${\fIparameter\fP\fB:?\fP\fIword\fP}
+\fBDisplay Error if Null or Unset\fP(显示错误，如果未定义或值为空)。如果
+.I parameter
+未定义或值为空，\fIword\fP (或一条信息，如果
+.I word
+不存在) 的扩展将写入到标准错误；shell 如果不是交互的，则将退出。否则，
+\fIparameter\fP 的值将被替换。
+.TP
+${\fIparameter\fP\fB:+\fP\fIword\fP}
+\fBUse Alternate Value\fP(使用可选值)。如果
+.I parameter
+未定义或非空，不会进行替换；否则将替换为
+.I word
+扩展后的值。
+.TP
+${\fIparameter\fP\fB:\fP\fIoffset\fP}
+.PD 0
+.TP
+${\fIparameter\fP\fB:\fP\fIoffset\fP\fB:\fP\fIlength\fP}
+.PD
+\fBSubstring Expansion\fP(子字符串扩展)。
+扩展为\fIparameter\fP 的最多 \fIlength\fP 个字符，从 \fIoffset\fP 
+指定的字符开始。如果忽略了 \fIlength\fP，扩展为 \fIparameter\fP 的子字符串，
+从 \fIoffset\fP 指定的字符串开始。\fIlength\fP 和 \fIoffset\fP 是算术表达式
+(参见下面的
+.SM
+.B ARITHMETIC EVALUATION 算术求值
+段落)。
+\fIlength\fP 必须是一个大于等于 0 的数值。如果 \fIoffset\fP 求值结果小于 0，
+值将当作从 \fIparameter\fP 的值的末尾算起的偏移量。如果 \fIparameter\fP
+是 \fB@\fP，结果是 \fIlength\fP 个位置参数，从 \fIoffset\fP 开始。
+如果 \fIparameter\fP 是一个数组名，以 @ 或 * 索引，结果是数组的
+\fIlength\fP 个成员，从 ${\fIparameter\fP[\fIoffset\fP]} 开始。
+子字符串的下标是从 0 开始的，除非使用位置参数时，下标从 1 开始。
+.TP
+${\fB!\fP\fIprefix\fP\fB*\fP}
+扩展为名称以 \fIprefix\fP 开始的变量名，以特殊变量
+.SM
+.B IFS
+的第一个字符分隔。
+.TP
+${\fB#\fP\fIparameter\fP}
+替换为 \fIparameter\fP 的值的长度 (字符数目)。如果
+.I parameter
+是
+.B *
+或者是 
+.BR @ ,
+替换的值是位置参数的个数。如果
+.I parameter
+是一个数组名，下标是
+.B *
+或者是
+.BR @ ,
+替换的值是数组中元素的个数。
+.TP
+${\fIparameter\fP\fB#\fP\fIword\fP}
+.PD 0
+.TP
+${\fIparameter\fP\fB##\fP\fIword\fP}
+.PD
+.I word
+被扩展为一个模式，就像路径扩展中一样。如果这个模式匹配
+.IR parameter
+的值的起始，那么扩展的结果是将
+.I parameter
+扩展后的值中，最短的匹配 (``\fB#\fP'' 的情况) 或者最长的匹配
+(``\fB##\fP''的情况) 删除的结果。如果
+.I parameter
+是
+.B @
+或者是
+.BR * ,
+则模式删除操作将依次施用于每个位置参数，最后扩展为结果的列表。如果
+.I parameter
+是一个数组变量，下标是
+.B @
+或者是
+.BR * ,
+模式删除将依次施用于数组中的每个成员，最后扩展为结果的列表。
+.TP
+${\fIparameter\fP\fB%\fP\fIword\fP}
+.PD 0
+.TP
+${\fIparameter\fP\fB%%\fP\fIword\fP}
+.PD
+\fIword\fP 被扩展为一个模式，就像路径扩展中一样。如果这个模式匹配
+.IR parameter 
+扩展后的值的尾部，那么扩展的结果是将
+.I parameter
+扩展后的值中，最短的匹配 (``\fB%\fP'' 的情况) 或者最长的匹配
+(``\fB%%\fP''的情况) 删除的结果。如果
+.I parameter
+是
+.B @
+或者是
+.BR * ,
+则模式删除操作将依次施用于每个位置参数，最后扩展为结果的列表。如果
+.I parameter
+是一个数组变量，下标是
+.B @
+或者是
+.BR * ,
+模式删除将依次施用于数组中的每个成员，最后扩展为结果的列表。
+.TP
+${\fIparameter\fP\fB/\fP\fIpattern\fP\fB/\fP\fIstring\fP}
+.PD 0
+.TP
+${\fIparameter\fP\fB//\fP\fIpattern\fP\fB/\fP\fIstring\fP}
+.PD
+\fIpatterm\fP 被扩展为一个模式，就像路径扩展中一样。\fIparameter\fP
+被扩展，其值中最长的匹配 \fIpattern\fP 的内容被替换为 \fIstring\fP。
+在第一种形式中，只有第一个匹配被替换。第二种形式使得 \fIpattern\fP
+中所有匹配都被替换为 \fIstring\fP。
+如果 \fIpattern\fP 以 \fB#\fP 开始，它必须匹配 \fIparameter\fP 扩展后
+值的首部。如果 \fIpattern\fP 以 \fB%\fP 开始，它必须匹配 \fIparameter\fP
+扩展后值的尾部。如果 \fIstring\fP 是空值，\fIpattern\fP 的匹配都将被删除，
+\fIpattern\fP 之后的 \fB/\fP 将被忽略。如果
+.I parameter
+是
+.B @
+或者是
+.BR * ,
+则替换操作将依次施用于每个位置参数，最后扩展为结果的列表。如果
+.I parameter
+是一个数组变量，下标是
+.B @
+或者是
+.BR * ,
+模式删除将依次施用于数组中的每个成员，最后扩展为结果的列表。
+.SS Command Substitution
+.PP
+命令替换 (\fICommand substitution\fP) 允许以命令的输出替换命令名。有
+两种形式：
+.PP
+.RS
+.PP
+\fB$(\fP\fIcommand\fP\|\fB)\fP
+.RE
+还有
+.RS
+\fB`\fP\fIcommand\fP\fB`\fP
+.RE
+.PP
+.B Bash
+进行扩展的步骤是执行 \fIcommand\fP，以它的标准输出替换它，并且将所有后续的
+新行符删除。内嵌的新行符不会删除，但是它们可能会在词的拆分中被删除。
+命令替换 \fB$(cat \fIfile\fP)\fR 可以用等价但是更快的方法
+\fB$(< \fIfile\fP)\fR 代替。
+.PP
+当使用旧式的反引号 ("``") 替换形式时，反斜杠只有其字面意义，除非
+后面是
+.BR $ ,
+.BR ` ,
+或者是
+.BR \e .
+第一个前面没有反斜杠的反引号将结束命令替换。当使用 $(\^\fIcommand\fP\|) 
+形式时，括号中所有字符组成了整个命令；没有被特殊处理的字符。
+.PP
+命令替换可以嵌套。要在使用反引号形式时嵌套，可以用反斜杠来转义内层的
+反引号。
+.PP
+如果替换发生在双引号之中，结果将不进行词的拆分和路径扩展。
+.SS Arithmetic Expansion
+.PP
+算术扩展允许算术表达式的求值和结果的替换。算术扩展的格式是：
+.RS
+.PP
+\fB$((\fP\fIexpression\fP\fB))\fP
+.RE
+.PP
+表达式
+.I expression
+被视为如同在双引号之中一样，但是括号中的双引号不会被特殊处理。
+表达式中所有词都经过了参数扩展，字符串扩展，命令替换和引用的删除。
+算术替换可以嵌套。
+.PP
+求值根据下面
+.SM
+.BR "算术求值 (ARITHMETIC EVALUATION)"
+章节中列出的规则进行。如果表达式
+.I expression
+非法，
+.B bash
+输出错误提示消息，不会进行替换。
+.SS Process Substitution
+.PP
+\fIProcess substitution\fP (进程替换) 只有在支持命名管道 (\fIFIFOs\fP)，
+或者支持使用 \fB/dev/fd\fP 方式为打开的文件命名的系统中才可用。
+它的形式是
+\fB<(\fP\fIlist\^\fP\fB)\fP
+或者是
+\fB>(\fP\fIlist\^\fP\fB)\fP。
+进程 \fIlist\fP 运行时的输入或输出被连接到一个 \fIFIFO\fP 或者 \fB/dev/fd\fP
+中的文件。文件的名称作为一个参数被传递到当前命令，作为扩展的结果。
+如果使用 \fB>(\fP\fIlist\^\fP\fB)\fP 形式，向文件写入相当于为 \fIlist\fP
+提供输入。如果使用 \fB<(\fP\fIlist\^\fP\fB)\fP 形式，可以读作为参数传递
+的文件来获得 \fIlist\fP 的输出。
+.PP
+如果可能的话，进程替换是与参数和变量扩展，命令替换和算术扩展同时发生的。
+.SS Word Splitting
+.PP
+shell 检测不在双引号引用中发生的参数扩展，命令替换和算术扩展的结果，
+进行
+.IR "word splitting" (词的拆分)。
+.PP
+shell 将
+.SM
+.B IFS
+的每个字符都作为定界符，根据这些字符来将其他扩展的结果分成词。如果
+.SM
+.B IFS
+没有定义，或者它的值是默认的
+.BR <space><tab><newline> ,
+那么
+.SM
+.B IFS
+字符的任何序列都将作为分界之用。如果
+.SM
+.B IFS
+的值是默认之外的值，那么词开头和结尾的空白字符
+.B space
+和
+.B tab
+都将被忽略，只要空白字符在
+.SM
+.BR IFS
+的值之内 (即，
+.SM
+.B IFS
+包含空白字符)。
+任何在
+.SM
+.B IFS
+之中但是不是
+.SM
+.B IFS
+空白的字符，以及任何相邻的
+.SM
+.B IFS
+空白字符，将字段分隔开来。
+.SM
+.B IFS
+空白字符的序列也被作为分界符。如果
+.SM
+.B IFS
+的值是空，不会发生词的拆分。
+.PP
+显式给出的空值参数 (\^\f3"\^"\fP 或 \^\f3'\^'\fP\^) 将被保留。
+隐含的空值参数，来自于空值的参数扩展，如果没有引用则将被删除。
+如果空值的参数在双引号引用中扩展，结果是空值的参数，将被保留。
+.PP
+注意如果没有发生扩展，不会进行词的拆分。
+.SS Pathname Expansion
+.PP
+词的拆分之后，除非设置过
+.B \-f
+选项，
+.B bash
+搜索每个词，寻找字符
+.BR * ,
+.BR ? ,
+和
+.BR [ .
+如果找到了其中之一，那么这个词被当作一个
+.IR pattern (模式)，
+被替换为匹配这个模式的文件名以字母顺序排列的列表。如果没有找到匹配的文件名，
+并且 shell 禁用了
+.B nullglob
+选项，这个词将不发生变化。如果设置了
+.B nullglob
+选项并且没有找到匹配，这个词将被删除。如果启用了
+.B nocaseglob
+选项，匹配时将不考虑字母的大小写。当模式用作路径名扩展时，字符
+.B ``.''
+如果在一个名称的开始或者紧随一个斜杠之后，那么它必须被显式地匹配，除非设置了
+.B dotglob
+shell 选项。当匹配一个路径名时，斜杠符必须被显式地匹配。其他情况下，字符
+.B ``.''
+不会被特殊对待。参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+中对
+.B shopt
+的介绍，其中有 shell 选项
+.BR nocaseglob ,
+.BR nullglob ,
+和
+.B dotglob
+的描述。
+.PP
+环境变量
+.SM
+.B GLOBIGNORE
+可以用来限制匹配
+.IR pattern 
+的文件名集合。如果设置了
+.SM
+.B GLOBIGNORE，
+每个匹配的文件名如果匹配
+.SM
+.B GLOBIGNORE
+中任何一个模式的话将从匹配的列表中删除。文件名
+.B ``.''
+和
+.B ``..''
+总是被忽略，即使设置了
+.SM
+.B GLOBIGNORE。
+但是，设置
+.SM
+.B GLOBIGNORE
+和启用 shell 选项
+.B dotglob
+效果是相同的，因此所有其他以
+.B ``.''
+开头的文件名将被匹配。要得到原来的行为 (忽略所有以
+.BR ``.'' 
+开头的文件名)，可以将
+.B ``.*''
+添加为
+.SM
+.BR GLOBIGNORE 
+的模式之一。选项
+.B dotglob
+被禁用，如果
+.SM
+.B GLOBIGNORE
+没有定义时。
+.PP
+\fBPattern Matching\fP
+.PP
+任何模式中出现的字符，除了下面描述的特殊模式字符外，都匹配它本身。
+模式中不能出现 NUL 字符。如果要匹配字面上的特殊模式字符，它必须被引用。
+.PP
+特殊模式字符有下述意义：
+.PP
+.PD 0
+.TP
+.B *
+匹配任何字符串包含空串。
+.TP
+.B ?
+匹配任何单个字符。
+.TP
+.B [...]
+匹配所包含的任何字符之一。用一个连字符 (`-') 分隔的一对字符意思是一个
+\fIrange expression\fP (范围表达式)；
+任何排在它们之间的字符，包含它们，都被匹配。
+排序使用当前语言环境的字符顺序和字符集。如果
+.B [
+之后的第一个字符是一个
+.B !
+或是一个
+.B ^
+那么任何不包含在内的字符将被匹配。范围表达式中字符的顺序是由当前语言环境
+和环境变量 \fBLC_COLLATE\fP 的值 (如果设置了的话) 决定的。一个
+.B \-
+只有作为集合中第一个或最后一个字符时才能被匹配。一个
+.B ]
+只有是集合中第一个字符时才能被匹配。
+.br
+.if t .sp 0.5
+.if n .sp 1
+在
+.B [
+和
+.BR ]
+中，\fIcharacter classes\fP (字符类) 可以用 \fB[:\fP\fIclass\fP\fB:]\fP
+这样的语法来指定，这里 \fIclass\fP 是在 POSIX.2 标准中定义的下列类名之一:
+.PP
+.RS
+.B
+.if n alnum alpha ascii blank cntrl digit graph lower print punct space upper word xdigit
+.if t alnum   alpha   ascii   blank   cntrl   digit   graph   lower   print   punct   space   upper   word   xdigit
+.br
+一个字符类匹配任何属于这一类的字符。\fBword\fP 字符类匹配字母，数字和字符 _。
+.br
+.if t .sp 0.5
+.if n .sp 1
+在
+.B [
+和
+.BR ]
+中，可以用 \fB[=\fP\fIc\fP\fB=]\fP 这样的语法来指定 \fIequivalence class\fP 
+(等价类)。它匹配与字符 \fIc\fP 有相同归并权值 (collation weight，由当前
+语言环境定义) 的字符。
+.br
+.if t .sp 0.5
+.if n .sp 1
+在
+.B [
+和
+.BR ]
+中，语法 \fB[.\fP\fIsymbol\fP\fB.]\fP 匹配归并符号 (collating symbol)
+\fIsymbol\fP。
+.RE
+.PD
+.PP
+如果使用内建命令 \fBshopt\fP 启用了 shell 选项 \fBextglob\fP，
+将识别另外几种模式匹配操作符。下面的描述中，\fIpattern-list\fP 是一个
+或多个模式以 \fB|\fP 分隔的列表。复合的模式可以使用一个或多个下列的
+子模式构造出来：
+.sp 1
+.PD 0
+.RS
+.TP
+\fB?(\fP\^\fIpattern-list\^\fP\fB)\fP
+匹配所给模式零次或一次出现
+.TP
+\fB*(\fP\^\fIpattern-list\^\fP\fB)\fP
+匹配所给模式零次或多次出现
+.TP
+\fB+(\fP\^\fIpattern-list\^\fP\fB)\fP
+匹配所给模式一次或多次出现
+.TP
+\fB@(\fP\^\fIpattern-list\^\fP\fB)\fP
+准确匹配所给模式之一
+.TP
+\fB!(\fP\^\fIpattern-list\^\fP\fB)\fP
+任何除了匹配所给模式之一的字串
+.RE
+.PD
+.SS Quote Removal
+.PP
+经过前面的扩展之后，所有未引用的字符
+.BR \e ,
+.BR ' ,
+以及并非上述扩展结果的字符 \^\fB"\fP\^ 都被删除。
+.SH 重定向(REDIRECTION)
+在命令执行前，它的输入和输出可能被
+.I redirected (重定向)，
+使用一种 shell 可以解释的特殊记法。重定向也可以用于为当前 shell
+执行环境 打开和关闭文件。下列重定向操作符可以前置或者放在
+.I simple command (简单命令)
+之中的任何位置，或者放在
+.IR command 
+之后。重定向是以出现的顺序进行处理的，从左到右。
+.PP
+下列描述中，如果文件描述符被忽略，并且第一个重定向操作符是
+.BR < ,
+那么重定向指的是标准输入 (文件描述符是 0)。如果重定向操作符的第一个字符是
+.BR > ,
+那么重定向指的是标准输出 (文件描述符是 1)。
+.PP
+下列描述中，重定向操作符之后的词如果没有特殊说明，都要经过
+brace expansion, tilde expansion, parameter expansion, 
+command substitution, arithmetic expansion, quote removal, 
+pathname expansion, 还有 word splitting。如果扩展为多于一个词，
+.B bash
+将报错。
+.PP
+注意重定向的顺序非常重要。例如，命令
+.RS
+.PP
+ls \fB>\fP dirlist 2\fB>&\fP1
+.RE
+.PP
+将标准输出和标准错误重定向到文件
+.IR dirlist ,
+而命令
+.RS
+.PP
+ls 2\fB>&\fP1 \fB>\fP dirlist
+.RE
+.PP
+只会将标准输出重定向到文件
+.IR dirlist ,
+因为在标准输出被重定向到文件
+.IR dirlist 
+中之前，标准错误被复制为标准输出。
+.PP
+一些文件名在重定向中被 \fBbash\fP 特殊处理，如下表所示：
+.RS
+.PP
+.PD 0
+.TP
+.B /dev/fd/\fIfd\fP
+如果 \fIfd\fP 是一个合法的整数，文件描述符 \fIfd\fP 将被复制。
+.TP
+.B /dev/stdin
+文件描述符 0 被复制。
+.TP
+.B /dev/stdout
+文件描述符 1 被复制。
+.TP
+.B /dev/stderr
+文件描述符 2 被复制。
+.TP
+.B /dev/tcp/\fIhost\fP/\fIport\fP
+如果 \fIhost\fP 是一个合法的主机名或 Internet 地址，并且 \fIport\fP 是
+一个整数端口号或服务名，\fBbash\fP 试图建立与相应的 socket (套接字) 的
+TCP 连接。
+.TP
+.B /dev/udp/\fIhost\fP/\fIport\fP
+如果 \fIhost\fP 是一个合法的主机名或 Internet 地址，并且 \fIport\fP 是
+一个整数端口号或服务名，\fBbash\fP 试图建立与相应的 socket (套接字) 的
+UDP 连接。
+.PD
+.RE
+.PP
+打开或创建文件错误将导致重定向出错。
+.SS Redirecting Input
+.PP
+重定向输入使得以
+.I word
+扩展结果为名的文件被打开并通过文件描述符
+.IR n 
+读取，如果没有指定
+.I n
+那么就作为标准输入 (文件描述符为 0) 读取。
+.PP
+重定向输入的一般形式是：
+.RS
+.PP
+[\fIn\fP]\fB<\fP\fIword\fP
+.RE
+.SS Redirecting Output
+.PP
+重定向输出使得以
+.I word
+扩展结果为名的文件被打开并通过文件描述符
+.IR n 
+写入，如果没有指定
+.I n
+那么就作为标准输出 (文件描述符为 1) 写入。
+.PP
+重定向的一般形式是：
+.RS
+.PP
+[\fIn\fP]\fB>\fP\fIword\fP
+.RE
+.PP
+如果重定向操作符是
+.BR > ，
+并且启用了内建命令
+.B set
+的
+.B noclobber
+选项，那么如果 \fIword\fP 扩展后得到的文件名存在并且是一个普通的文件，
+重定向将失败。如果重定向操作符是
+.BR >| ,
+或者重定向操作符是
+.B >
+并且没有启用内建命令
+.B set
+的
+.B noclobber
+选项，那么即使 \fIword\fP 得出的文件名存在，也会尝试进行重定向。
+.SS Appending Redirected Output (添加到重定向后的输出尾部)
+.PP
+这种方式的输出重定向使得以
+.I word
+扩展结果为名的文件被打开并通过文件描述符
+.IR n 
+从尾部添加。如果没有指定
+.I n
+就使用标准输出 (文件描述符 1)。如果文件不存在，它将被创建。
+.PP
+重定向的一般形式是：
+.RS
+.PP
+[\fIn\fP]\fB>>\fP\fIword\fP
+.RE
+.PP
+.SS Redirecting Standard Output and Standard Error
+.PP
+.B Bash
+允许使用这种结构将标准输出和标准错误 (文件描述符 1 和 2) 重定向到以
+.I word
+扩展结果为名的文件中。
+.PP
+有两种重定向标准输出/标准错误的形式：
+.RS
+.PP
+\fB&>\fP\fIword\fP
+.RE
+还有
+.RS
+\fB>&\fP\fIword\fP
+.RE
+.PP
+两种形式中，推荐使用第一种。它与
+.RS
+.PP
+\fB>\fP\fIword\fP 2\fB>&\fP1
+.RE
+在语义上等价。
+.SS Here Documents
+.PP
+这种重定向使得 shell 从当前源文件读取输入，直到遇到仅包含
+.I word
+的一行 (并且没有尾部空白，trailing blanks) 为止。直到这一点的所有行被用作
+命令的标准输入。
+.PP
+here-document 的格式是：
+.RS
+.PP
+.nf
+\fB<<\fP[\fB\-\fP]\fIword\fP
+        \fIhere-document\fP
+\fIdelimiter\fP
+.fi
+.RE
+.PP
+不会对
+.IR word
+进行 parameter expansion, command substitution, arithmetic expansion,
+或者 pathname expansion。如果
+.I word
+中任何字符是引用的，
+.I delimiter
+将是对
+.IR word
+进行引用删除的结果，here-document 中的行不会被扩展。如果 \fIword\fP 
+没有被引用，here-documnet 中的所有行都要经过
+parameter expansion, command substitution, 和 arithmetic expansion。
+在后一种情况下，字符序列
+.B \e<newline>
+被忽略；必须用
+.B \e
+来引用字符
+.BR \e ,
+.BR $ ,
+和
+.BR ` .
+.PP
+如果重定向操作符是
+.BR <<\- ,
+那么所有前导的 tab 字符都被从输入行和包含
+.IR delimiter
+的行中删除。这样使得 shell 脚本中的 here-document 可以被更好地缩进。
+.SS "Here Strings"
+here-document 的变种，形式是
+.RS
+.PP
+.nf
+\fB<<<\fP\fIword\fP
+.fi
+.RE
+.PP
+\fIword\fP 被扩展，提供给命令作为标准输入。
+.SS "Duplicating File Descriptors" (复制文件描述符)
+.PP
+重定向操作符
+.RS
+.PP
+[\fIn\fP]\fB<&\fP\fIword\fP
+.RE
+.PP
+用于复制文件描述符。如果
+.I word
+扩展为一个或多个数字，
+.I n
+代表的文件描述符将成为那个文件描述符的复制。如果
+.I word
+中的数字并未指定一个被用于读取的文件描述符，将产生一个重定向错误。如果
+.I word
+扩展为
+.BR \- ,
+文件描述符
+.I n
+将被关闭。如果没有指定
+.I n，
+将使用标准输入 (文件描述符 0)。
+.PP
+类似的，操作符
+.RS
+.PP
+[\fIn\fP]\fB>&\fP\fIword\fP
+.RE
+.PP
+用于复制输出文件描述符。如果没有指定
+.I n，
+将使用标准输出 (文件描述符 1)。如果
+.I word
+中的数字并未指定一个被用于输出的文件描述符，将产生一个重定向错误。
+特殊情况下，如果忽略了 \fIn\fP，并且 \fIword\fP 并非扩展为一个或多个数字，
+标准输出和标准错误将被重定向，和前面描述的一样。
+.SS "Moving File Descriptors"
+.PP
+重定向操作符
+.RS
+.PP
+[\fIn\fP]\fB<&\fP\fIdigit\fP\fB\-\fP
+.RE
+.PP
+将文件描述符 \fIdigit\fP 移动为文件描述符
+.IR n ,
+或标准输入 (文件描述符 0)，如果没有指定 \fIn\fP 的话。
+\fIdigit\fP 复制为 \fIn\fP 之后就被关闭了。
+.PP
+类似的，重定向操作符
+.RS
+.PP
+[\fIn\fP]\fB>&\fP\fIdigit\fP\fB\-\fP
+.RE
+.PP
+将文件描述符 \fIdigit\fP 移动为文件描述符
+.IR n ,
+或标准输出 (文件描述符 1)，如果没有指定 \fIn\fP 的话。
+.SS "Opening File Descriptors for Reading and Writing"
+.PP
+重定向操作符
+.RS
+.PP
+[\fIn\fP]\fB<>\fP\fIword\fP
+.RE
+.PP
+使得以
+.I word
+扩展结果为名的文件被打开，通过文件描述符
+.IR n 
+进行读写。如果没有指定
+.I n
+那么就使用文件描述符 0。如果文件不存在，它将被创建。
+.SH 别名(ALIASES)
+\fIAliases\fP (别名机制) 允许将一个词来替换为一个字符串，如果它是
+一个简单命令的第一个词的话。shell 记录着一个别名列表，可以使用
+内建命令
+.B alias
+和
+.B unalias
+来定义和取消 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。每个命令的第一个词，如果没有引用，都将被检查是否是一个别名。
+如果是，这个词将被它所指代的文本替换。别名和替换的文本可以包含任何有效
+的 shell 输入，包含上面列出的
+.I metacharacters (元字符)
+，特殊情况是别名中不能包含 \fI=\fP。替换文本的第一个词也被检查是否
+是别名，但是如果它与被替换的别名相同，就不会再替换第二次。这意味着可以用
+.B ls
+作为
+.BR "ls \-F"
+的别名，
+.B bash
+不会递归地展开替换文本。如果别名的最后一个字符是
+.IR blank ,
+那么命令中别名之后的下一个词也将被检查是否能进行别名展开。
+.PP
+别名可以使用
+.B alias
+命令来创建或列举出来，使用
+.B unalias
+命令来删除。
+.PP
+在替换文本中没有参数机制。如果需要参数，应当使用 shell 函数 (参见下面的
+.SM
+.B FUNCTIONS (函数)
+段落)。
+.PP
+如果 shell 不是交互的，别名将不会展开，除非使用内建命令
+.B shopt
+设置了
+.B expand_aliases
+选项。
+.PP
+关于别名的定义和使用中的规则比较混乱。
+.B Bash
+在执行一行中的任何命令之前，总是读入至少完整一行的输入。
+别名在命令被读取时展开，而不是在执行的时候。因此，别名定义如果
+和另一个命令在同一行，那么不会起作用，除非读入了下一行。
+别名定义之后，同一行中的命令不会受新的别名影响。这种行为
+在函数执行时存在争议，因为别名替换是在函数定义被读取时发生的，
+而不是函数被执行的时候，因为函数定义本身是一个复合命令。结果，
+在函数中定义的别名只有当这个函数执行完才会生效。为了保险起见，
+应当总是将别名定义放在单独的一行，不在复合命令中使用
+.B alias。
+.PP
+不管什么情况下，别名都被 shell 函数超越 (be superseded)。
+.SH 函数(FUNCTIONS)
+一个 shell 函数，以上面
+.SM
+.BR "SHELL GRAMMAR" 
+中描述的方法定义，保存着一系列的命令，等待稍后执行。
+当 shell 函数名作为一个简单命令名使用时，这个函数名关联的命令的序列
+被执行。函数在当前 shell 的上下文环境中执行；不会创建新的进程来
+解释它们 (这与 shell 脚本的执行形成了对比)。当执行函数时，函数
+的参数成为执行过程中的位置参数 (positional parameters)。特殊参数
+.B #
+被更新以反映这个变化。位置参数 0 不会改变。函数执行时，
+.SM
+.B FUNCNAME
+变量被设置为函数的名称。函数和它的调用者在 shell 执行环境的所有
+其他方面都是一样的，特殊情况是
+.SM
+.B DEBUG
+陷阱 (参见下面对内建函数
+.B trap
+的描述，在
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节中) 不会被继承，除非函数设置了
+\fBtrace\fP 属性 (参见下面对内建函数
+.SM
+.B declare
+的描述)。
+.PP
+函数中的局部变量可以使用内建命令
+.B local
+来声明。通常情况下，变量和它们的值在函数和它的调用者之间是共享的。
+.PP
+如果函数中执行了内建命令
+.B return，
+那么函数结束，执行从函数调用之后的下一个命令开始。
+函数结束后，位置参数的值以及特殊参数
+.B #
+都将重置为它们在函数执行前的值。
+.PP
+函数名和定义可以使用内建命令
+.B declare
+或
+.B typeset
+加上
+.B \-f
+参数来列出。如果在
+.B declare
+或
+.B typeset
+命令中使用
+.B \-F
+选项将只列出函数名。函数可以使用内建命令
+.B export
+加上
+.B \-f
+参数导出，使得子 shell 中它们被自动定义。
+.PP
+函数可以是递归的。对于递归调用的次数没有硬性限制。
+.SH 算术求值("ARITHMETIC EVALUATION")
+在一定的环境下，shell 允许进行算术表达式的求值 (参见内建命令 \fBlet\fP
+和 \fBArithmetic Expansion\fP (算术表达式))。
+求值使用固定宽度的整数，不检查是否溢出，但是被零除会被捕获，标记为错误。
+操作数及其优先级和聚合程度与 C 语言中相同。下列操作数的列表按照相同
+优先级的操作数其级别来分组。列出的级别顺序是优先级递减的。
+.PP
+.PD 0
+.TP
+.B \fIid\fP++ \fIid\fP\-\-
+变量自增/自减 (在后)
+.TP
+.B ++\fIid\fP \-\-\fIid\fP
+变量自增/自减 (在前)
+.TP
+.B \- +
+(单目的) 取负/取正
+.TP
+.B ! ~
+逻辑和位取反
+.TP
+.B **
+乘幂
+.TP
+.B * / %
+乘，除，取余
+.TP
+.B + \-
+加，减
+.TP
+.B << >>
+左/右位移
+.TP
+.B <= >= < >
+比较
+.TP
+.B == !=
+相等/不等
+.TP
+.B &
+位与 (AND)
+.TP
+.B ^
+位异或 (exclusive OR)
+.TP
+.B |
+位或 (OR)
+.TP
+.B &&
+逻辑与 (AND)
+.TP
+.B ||
+逻辑或 (OR)
+.TP
+.B \fIexpr\fP?\fIexpr\fP:\fIexpr\fP
+条件求值
+.TP
+.B = *= /= %= += \-= <<= >>= &= ^= |=
+赋值
+.TP
+.B \fIexpr1\fP , \fIexpr2\fP
+逗号表达式
+.PD
+.PP
+shell 变量可以作为操作数；在表达式求值之前会进行参数扩展。
+在表达式中，可以用名称引用 shell 变量，不必使用参数扩展的语法。
+变量被引用时，其值被作为算术表达式来求值。
+shell 变量用于表达式中时，不必启用整数属性。
+.PP
+以 0 为前导的常量被当作八进制数，以 0x 或 0X 作为前导表明是十六进制。
+其他情况下，数字的形式是 [\fIbase#\fP]n，这里 \fIbase\fP 是一个 2 到 64
+的十进制数值，作为数字的基数，\fIn\fP 是在这个基数中数字的值。
+如果忽略了 \fIbase#\fP，将以 10 为基数。大于 10 的数字依次以小写字母，
+大写字母，@ 和 _ 表示。如果 \fIbase\fP 小于或等于 36，在表示 10 与 35 之间
+的数字时小写字母和大写字母可以互换。
+.PP
+操作符根据优先级顺序进行求值。圆括号中的子表达式被最先求值，可能会
+超越上面的优先级规则。
+.SH 条件表达式("CONDITIONAL EXPRESSIONS")
+条件表达式用于 \fB[[\fP 复合命令以及内建命令 \fBtest\fP 和 \fB[\fP 中，
+用来测试文件属性，进行字符串和算术比较。表达式使用下面的单目或二进制操作构造。
+如果某操作的任何 \fIfile\fP 参数的形式是 \fI/dev/fd/n\fP，那么将检查
+文件描述符 \fIn\fP。如果某操作的 \fIfile\fP 参数是 \fI/dev/stdin\fP，
+\fI/dev/stdout\fP 或者 \fI/dev/stderr\fP 之一，将分别检查文件描述符 0，1 和 2。
+.sp 1
+.PD 0
+.TP
+.B \-a \fIfile\fP
+如果 \fIfile\fP 存在则为真。
+.TP
+.B \-b \fIfile\fP
+如果 \fIfile\fP 存在且为块设备则为真。
+.TP
+.B \-c \fIfile\fP
+如果 \fIfile\fP 存在且为字符设备则为真。
+.TP
+.B \-d \fIfile\fP
+如果 \fIfile\fP 存在且是一个目录则为真。
+.TP
+.B \-e \fIfile\fP
+如果 \fIfile\fP 存在则为真。
+.TP
+.B \-f \fIfile\fP
+如果 \fIfile\fP 存在且为普通文件则为真。
+.TP
+.B \-g \fIfile\fP
+如果 \fIfile\fP 存在且是设置组ID的 (sgid) 则为真。
+.TP
+.B \-h \fIfile\fP
+如果 \fIfile\fP 存在且为符号链接则为真。
+.TP
+.B \-k \fIfile\fP
+如果 \fIfile\fP 存在且设置了 ``sticky'' 位 (粘滞位) 则为真。
+.TP
+.B \-p \fIfile\fP
+如果 \fIfile\fP 存在且是一个命名管道 (FIFO) 则为真。
+.TP
+.B \-r \fIfile\fP
+如果 \fIfile\fP 存在且可读则为真。
+.TP
+.B \-s \fIfile\fP
+如果 \fIfile\fP 存在且大小大于零则为真。
+.TP
+.B \-t \fIfd\fP
+如果文件描述符
+.I fd
+是打开的且对应一个终端则为真。
+.TP
+.B \-u \fIfile\fP
+如果 \fIfile\fP 存在且是设置用户ID的 (suid) 则为真。
+.TP
+.B \-w \fIfile\fP
+如果 \fIfile\fP 存在且可写则为真。
+.TP
+.B \-x \fIfile\fP
+如果 \fIfile\fP 存在且可执行则为真。
+.TP
+.B \-O \fIfile\fP
+如果 \fIfile\fP 存在且为有效用户ID所拥有则为真。
+.TP
+.B \-G \fIfile\fP
+如果 \fIfile\fP 存在且为有效组ID所拥有则为真。
+.TP
+.B \-L \fIfile\fP
+如果 \fIfile\fP 存在且为符号链接则为真。
+.TP
+.B \-S \fIfile\fP
+如果 \fIfile\fP 存在且为套接字则为真。
+.TP
+.B \-N \fIfile\fP
+如果 \fIfile\fP 存在且上次读取后被修改过则为真。
+.TP
+\fIfile1\fP \-\fBnt\fP \fIfile2\fP
+如果 \fIfile1\fP 比 \fIfile2\fP 要新 (根据修改日期)，或者
+如果 \fIfile1\fP 存在而 \fIfile2\fP 不存在，则为真。
+.TP
+\fIfile1\fP \-\fBot\fP \fIfile2\fP
+如果 \fIfile1\fP 比 \fIfile2\fP 更旧，或者
+如果 \fIfile1\fP 不存在而 \fIfile2\fP 存在，则为真。
+.TP
+\fIfile1\fP \fB\-ef\fP \fIfile2\fP
+如果 \fIfile1\fP 和 \fIfile2\fP 指的是相同的设备和 inode 号则为真。
+.TP
+.B \-o \fIoptname\fP
+如果启用了 shell 选项
+.I optname
+则为真。参见下面对内建命令
+.B set
+的
+.B \-o
+选项的描述中的选项列表。
+.TP
+.B \-z \fIstring\fP
+如果 \fIstring\fP 的长度为 0 则为真。
+.TP
+.B \-n \fIstring\fP
+.TP
+\fIstring\fP
+如果 \fIstring\fP 的长度非 0 则为真。
+.TP
+\fIstring1\fP \fB==\fP \fIstring2\fP
+如果字符串相等则为真。\fB=\fP 可以用于使用 \fB==\fP 的场合来兼容 POSIX 规范。
+.TP
+\fIstring1\fP \fB!=\fP \fIstring2\fP
+如果字符串不相等则为真。
+.TP
+\fIstring1\fP \fB<\fP \fIstring2\fP
+如果 \fIstring1\fP 在当前语言环境的字典顺序中排在 \fIstring2\fP 之前则为真。 
+.TP
+\fIstring1\fP \fB>\fP \fIstring2\fP
+如果 \fIstring1\fP 在当前语言环境的字典顺序中排在 \fIstring2\fP 之后则为真。 
+.TP
+.I \fIarg1\fP \fBOP\fP \fIarg2\fP
+.SM
+.B OP
+是
+.BR \-eq ,
+.BR \-ne ,
+.BR \-lt ,
+.BR \-le ,
+.BR \-gt ,
+或
+.BR \-ge
+之一。这些算术二进制操作返回真，如果 \fIarg1\fP 与 \fIarg2\fP 分别是
+相等，不等，小于，小于或等于，大于，大于或等于关系。
+.I Arg1
+和
+.I arg2
+可以是正/负整数。
+.PD
+.SH 简单命令扩展("SIMPLE COMMAND EXPANSION")
+当执行一个简单命令时，shell 进行下列扩展，赋值和重定向，从左到右。
+.IP 1.
+解释器标记为与变量赋值 (在命令名之前的) 和重定向有关的词被保存等待随后处理。
+.IP 2.
+并非变量赋值或重定向的词被扩展。如果扩展后仍然有词保留下来，第一个词被
+作为命令名，其余词是参数。
+.IP 3.
+重定向按照上面
+.SM
+.BR REDIRECTION
+中讲到的规则进行。
+.IP 4.
+每个变量赋值中 \fB=\fP 之后的文本在赋予变量之前要经过波浪线扩展，
+参数扩展，命令替换，算术扩展和引用删除。
+.PP
+如果没有得到命令名，变量赋值影响当前 shell 环境。否则，变量被加入
+被执行的命令的环境中，不影响当前 shell 环境。如果任何赋值动作试图
+为只读变量赋值，将导致出错，命令以非零状态值退出。
+.PP
+如果没有得到命令名，重定向仍会进行，但是不影响当前 shell 环境。
+重定向出错将使命令以非零状态值退出。
+.PP
+如果扩展后有命令名保留下来，那么执行过程如下所示。否则，命令退出。
+如果在任何扩展中包含命令替换，那么整个命令的退出状态是最后一个命令
+替换的退出状态。如果没有进行命令替换，命令以状态零退出。
+.SH "命令执行(COMMAND EXECUTION)"
+命令被拆分为词之后，如果结果是一个简单命令和可选的参数列表，将执行
+下面的操作。
+.PP
+如果命令名中没有斜杠，shell 试图定位命令位置。如果存在同名的 shell
+函数，函数将被执行，像上面
+.SM
+.BR FUNCTIONS 
+中讲到的一样。如果名称不是一个函数，shell 从 内建命令中搜索它。如果找到
+对应命令，它将被执行。
+.PP
+如果名称既不是 shell 函数也不是一个内建命令，并且没有包含斜杠，
+.B bash
+搜索
+.SM
+.B PATH
+的每个成员，查找含有此文件名 (可执行文件) 的目录。
+.B Bash
+使用散列表来储存可执行文件的全路径 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+中的
+.B hash。
+只有在散列表中没有找到此命令，才对
+.SM
+.B PATH
+进行完整的搜索。如果搜索不成功，shell 输出错误消息，返回退出状态 127。
+.PP
+如果搜索成功，或者命令中包含一个或多个斜杠，shell 在单独的执行环境中
+执行这个程序。参数 0 被设置为所给名称；命令的其他参数被设置为所给的参数，
+如果有的话。
+.PP
+如果执行失败，因为文件不是可执行格式，并且此文件不是目录，就假定它是
+一个 \fIshell script\fP (脚本)，一个包含 shell 命令的文件。此时将孵化 
+(spawn) 出一个子 shell 来执行它。子 shell 重新初始化自身，效果就好像是
+执行了一个新的 shell 来处理脚本一样，但是父 shell 保存的命令位置仍然被
+保留 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+中的
+.B hash)。
+.PP
+如果程序是以
+.BR #!
+开头的文件，那么第一行的其余部分指定了这个程序的解释器。
+shell 执行指定的解释器，如果操作系统不会自行处理这种可执行文件格式的话。
+解释器的参数由下面三部分组成：程序第一行中解释器名称之后的可选的一个参数，
+程序的名称，命令行参数，如果有的话。
+.SH "命令执行环境(COMMAND EXECUTION ENVIRONMENT)"
+shell 有 \fIexecution environment\fP (执行环境) 的概念，由下列内容组成：
+.sp 1
+.IP \(bu
+shell 启动时继承的打开的文件，例如在内建命令 \fBexec\fP 中使用重定向
+修改的结果
+.IP \(bu
+当前工作目录，使用 \fBcd\fP，\fBpushd\fP 或者 \fBpopd\fP 设置，或是由
+shell 在启动时继承得到
+.IP \(bu
+文件创建模式掩码，使用 \fBumask\fP 设置或是从 shell 的父进程中继承得到
+.IP \(bu
+当前陷阱，用 \fBtrap\fP 设置
+.IP \(bu
+shell 参数，使用变量赋值或者 \fBset\fP 设置，或者是从父进程的环境中继承得到
+.IP \(bu
+shell 函数，在执行中定义或者是从父进程的环境中继承得到
+.IP \(bu
+设为允许的选项，在执行时设置 (要么是默认允许的，要么是命令行给出的) 或者是
+用 \fBset\fP 设置
+.IP \(bu
+用 \fBshopt\fP 设为允许的选项
+.IP \(bu
+用 \fBalias\fP 定义的 shell 别名
+.IP \(bu
+各种进程号，包含后台作业的进程号，\fB$$\fP 的值，以及 \fB$PPID\fP 的值
+.PP
+当并非 shell 函数或内置命令的简单命令执行时，它在一个由下述内容组成的
+单独的执行环境中启动。除非另外说明，值都是从 shell 中继承的。
+.sp 1
+.IP \(bu
+shell 打开的文件，加上对命令使用重定向修改和添加的文件
+.IP \(bu
+当前工作目录
+.IP \(bu
+文件创建模式掩码
+.IP \(bu
+标记为导出 (export) 的 shell 变量，以及传递到环境中为这个命令导出的变量
+.IP \(bu
+shell 捕捉的陷阱被重置为从 shell 的父进程中继承的值，shell 忽略的陷阱
+也被忽略
+.PP
+在单独的环境中启动的命令不能影响 shell 的执行环境。
+.PP
+命令替换和异步命令都在子 shell 环境中执行。子 shell 环境是原有 shell 
+环境的赋值，但 shell 捕捉的陷阱被重置为 shell 启动时从父进程中继承的值。
+作为管道一部分来执行的内建命令也在一个子 shell 环境中执行。对子 shell
+环境所作修改不能影响到原有 shell 的执行环境。
+.PP
+如果命令后面是 \fB&\fP 并且没有启用作业控制，命令的默认标准输入将是空文件
+\fI/dev/null\fP。否则，被执行的命令从调用它的 shell 中继承被重定向修改的
+文件描述符。
+.SH 环境(ENVIRONMENT)
+当一个程序执行时，它被赋予一个字符串数组，成为环境
+.IR environment 。
+它是一个
+名称-值对 (\fIname\fP\-\fIvalue\fP) 的列表，形式是
+.IR "name\fR=\fPvalue" .
+.PP
+shell 提供了多种操作环境的方法。启动时，shell 扫描自身的环境，为每个找到
+的名字创建一个参数，自动地将它标记为
+.I export
+(向子进程导出的)。被执行的命令继承了这个环境。
+.B export
+和
+.B declare \-x
+命令允许参数和函数被加入到环境中或从环境中删除。如果环境中参数的值
+被修改，新值成为环境的一部分，替换了旧值。所有被执行的命令继承的环境
+包含 shell 的初始环境 (可能值被修改过)，减去被
+.B unset
+命令删除的，加上通过
+.B export
+和
+.B declare \-x
+命令添加的部分。
+.PP
+可以在任何
+.I simple command
+或函数的环境中设定暂时有效的参数，只要将参数赋值放在命令前面就可以了，
+参见上面
+.SM
+.BR PARAMETERS
+的描述。这些赋值语句只在这个命令的环境中有效。
+.PP
+如果设置了内建命令
+.B set
+的
+.B \-k
+选项，
+.I 所有的
+变量赋值都将放到命令的环境中，不仅是在命令名前面的那些。
+.PP
+当
+.B bash
+执行一个外部命令时，变量
+.B _
+被设置为命令的文件全名，然后被传递到命令的环境之中。
+.SH 退出状态("EXIT STATUS")
+从 shell 的角度看，一个命令退出状态是 0 意味着成功退出。
+退出状态是 0 表明成功。非零状态值表明失败。当命令收到 fatal signal \fIN\fP
+退出时，bash 使用 128+\fIN\fP 作为它的退出状态。
+.PP
+如果没有找到命令，为执行它而创建的子进程返回 127。如果找到了命令但是
+文件不可执行，返回状态是 126。
+.PP
+如果命令由于扩展或重定向错误而失败，退出状态大于零。
+.PP
+shell 内建命令如果成功返回 0(\fItrue\fP)，执行时出错则返回非零 (\fIfalse\fP)。
+所有内建命令返回 2 来指示不正确的用法。
+.PP
+\fBBash\fP 自身返回最后执行的命令的退出状态，除非发生了语法错误，
+这时它返回非零值。参见下面的内建命令 \fBexit\fP。
+.SH 信号(SIGNALS)
+如果 \fBbash\fP 是交互的，没有设定任何陷阱，它忽略
+.SM
+.B SIGTERM
+(这样 \fBkill 0\fP 不会杀掉交互的 shell)。
+.SM
+.B SIGINT
+被捕获并处理 (从而使内建命令 \fBwait\fP 可以中断)。在所有情况下，
+\fBbash\fP 忽略
+.SM
+.BR SIGQUIT 。
+如果正在使用作业控制，
+.B bash
+忽略
+.SM
+.BR SIGTTIN ,
+.SM
+.BR SIGTTOU ,
+和
+.SM
+.BR SIGTSTP .
+.PP
+\fBbash\fP 开始的并行作业的信号处理句柄都设置为 shell 从父进程中继承
+的值。如果不是正在使用作业控制，异步命令还忽略
+.SM
+.B SIGINT
+和
+.SM
+.B SIGQUIT 。
+作为命令替换结果运行的命令忽略键盘产生的作业控制信号
+.SM
+.BR SIGTTIN ,
+.SM
+.BR SIGTTOU ,
+和
+.SM
+.BR SIGTSTP .
+.PP
+如果收到信号
+.SM
+.BR SIGHUP，
+shell 默认退出。在退出前，交互的 shell 向所有作业，运行的或停止的，发送
+.SM
+.B SIGHUP
+信号。shell 向停止的作业发出
+.SM
+.B SIGCONT
+信号来保证它们会收到
+.SM
+.BR SIGHUP .
+要阻止 shell 向特定的作业发送信号，应当使用内建命令
+.B disown
+将作业从作业表中删除 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节) 或者使用
+.BR "disown \-h" 
+来标记为不接受
+.SM
+.B SIGHUP。
+.PP
+如果使用
+.BR shopt
+设置了 shell 选项
+.B huponexit，
+在交互的登录 shell 退出时
+.B bash
+向所有作业发出
+.SM
+.B SIGHUP
+信号。
+.PP
+当 \fBbash\fP 等待命令执行结束时，如果收到已设置了陷阱的信号，陷阱 
+(trap) 将不会执行，直到命令结束。
+当 \fBbash\fP 通过内建命令 \fBwait\fP 等待异步命令时，如果收到已设置
+了陷阱的信号，将使得内建命令 \fBwait\fP 立即以大于 128 的状态值返回。
+接着，陷阱将立即被执行。
+.SH 作业控制("JOB CONTROL")
+.I Job control
+(作业控制) 指的是可以选择停止 (\fIsuspend\fP，挂起) 进程执行，并且
+可以在之后继续 (\fIresume\fP，恢复) 执行的能力。用户一般在交互的人机界面
+中使用这种功能。界面是由系统的终端驱动和
+.BR bash 
+共同提供的。
+.PP
+shell 将每个管道分配给一个
+.I 作业(job)。
+它保存一个当前运行的作业表，可以用
+.B jobs
+命令来列出。当
+.B bash
+启动一个异步的作业时
+.IR (background，后台执行)，
+它输出这样的一行：
+.RS
+.PP
+[1] 25647
+.RE
+.PP
+表明这个作业的作业号是 1，与作业相关连的管道中最后一个进程的
+进程ID是 15647。管道中所有进程都是同一个作业的成员。
+.B Bash
+使用
+.I 作业(job)
+概念作为作业控制的基础。
+.PP
+为简化作业控制的用户界面的实现，操作系统负责管理“当前终端的进程组” 
+(\fIcurrent terminal process group ID\fP) 的概念。这个进程组的成员
+(进程组 ID 是当前终端进程组 ID 的进程) 可以收到键盘产生的信号，例如
+.SM
+.BR SIGINT .
+这些进程被称为
+.IR foreground (前台的)。
+.I Background (后台的)
+进程是那些进程组 ID 与终端不同的进程；这些进程不会收到键盘产生的信号。
+只有前台进程可以从终端读或向终端写。后台进程试图读/写终端时，将收到终端驱动程序发送的
+.SM
+.B SIGTTIN (SIGTTOU)
+信号。这个信号如果没有加以捕捉，将挂起这个进程。
+.PP
+如果
+.B bash
+运行其上的操作系统支持作业控制，
+.B bash
+会包含使用它的设施。在一个进程正在运行的时候键入
+.I suspend 挂起
+字符 (通常是
+.BR ^Z ,
+Control-Z) 将使这个进程暂停，将控制权还给
+.BR bash .
+输入
+.I "delayed suspend", 延时挂起
+字符 (通常是
+.BR ^Y ,
+Control-Y) 将使这个进程在试图从终端读取输入时暂停，将控制权还给
+.BR bash .
+用户接下来可以控制此作业的状态，使用
+.B bg
+命令使它在后台继续运行，
+.B fg
+命令使它在前台继续运行，或
+.B kill
+命令将它杀死。\fB^Z\fP 会立即起作用，并且还有使等待中的 (pending) 输出和输入被忽略的附加副作用。
+.PP
+有很多方法来指代 shell 中的作业。字符
+.B %
+可以引入作业名。编号为
+.I n
+的作业可以用
+.BR %n
+的形式来指代。作业也可以用启动它的名称的前缀，或者命令行中的子字符串来指代。例如，
+.B %ce
+指代一个暂停的
+.B ce
+作业。如果前缀匹配多于一个作业，
+.B bash
+报错。另一方面，使用
+.BR %?ce ,
+可以指代任何命令行中包含字符串
+.B ce
+的作业。如果子字符串匹配多于一个作业，
+.B bash
+报错。符号
+.B %%
+和
+.B %+
+指代 shell 意义上的
+.IR "current job"，当前作业，
+也就是前台被暂停的最后一个作业，或者是在后台启动的作业。
+.I "previous job"，前一作业
+可以使用
+.BR %\- 
+来指代。在有关作业的输出信息中 (例如，命令
+.B jobs
+的输出)，当前作业总是被标记为
+.BR + ,
+前一作业标记为
+.BR \- .
+.PP
+简单地给出作业名，可以用来把它放到前台：
+.B %1
+是
+\fB``fg %1''\fP
+的同义词，将作业 1 从后台放到前台。类似的，
+.B ``%1 &''
+在后台恢复作业 1，与
+\fB``bg %1''\fP
+等价。
+.PP
+当某个作业改变状态时，shell 立即可以得知。通常，
+.B bash
+等待直到要输出一个提示符时，才会报告作业的状态变化，从而不会打断其他输出。
+如果启用了内建命令
+.B set
+的
+.B \-b
+选项，
+.B bash
+将立即报告这些变化。对
+.SM
+.B SIGCHLD
+信号的陷阱将在每个子进程退出时执行。
+.PP
+如果在作业暂停时试图退出
+.B bash，
+shell 打印一条警告消息。命令
+.B jobs
+可能被用来检查作业的状态。如果再次试图退出，中间没有其他命令，shell 不会打印
+其他警告，暂停的作业将终止。
+.SH 提示符(PROMPTING)
+在交互执行时，
+.B bash
+在准备好读入一条命令时显示主提示符
+.SM
+.B PS1，
+在需要更多的输入来完成一条命令时显示
+.SM
+.B PS2。
+.B Bash
+允许通过插入一些反斜杠转义的特殊字符来定制这些提示字符串，这些字符被如下解释：
+.RS
+.PD 0
+.TP
+.B \ea
+一个 ASCII 响铃字符 (07)
+.TP
+.B \ed
+日期，格式是 "星期 月份 日" (例如，"Tue May 26")
+.TP
+.B \eD{\fIformat\fP}
+\fIformat\fP 被传递给 \fIstrftime\fP(3)，结果被插入到提示字符串中；
+空的 \fIformat\fP 将使用语言环境特定的时间格式。花括号是必需的
+.TP
+.B \ee
+一个 ASCII 转义字符 (033)
+.TP
+.B \eh
+主机名，第一个 `.' 之前的部分
+.TP
+.B \eH
+主机名
+.TP
+.B \ej
+shell 当前管理的作业数量
+.TP
+.B \el
+shell 的终端设备名的基本部分
+.TP
+.B \en
+新行符
+.TP
+.B \er
+回车
+.TP
+.B \es
+shell 的名称，
+.B $0
+的基本部分 (最后一个斜杠后面的部分)
+.TP
+.B \et
+当前时间，采用 24小时制的 HH:MM:SS 格式
+.TP
+.B \eT
+当前时间，采用 12小时制的 HH:MM:SS 格式
+.TP
+.B \e@
+当前时间，采用 12小时制上午/下午 (am/pm) 格式
+.TP
+.B \eA
+当前时间，采用 24小时制上午/下午格式
+.TP
+.B \eu
+当前用户的用户名
+the username of the current user
+.TP
+.B \ev
+\fBbash\fP 的版本 (例如，2.00)
+.TP
+.B \eV
+\fBbash\fP 的发行编号，版本号加补丁级别 (例如，2.00.0)
+.TP
+.B \ew
+当前工作目录
+.TP
+.B \eW
+当前工作目录的基本部分
+.TP
+.B \e!
+此命令的历史编号
+.TP
+.B \e#
+此命令的命令编号
+.TP
+.B \e$
+如果有效 UID 是 0，就是
+.BR # ,
+其他情况下是
+.B $
+.TP
+.B \e\fInnn\fP
+对应八进制数 \fInnn\fP 的字符
+.TP
+.B \e\e
+一个反斜杠
+.TP
+.B \e[
+一个不可打印字符序列的开始，可以用于在提示符中嵌入终端控制序列
+.TP
+.B \e]
+一个不可打印字符序列的结束
+.PD
+.RE
+.PP
+命令编号和历史编号通常是不同的：历史编号是命令在历史列表中的位置，可能
+包含从历史文件中恢复的命令 (参见下面的
+.SM
+.B HISTORY 历史
+章节)，而命令编号是当前 shell 会话中执行的命令序列中，命令的位置。
+字符串被解码之后，它将进行扩展，要经过
+parameter expansion, command substitution, arithmetic
+expansion 和 quote removal, 最后要经过 shell 选项
+.B promptvars
+处理 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节中，对命令
+.B shopt
+的描述)。
+.SH readline库(READLINE)
+这是在交互 shell 中处理读取输入的库，除非在 shell 启动时给出了
+.B \-\-noediting
+选项。默认情况下，行编辑命令类似于 emacs 中的那些。也可以使用 vi 样式的行编辑界面。
+要在 shell 运行之后关闭行编辑，使用内置命令
+.B set
+的
+.B +o emacs
+或
+.B +o vi
+选项 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.SS "Readline Notation"
+.PP
+在这个小节中，将使用 emacs 样式的记法来表述按键。Ctrl 键记为 C\-\fIkey\fR，
+例如，C\-n 意思是 Ctrl\-N。类似的，
+.I meta
+键记为 M\-\fIkey\fR，因此 M\-x 意味着 Meta\-x。(在没有
+.I meta
+键的键盘上，M\-\fIx\fP 意思是 ESC\-\fIx\fP，也就是说，按下 Esc 键，然后按
+.I x
+键。这使得 Esc 成为 \fImeta prefix\fP。M\-C\-\fIx\fP 的组合意思是 Esc\-Ctrl\-\fIx\fP，
+也就是按 Esc 键，然后按住 Ctrl 键，同时按
+.I x
+键。)
+.PP
+readline 命令可以有数字的
+.IR 参数 (arguments)，
+一般作为重复的计数。有些时候，它是重要参数的标记。给向前方进行的命令 
+(例如，\fBkill\-line\fP) 传递负数参数，将使得命令向反方向进行。
+下面的命令如果接受参数时的行为与此不同，将另行说明。
+.PP
+当命令被描述为剪切 (\fIkilling\fP) 文本时，被删除的文本被保存，等待将来使用
+(粘贴，\fIyanking\fP)。被剪切的文本保存在 \fIkill ring\fP 中。连续的剪切使得
+文本被依次加入到一个单元中，可以一次被粘贴。不剪切文本的命令将 kill ring 中的文本分离。
+.SS "Readline Initialization 初始化"
+.PP
+readline 可以通过将命令放入初始化文件 (\fIinputrc\fP 文件) 来定制。
+文件名从变量
+.SM
+.B INPUTRC
+的值中获取。如果没有设置这个变量，默认是
+.IR ~/.inputrc .
+当使用 readline 库的程序启动时，将读取初始化文件，按键关联和变量将被设置。
+readline 初始化文件中只允许有很少的基本构造。
+空行被忽略。以 \fB#\fP 开始的行是注释。以 \fB$\fP 开始的行指示了有条件的构造。
+其他行表示按键关联和变量设置。
+.PP
+默认的按键关联可以使用
+.I inputrc 
+文件改变。其他使用这个库的程序可以添加它们自己的命令和关联。
+.PP
+例如，将
+.RS
+.PP
+M\-Control\-u: universal\-argument
+.RE
+或
+.RS
+C\-Meta\-u: universal\-argument
+.RE
+放入
+.I inputrc
+将使得 M\-C\-u 执行 readline 命令
+.IR universal\-argument .
+.PP
+可以识别下列字符的符号名称：
+.IR RUBOUT ,
+.IR DEL ,
+.IR ESC ,
+.IR LFD ,
+.IR NEWLINE ,
+.IR RET ,
+.IR RETURN ,
+.IR SPC ,
+.IR SPACE ,
+和
+.IR TAB .
+.PP
+在命令名之外，readline 允许将按键与一个字符串关联，当按下这个键时，将插入这个字符串 (一个宏，\fImacro\fP)。
+.SS "Readline Key Bindings"
+.PP
+.I inputrc
+文件中的控制按键关联的语法非常简单。需要的内容是命令名或宏，以及它应当关联到的按键序列。
+名称可以以两种方式指定：一个按键的符号名称，可能带有 \fIMeta\-\fP 或 \fIControl\-\fP 前缀，或者是一个按键序列。
+.PP
+当使用 \fBkeyname\fP:\^\fIfunction\-name\fP 或 \fImacro\fP 形式时，
+.I keyname
+是按键以英文拼写的名称。例如：
+.sp
+.RS
+Control-u: universal\-argument
+.br
+Meta-Rubout: backward-kill-word
+.br
+Control-o: "> output"
+.RE
+.LP
+在上述例子中，
+.I C\-u
+被关联到函数
+.BR universal\-argument ,
+.I M\-DEL
+被关联到函数
+.BR backward\-kill\-word ,
+而
+.I C\-o
+被关联为运行右边给出的宏 (意思是，将向行中插入
+.if t \f(CW> output\fP
+.if n ``> output''
+)。
+.PP
+在第二种形式中，\fB"keyseq"\fP:\^\fIfunction\-name\fP 或 \fImacro\fP，
+.B keyseq
+不同于上面的
+.B keyname，
+表示整个按键序列的字符串可以通过将按键序列放在双引号引用中来指定。
+可以使用一些 GNU Emacs 样式的按键序列，如下例所示，但是不会识别按键的符号名称。
+.sp
+.RS
+"\eC\-u": universal\-argument
+.br
+"\eC\-x\eC\-r": re\-read\-init\-file
+.br
+"\ee[11~": "Function Key 1"
+.RE
+.PP
+在上述例子中，
+.I C\-u
+被又一次关联到函数
+.BR universal\-argument .
+.I "C\-x C\-r"
+被关联到函数
+.BR re\-read\-init\-file ,
+而
+.I "ESC [ 1 1 ~"
+被关联为插入文本
+.if t \f(CWFunction Key 1\fP.
+.if n ``Function Key 1''.
+.PP
+GNU Emacs 样式的转义序列的全集为：
+.RS
+.PD 0
+.TP
+.B \eC\-
+Ctrl 前缀
+.TP
+.B \eM\-
+Meta 前缀
+.TP
+.B \ee
+一个 Esc 字符
+.TP
+.B \e\e
+反斜杠
+.TP
+.B \e"
+字面上的 "
+.TP
+.B \e'
+字面上的 '
+.RE
+.PD
+.PP
+除了 GNU Emacs 样式的转义序列，还有一系列反斜杠转义序列可用：
+.RS
+.PD 0
+.TP
+.B \ea
+响铃
+.TP
+.B \eb
+回退
+.TP
+.B \ed
+删除
+.TP
+.B \ef
+进纸
+.TP
+.B \en
+新行符
+.TP
+.B \er
+回车
+.TP
+.B \et
+水平跳格
+.TP
+.B \ev
+竖直跳格
+.TP
+.B \e\fInnn\fP
+一个八比特字符，它的值是八进制值 \fInnn\fP (一到三个八进制数字)。
+.TP
+.B \ex\fIHH\fP
+一个八比特字符，它的值是十六进制值 \fIHH\fP (一到两个十六进制数字)。
+.RE
+.PD
+.PP
+输入宏的文本时，必须使用单引号或双引号引用来表明是宏的定义。
+没有引用的文本被当作函数名。在宏的定义体中，上述反斜杠转义被扩展。
+反斜杠将引用宏文本中所有其他字符，包括 " 和 '。
+.PP
+.B Bash
+允许使用内建命令
+.B bind
+来显示和修改当前 readline 按键关联。在交互使用中可以用内建命令
+.B set
+的
+.B \-o 
+选项切换到编辑模式 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.SS "Readline Variables"
+.PP
+readline 包含额外的可用于定制它的行为的变量。可以在
+.I inputrc
+文件中设置变量，使用如下形式的语句：
+.RS
+.PP
+\fBset\fP \fIvariable\-name\fP \fIvalue\fP
+.RE
+.PP
+除非另外说明，readline 变量的值总是
+.B On
+或
+.BR Off。
+变量和它们的默认值是：
+.PP
+.PD 0
+.TP
+.B bell\-style (audible)
+控制了当 readline 需要鸣终端响铃时的动作。如果设置为 \fBnone\fP，
+readline 不会鸣铃。如果设置为 \fBvisible\fP，readline 使用可视的响铃，如果可用的话。
+如果设置为 \fBaudible\fP，readline 试着鸣终端响铃。
+.TP
+.B comment\-begin (``#'')
+这个字符串在执行 readline 命令
+.B insert\-comment
+时被插入。这个命令在 emacs 模式下被关联为
+.B M\-#，
+在 vi 模式下是
+.B #。
+.TP
+.B completion\-ignore\-case (Off)
+如果设置为 \fBOn\fP，readline 进行大小写不敏感的文件名匹配和补全。
+.TP
+.B completion\-query\-items (100)
+这个变量决定着何时向用户询问，是否查看由命令 \fBpossible\-completions\fP 产生的可能的补全数量。
+它可以设为任何大于或等于 0 的值。如果可能的补全数量大于或等于这个变量的值，
+用户将被提示是否愿意查看它们；否则将直接在终端上列出它们。
+.TP
+.B convert\-meta (On)
+如果设置为 \fBOn\fP，readline 将把设置了最高位的字符转换为 ASCII 按键序列，方法是
+去掉第八位，前缀一个转义字符 (实际上，使用 Esc 作为转义符 \fImeta prefix\fP)。
+.TP
+.B disable\-completion (Off)
+如果设置为 \fBOn\fP，readline 将禁止词的补全。补全字符将被插入到行中，就好像它们被
+映射为 \fBself-insert\fP。
+.TP
+.B editing\-mode (emacs)
+控制 readline 的按键关联集合与 \fIemacs\fP 还是 \fIvi\fP 相似。
+.B editing\-mode
+可以设置为
+.B emacs
+或
+.BR vi。
+.TP
+.B enable\-keypad (Off)
+如果设置为 \fBOn\fP ，readline 在调用时将试图启用辅助键盘。
+一些系统需要设置这个来启用方向键。
+.TP
+.B expand\-tilde (Off)
+如果设置为 \fBOn\fP，readline 试图进行词的补全时会进行波浪线扩展。
+.TP
+.B history-preserve-point
+如果设置为 \fBOn\fP，历史代码试着在 \fBprevious-history\fP 或 \fBnext-history\fP
+取回的每个历史行的相同位置中加点。
+.TP
+.B horizontal\-scroll\-mode (Off)
+如果设置为 \fBOn\fP，将使得 readline 使用单行来显示，如果它比屏幕宽度要长，就在
+单一的屏幕行上水平滚动输入行，而不是自动回绕到新行。
+.TP
+.B input\-meta (Off)
+如果设置为 \fBOn\fP，readline 将允许八比特输入 (也就是说，它不会将它读入的字符中最高位删除)，
+不管它能支持什么样的终端要求。名称
+.B meta\-flag
+与此变量同义。
+.TP
+.B isearch\-terminators (``C\-[C\-J'')
+用于终止增量的搜索，不再将字符当作命令执行的字符串。
+如果这个变量没有赋值，字符串 \fIEsc\fP 和 \fIC\-J\fP 将终止增量的搜索。
+.TP
+.B keymap (emacs)
+设置当前 readline 键盘映射。有效的键盘映射名称是 
+\fIemacs, emacs\-standard, emacs\-meta, emacs\-ctlx, vi,
+vi\-command\fP，还有 
+.IR vi\-insert。
+\fIvi\fP 等价于 \fIvi\-command\fP; \fIemacs\fP 等价于
+\fIemacs\-standard\fP。默认值是
+.IR emacs ;
+.B editing\-mode
+的值也会影响默认的键盘映射。
+.TP
+.B mark\-directories (On)
+如果设置为 \fBOn\fP，补全的目录名会添加一个斜杠。
+.TP
+.B mark\-modified\-lines (Off)
+如果设置为 \fBOn\fP，已被修改的历史行将显示为前缀一个星号 (\fB*\fP)。
+.TP
+.B mark\-symlinked\-directories (Off)
+如果设置为 \fBOn\fP，补全的名称如果是到目录的符号链接，则将添加一个斜杠 (与
+\fBmark\-directories\fP 的值同样处理)。
+.TP
+.B match\-hidden\-files (On)
+这个变量，如果设置为 \fBOn\fP，将使得 readline 在进行文件名补全时，匹配以 `.' 开头的文件 (隐藏文件)，
+除非用户在要补全的文件名中给出了前导的 `.'。
+.TP
+.B output\-meta (Off)
+如果设置为 \fBOn\fP，readline 将直接显示设置了第八位的字符，而不是转化为一个带 meta 前缀的转义序列。
+.TP
+.B page\-completions (On)
+如果设置为 \fBOn\fP，readline 将使用内建的类似 \fImore\fP 的分页程序，
+来每次显示一屏可能的补全。
+.TP
+.B print\-completions\-horizontally (Off)
+如果设置为 \fBOn\fP，readline 将匹配的补全按字母表顺序排序，然后水平排列显示出来，
+而不是在屏幕上竖直排列显示。
+.TP
+.B show\-all\-if\-ambiguous (Off)
+这将调整补全函数的默认行为。如果设置为
+.BR on ,
+拥有多于一个可能的补全的词将立即列出所有匹配，而不是鸣响铃。
+.TP
+.B visible\-stats (Off)
+如果设置为 \fBOn\fP，在列出可能的补全时，将在文件名后面添加一个表示文件类型的字符，
+文件类型由 \fIstat\fP(2) 报告。
+.PD
+.SS "Readline Conditional Constructs"
+.PP
+readline 实现了一种功能，本质上与 C 预处理器进行条件编译的功能类似，
+允许根据测试的结果进行键盘关联和变量设置。其中使用了四种解释器指令。
+.IP \fB$if\fP
+.B $if
+结构允许根据编辑模式，正在使用的终端，使用 readline 的应用程序来设定按键关联。
+测试的文本包括一行，直到行尾；不必用字符来隔离它。
+.RS
+.IP \fBmode\fP
+\fB$if\fP 结构的 \fBmode=\fP 形式用于测试 readline 处于 emacs 还是 vi 模式。
+这可以与命令 \fBset keymap\fP 结合使用，例如，设置 \fIemacs\-standard\fP 和 \fIemacs\-ctlx\fP 
+键盘映射，仅当 readline 以 emacs 模式启动。
+.IP \fBterm\fP
+\fBterm=\fP 形式用于包含与终端相关的按键关联，也许是将按键序列输出与终端的功能键相关联。
+等号
+.B =
+右边的词被同终端的全名和名称中第一个 \fB\-\fP 前面的一部分相比较。
+例如，允许
+.I sun
+同时匹配
+.I sun
+和
+.IR sun\-cmd。
+.IP \fBapplication\fP
+\fBapplication\fP 结构用于包含应用程序相关的设置。每个使用 readline 的程序都设置 \fIapplication name\fP，
+初始化文件可以测试它的值。它可用于将一个按键序列与对特定的程序有用的功能相关联。
+例如，下列命令添加了一个按键序列，用以引用 bash 中当前的词或前一个词
+.sp 1
+.RS
+.nf
+\fB$if\fP Bash
+# Quote the current or previous word
+"\eC\-xq": "\eeb\e"\eef\e""
+\fB$endif\fP
+.fi
+.RE
+.RE
+.IP \fB$endif\fP
+上例中的这个命令，结束了一个 \fB$if\fP 命令。
+.IP \fB$else\fP
+如果测试失败，\fB$if\fP 指令中这个分支的命令将被执行。
+.IP \fB$include\fP
+这个指令使用单个文件名作为参数，从文件中读取命令和按键关联。例如，下列指令
+将读取 \fI/etc/inputrc\fP：
+.sp 1
+.RS
+.nf
+\fB$include\fP \^ \fI/etc/inputrc\fP
+.fi
+.RE
+.SS Searching
+.PP
+readline 提供了从命令历史中搜索包含给定字符串的行的命令 (参见下面的
+.SM
+.B HISTORY 历史
+章节)。有两种搜索模式：
+.I incremental
+和
+.IR non-incremental .
+.PP
+增量的搜索在用户结束输入搜索字符串时开始。在搜索字符串的每个字符被输入的同时，
+readline 显示与已输入的字符串匹配的下一个历史条目。
+增量的搜索只要求输入能找到期望的历史条目所需的那么多字符。
+\fBisearch-terminators\fP 变量中的字符用来终止一次增量的搜索。如果
+这个变量没有被赋值，Esc 和 Ctrl-J 字符串将结束一次增量的搜索。
+Ctrl-G 将取消一次增量的搜索，恢复初始的行。当搜索终止时，包含搜索字符串
+的历史条目成为当前行。
+.PP
+要从历史列表中找到其他匹配的条目，适当地键入 Ctrl-S 或 Ctrl-R。
+这样将在历史中向前/向后搜索下一个匹配已输入的搜索字符串的条目。
+其他关联到某个 readline 命令的按键序列将终止搜索并执行关联的命令。
+例如，\fInewline\fP 将终止搜索，接受当前行，从而执行历史列表中的命令。
+.PP
+readline 可以记住上次增量搜索的字符串。如果键入两次 Ctrl-R，中间没有
+输入任何字符来定义一个新的搜索字符串，那么将使用已记住的搜索字符串。
+.PP
+非增量的搜索将整个搜索字符串读入，然后才开始搜索匹配的历史条目。
+搜索字符串可以由用户输入，或者是当前行的内容的一部分。
+.SS "Readline Command Names"
+.PP
+下面列出的是命令的名称以及默认情况下它们关联的按键序列。
+命令名称如果没有对应的按键序列，那么默认是没有关联的。在下列描述中，
+点 (\fIpoint\fP) 指当前光标位置，标记 (\fImark\fP) 指命令 \fBset\-mark\fP 
+保存的光标位置。point 和 mark 之间的文本被称为范围 (\fIregion\fP)。
+.SS Commands for Moving 移动
+.PP
+.PD 0
+.TP
+.B beginning\-of\-line (C\-a)
+移动到当前行的开始。
+.TP
+.B end\-of\-line (C\-e)
+移动到当前行的结尾。
+.TP
+.B forward\-char (C\-f)
+向前移动一字。
+.TP
+.B backward\-char (C\-b)
+向后移动一字。
+.TP
+.B forward\-word (M\-f)
+向前移动到下一词尾。词由字符 (字母和数字) 组成。
+.TP
+.B backward\-word (M\-b)
+向后移动到当前或上一词首。
+.TP
+.B clear\-screen (C\-l)
+清除屏幕，保留当前行在屏幕顶端。有参数时，刷新当前行，不清屏。
+.TP
+.B redraw\-current\-line
+刷新当前行。
+.PD
+.SS Commands for Manipulating the History 操纵历史行
+.PP
+.PD 0
+.TP
+.B accept\-line (Newline, Return)
+接受这一行，不管光标在什么位置。如果行非空，将根据变量
+.SM
+.B HISTCONTROL
+的状态加入到历史列表中。如果行是修改过的历史行，将恢复该历史行到初始状态。
+.TP
+.B previous\-history (C\-p)
+从历史列表中取得前一个命令，从列表中向后移动。
+.TP
+.B next\-history (C\-n)
+从历史列表中取得后一个命令，从列表中向前移动。
+.TP
+.B beginning\-of\-history (M\-<)
+移动到历史中的第一行。
+.TP
+.B end\-of\-history (M\->)
+移动到输入历史行的末尾，也就是当前输入的行的末尾。
+.TP
+.B reverse\-search\-history (C\-r)
+从当前行开始向后搜索，按照需要在历史中向“上”移动。这是一个增量的搜索。
+.TP
+.B forward\-search\-history (C\-s)
+从当前行开始向前搜索，按照需要在历史中向“下”移动。这是一个增量的搜索。
+.TP
+.B non\-incremental\-reverse\-search\-history (M\-p)
+从当前行开始向后，使用非增量搜索来查找用户给出的字符串。
+.TP
+.B non\-incremental\-forward\-search\-history (M\-n)
+从当前行开始向前，使用非增量搜索来查找用户给出的字符串。
+.TP
+.B history\-search\-forward
+从当前行开始向前搜索历史，查找从当前行首到 point 之间的字符串。
+这是一个非增量的搜索。
+.TP
+.B history\-search\-backward
+从当前行开始向后搜索历史，查找从当前行首到 point 之间的字符串。
+这是一个非增量的搜索。
+.TP
+.B yank\-nth\-arg (M\-C\-y)
+将前一个命令的第一个参数 (通常是上一行的第二个词) 插入到 point 位置。有参数
+.IR n
+时，将前一个命令的第 \fIn\fP 个词 (前一个命令中的词从 0 开始计数) 
+插入到 point 位置。负数参数则插入前一个命令倒数第 \fIn\fP 个词。
+.TP
+.B
+yank\-last\-arg (M\-.\^, M\-_\^)
+插入前一个命令的最后一个参数 (上一历史条目的最后一个词)。有参数时，
+行为类似于 \fByank\-nth\-arg\fP。后继的 \fByank\-last\-arg\fP 调用将
+从历史列表中向后移动，依次将每行的最后一个参数插入。
+.TP
+.B shell\-expand\-line (M\-C\-e)
+扩展行，像 shell 做的那样。其中包含别名和历史扩展，还有所有的 shell 词的扩展。
+参见下面的
+.SM
+.B HISTORY EXPANSION
+中关于历史扩展的描述。
+.TP
+.B history\-expand\-line (M\-^)
+在当前行进行历史扩展。参见下面的
+.SM
+.B HISTORY EXPANSION
+中关于历史扩展的描述。
+.TP
+.B magic\-space
+在当前行进行历史扩展，并插入一个空格。参见下面的
+.SM
+.B HISTORY EXPANSION
+中关于历史扩展的描述。
+.TP
+.B alias\-expand\-line
+在当前行进行别名扩展，参见上面的
+.SM
+.B ALIASES
+中关于别名扩展的描述。
+.TP
+.B history\-and\-alias\-expand\-line
+在当前行进行历史和别名扩展。
+.TP
+.B insert\-last\-argument (M\-.\^, M\-_\^)
+与 \fByank\-last\-arg\fP 同义。
+.TP
+.B operate\-and\-get\-next (C\-o)
+接受当前行，加以执行，从历史中取出相对当前行的下一行进行编辑。
+任何参数都被忽略。
+.TP
+.B edit\-and\-execute\-command (C\-xC\-e)
+启动一个编辑器，编辑当前命令行，将结果作为 shell 命令运行。
+\fBBash\fP 将依次试着运行
+.SM
+.BR $FCEDIT ,
+.SM
+.BR $EDITOR ,
+和 \fIemacs\fP 作为编辑器。
+.PD
+.SS Commands for Changing Text 改变文本
+.PP
+.PD 0
+.TP
+.B delete\-char (C\-d)
+删除 point 处的字符。如果 point 在行首，行中没有字符，最后一次输入的字符
+没有被关联到 \fBdelete\-char\fP，将返回
+.SM
+.BR EOF .
+.TP
+.B backward\-delete\-char (Rubout)
+删除光标之后的字符。当给出一个数值的参数时，保存删除的文本到 kill ring 中。
+.TP
+.B forward\-backward\-delete\-char
+删除光标下的字符，除非光标在行尾，此时删除光标后的字符。
+.TP
+.B quoted\-insert (C\-q, C\-v)
+将输入的下一字符保持原样添加到行中。例如，可以用它来插入类似 \fBC\-q\fP 的字符。
+.TP
+.B tab\-insert (C\-v TAB)
+插入一个跳格符号。
+.TP
+.B self\-insert (a,\ b,\ A,\ 1,\ !,\ ...)
+插入键入的字符。
+.TP
+.B transpose\-chars (C\-t)
+将 point 之前的字符向前移动，越过 point 处的字符，同时也改变 point 的位置。
+如果 point 在行尾，将调换 point 之前的两个字符。负数参数没有作用。
+.TP
+.B transpose\-words (M\-t)
+将 point 之前的词向前移动，越过 point 处的词，同时也改变 point 的位置。
+如果 point 在行尾，将调换行中的最后两个词。
+.TP
+.B upcase\-word (M\-u)
+将当前 (或下一个) 词变成全大写。有负值的参数时，将前一个词变为大写，
+但是不移动 point。
+.TP
+.B downcase\-word (M\-l)
+将当前 (或下一个) 词变成全小写。有负值的参数时，将前一个词变为小写，
+但是不移动 point。
+.TP
+.B capitalize\-word (M\-c)
+将当前 (或下一个) 词变为首字大写。有负值的参数时，将前一个词变为首字大写，
+但是不移动 point。
+.TP
+.B overwrite\-mode
+控制插入/改写模式。给出一个正整数参数时，切换为改写模式。给出一个非正数
+参数时，切换为插入模式。这个命令只影响 \fBemacs\fP 模式；\fBvi\fP 模式
+的改写与此不同。每个对 \fIreadline()\fP 的调用都以插入模式开始。在改写模式下，
+关联到 \fBself\-insert\fP 的字符替换 point 处的字符，而不是将它推到右边。
+关联到 \fBbackward\-delete\-char\fP 的字符以空格替换 point 前的字符。
+默认情况下，这个命令没有关联。
+.PD
+.SS Killing and Yanking 剪切和粘贴
+.PP
+.PD 0
+.TP
+.B kill\-line (C\-k)
+剪切从 point 到行尾的文本。
+.TP
+.B backward\-kill\-line (C\-x Rubout)
+反向剪切到行首。
+.TP
+.B unix\-line\-discard (C\-u)
+反向剪切到行首。与 \fIbackward\-kill\-line\fP 没有什么区别。
+剪切的文本被保存于 kill\-ring 中。
+.\" There is no real difference between this and backward-kill-line
+.TP
+.B kill\-whole\-line
+剪切当前行中所有字符，不管 point 在什么位置。
+.TP
+.B kill\-word  (M\-d)
+剪切从 point 到当前词尾，或者如果 point 在词之间，那么剪切到下一词尾。
+.TP
+.B backward\-kill\-word (M\-Rubout)
+剪切 point 之后的词。词的边界与 \fBbackward\-word\fP 使用的相同。
+.TP
+.B unix\-word\-rubout (C\-w)
+剪切 point 之后的词，使用空白作为词的边界。剪切的文本被保存于 kill\-ring 中。
+.TP
+.B delete\-horizontal\-space (M\-\e)
+删除 point 两边的所有空格和跳格。
+.TP
+.B kill\-region
+剪切当前 region 的文本。
+.TP
+.B copy\-region\-as\-kill
+将 region 的文本复制到剪切缓冲区中。
+.TP
+.B copy\-backward\-word
+将 point 前面的词复制到剪切缓冲区中。
+词的边界与 \fBbackward\-word\fP 使用的相同。
+.TP
+.B copy\-forward\-word
+将 point 之后的词复制到剪切缓冲区中。
+词的边界与 \fBbackward\-word\fP 使用的相同。
+.TP
+.B yank (C\-y)
+将 kill\-ring 顶部的内容粘贴到 point 处的缓冲区中
+.TP
+.B yank\-pop (M\-y)
+轮转 kill\-ring，粘贴新的顶部内容。只能在
+.B yank
+或
+.BR yank\-pop
+之后使用。
+.PD
+.SS Numeric Arguments 数值参数
+.PP
+.PD 0
+.TP
+.B digit\-argument (M\-0, M\-1, ..., M\-\-)
+将这个数字加入已有的 (already accumulating) 参数中，或者开始新的参数。
+M\-\- 开始一个否定的参数。
+.TP
+.B universal\-argument
+这是指定参数的另一种方法。如果这个命令后面跟着一个或多个数字，
+可能还包含前导的负号，这些数字定义了参数。如果命令之后跟随着数字，再次执行
+.B universal\-argument
+将结束数字参数，但是其他情况下被忽略。有一种特殊情况，如果命令之后紧接着
+一个并非数字或负号的字符，下一命令的参数计数将乘以 4。
+参数计数初始是 1，因此第一次执行这个函数，使得参数计数为 4，
+第二次执行使得参数计数为 16，以此类推。
+.PD
+.SS Completing 补全
+.PP
+.PD 0
+.TP
+.B complete (TAB)
+试着对 point 之前的文本进行补全。
+.B Bash
+依次试着将文本作为一个变量 (如果文本以 \fB$\fP 开始)，一个用户名
+(如果文本以 \fB~\fP 开始)，主机名 (如果文本以 \fB@\fP 开始)，或者命令 
+(以及别名和函数) 来补全。如果这些都没有匹配，将尝试文件名补全。
+.TP
+.B possible\-completions (M\-?)
+列出 point 之前的文本可能的补全。
+.TP
+.B insert\-completions (M\-*)
+插入 \fBpossible\-completions\fP 已产生的 point 之前的文本所有的补全。
+.TP
+.B menu\-complete
+与 \fBcomplete\fP 相似，但是使用可能的补全列表中的某个匹配替换要补全的词。
+重复执行 \fBmenu\-complete\fP 将遍历可能的补全列表，插入每个匹配。
+到达补全列表的结尾时，鸣终端响铃 (按照 \fBbell\-style\fP 的设置来做) 并恢复初始的文本。
+参数 \fIn\fP 将在匹配列表中向前移动 \fIn\fP 步；负数参数可以用于在列表中向后移动。
+这个命令应当与 \fBTAB\fP 键关联，但是默认情况下是没有关联的。
+.TP
+.B delete\-char\-or\-list
+删除光标下的字符，如果不是在行首或行尾 (类似 \fBdelete\-char\fP)。
+如果在行尾，行为与 \fBpossible\-completions\fP 一致。
+这个命令默认没有关联。
+.TP
+.B complete\-filename (M\-/)
+尝试对 point 之前的文本进行文件名补全。
+.TP
+.B possible\-filename\-completions (C\-x /)
+列出 point 之前的文本可能的补全，将它视为文件名。
+.TP
+.B complete\-username (M\-~)
+尝试对 point 之前的文本进行补全，将它视为用户名。
+.TP
+.B possible\-username\-completions (C\-x ~)
+列出 point 之前的文本可能的补全，将它视为用户名。
+.TP
+.B complete\-variable (M\-$)
+尝试对 point 之前的文本进行补全，将它视为 shell 变量。
+.TP
+.B possible\-variable\-completions (C\-x $)
+列出 point 之前的文本可能的补全，将它视为 shell 变量。
+.TP
+.B complete\-hostname (M\-@)
+尝试对 point 之前的文本进行补全，将它视为主机名。
+.TP
+.B possible\-hostname\-completions (C\-x @)
+列出 point 之前的文本可能的补全，将它视为主机名。
+.TP
+.B complete\-command (M\-!)
+尝试对 point 之前的文本进行补全，将它视为命令名。命令补全尝试着将此文本
+依次与别名，保留字，shell 函数，shell 内建命令，最后是可执行文件名进行匹配。
+.TP
+.B possible\-command\-completions (C\-x !)
+列出 point 之前的文本可能的补全，将它视为命令名。
+.TP
+.B dynamic\-complete\-history (M\-TAB)
+尝试对 point 之前的文本进行补全，将此文本与历史列表中的行相比较来查找可能的补全匹配。
+.TP
+.B complete\-into\-braces (M\-{)
+进行文件名补全，将可能的补全列表放在花括号中插入，使得列表可以被 shell 使用 
+(参见上面的
+.B Brace Expansion
+花括号扩展)。
+.PD
+.SS Keyboard Macros 宏
+.PP
+.PD 0
+.TP
+.B start\-kbd\-macro (C\-x (\^)
+开始保存输入字符为当前键盘宏。
+.TP
+.B end\-kbd\-macro (C\-x )\^)
+停止保存输入字符为当前键盘宏，保存宏定义。
+.TP
+.B call\-last\-kbd\-macro (C\-x e)
+重新执行上次定义的键盘宏，即显示出宏中的字符，好像它们是从键盘输入的一样。
+.PD
+.SS Miscellaneous
+.PP
+.PD 0
+.TP
+.B re\-read\-init\-file (C\-x C\-r)
+读入 \fIinputrc\fP 文件的内容，合并其中的按键关联和变量赋值。
+.TP
+.B abort (C\-g)
+取消当前编辑命令，鸣终端响铃 (按照
+.BR bell\-style
+的设置来做)。
+.TP
+.B do\-uppercase\-version (M\-a, M\-b, M\-\fIx\fP, ...)
+如果有 Meta 前缀的字符 \fIx\fP 是小写的，那么与命令相关连的是对应的大写字符。
+.TP
+.B prefix\-meta (ESC)
+将输入的下一个字符加上 Meta 前缀。
+.SM
+.B ESC
+.B f
+等价于
+.BR Meta\-f .
+.TP
+.B undo (C\-_, C\-x C\-u)
+增量的撤销，分别记住每一行。
+.TP
+.B revert\-line (M\-r)
+撤销这一行的所有修改。这与执行命令
+.B undo
+足够多次的效果相同，将这一行恢复到初始状态。
+.TP
+.B tilde\-expand (M\-&)
+对当前词进行波浪线扩展。
+.TP
+.B set\-mark (C\-@, M\-<space>)
+在 point 处设置 mark。如果给出了数值的参数，标记被设置到那个位置。
+.TP
+.B exchange\-point\-and\-mark (C\-x C\-x)
+交换 point 和 mark。当前光标位置被设置为保存的位置，旧光标位置被保存为 mark。
+.TP
+.B character\-search (C\-])
+读入一个字符，point 移动到这个字符下一次出现的地方。负数将搜索上一个出现。
+.TP
+.B character\-search\-backward (M\-C\-])
+读入一个字符，point 移动到这个字符上一次出现的地方。负数将搜索下面的出现。
+.TP
+.B insert\-comment (M\-#)
+没有数值的参数时，readline 变量
+.B comment\-begin
+的值将被插入到当前行首。如果给出一个数值的参数，命令的行为类似于一个开关：
+如果行首字符不匹配 \fBcomment\-begin\fP 的值，将插入这个值，否则
+匹配 \fBcomment\-begin\fP 的字符将被从行首删除。在两种情况下，这一行都被接受，
+好像输入了新行符一样。\fBcomment\-begin\fP 的默认值使得这个命令将当前行变成
+一条 shell 注释。如果数值参数使得注释字符被删除，这一行将被 shell 执行。
+.TP
+.B glob\-complete\-word (M\-g)
+point 之前的词被当作路径扩展的一个模式，尾部暗含了一个星号。这个模式被用来
+为可能的补全产生匹配的文件名列表。
+.TP
+.B glob\-expand\-word (C\-x *)
+point 之前的词被当作路径扩展的一个模式，匹配的文件名的列表被插入，替换这个词。
+如果给出一个数值参数，在路径扩展之前将添加一个星号。
+.TP
+.B glob\-list\-expansions (C\-x g)
+显示
+.B glob\-expand\-word
+可能产生的扩展的列表，重绘当前行。如果给出一个数值参数，在路径扩展之前将添加一个星号。
+.TP
+.B dump\-functions
+向 readline 输出流打印所有的函数和它们的按键关联。如果给出一个数值参数，
+输出将被格式化，可以用作 \fIinputrc\fP 文件一部分。
+.TP
+.B dump\-variables
+向 readline 输出流打印所有可设置的 readline 函数。如果给出一个数值参数，
+输出将被格式化，可以用作 \fIinputrc\fP 文件一部分。
+.TP
+.B dump\-macros
+向 readline 输出流打印所有关联到宏的 readline 按键序列以及它们输出的字符串。
+如果给出一个数值参数，输出将被格式化，可以用作 \fIinputrc\fP 文件一部分。
+.TP
+.B display\-shell\-version (C\-x C\-v)
+显示当前
+.BR bash
+实例的版本信息。
+.PD
+.SS Programmable Completion 可编程补全
+.PP
+当试图对一个命令的参数进行词的补全时，如果已经使用内建命令 \fBcomplete\fP
+定义了这个命令的补全规则 ( \fBcompspec\fP)，将启动可编程补全功能 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。
+.PP
+首先，命令名被确认。如果针对这个命令有补全规则的定义，那么将使用
+规则来产生可能的词的补全的列表。如果命令词是一个路径全名，将首先搜索
+针对这个路径全名的规则。如果针对这个路径全名没有找到规则，将尝试查找
+针对最后一个斜杠后面的部分的规则。
+.PP
+一旦找到了一个规则，它将用作产生匹配的词。如果没有找到，将进行上面
+\fBCompleting\fP 中描述的 \fBbash\fP 默认的补全。
+.PP
+首先，将执行规则指定的动作。只有以被补全的词开始的匹配词才会被返回。
+当在文件或目录名补全中使用
+.B \-f
+或
+.B \-d
+选项时，shell 变量
+.SM
+.B FIGNORE
+将用于对匹配进行过滤。
+.PP
+接下来，将产生所有由\fB\-G\fP 选项给出的文件名扩展模式指定的补全。
+模式产生的词不必匹配要补全的词。shell 变量
+.SM
+.B GLOBIGNORE
+不会用于过滤匹配结果，但是变量
+.SM
+.B FIGNORE
+会被使用。
+.PP
+接下来，将考虑 \fB\-W\fP 选项的参数指定的字符串。这个字符串首先被
+划分，用特殊变量
+.SM
+.B IFS
+中的字符作为分隔符。shell 引用被当作一个词。
+接下来，每个词被扩展，使用上面
+.SM
+.BR EXPANSION 
+中描述的
+brace expansion, tilde expansion, parameter 和 variable expansion,
+command substitution, arithmetic expansion, 以及 pathname expansion
+规则处理。对于结果，再使用上面 \fBWord Splitting\fP 中描述的规则划分成词。
+扩展的结果与要补全的词进行前部一致的比较，匹配的词成为可能的补全。
+.PP
+在这些匹配被产生后，任何由 \fB\-F\fP 和 \fB\-C\fP 选项指定的
+shell 函数和命令将被执行。当命令或函数被执行时，变量
+.SM
+.B COMP_LINE
+和
+.SM
+.B COMP_POINT
+被赋值，使用上面 \fBShell Variables\fP 中的规则。
+如果要执行 shell 函数，还将设置变量
+.SM
+.B COMP_WORDS
+和
+.SM
+.B COMP_CWORD
+当函数或命令被执行时，第一个参数是等待参数被补全的命令的名称，
+第二个参数是要补全的词，第三个参数是当前命令行中，要补全的词前面的词。
+对要补全的词产生的补全不会进行任何过滤；函数或命令在产生匹配时有完全的自由。
+.PP
+任何 \fB\-F\fP 指定的函数将被首先执行。函数可以使用任何 shell 功能，
+包含内建命令 \fIcompgen\fP，来产生匹配。它必须将可能的补全放到数组变量
+.SM
+.B COMPREPLY
+中。
+.PP
+接下来，任何 \fB\-C\fP 选项指定的命令将被执行，其执行环境与命令替换
+的环境相同。它应当向标准输出打印一个补全的列表，每行一个。
+反斜杠可以用来转义一个新行符，如果需要的话。
+.PP
+所有可能的补全都产生之后，将对列表进行 \fB\-X\fP 选项指定的任何过滤。
+过滤器是一个模式，和路径名扩展中的一样；模式中的 \fB&\fP 替换为
+要补全的词。字面上的 \fB&\fP 可以用反斜杠转义；反斜杠在进行匹配时被删除。
+任何匹配这个模式的补全将从列表中删除。前导的 \fB!\fP 将使模式含义相反；
+这种情况下，任何不匹配这个模式的补全将被删除。
+.PP
+最后，\fPB\-P\fP 和 \fB\-S\fP 指定的任何前缀和后缀被添加到补全列表的每个
+成员后面，结果返回给 readline 补全代码，作为可能的补全列表。
+.PP
+如果先前执行的动作没有产生任何匹配，并且在定义 compspec 规则时，为
+\fBcomplete\fP 命令提供了 \fB\-o dirname\fP 选项，将尝试目录名补全。
+.PP
+默认情况下，如果找到了一个规则，它产生的任何东西都被返回给补全代码，
+作为可能的补全的全集。不再尝试默认的 \fBbash\fP 补全，readline 默认的
+文件名补全也会禁止。如果定义规则时，为 \fBcomplete\fP 命令提供了
+\fB\-o default\fP 选项，在规则没有产生匹配时将进行 readline 默认的补全处理。
+.PP
+当一个规则指出期望目录名补全时，可编程补全函数强制 readline 在补全的名称
+后面添加一个斜杠，如果它是一个到目录的符号连接。然后还要经过 readline 变量
+\fBmark\-directories\fP 的值处理，不管 readline 变量 
+\fBmark\-symlinked\-directories\fP 的值是什么。
+.SH 历史(HISTORY)
+当启用内建命令
+.B set
+的
+.B \-o history
+选项时，shell 允许访问 \fIcommand history\fP，以前输入的命令的列表。
+\fBHISTSIZE\fP 的值用作命令列表中保存的命令数量。
+过去
+.SM
+.B HISTSIZE
+个 (默认为500) 命令将被保存。shell 将每条命令在进行参数和变量扩展之前
+保存到历史列表中 (参见上面的
+.SM
+.B EXPANSION
+段落)，但是是在历史扩展进行之后，并且要经过 shell 变量
+.SM
+.B HISTIGNORE
+和
+.SM
+.BR HISTCONTROL
+处理。
+.PP
+在启动时，历史根据以变量
+.SM
+.B HISTFILE
+的值为名的文件 (默认是 \fI~/.bash_history\fP) 进行初始化。
+如果需要的话，以
+.SM
+.B HISTFILE
+为名的文件将被截断，来包含不超过变量
+.SM
+.BR HISTFILESIZE
+的值指定的行数。当交互 shell 退出时，最后
+.SM
+.B $HISTSIZE
+行被从历史列表中复制到
+.SM
+.BR $HISTFILE
+文件中。如果启用了 shell 选项
+.B histappend
+(参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节中对内建命令
+.B shopt
+的描述)，这些行被追加到历史文件中，否则历史文件被覆盖。如果
+.SM
+.B HISTFILE
+被取消定义，或者如果历史文件不可写，历史将不会保存。保存历史之后，
+历史文件被截断，以包含不超过
+.SM
+.B HISTFILESIZE
+行。如果
+.SM
+.B HISTFILESIZE
+被取消定义，不会进行截断操作。
+.PP
+内建命令
+.B fc
+(参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节) 可以用来列出或修改并重新执行历史列表中的一部分。内建命令
+.B history
+可以用来显示或修改历史列表，操作历史文件。当使用命令行编辑时，每种
+编辑模式都有搜索命令，提供对历史列表的访问。
+.PP
+shell 允许控制哪些命令被保存到历史列表中。可以设置
+.SM
+.B HISTCONTROL
+和
+.SM
+.B HISTIGNORE
+变量，来使得 shell 只保存输入命令的一个子集。shell 选项
+.B cmdhist
+如果被启用，将使得 shell 将多行的命令的每一行保存到同一个历史条目中，
+在需要的地方添加分号来保证语义的正确性。shell 选项
+.B lithist
+使得 shell 保存命令时，保留嵌入的新行而不是用分号代替。参见下面
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+中，内建命令
+.B shopt
+的描述，有关设置和取消 shell 选项的信息。
+.SH 历史扩展("HISTORY EXPANSION")
+.PP
+shell 支持历史扩展机制，类似于
+.BR csh
+中历史扩展。这一节描述了可用的语法特征。在交互的 shell 中这一机制被默认启用，
+可以使用内建命令
+.B set
+的
+.B \-H
+选项来禁用它 (参见下面的
+.SM
+.B "shell 内建命令(SHELL BUILTIN COMMANDS)"
+章节)。非交互的 shell 默认不进行历史扩展。
+.PP
+历史扩展将历史列表中的词引入输入流中，使得可以方便地重复已执行命令，
+在当前输入行中为前一个命令插入新的参数，
+或者快速修正前一个命令中的错误。
+.PP
+历史扩展在读入一整行后，在 shell 将它拆分成词之前立即进行。它
+由两部分组成。首先是判断替换中使用历史列表中哪一行。其次是选择那一行中要包含到当前行中的部分。
+从历史中选择的行称为 \fIevent\fP，从那一行中选择的部分是 \fIwords\fP。
+可以用多种多样的 \fImodifiers\fP 来操纵所选的词。在读入输入时，行被按照同样方式分解成词，
+因此多个以 \fImetacharacter\fP 分隔的词，如果被引号包含，就被当成一个词。
+历史扩展由历史扩展字符引入，默认是 \^\fB!\fP\^。只有反斜杠 (\^\fP\e\fP\^) 和单引号可以引用历史扩展字符。
+.PP
+内建命令
+.B shopt
+可以设定多个选项值，来调整历史扩展的行为。如果 shell 选项
+.B histverify
+被启用 (参见内建命令
+.B shopt
+的描述)，并且正在使用
+.B readline，
+历史替换不会被立即传给 shell 解释器。与此相对，扩展后的行被重新载入
+.B readline
+编辑缓冲区，进行进一步的修改。如果正在使用
+.B readline，
+并且启用了 shell 选项
+.B histreedit，
+失败的历史替换将被重新载入到
+.B readline
+编辑缓冲区，进行改正。内建命令
+.B history
+的
+.B \-p
+选项可以用来在执行之前查看历史扩展将如何进行。内建命令
+.B history
+的
+.B \-s
+选项可以用来在历史列表末尾添加命令，而不真正执行它们，从而
+在接下来的调用中可以使用它们。
+.PP
+shell 允许控制历史扩展机制使用的多种字符 (参见上面的
+.BR "Shell Variables"
+中
+.B histchars
+的描述)。
+.SS Event Designators
+.PP
+事件指示器 (event designator) 是一个对历史列表中某个命令行条目的引用。
+.PP
+.PD 0
+.TP
+.B !
+开始一个命令替换，除非后面跟随的是
+.BR blank ,
+newline, = 或是 (.
+.TP
+.B !\fIn\fR
+引用命令行
+.IR n .
+.TP
+.B !\-\fIn\fR
+引用当前命令行减去
+.IR n .
+.TP
+.B !!
+引用上一条命令。这是 `!\-1' 的同义词。
+.TP
+.B !\fIstring\fR
+引用最近的以
+.IR string 
+开始的命令。
+.TP
+.B !?\fIstring\fR\fB[?]\fR
+引用最近的包含
+.IR string
+的命令。尾部的 \fB?\fP 可以被忽略，如果
+.I string
+之后紧接着一个新行符。
+.TP
+.B \d\s+2^\s-2\u\fIstring1\fP\d\s+2^\s-2\u\fIstring2\fP\d\s+2^\s-2\u
+快速替换。重复上一条命令，将
+.I string1
+替换为
+.IR string2 .
+与
+``!!:s/\fIstring1\fP/\fIstring2\fP/'' 等价
+(参见下面的 \fB修饰符 (Modifiers)\fP)。
+.TP
+.B !#
+到此为止输入的整个命令行。
+.PD
+.SS Word Designators
+.PP
+词指示器 (word designator) 用于从 event 中选择期望的词。
+.B :
+分隔 event 规则与 word 指示器。它可以忽略，如果词指示器以
+.BR ^ ,
+.BR $ ,
+.BR * ,
+.BR \- ,
+或
+.BR %
+开始。词被从行首开始编号，第一个词被表示为 0。插入当前行中的词以单个空格分隔。
+.PP
+.PD 0
+.TP
+.B 0 (zero)
+第 0 个词。对 shell 来将，这是命令名。
+.TP
+.I n
+第 \fIn\fR 个词。
+.TP
+.B ^
+第一个参数。也就是，第 1 个词。
+.TP
+.B $
+最后的参数。
+.TP
+.B %
+最近一次搜索 `?\fIstring\fR?' 匹配的词。
+.TP
+.I x\fB\-\fPy
+一组词；`\-\fIy\fR' 是 `0\-\fIy\fR' 的简写。
+.TP
+.B *
+所有词，除了第 0 个。这是 `\fI1\-$\fP' 的同义词。如果 event 中只有一个词，使用
+.B *
+也不是错误；这种情况下将返回空字符串。
+.TP
+.B x*
+\fIx\-$\fP 的简写。
+.TP
+.B x\-
+\fI\-$\fP 的简写，就像 \fBx*\fP 一样，但是忽略最后一个词。
+.PD
+.PP
+如果给出了一个 word 指示器，没有给出 event 规则，前一个命令将用作 event。
+.SS 修饰符 (Modifiers)
+.PP
+可选的 word 指示器之后，可以出现一个或多个下述 modifiers 的序列，每一个都前缀有 `:'。
+.PP
+.PD 0
+.PP
+.TP
+.B h
+删除文件名组成的尾部，只保留头部。
+.TP
+.B t
+删除文件名组成中前面的成分，保留尾部。
+.TP
+.B r
+删除 \fI.xxx\fP 形式中尾部的后缀成分，保留基本名称部分。
+.TP
+.B e
+删除所有内容，保留尾部的后缀。
+.TP
+.B p
+打印新的命令，但是不执行它。
+.TP
+.B q
+引用替换所得的词，使它不再进行替换。
+.TP
+.B x
+引用替换所得的词，类似与
+.BR q ,
+但是会根据
+.B blanks，空白
+和新行符分解为词。
+.TP
+.B s/\fIold\fP/\fInew\fP/
+将事件行中出现的第一个
+.I old
+替换为
+.I new。
+任何分隔符都可以用来代替 /，最后一个分隔符是可选的，如果它是事件行的最后一个字符。
+.I old
+和
+.I new
+中的分隔符可以用一个反斜杠来引用。如果 & 出现在
+.IR new 
+中，它将替换为
+.IR old。
+可以用单个反斜杠来引用 &。如果
+.I old
+为空，它将设置为最后替换的
+.I old，
+或者，如果前面没有发生过历史替换，就是
+.B !?\fIstring\fR\fB[?]\fR
+搜索中的最后一个
+.I string。
+.TP
+.B &
+重复上一次替换。
+.TP
+.B g
+使得改变被整个事件行所接受。用于与 `\fB:s\fP' 或 `\fB:&\fP' 结合 
+(例如，`\fB:gs/\fIold\fP/\fInew\fP/\fR')。
+如果与 `\fB:s\fP' 结合使用，任何分隔符都可以用来代替 /，
+最后一个分隔符是可选的，如果它是事件行的最后一个字符。
+.PD
+.SH "shell 内建命令(SHELL BUILTIN COMMANDS)"
+.\" start of bash_builtins
+.zZ
+.PP
+除非另外说明，这一章介绍的内建命令如果接受
+.B \-
+引导的选项，那么它也接受
+.B \-\-
+作为参数，来指示选项的结束
+.sp .5
+.PD 0
+.TP
+\fB:\fP [\fIarguments\fP]
+.PD
+没有效果；这个命令除了扩展
+.I arguments
+并且作任何指定的重定向之外，不做任何事。
+退出时返回0。
+.TP
+\fB .\| \fP \fIfilename\fP [\fIarguments\fP]
+.PD 0
+.TP
+\fBsource\fP \fIfilename\fP [\fIarguments\fP]
+.PD
+读取并在当前 shell 环境中执行
+.I filename
+中的命令，返回
+.IR filename
+中最后一个命令的返回状态。如果
+.I filename
+中不包含斜杠 (slash)，系统将在
+.SM
+.B PATH
+中查找包含
+.IR filename 
+的目录。在
+.SM
+.B PATH
+中搜索的文件不必是可执行的。
+如果 \fBbash\fP 不是运行于 \fIposix mode\fP，当
+.SM
+.BR PATH
+中找不到文件时会在当前目录搜索。如果
+.B shopt
+内建命令的
+.B sourcepath
+选项被关闭，
+.SM
+.B PATH
+将不会被搜索。如果有任何 \fIarguments\fP ，它们成为
+\fIfilename\fP 的位置参数 (positional parameters)，否则
+位置参数不发生变化。
+返回状态是脚本中最后一个命令退出时的状态。
+没有执行命令则返回0，没有找到或不能读取
+.I filename
+时返回false。
+.TP
+\fBalias\fP [\fB\-p\fP] [\fIname\fP[=\fIvalue\fP] ...]
+\fBAlias\fP 不带参数或者带
+.B \-p
+参数运行时将在标准输出以这样的格式
+\fBalias\fP \fIname\fP=\fIvalue\fP 给出别名列表。
+如果有参数，将创建提供了 \fIvalue\fP 的 \fIname\fP 的别名。
+\fIvalue\fP 中尾部的空格使得别名被扩展时，下一个词做别名替换。
+对于参数列表中的每一个 \fIname\fP，如果 \fIvalue\fP 没有
+给出，这个别名的名称和值会被打印出来。
+\fBAlias\fP 返回 true 除非 \fIname\fP 没有定义为别名。
+.TP
+\fBbg\fP [\fIjobspec\fP]
+使挂起的程序 \fIjobspec\fP 在后台继续执行，就好像它是用
+.BR &
+启动的一样。如果没有指定 \fIjobspec\fP，shell 意义上的
+\fIcurrent job 当前作业\fP 将被使用。
+.B bg
+.I jobspec
+返回0，除非当前禁止了作业控制，或者在允许作业控制，但
+是没有找到 \fIjobspec\fP ，或者它不是在作业控制下启动的时候。
+.TP
+\fBbind\fP [\fB\-m\fP \fIkeymap\fP] [\fB\-lpsvPSV\fP]
+.PD 0
+.TP
+\fBbind\fP [\fB\-m\fP \fIkeymap\fP] [\fB\-q\fP \fIfunction\fP] [\fB\-u\fP \fIfunction\fP] [\fB\-r\fP \fIkeyseq\fP]
+.TP
+\fBbind\fP [\fB\-m\fP \fIkeymap\fP] \fB\-f\fP \fIfilename\fP
+.TP
+\fBbind\fP [\fB\-m\fP \fIkeymap\fP] \fB\-x\fP \fIkeyseq\fP:\fIshell\-command\fP
+.TP
+\fBbind\fP [\fB\-m\fP \fIkeymap\fP] \fIkeyseq\fP:\fIfunction\-name\fP
+.TP
+\fBbind\fP \fIreadline\-command\fP
+.PD
+显示当前
+.B readline
+键和功能的，将一个按键序列和一个
+.B readline
+功能或宏进行关联，或者设置一个
+.B readline
+变量。每一个在非选项的参数都是一个命令，好像它是在
+.IR .inputrc
+中出现的一样。但是每个关联或者命令必须作为单独的参数传递；
+也就是这样 '"\eC\-x\eC\-r": re\-read\-init\-file'。
+如果有参数，它们有如下的意义：
+.RS
+.PD 0
+.TP
+.B \-m \fIkeymap\fP
+使用
+.I keymap
+作为随后的关联的keymap。可选的
+.I keymap
+名称是
+\fIemacs, emacs\-standard, emacs\-meta, emacs\-ctlx, vi,
+vi\-move, vi\-command\fP，还有
+.IR vi\-insert 。
+\fIvi\fP 和 \fIvi\-command\fP 等价; \fIemacs\fP 和 \fIemacs\-standard\fP 等价。
+.TP
+.B \-l
+列出所有的 \fBreadline\fP 功能。
+.TP
+.B \-p
+以程序可读的方式显示 \fBreadline\fP 功能名称和关联
+.TP
+.B \-P
+列出当前 \fBreadline\fP 功能名称和关联。
+.TP
+.B \-v
+以程序可读的方式显示 \fBreadline\fP 变量名称和值
+.TP
+.B \-V
+列出当前 \fBreadline\fP 变量和值。
+.TP
+.B \-s
+以程序可读的方式显示 \fBreadline\fP 键序列和对应的宏
+.TP
+.B \-S
+显示 \fBreadline\fP 宏对应的键序列和他们输出的字符串
+.TP
+.B \-f \fIfilename\fP
+从 \fIfilename\fP 中读取键序列
+.TP
+.B \-q \fIfunction\fP
+查询那些键将执行\fIfunction\fP。
+.TP
+.B \-u \fIfunction\fP
+取消所有关联到 \fIfunction\fP 的键。
+.TP
+.B \-r \fIkeyseq\fP
+取消当前任何 \fIkeyseq\fP 的关联。
+.TP
+.B \-x \fIkeyseq\fP:\fIshell\-command\fP
+使 \fIshell\-command\fP 在 \fIkeyseq\fP 按下时被执行。
+.PD
+.PP
+返回值是0，除非给出了一个不能识别的选项或是产生了一个错误。
+.RE
+.TP
+\fBbreak\fP [\fIn\fP]
+从一个
+.BR for ,
+.BR while ,
+.BR until ,
+或者
+.B select
+循环退出。
+如果指定了 \fIn\fP ，就跳出 \fIn\fP 层循环。
+.I n
+必须 \(>= 1。如果
+.I n
+比当前循环层数还要大，将跳出所有循环。
+返回值是0，除非执行
+.B break 
+的时候 shell 不是在执行一个循环。
+.TP
+\fBbuiltin\fP \fIshell\-builtin\fP [\fIarguments\fP]
+执行指定的 shell 内建命令，传递
+.IR arguments
+，返回命令的返回值。
+这在定义了一个和 shell 内建命令同名的函数时很有用，
+在那个函数中使用它来执行相应的功能。\fBcd\fP 命令常以这种方式重新定义。
+返回状态是 false，如果指定的
+.I shell\-builtin
+并不是一个 shell 内建命令。
+.TP
+\fBcd\fP [\fB\-L|-P\fP] [\fIdir\fP]
+改变当前路径到 \fIdir\fP。这个变量的默认值是
+.SM
+.B HOME
+目录。环境变量
+.SM
+.B CDPATH
+定义了包含
+.IR dir 
+的搜索路径。在
+.SM
+.B CDPATH
+中可选的路径名以冒号(:) 分隔。
+.SM
+.B CDPATH
+中的空路径名与当前路径相同，就是 ``\fB.\fP''.  如果
+.I 目录名
+以斜杠 (/,slash) 起始，那么
+.SM
+.B CDPATH
+不会被使用。
+.B \-P
+选项是说使用物理路径结构而不是跟随符号链接，(参见
+.B set
+命令中的
+.B \-P
+选项);
+.B \-L
+选项强制跟随符号链接。另外，选项
+.B \-
+与
+.SM
+.BR $OLDPWD 
+是相同的。
+返回值是 true ，如果成功地改变了目录；否则是 false。
+.TP
+\fBcommand\fP [\fB\-pVv\fP] \fIcommand\fP [\fIarg\fP ...]
+运行
+.I command
+，使用
+.I args
+作为参数，禁止通常的查找 shell 函数的过程。只有内建命令或者
+.SM
+.B PATH
+中包含的命令可以执行。如果给出
+.B \-p
+参数，
+.I command
+的查找是以
+.B PATH
+的默认值进行的。这样可以保证找到所有的标准工具。如果给出
+.B \-V
+或者
+.B \-v
+选项，关于
+.I command
+的说明将被打印出来。
+.B \-v
+选项使得表述这个命令的词，或者要执行
+.I command
+需要执行的文件显示出来；
+.B \-V
+选项给出更详细的描述。如果给出
+.B \-V
+或者
+.B \-v
+选项，退出状态在找到了
+.I command
+的情况下0，没找到就是1。
+如果没有提供选项，并且产生了错误或者
+.I command
+没有找到，退出状态就是127。否则，
+.B command
+内建命令的退出状态是
+.IR command
+的退出状态。
+.TP
+\fBcompgen\fP [\fIoption\fP] [\fIword\fP]
+根据 \fIoption\fP 为 \fIword\fP 产生可能的补全。\fIoption\fP 是
+内建命令
+.B complete
+接受的任何选项，除了 \fB\-p\fP 和 \fB\-r\fP，将匹配结果写到标准输出。
+当使用 \fB\-F\fP 或 \fB\-C\fP 选项时，可编程补全功能所设置的多数
+shell 变量如果存在，其值将不再有用。
+.sp 1
+产生的匹配与可编程补全代码根据补全规则加上相同的标志直接产生的结果相同。
+如果指定了 \fIword\fP，只有匹配 \fIword\fP 的补全结果将被显示出来。
+.sp 1
+返回值为真，除非提供了非法的选项，或者没有产生匹配。
+.TP
+\fBcomplete\fP [\fB\-abcdefgjksuv\fP] [\fB\-o\fP \fIcomp-option\fP] [\fB\-A\fP \fIaction\fP] [\fB\-G\fP \fIglobpat\fP] [\fB\-W\fP \fIwordlist\fP] [\fB\-P\fP \fIprefix\fP] [\fB\-S\fP \fIsuffix\fP]
+.br
+[\fB\-X\fP \fIfilterpat\fP] [\fB\-F\fP \fIfunction\fP] [\fB\-C\fP \fIcommand\fP] \fIname\fP [\fIname ...\fP]
+.PD 0
+.TP
+\fBcomplete\fP \fB\-pr\fP [\fIname\fP ...]
+.PD
+指定每个 \fIname\fP 的参数应当如何被补全。如果给出了 \fB\-p\fP 选项，
+或者没有选项给出，现有的补全规则将被显示出来，以一种可以重用为输入
+的格式显示。\fB\-r\fP 选项将一个针对每个 \fIname\fP 的补全规则删除。
+或者，如果没有给出 \fIname\fP，将删除所有补全规则。
+.sp 1
+尝试词的补全时，应用这些补全规则的过程在上面
+\fBProgrammable Completion\fP(可编程补全) 中详述。
+.sp 1
+其他选项，如果给出的话，具有下列意义。\fB\-G\fP, \fB\-W\fP, 
+和 \fB\-X\fP 选项的参数 (如果需要的话，还包括 \fB\-P\fP 和 \fB\-S\fP 
+选项) 应当被引用，避免在执行内建命令
+.B complete
+之前被扩展。
+.RS
+.PD 0
+.TP 8
+\fB\-o\fP \fIcomp-option\fP
+\fIcomp-option\fP 控制着 compspec 除了简单地产生补全之外的多种行为。
+\fIcomp-option\fP 可以是如下之一：
+.RS
+.TP 8
+.B default
+使用 readline 的默认文件名补全，如果 compspec 没有得到匹配。
+.TP 8
+.B dirnames
+进行目录名补全，如果 compspec 没有得到匹配。
+.TP 8
+.B filenames
+告诉 readline，compspec 产生了文件名，使它可以进行任何文件名专用的处理
+(例如，给目录名加上斜杠或消除尾部空白)。主要用于 shell 函数。
+.TP 8
+.B nospace
+告诉 readline 不要向补全的词在行的最后添加一个空格 (这是默认行为)。
+.RE
+.TP 8
+\fB\-A\fP \fIaction\fP
+\fIaction\fP 可以是下列之一，来产生一系列可能的补全结果：
+.RS
+.TP 8
+.B alias
+起别名。也可以用 \fB\-a\fP 指定。
+.TP 8
+.B arrayvar
+数组变量名。
+.TP 8
+.B binding
+\fBReadline\fP 按键关联。
+.TP 8
+.B builtin
+shell 内建命令的名称。也可以用 \fB\-b\fP 指定。
+.TP 8
+.B command
+命令名。也可以用 \fB\-c\fP 指定。
+.TP 8
+.B directory
+目录名。也可以用 \fB\-d\fP 指定。
+.TP 8
+.B disabled
+被禁用的内建命令名称。
+.TP 8
+.B enabled
+启用的内建命令名称。
+.TP 8
+.B export
+被导出的 shell 变量名称。也可以用 \fB\-e\fP 指定。
+.TP 8
+.B file
+文件名。也可以用 \fB\-f\fP 指定。
+.TP 8
+.B function
+shell 函数的名称。
+.TP 8
+.B group
+组名。也可以用 \fB\-g\fP 指定。
+.TP 8
+.B helptopic
+内建命令 \fBhelp\fP 接受的帮助主题。
+.TP 8
+.B hostname
+主机名，从环境变量
+.SM
+.B HOSTFILE
+指定的文件中得到。
+.TP 8
+.B job
+作业名，如果作业控制被激活的话。也可以用 \fB\-j\fP 指定。
+.TP 8
+.B keyword
+shell 保留字。也可以用 \fB\-k\fP 指定。
+.TP 8
+.B running
+正在运行的作业名，如果作业控制被激活的话。
+.TP 8
+.B service
+服务名。也可以用 \fB\-s\fP 指定。
+.TP 8
+.B setopt
+内建命令 \fBset\fP 的 \fB\-o\fP 选项的有效参数。
+.TP 8
+.B shopt
+内建命令 \fBshopt\fP 接受的 shell 选项名。
+.TP 8
+.B signal
+信号名。
+.TP 8
+.B stopped
+停止的作业名，如果作业控制被激活的话。
+.TP 8
+.B user
+用户名。也可以用 \fB\-u\fP 指定。
+.TP 8
+.B variable
+shell 变量的名称。也可以用 \fB\-v\fP 指定。
+.RE
+.TP 8
+\fB\-G\fP \fIglobpat\fP
+文件名扩展模式 \fIglobpat\fP 被扩展，产生可能的补全。
+.TP 8
+\fB\-W\fP \fIwordlist\fP
+.SM
+\fIwordlist\fP 被使用
+.B IFS
+特殊变量中的字符作为定界符来拆分，每个结果的词被扩展。可能的补全是结果列表
+中匹配要补全的词的那一些。
+.TP 8
+\fB\-C\fP \fIcommand\fP
+\fIcommand\fP 将在一个子 shell 环境中执行，它的结果用作可能的补全。
+.TP 8
+\fB\-F\fP \fIfunction\fP
+shell 函数 \fIfunction\fP 将在当前 shell 环境中执行。当它结束时，可能
+的补全可以从数组元素
+.SM
+.B COMPREPLY
+中得到。
+.TP 8
+\fB\-X\fP \fIfilterpat\fP
+\fIfilterpat\fP 是一个模式，用于文件名扩展。所有前面的选项和参数产生
+的可能的补全都要经过这一步处理，每一个匹配 \fIfilterpat\fP 的补全都
+被从列表中删除。为 \fIfilterpat\fP 加上前导 \fB!\fP 使模式意义相反；
+这种情况下，所有不匹配 \fIfilterpat\fP 的模式被删除。
+.TP 8
+\fB\-P\fP \fIprefix\fP
+在所有其他选项都处理过之后，\fIprefix\fP 被加到每个可能的补全前面。
+.TP 8
+\fB\-S\fP \fIsuffix\fP
+在所有其他选项都处理过之后，\fIsuffix\fP 被加到每个可能的补全后面。
+.PD
+.PP
+返回值为真，除非给出了非法的选项，给出除 \fB\-p\fP 和 \fB\-r\fP 之外
+的某个选项时没有给出 \fIname\fP 参数，试图删除一条 \fIname\fP 的补全
+规则但是规则不存在，或者添加补全规则时出错。
+.RE
+.TP
+\fBcontinue\fP [\fIn\fP]
+复位到外层
+.BR for ,
+.BR while ,
+.BR until ,
+或
+.B select
+循环的下一次开始。如果指定了
+.I n，
+复位到向外第 \fIn\fP 层循环的开始。
+.I n
+必须 \(>= 1。如果
+.I n
+比外部循环的层数要多，将复位到最外层的循环 (``top-level'' loop，顶层循环)。
+返回值是 0，除非执行
+.B continue
+时，shell 不是在循环之中。
+.TP
+\fBdeclare\fP [\fB\-afFirtx\fP] [\fB\-p\fP] [\fIname\fP[=\fIvalue\fP]]
+.PD 0
+.TP
+\fBtypeset\fP [\fB\-afFirtx\fP] [\fB\-p\fP] [\fIname\fP[=\fIvalue\fP]]
+.PD
+声明变量且/或设置它们的属性。如果没有给出 \fIname\fP 则显示变量的值。
+选项
+.B \-p
+将显示每个名称
+.IR name 
+的属性和值。当使用
+.B \-p
+时，其他选项被忽略。选项
+.B \-F
+禁止显示函数定义；只有函数名和属性会被显示。
+.B \-F
+选项暗含
+.BR \-f .
+下列选项可用来限制只输出具有指定属性的变量，或者为变量设置属性：
+.RS
+.PD 0
+.TP
+.B \-a
+每个 \fIname\fP 都是数组变量 (参见上面的
+.B Arrays
+段落)。
+.TP
+.B \-f
+只使用函数名。
+.TP
+.B \-i
+变量被当作一个整数；当变量被赋值时将进行算术运算 (参见
+.SM
+.B "算术求值 (ARITHMETIC EVALUATION)"
+章节)。
+.TP
+.B \-r
+使得 \fIname\fP 只读。这些名称不能再被后续的赋值语句赋值或取消定义。
+.TP
+.B \-t
+设置每个 \fIname\fP 的 \fItrace\fP(跟踪) 属性。被跟踪的函数继承了
+调用者 shell 的 \fBDEBUG\fP 陷阱。trace 属性对变量没有特殊意义。
+.TP
+.B \-x
+标记 \fIname\fP 为可以通过环境导出给后续命令。
+.PD
+.PP
+使用 `+' 代替 `\-' 将关闭属性，特殊情况是 \fB+a\fP 不能用于销毁一个
+数组变量。当用于函数中时，它使得每个 \fIname\fP 成为局部的，就像
+使用了 
+.B local
+命令。返回值是 0，除非遇到了非法的选项，试图使用
+.if n ``\-f foo=bar''
+.if t \f(CW\-f foo=bar\fP
+定义函数，试图向只读变量赋值，试图向数组变量赋值但没有使用复合的赋值
+语法 (参见上面的
+.B Arrays
+段落)，\fIname\fP 之一不是有效的 shell 变量名，试图将数组变量的数组
+状态关闭，或者是试图使用 \fB\-f\fP 显示一个不存在的函数。
+.RE
+.TP
+.B dirs [\fB\-clpv\fP] [+\fIn\fP] [\-\fIn\fP]
+没有选项时显示当前保存的目录。默认输出为一行，目录名用空格分开。
+可以使用
+.B pushd
+命令将目录添加到列表，
+.B popd
+命令将列表中的条目删除。
+.RS
+.PD 0
+.TP
+\fB+\fP\fIn\fP
+显示
+.B dirs
+在不带选项执行时显示的列表的第 \fIn\fP 个条目，从 0 开始自左算起。
+.TP
+\fB\-\fP\fIn\fP
+显示
+.B dirs
+在不带选项执行时显示的列表的第 \fIn\fP 个条目，从 0 开始自右算起。
+.TP
+.B \-c
+删除所有条目，清空目录栈。
+.TP
+.B \-l
+产生长列表；默认列表格式使用波浪线来表示个人目录。
+.TP
+.B \-p
+输出目录栈，一行一个。
+.TP
+.B \-v
+输出目录栈，一行一个，每个条目前面加上它在栈中的位置索引。
+.PD
+.PP
+返回值是 0，除非给出了非法的参数，或者 \fIn\fP 索引超出了目录栈的范围。
+.RE
+.TP
+\fBdisown\fP [\fB\-ar\fP] [\fB\-h\fP] [\fIjobspec\fP ...]
+没有选项时，每个
+.I jobspec
+被从正在运行的作业表中删除。如果给出了 \fB\-\fP 选项，每个
+.I jobspec
+并不从表中删除，而是被标记，使得在 shell 接到
+.SM
+.BR SIGHUP 
+信号时，不会向作业发出
+.SM
+.B SIGHUP
+信号。如果没有给出
+.I jobspec，
+也没有给出
+.B \-a
+或者
+.B \-r
+选项，将使用当前作业 (\fIcurrent job\fP)。如果没有给出
+.I jobspec，
+选项
+.B \-a
+意味着删除或标记所有作业；选项
+.B \-r
+不带
+.I jobspec
+参数时限制操作只对正在运行的作业进行。返回值是 0，除非
+.I jobspec
+不指定有效的作业。
+.TP
+\fBecho\fP [\fB\-neE\fP] [\fIarg\fP ...]
+输出 \fIarg\fP，以空格分开，最后加一个新行符。返回值总是 0。
+如果指定了 \fB\-n\fP，将不在尾部添加新行符。如果给出了 \fB\-e\fP 选项，
+将允许解释下列反斜杠转义的字符。
+.B \-E
+选项禁止这些转义字符的解释，即使在默认解释它们的系统中也是如此。
+shell 选项 \fBxpg_echo\fP 可以用来在运行时判断 \fBecho\fP 是否默认
+展开这些转义字符。
+.B echo
+不将
+.B \-\-
+作为选项的结束。
+.B echo
+解释下列转义序列：
+.RS
+.PD 0
+.TP
+.B \ea
+alert (bell) 响铃
+.TP
+.B \eb
+backspace 回退
+.TP
+.B \ec
+suppress trailing newline 删除尾部新行符
+.TP
+.B \ee
+an escape character 字符 Esc
+.TP
+.B \ef
+form feed 进纸
+.TP
+.B \en
+new line 新行符
+.TP
+.B \er
+carriage return 回车
+.TP
+.B \et
+horizontal tab 水平跳格
+.TP
+.B \ev
+vertical tab 竖直跳格
+.TP
+.B \e\e
+backslash 反斜杠
+.TP
+.B \e0\fInnn\fP
+一个八比特字符，它的值是八进制值 \fInnn\fP (零到三个八进制数字)。
+.TP
+.B \e\fInnn\fP
+一个八比特字符，它的值是八进制值 \fInnn\fP (一到三个八进制数字)。
+.TP
+.B \ex\fIHH\fP
+一个八比特字符，它的值是十六进制值 \fIHH\fP (一到两个十六进制数字)。
+.PD
+.RE
+.TP
+\fBenable\fP [\fB\-adnps\fP] [\fB\-f\fP \fIfilename\fP] [\fIname\fP ...]
+允许或禁止 shell 内建命令。禁止一个内建命令使得磁盘上的与内建命令同名
+的文件得以运行，不必使用它的全路径，即使 shell 一般在搜索磁盘上的命令之前
+搜索内建命令。如果使用了 \fB\-n\fP 选项，每个 \fIname\fP 都被禁止；否则，
+\fIname\fP 被允许。例如，要使用
+.SM
+.B PATH
+中搜索到的
+.B test
+命令而不是 shell 内建的那一个，可以运行
+.if t \f(CWenable -n test\fP.
+.if n ``enable -n test''.
+选项
+.B \-f
+意味着从共享库
+.IR filename
+中加载新的内建命令
+.I name，
+如果系统支持动态加载的话。选项
+.B \-d
+将删除曾经用
+.BR \-f 
+加载的内建命令。如果没有给出 \fIname\fP 参数，或者给出了
+.B \-p
+选项，将显示 shell 内建命令的列表。如果没有其他选项参数，
+这个列表只包含所有被允许的 shell 内建命令；如果给出了
+\fB\-n\fP，将只显示被禁止的内建命令；如果给出了 
+\fB\-a\fP，显示的列表中包含所有内建命令，还有命令是否被允许的指示；
+如果给出了 \fB\-s\fP，输出被限制为 POSIX \fIspecial\fP 内建命令。
+返回值是 0，除非
+.I name
+不是 shell 内建命令，或者从共享库中加载新的内建命令时出错。
+.TP
+\fBeval\fP [\fIarg\fP ...]
+\fIarg\fP 被读取并连结为单一的命令。这个命令然后被 shell 读取并执行，
+它的退出状态被作为
+.BR eval
+的值返回。如果没有
+.IR args ，
+或仅仅包含空参数，
+.B eval
+返回 0。
+.TP
+\fBexec\fP [\fB\-cl\fP] [\fB\-a\fP \fIname\fP] [\fIcommand\fP [\fIarguments\fP]]
+如果指定了
+.I command，
+它将替换 shell。不会产生新的进程。
+.I arguments
+成为 \fIcommand\fP 的参数。如果给出了
+.B \-l
+选项，shell 将在传递给
+.IR command
+的第 0 个参数前面加上一个连字符 (dash,`-')。这样做和
+.IR login (1)
+相同。选项
+.B \-c
+使得命令
+.I command
+在一个空环境中执行。如果给出了
+.B \-a，
+shell 会将
+.I name
+作为第 0 个参数传递给要执行的命令。如果由于某种原因
+as the zeroth argument to the executed command.  If
+.I command
+不能被执行，非交互的 shell 将退出，除非 shell 选项
+.B execfail
+被设置为允许，这种情况下它返回失败。如果命令不能执行，交互的 shell 返回失败。
+如果没有指定
+.I command
+任何重定向对当前 shell 发生作用，返回值是 0。如果发生重定向错误，返回状态是 1。
+.TP
+\fBexit\fP [\fIn\fP]
+使得 shell 以状态值 \fIn\fP 退出。如果忽略了
+.I n，
+退出状态是最后执行的命令的退出状态。在 shell 终止前，对
+.SM
+.B EXIT
+的陷阱将被执行。
+.TP
+\fBexport\fP [\fB\-fn\fP\^] [\fIname\fP[=\fIword\fP]] ...
+.PD 0
+.TP
+.B export \-p
+.PD
+给出的名称
+.I names
+被标记为自动地导出到后续执行的命令的环境中。如果给出了
+.B \-f
+选项，名称
+.I names
+指的是函数。如果没有给出
+.I names，
+或者如果给出了
+.B \-p
+选项，将打印在这个 shell 中被导出的所有名字的列表。选项
+.B \-n
+使得以此为名的变量的导出属性被删除。
+.B export
+返回 0，除非遇到了非法的选项，\fIname\fP 之一不是有效的 shell 变量名，
+或者给出了
+.B \-f
+选项，而
+.I name
+不是一个函数。
+.TP
+\fBfc\fP [\fB\-e\fP \fIename\fP] [\fB\-nlr\fP] [\fIfirst\fP] [\fIlast\fP]
+.PD 0
+.TP
+\fBfc\fP \fB\-s\fP [\fIpat\fP=\fIrep\fP] [\fIcmd\fP]
+.PD
+命令修复。第一种形式中，历史列表中从
+.I first
+到
+.I last
+范围内的命令都被选取。
+.I First
+和
+.I last
+可以指定为字符串 (可以定位最后一个以此字符串开始的命令) 或者数字 (历史列表中
+的索引，负数被当作相对当前命令号的偏移)。如果没有指定
+.I last，
+它在列举时被设为当前命令 (因此
+.if n ``fc \-l \-10''
+.if t \f(CWfc \-l \-10\fP
+将输出最后 10 条命令)，其他情况下被设为
+.I first。
+如果没有指定
+.I first，
+它在编辑时被设为前一个命令，列举是设为 \-16。
+.sp 1
+选项
+.B \-n
+使得列举时不显示命令号码。选项
+.B \-r
+将命令顺序进行掉换。如果给出了
+.B \-l
+选项，命令将列举在标准输出上。否则，将启动
+.I ename
+给出的编辑器，编辑包含这些命令的文件。如果没有给出
+.I ename，
+将使用变量
+.SM
+.B FCEDIT
+的值，如果
+.SM
+.B FCEDIT
+没有定义就使用
+.SM
+.B EDITOR
+的值。如果仍然没有定义，将使用
+.FN vi。
+编辑结束后，被编辑的命令将回显并执行。
+.sp 1
+第二种形式中，\fIcommand\fP 在每个 \fIpat\fP 的实例被 \fIrep\fP 替换后
+都被重新执行。使用这种特性时可以起一个有用的别名：
+.if n ``r=fc -s'',
+.if t \f(CWr='fc \-s'\fP,
+这样输入
+.if n ``r cc''
+.if t \f(CWr cc\fP
+将运行最后的以
+.if n ``cc''
+.if t \f(CWcc\fP
+开头的命令，输入
+.if n ``r''
+.if t \f(CWr\fP
+将重新执行上一个命令。
+.sp 1
+如果使用第一种形式，返回值是 0，除非遇到了非法的选项，或
+.I first
+或
+.I last
+指定的历史行数超出了范围。如果给出了
+.B \-e
+选项，返回值是最后执行的命令的返回值，或着是失败，如果临时文件中的命令
+执行出错。如果使用第二种形式，返回状态是重新执行的命令，除非
+.I cmd
+没有指定一个有效的历史行，这种情况下
+.B fc
+返回失败。
+.TP
+\fBfg\fP [\fIjobspec\fP]
+将
+.I jobspec
+恢复至前台，使它成为当前作业。如果
+.I jobspec
+不存在，将使用 shell 意义上的当前作业 \fIcurrent job\fP。返回值是
+被放到前台的命令的状态，或者是失败，如果在禁用作业控制时运行，或者
+在启用作业控制时运行，但
+.I jobspec
+没有指定有效的作业，或
+.I jobspec
+指定了没有使用作业控制的作业。
+.TP
+\fBgetopts\fP \fIoptstring\fP \fIname\fP [\fIargs\fP]
+.B getopts
+由 shell 程序用来处理位置参数。
+.I optstring
+包含要识别的选项字符；如果某个字符跟随着冒号，那么这个选项需要一个参数，
+需要用空白和它隔离开。冒号和问号字符不能用作选项字符。每次它执行时，
+.B getopts
+将下一个选项放在 shell 变量
+.IR name 
+中，如果
+.I name
+不存在就初始化它；下一个要处理的参数的索引放在变量
+.SM
+.BR OPTIND
+中。每次 shell 或 shell 脚本被执行的时候
+.SM
+.B OPTIND
+被初始化为 1。当某个选项需要参数时，
+.B getopts
+将那个参数放到变量
+.SM
+.BR OPTARG 
+中。shell 不会自动重置
+.SM
+.B OPTIND；
+在相同的 shell 中，如果要使用新的参数集合而需要多次调用
+.B getopts
+时，必须手动重置它。
+.sp 1
+当遇到选项结束的时候，\fBgetopts\fP 以大于 0 的值退出。
+\fBOPTIND\fP 被设置为第一个非选项的参数的索引，\fIname\fP 被设置为 ?。
+.sp 1
+.B getopts
+通常解释位置参数，但是如果
+.IR args 
+中给出了更多参数，
+.B getopts
+将解释它们。
+.sp 1
+.B getopts
+能以两种方式报告错误。如果
+.I optstring
+的第一个字符是冒号，将使用
+.I silent
+安静的错误报告。通常的操作中，遇到非法选项或缺少选项的参数时将打印出
+诊断信息。如果变量
+.SM
+.B OPTERR
+被设置为 0，不会显示错误消息，即使
+.I optstring
+的第一个字符不是冒号。
+.sp 1
+如果发现了一个非法的选项，
+.B getopts
+向
+.I name
+中置入 ?，并且如果不是安静模式的话，打印错误消息并取消
+.SM
+.BR OPTARG
+的定义。如果
+.B getopts
+是安静模式，找到的选项字符将置入
+.SM
+.B OPTARG，
+不会打印诊断消息。
+.sp 1
+如果没有找到需要的参数，并且
+.B getopts
+不是安静模式，将向
+.IR name
+置入一个问号 (\^\fB?\fP\^)，取消
+.SM
+.B OPTARG
+的定义，打印出诊断消息。如果
+.B getopts
+是安静模式，那么将向
+.I name
+置入一个冒号 (\^\fB:\fP\^) 并且
+.SM
+.B OPTARG
+将设置为找到的选项字符。
+.sp 1
+.B getopts
+返回真，如果找到了指定的/未被指定的选项。它返回假，如果遇到了选项结束
+或者发生了错误。
+.TP
+\fBhash\fP [\fB\-lr\fP] [\fB\-p\fP \fIfilename\fP] [\fB\-dt\fP] [\fIname\fP]
+对于每个
+.IR name ,
+通过搜索
+.B $PATH
+中的目录，找到命令的全路径名并记录它。如果给出了 
+.B \-p
+选项，不会进行路径搜索，直接将
+.I filename
+作为命令的全路径名。选项
+.B \-r
+使得 shell 忘记所有已记录的位置。选项
+.B \-d
+使得 shell 忘记已记录的 \fIname\fP 的位置。如果给出了
+.B \-t
+选项，每个 \fIname\fP 对应的全路径名被打印出来。如果给出多个
+\fIname\fP 作为 \fB\-t\fP 的参数，\fIname\fP 将在已记录的全路径名
+之前被打印出来。选项
+.B \-l
+使得输出以一种可以重用为输入的格式显示。如果没有给出参数，
+或者只给出了 \fB\-l\fP 选项，已记录的命令的信息将被打印出来。
+返回真，除非
+.I name
+没有找到或给出了非法的选项。
+.TP
+\fBhelp\fP [\fB\-s\fP] [\fIpattern\fP]
+显示关于内建命令的有用的信息。如果指定了
+.I pattern (模式)，
+.B help
+给出关于所有匹配
+.IR pattern
+的命令的详细帮助；否则所有内建命令的帮助和 shell 控制结构将被打印出来。
+选项 \fB\-s\fP 限制信息显示为简短的用法概要。
+返回 0，除非没有匹配
+.IR pattern
+的命令。
+.TP
+\fBhistory [\fIn\fP]
+.PD 0
+.TP
+\fBhistory\fP \fB\-c\fP
+.TP
+\fBhistory \-d\fP \fIoffset\fP
+.TP
+\fBhistory\fP \fB\-anrw\fP [\fIfilename\fP]
+.TP
+\fBhistory\fP \fB\-p\fP \fIarg\fP [\fIarg ...\fP]
+.TP
+\fBhistory\fP \fB\-s\fP \fIarg\fP [\fIarg ...\fP]
+.PD
+不带选项的话，显示带行号的命令历史列表。列出的行中含有
+.B *
+的已经被修改过。参数
+.I n
+使得只显示最后
+.I n
+行。如果给出了 \fIfilename\fP，它被用做历史文件名；没有的话，将使用
+.SM
+.B HISTFILE
+的值作为历史文件名。选项如果给出，则具有下列意义：
+.RS
+.PD 0
+.TP
+.B \-c
+清空历史列表，删除所有条目。
+.TP
+\fB\-d\fP \fIoffset\fP
+删除 \fIoffset\fP 位置的历史条目。
+.TP
+.B \-a
+将 ``新'' 的历史条目 (自当前 \fBbash\fP 会话开始输入的历史命令)
+追加到历史文件中。
+.TP
+.B \-n
+将尚未从历史文件中读取的历史条目读入当前历史列表。这些行是当前
+\fBbash\fP 会话开始之后，才追加到历史文件中的行。
+.TP
+.B \-r
+读取历史文件的内容，使用它们作为当前历史。
+.TP
+.B \-w
+将当前历史列表写入历史文件，覆盖历史文件的原有内容。
+.TP
+.B \-p
+对后续的 \fIargs\fP 进行历史替换，在标准输出上显示结果。
+不会将结果存入历史列表。每个 \fIargs\fP 都必须被引用，来禁止
+普通的命令扩展。
+.TP
+.B \-s
+将
+.I args
+保存到历史列表中，作为单独的条目。历史列表中的最后一个命令在添加
+.I args
+之前被删除。
+.PD
+.PP
+返回 0，除非遇到了非法的选项，读/写历史文件发生错误，在 \fB\-d\fP 的
+参数中给出了无效的 \fIoffset\fP，或者对 \fB\-p\fP 的后续参数进行历史扩展失败。
+.RE
+.TP
+\fBjobs\fP [\fB\-lnprs\fP] [ \fIjobspec\fP ... ]
+.PD 0
+.TP
+\fBjobs\fP \fB\-x\fP \fIcommand\fP [ \fIargs\fP ... ]
+.PD
+第一种形式列出正在运行的作业。选项具有下列意义：
+.RS
+.PD 0
+.TP
+.B \-l
+普通信息之外，列出进程ID。
+.TP
+.B \-p
+只列出作业的进程组 leader 的进程ID。
+.TP
+.B \-n
+只显示从上次用户得知它们的状态之后，状态发生改变的作业的信息。
+.TP
+.B \-r
+限制只输出正在运行的作业。
+.TP
+.B \-s
+限制只输出停止的作业。
+.PD
+.PP
+如果给出了
+.I jobspec
+输出被限制为仅此作业的信息。
+返回 0，除非遇到了非法的选项或给出了非法的
+.I jobspec。
+.PP
+如果给出了
+.B \-x
+选项，作业
+.B jobs
+将
+.I command
+或
+.I args
+中的任何
+.I jobspec
+替换为相应的进程组ID，执行
+.I command，
+传递参数
+.IR args
+给它并返回它的退出状态。
+.RE
+.TP
+\fBkill\fP [\fB\-s\fP \fIsigspec\fP | \fB\-n\fP \fIsignum\fP | \fB\-\fP\fIsigspec\fP] [\fIpid\fP | \fIjobspec\fP] ...
+.PD 0
+.TP
+\fBkill\fP \fB\-l\fP [\fIsigspec\fP | \fIexit_status\fP]
+.PD
+向以
+.I pid
+或
+.IR jobspec
+为名的进程发送名为
+.I sigspec
+或
+.I signum
+的信号。
+.I sigspec
+可以是一个信号名称，类似
+.SM
+.B SIGKILL
+或信号编号；
+.I signum
+是一个信号编号。如果
+.I sigspec
+是一个信号名称，那么可以有，也可以没有
+.SM
+.B SIG
+前缀。如果没有给出
+.I sigspec，
+那么假设是
+.SM
+.B SIGTERM。
+参数
+.B \-l
+将列出所有信号的名称。如果给出
+.B \-l
+时还有任何参数，将列出参数对应的信号名称，返回状态 0。
+.B \-l
+的 \fIexit_status\fP 参数是一个数字，指定了一个信号编号或被信号
+终止的进程的退出状态值。
+.B kill
+返回真，如果至少成功发送了一个信号，或者返回假，如果发生了错误或遇到了
+非法的选项。
+.TP
+\fBlet\fP \fIarg\fP [\fIarg\fP ...]
+每个
+.I arg
+都是要求值的算术表达式 (参见
+.SM
+.BR "算术求值 (ARITHMETIC EVALUATION)"
+章节)。如果最后一个参数
+.I arg
+求值结果是 0，
+.B let
+返回 1；否则返回 0。
+.TP
+\fBlocal\fP [\fIoption\fP] [\fIname\fP[=\fIvalue\fP] ...]
+对每个参数将创建一个名为
+.I name 
+的局部变量并赋予值
+.IR value。
+\fIoption\fP 可以是任何 \fBdeclare\fP 接受的值。当
+.B local
+用于函数内部时，它使得变量
+.I name
+作用域局限于函数和它的子进程。没有操作数时，
+.B local
+将局部变量的列表写到标准输出。不在函数内部使用
+.B local
+会导致出错。返回 0，除非在函数之外使用了
+.B local，
+给出了非法的
+.I name，
+或者 \fIname\fP 是一个只读的变量。
+.TP
+.B logout
+退出登录 shell。
+.TP
+\fBpopd\fP [\-\fBn\fP] [+\fIn\fP] [\-\fIn\fP]
+从目录栈中删除条目。没有参数的话，从栈中删除顶层目录，执行
+.B cd
+切换到新的顶层目录。如果给出了参数，有下列的含义：
+.RS
+.PD 0
+.TP
+\fB+\fP\fIn\fP
+删除
+.BR dirs
+给出的列表中从左数第 \fIn\fP 个条目 (从 0 算起)。例如：
+.if n ``popd +0''
+.if t \f(CWpopd +0\fP
+删除第一个目录，
+.if n ``popd +1''
+.if t \f(CWpopd +1\fP
+第二个。
+.TP
+\fB\-\fP\fIn\fP
+删除
+.BR dirs
+给出的列表中从右数第 \fIn\fP 个条目 (从 0 算起)。例如：
+.if n ``popd -0''
+.if t \f(CWpopd -0\fP
+删除最后一个目录，
+.if n ``popd -1''
+.if t \f(CWpopd -1\fP
+删除倒数第二个。
+.TP
+.B \-n
+阻止从栈中删除目录之后改变目录，这时只对栈进行操作。
+.PD
+.PP
+如果命令
+.B popd
+成功，还要执行一个
+.B dirs，
+返回 0。
+.B popd
+返回假，如果遇到了非法的选项，目录栈为空，指定了目录栈中不存在的条目，
+或者改变目录失败。
+.RE
+.TP
+\fBprintf\fP \fIformat\fP [\fIarguments\fP]
+在 \fIformat\fP 控制下将格式化的 \fIarguments\fP 写到标准输出。
+\fIformat\fP 是一个字符串，包含三种类型的对象：普通字符，被简单地
+复制到标准输出，转义字符，被转换并复制到标准输出，格式说明，每一个
+都使得相邻的下一个 \fIargument\fP 被打印出来。
+在标准的 \fIprintf\fP(1) 格式之外，\fB%b\fP 使得 \fBprintf\fP 展开相应
+\fIarguments\fP 中的反斜杠转义序列，\fB%q\fP 使得 \fBprintf\fP 将
+相应的 \fIargument\fP 以一种可以重用为 shell 输入的格式输出。
+.sp 1
+\fIformat\fP 在需要时被重用，以处理所有的 \fIarguments\fP。
+如果 \fIformat\fP 需要比所提供的更多的 \fIarguments\fP，
+多出的格式说明视为已经提供了相应的 0 值或空字符串。
+成功的话返回值是 0，失败则是非 0 值。
+.TP
+\fBpushd\fP [\fB\-n\fP] [\fIdir\fP]
+.PD 0
+.TP
+\fBpushd\fP [\fB\-n\fP] [+\fIn\fP] [\-\fIn\fP]
+.PD
+将目录推入目录栈，或者轮换栈中的内容，使栈的顶部成为当前工作目录。
+没有参数时，交换顶部两个目录，返回 0，除非目录栈为空。如果给出了参数，
+它们有如下含义：
+.RS
+.PD 0
+.TP
+\fB+\fP\fIn\fP
+轮换栈中内容，使得
+.BR dirs
+给出的列表中从左数第 \fIn\fP 个目录 (从 0 数起) 成为目录栈的顶部。
+.TP
+\fB\-\fP\fIn\fP
+轮换栈中内容，使得
+.BR dirs
+给出的列表中从右数第 \fIn\fP 个目录 (从 0 数起) 成为目录栈的顶部。
+.TP
+.B \-n
+阻止向栈中添加目录之后改变目录，这时只对栈进行操作。
+.TP
+.I dir
+添加
+.I dir
+到栈顶，使得它成为新的当前工作目录。
+.PD
+.PP
+如果命令
+.B pushd
+成功，还要执行一个
+.B dirs。
+如果使用第一种形式，
+.B pushd
+返回 0，除非 cd 切换到目录
+.I dir
+失败。使用第二中形式时，
+.B pushd
+返回 0，除非目录栈为空，指定了目录栈中不存在的元素，或者
+切换到指定的新的当前目录失败。
+.RE
+.TP
+\fBpwd\fP [\fB\-LP\fP]
+打印当前工作目录的绝对路径名。如果给出了
+.B \-P
+选项，或者设置了内建命令
+.B set
+的
+.B \-o physical
+选项，打印出的路径名中不会包含符号链接。如果使用了
+.B \-L
+选项，打印出的路径中可能包含符号链接。
+返回 0，除非在读取当前目录名时出错或给出了非法的选项。
+.TP
+\fBread\fP [\fB\-ers\fP] [\fB\-u\fP \fIfd\fP] [\fB\-t\fP \fItimeout\fP] [\fB\-a\fP \fIaname\fP] [\fB\-p\fP \fIprompt\fP] [\fB\-n\fP \fInchars\fP] [\fB\-d\fP \fIdelim\fP] [\fIname\fP ...]
+从标准输入读入一行，或从 \fB\-u\fP 选项的参数中给出的文件描述符 \fIfd\fP 中
+读取，第一个词被赋予第一个
+.IR name ,
+第二个词被赋予第二个
+.IR name ,
+以此类推，多余的词和其间的分隔符被赋予最后一个
+.IR name .
+如果从输入流读入的词数比名称数少，剩余的名称被赋予空值。
+.SM
+.B IFS
+中的字符被用来将行拆分成词。
+反斜杠字符 (\fB\e\fP) 被用于删除读取的下一字符的特殊含义，以及续行。
+如果给出了选项，将包含下列含义：
+.RS
+.PD 0
+.TP
+.B \-a \fIaname\fP
+词被赋以数组变量
+.IR aname
+的连续的下标，从 0 开始。在赋新值之前，
+.I aname
+被取消定义。其他 \fIname\fP 参数被忽略。
+.TP
+.B \-d \fIdelim\fP
+\fIdelim\fP 的第一个字符被用于结束输入行，而不是新行符。
+.TP
+.B \-e
+如果标准输入来自终端，将使用
+.B readline
+(参见上面的
+.SM
+.B READLINE
+章节) 来获得输入行。
+.TP
+.B \-n \fInchars\fP
+\fBread\fP 读入 \fInchars\fP 个字符后返回，而不是等待一整行输入。
+.TP
+.B \-p \fIprompt\fP
+读取任何输入之前，在标准错误显示提示 \fIprompt\fP，末尾没有新行符。
+提示只有在输入来自终端时才会显示。
+.TP
+.B \-r
+反斜杠不作为转义字符。反斜杠被认为行的一部分。特殊地，一对反斜杠-新行符不作为续行。
+.TP
+.B \-s
+安静模式。如果输入来自终端，字符将不会回显。
+.TP
+.B \-t \fItimeout\fP
+使得 \fBread\fP 超时并返回失败，如果在 \fItimeout\fP 秒内没有读入完整的一行输入。
+如果 \fBread\fP 不是从终端或管道读取输入，那么这个选项无效。
+.TP
+.B \-u \fIfd\FP
+从文件描述符 \fIfd\fP 中读取输入。
+.PD
+.PP
+如果没有给出
+.I names，
+读取的一行将赋予变量
+.SM
+.BR REPLY 。
+返回值是 0，除非遇到了 EOF，\fBread\P 超时，或给出了非法的文件描述符作为 \fB\-u\fP 的参数。
+.RE
+.TP
+\fBreadonly\fP [\fB\-apf\fP] [\fIname\fP ...]
+.PD
+给出的 \fIname\fP 将被标记为只读的；
+.I names
+的值不能被后来的赋值语句改变。如果给出了
+.B \-f
+选项，\fInames\fP 对应的函数也被标记。选项
+.B \-a
+限制变量只能是数组类型。如果没有给出
+.I name
+参数，或者如果给出了
+.B \-p
+选项，将打印所有只读的名称。选项
+.B \-p
+使得输出以一种可以被重新用作输入的格式显示。
+返回值是 0，除非遇到了非法的选项，
+.I names
+之一不是有效的 shell 变量名，或选项
+.B \-f
+中给出的
+.I name
+不是一个函数。
+.TP
+\fBreturn\fP [\fIn\fP]
+使得一个函数以指定值
+.IR n
+退出。如果忽略了
+.I n，
+返回状态是函数体中执行的最后一个命令的退出状态。如果在函数外使用，但是是在一个以
+.B .
+(\fBsource\fP) 命令执行的脚本内，它使得 shell 中止执行脚本，返回
+.I n
+或脚本中执行的最后一个命令的退出状态。如果在函数外使用，并且不是在以 
+\fB.\fP\^ 执行的脚本内，返回状态是假。
+.TP
+\fBset\fP [\fB\-\-abefhkmnptuvxBCHP\fP] [\fB\-o\fP \fIoption\fP] [\fIarg\fP ...]
+不带选项时，shell 变量的名称和值将以一种可以重用为输入的格式显示。
+输出根据当前语言环境进行排序。指定了选项的时候，它们设置或取消了 shell 的属性。
+处理完选项之后剩余的任何参数都被作为位置参数的值被赋值，分别赋予
+.BR $1 ,
+.BR $2 ,
+.B ...
+.BR $\fIn\fP .
+如果给出了选项，那么具有以下含义：
+.RS
+.PD 0
+.TP 8
+.B \-a
+自动将被修改或创建的变量和函数标志为导出至后续命令的环境中。
+.TP 8
+.B \-b
+后台作业结束时立即报告状态，而不是在下次显示主提示符前报告。只有在启用作业控制时才有效。
+.TP 8
+.B \-e
+立即退出，如果 \fIsimple command\fP (简单命令，参见上面的
+.SM
+.B SHELL GRAMMAR 语法)
+以非零值退出。shell 不会退出，如果失败的命令是
+.I until
+或
+.I while
+循环的一部分，
+.I if
+语句的一部分，
+.B &&
+或
+.B \(bv\(bv
+序列的一部分，或者命令的返回值是由
+.BR ! 
+翻转得到。针对 \fBERR\fP 的陷阱，如果设置的话，将在 shell 退出前执行。
+.TP 8
+.B \-f
+禁止路径扩展。
+.TP 8 
+.B \-h
+在查找并执行命令时，记住它们的位置。这是默认启用的。
+.TP 8
+.B \-k
+所有以赋值语句形式出现的参数都被加入到命令执行的环境中，不仅是命令名前面那些。
+.TP 8
+.B \-m
+监视模式。作业控制被启用。在支持这个选项的系统中，它在交互 shell 中是默认启用的 (参见上面的
+.SM
+.B JOB CONTROL 作业控制)。
+后台进程在单独的进程组中运行，结束时将打印出包含它们退出状态的一行信息。
+.TP 8
+.B \-n
+读取命令，但不执行。这可以用在检查 shell 脚本中的语法错误。交互 shell 中它被忽略。
+.TP 8
+.B \-o \fIoption\-name\fP
+\fIoption\-name\fP 可以是如下之一：
+.RS
+.TP 8
+.B allexport
+与
+.BR \-a
+相同。
+.TP 8
+.B braceexpand
+与
+.BR \-B
+相同。
+.TP 8
+.B emacs
+使用 emacs 样式的命令行编辑界面。这个选项在交互 shell 中默认启用，除非 shell 以
+.B \-\-noediting
+选项启动。
+.TP 8
+.B errexit
+与
+.BR \-e
+相同。
+.TP 8
+.B hashall
+与
+.BR \-h
+相同。
+.TP 8
+.B histexpand
+与
+.BR \-H
+相同。
+.TP 8
+.B history
+允许记录命令历史，如上述
+.SM
+.BR HISTORY
+中的描述。这个选项在交互 shell 中默认启用。
+.TP 8
+.B ignoreeof
+它的效果是好像已经执行了 shell 命令
+.if t \f(CWIGNOREEOF=10\fP
+.if n ``IGNOREEOF=10''
+一样 (参见上面的
+.B Shell Variables 变量)。
+.TP 8
+.B keyword
+与
+.BR \-k
+相同。
+.TP 8
+.B monitor
+与
+.BR \-m
+相同。
+.TP 8
+.B noclobber
+与
+.BR \-C
+相同。
+.TP 8
+.B noexec
+与
+.BR \-n
+相同。
+.TP 8
+.B noglob
+与
+.BR \-f 
+相同。
+.B nolog
+当前被忽略。
+.TP 8
+.B notify
+与
+.BR \-b
+相同。
+.TP 8
+.B nounset
+与
+.BR \-u 
+相同。
+.TP 8
+.B onecmd
+与
+.BR \-t 
+相同。
+.TP 8
+.B physical
+与
+.BR \-P 
+相同。
+.TP 8
+.B posix
+如果默认操作与 POSIX 1003.2 不同的话，改变
+.B bash
+的行为，来满足标准 (\fIposix mode\fP)。
+.TP 8
+.B privileged
+与
+.BR \-p
+相同。
+.TP 8
+.B verbose
+与
+.BR \-v 
+相同。
+.TP 8
+.B vi
+使用 vi 样式的命令行编辑界面。
+.TP 8
+.B xtrace
+与
+.BR \-x 
+相同。
+.sp .5
+.PP
+如果给出了不带 \fIoption\-name\fP 的
+.B \-o
+选项，当前选项的值将被打印出来。如果给出了不带 \fIoption\-name\fP 的
+.B +o
+选项，将在标准输出显示一系列可以重建当前选项设定的
+.B set
+命令。
+.RE
+.TP 8
+.B \-p
+打开
+.I privileged mode (特权模式)。
+在这个模式中，不会处理
+.SM
+.B $ENV
+和
+.SM
+.B $BASH_ENV
+文件，shell 函数不会从环境中继承，环境中如果有变量
+.SM
+.B SHELLOPTS，
+也将被忽略。如果 shell 启动时的有效用户(组) ID 与真实用户(组) ID 不同，并且没有给出 \fB\-p\fP 选项，
+将执行这些操作，有效用户 ID 将设置为真实用户 ID。如果启动是给出了 \fB\-p\fP 选项，有效用户 ID 不会
+被重置。将这个选项关闭使得有效用户和组 ID 被设置为真实用户和组 ID。
+.TP 8
+.B \-t
+读取并执行一个命令之后退出。
+.TP 8
+.B \-u
+在进行参数扩展时，将未定义的变量作为错误。如果试图扩展未定义的变量，shell 将输出一条错误消息;
+如果是非交互的 shell，shell 将以非零值退出。
+.TP 8
+.B \-v
+在读取输入的同时打印出来。
+.TP 8
+.B \-x
+扩展每个简单命令之后，显示
+.SM
+.BR PS4
+的值，接着显示命令和它扩展后的参数。
+.TP 8
+.B \-B
+shell 执行花括号扩展 (参见上面的
+.B Brace Expansion)。
+这是默认允许的。
+.TP 8
+.B \-C
+如果设置的话，
+.B bash
+使用重定向操作符
+.BR > ,
+.BR >& ,
+和
+.B <>
+时，不会覆盖已存在的文件。可以使用重定向操作符
+.B >|
+代替
+.BR >
+来创建输出文件，从而绕过这个限制。
+.TP 8
+.B \-H
+允许
+Enable
+.B !
+样式的历史替换。在交互 shell 中这个选项是默认启用的。
+.TP 8
+.B \-P
+如果设置的话，shell 在执行类似
+.B cd
+的，改变当前工作目录的命令时，不会跟随符号连接。它将使用物理的目录结构来代替。默认情况下，
+.B bash
+在执行改变当前目录的命令时跟随路径的逻辑链。
+.TP 8
+.B \-\-
+如果这个选项没有参数，将取消位置参数的定义。否则，位置参数将设置为
+\fIarg\fP，即使它们以
+.BR \-
+开始。
+.TP 8
+.B \-
+通知信号的结束，使得所有剩余的 \fIarg\fP 被赋予位置参数。
+.B \-x
+和
+.B \-v
+选项被关闭。如果没有 \fIarg\fP，位置参数将不会改变。
+.PD
+.PP
+这个选项默认是关闭的，除非另外说明。使用 + 而不是 \- 使得这些选项被关闭。选项都可以作为参数，
+在 shell 启动时指定。当前的选项集合可以从
+.BR $\- 
+找到。返回值总是真，除非遇到了非法的选项。
+.RE
+.TP
+\fBshift\fP [\fIn\fP]
+从 \fIn\fP+1 ... 开始的选项被重命名为
+.B $1
+.B ....
+从 \fB$#\fP 向下直到 \fB$#\fP\-\fIn\fP+1 的选项被取消定义。
+.I n
+必须是非负整数，小于或等于 \fB$#\fP。如果
+.I n
+是 0，不会改变参数。如果没有给出
+.I n，
+就假定它是 1。如果
+.I n
+比 \fB$#\fP 大，位置参数不会改变。返回值大于 0，如果
+.I n
+比
+.B $#
+大或小于 0；否则返回 0。
+.TP
+\fBshopt\fP [\fB\-pqsu\fP] [\fB\-o\fP] [\fIoptname\fP ...]
+对于控制可选的 shell 行为的变量，改变它们的值。没有选项或者有
+.B \-p
+选项时，将显示所有可设置的选项列表，以及它们是否已经设置的指示。
+\fB\-p\fP 使得输出以一种可以被重用为输入的形式显示。
+其他选项有如下含义：
+.RS
+.PD 0
+.TP
+.B \-s
+允许(设置) 每个 \fIoptname\fP。
+.TP
+.B \-u
+禁止(取消) 每个 \fIoptname\fP。
+.TP
+.B \-q
+禁止通常的输出 (安静模式)；返回状态指示了 \fIoptname\fP 是否被设置。
+如果对
+.BR \-q 
+给出了多个 \fIoptname\fP 参数，如果所有 \fIoptname\fP 都被允许，返回值就是 0；
+否则返回非零值。
+.TP
+.B \-o
+限制 \fIoptname\fP 的值为内建命令
+.B set
+的
+.B \-o
+选项定义的值。
+.PD
+.PP
+如果使用
+.B \-s
+或
+.B \-u
+时没有给出 \fIoptname\fP 参数，显示将分别限于被设置或被取消的选项。
+除非另外说明，\fBshopt\fP 选项默认被禁止(取消)。
+.PP
+返回值在列出选项时是 0，如果所有 \fIoptname\fP 都被允许的话，否则是非零值。
+当设置或取消选项时，返回值是 0，除非 \fIoptname\fP 是非法的 shell 选项。
+.PP
+\fBshopt\fP 选项的列表是：
+.if t .sp .5v
+.if n .sp 1v
+.PD 0
+.TP 8
+.B cdable_vars
+如果设置的话，内建命令
+.B cd
+的参数如果不是目录，就假定是一个变量，它的值是要切换到的目录名。
+.TP 8
+.B cdspell
+如果设置的话，
+.B cd
+命令中目录的细微拼写错误能够得以纠正。检查的错误包括字符错位，缺字符，
+重复输入同一字符。如果找到了正确的值，将打印正确的文件名，命令将继续。
+这个选项只能在交互 shell 中使用。
+.TP 8
+.B checkhash
+如果设置的话，\fBbash\fP 在执行命令前检测散列表中的命令是否存在。
+如果一个被散列的命令不再存在，将进行正常的路径搜索。
+.TP 8
+.B checkwinsize
+如果设置的话，\fBbash\fP 在每条命令执行后检测窗口大小，如果需要的话就更新
+.SM
+.B LINES
+和
+.SM
+.BR COLUMNS 
+的值。
+.TP 8
+.B cmdhist
+如果设置的话，
+.B bash
+试着将一个多行命令的所有行放到同一个历史条目中。这样使得
+多行命令可以容易地重新修改。
+.TP 8
+.B dotglob
+如果设置的话，
+.B bash
+会把以 `.' 开始的文件名包含在路径名扩展的结果中。
+.TP 8
+.B execfail
+如果设置的话，非交互的 shell 如果不能执行作为参数提供给内建命令
+.B exec
+的文件时将不会退出。交互的 shell 在
+.B exec
+失败时不会退出。
+.TP 8
+.B expand_aliases
+如果设置的话，别名被扩展，就像上面
+.SM
+.BR ALIASES
+中讲到的一样。这个选项在交互 shell 中是默认启用的。
+.TP 8
+.B extglob
+如果设置的话，将允许上面 \fBPathname Expansion\fP 中提到的扩展模式匹配特性。
+.TP 8
+.B histappend
+如果设置的话，在 shell 退出时，历史列表将追加到以
+.B HISTFILE
+的值为名的文件之后，而不是覆盖文件。
+.TP 8
+.B histreedit
+如果设置的话，并且正在使用
+.B readline，
+用户可以重新修改失败的历史替换。
+.TP 8
+.B histverify
+如果设置的话，并且正在使用
+.B readline，
+历史替换的结果不会立即传给 shell 解释器。结果行被加载到 
+\fBreadline\fP 编辑缓冲区，允许进行进一步的修改。
+.TP 8
+.B hostcomplete
+如果设置的话，并且正在使用
+.B readline，
+\fBbash\fP 将试着对正在进行补全的包含 \f@\fP 的词进行主机名补全
+(参见上面的
+.SM
+.B READLINE
+中的
+.B Completing
+段落)。这是默认允许的。
+.TP 8
+.B huponexit
+如果设置的话，在交互的登录 shell 退出时 \fBbash\fP 将向所有作业发出
+.SM
+.B SIGHUP
+信号。
+.TP 8
+.B interactive_comments
+如果设置的话，将允许在交互 shell 中遇到以
+.B #
+开头的词时忽略这个词和一行中所有剩余的字符 (参见上面的
+.SM
+.B COMMENTS 注释)。
+这个选项是默认允许的。
+.TP 8
+.B lithist
+如果设置的话，并且允许了
+.B cmdhist
+选项，多行的命令在保存到历史中时将包含新行符，而不是在可能的地方使用分号。
+.TP 8
+.B login_shell
+如果 shell 作为登录 shell 启动，将设置这个选项 (参见上面的
+.SM
+.B "启动(INVOCATION)")。
+这个值不可修改。
+.TP 8
+.B mailwarn
+如果设置的话，并且 \fBbash\fP 正在检测上次检测以来被存取过的邮件，
+将显示 ``The mail in \fImailfile\fP has been read''(\fImailfile\fP 中的邮件已被读取)。
+.TP 8
+.B no_empty_cmd_completion
+如果设置的话，并且正在使用
+.B readline，
+试图在空行上执行补全时，
+.B bash
+不会搜索 \fBPATH\fP 来查找可能的补全。
+.TP 8
+.B nocaseglob
+如果设置的话，
+.B bash
+进行路径扩展时使用大小写不敏感方式匹配文件名(参见上面的
+.B Pathname Expansion 路径扩展)。
+.TP 8
+.B nullglob
+如果设置的话，
+.B bash
+将允许不匹配任何文件的模式扩展为空字符串而不是它们自身(参见上面的
+.B Pathname Expansion 路径扩展)。
+.TP 8
+.B progcomp
+如果设置的话，将启用可编程补全功能 (参见上面的 \fBProgrammable Completion\fP)。
+这个选项是默认启用的。
+.TP 8
+.B promptvars
+如果设置的话，提示字符串要经过上面
+.SM
+.B PROMPTING
+中描述的扩展，然后还要经过变量和参数扩展。这个选项是默认启用的。
+.TP 8
+.B restricted_shell
+shell 设置这个选项，如果它是以受限模式启用的 (参见下面的
+.SM
+.B "受限的shell(RESTRICTED SHELL)"
+章节)。这个值不能修改。在执行启动文件时，它不会被重置，使得启动文件可以
+得知 shell 是否是受限的。
+.TP 8
+.B shift_verbose
+如果设置的话，内建命令
+.B shift
+在偏移量超过位置参数的个数时打印一条错误消息。
+.TP 8
+.B sourcepath
+如果设置的话，内建命令 \fBsource\fP (\fB.\fP) 使用
+.SM
+.B PATH
+中的值来查找包含作为参数给出的文件。这个选项默认是启用的。
+.TP 8
+.B xpg_echo
+如果设置的话，内建命令 \fBecho\fP 默认扩展反斜杠转义序列。
+.RE
+.TP
+\fBsuspend\fP [\fB\-f\fP]
+挂起 shell 的执行，直到收到一个
+.SM
+.B SIGCONT
+信号。选项
+.B \-f
+表示如果这是一个登录 shell，那么不要提示，直接挂起。返回值是 0，除非
+shell 是登录 shell 并且没有指定
+.B \-f，
+或者没有启用作业控制。
+.TP
+\fBtest\fP \fIexpr\fP
+.PD 0
+.TP
+\fB[\fP \fIexpr\fP \fB]\fP
+返回状态值 0 或 1，根据条件表达式
+.IR expr
+的求值而定。每个操作符和操作数都必须是一个单独的参数。表达式使用上面
+.SM
+.BR "条件表达式 (CONDITIONAL EXPRESSIONS)"
+中的操作构造。
+.if t .sp 0.5
+.if n .sp 1
+表达式可以用下列操作符结合，以优先级的降序列出。
+.RS
+.PD 0
+.TP
+.B ! \fIexpr\fP
+值为真，如果
+.I expr
+为假。
+.TP
+.B ( \fIexpr\fP )
+返回 \fIexpr\fP 的值。括号可以用来超越操作符的一般优先级。
+.TP
+\fIexpr1\fP \-\fBa\fP \fIexpr2\fP
+值为真，如果
+.I expr1
+和
+.I expr2
+都为真。
+.TP
+\fIexpr1\fP \-\fBo\fP \fIexpr2\fP
+值为真，如果
+.I expr1
+或
+.I expr2
+为真。
+.PD
+.PP
+\fBtest\fP 和 \fB[\fP 
+使用基于参数个数的一系列规则，对条件表达式进行求值。
+.if t .sp 0.5
+.if n .sp 1
+.PD 0
+.TP
+0 arguments
+表达式为假。
+.TP
+1 argument
+表达式为真，当且仅当参数非空。
+.TP
+2 arguments
+如果第一个参数是 \fB!\fP，表达式为真，当且仅当第二个参数为空。
+如果第一个参数是上面
+.SM
+.BR "条件表达式 (CONDITIONAL EXPRESSIONS)"
+中列出的单目条件运算符之一，表达式为真，当且仅当单目测试为真。
+如果第一个参数不是合法的单目条件运算符，表达式为假。
+.TP
+3 arguments
+如果第二个参数是上面
+.SM
+.BR "条件表达式 (CONDITIONAL EXPRESSIONS)"
+中列出的二进制条件操作符之一，表达式的结果是使用第一和第三个参数作为操作数的二进制测试的结果。
+如果第一个参数是 \fB!\fP，表达式值是使用第二和第三个参数进行双参数测试的结果取反。
+如果第一个参数是 \fB(\fP，第三个参数是 \fB)\fP，结果是对第二个参数进行单参数测试的结果。
+否则，表达式为假。这种情况下 \fB\-a\fP 和 \fB\-o\fP 操作符被认为二进制操作符。
+.TP
+4 arguments
+如果第一个参数是 \fB!\fP，结果是由剩余参数组成的三参数表达式结果取反。
+否则，表达式被根据上面列出的优先级规则解释并执行。
+.TP
+5 或更多 arguments
+表达式被根据上面列出的优先级规则解释并执行。
+.RE
+.PD
+.TP
+.B times
+对 shell 以及 shell 运行的进程，打印累计的用户和系统时间。
+返回状态是 0。
+.TP
+\fBtrap\fP [\fB\-lp\fP] [\fIarg\fP] [\fIsigspec\fP ...]
+当 shell 收到信号
+.IR sigspec
+时，命令
+.I arg
+将被读取并执行。如果没有给出
+.I arg
+或者给出的是
+.BR \- ,
+所有指定的信号被设置为它们的初始值 (进入 shell 时它们的值)。如果
+.I arg
+是空字符串，
+.I sigspec
+指定的信号被 shell 和它启动的命令忽略。如果
+.I arg
+不存在，并且给出了
+.B \-p
+那么与每个
+.I sigspec
+相关联的陷阱命令将被显示出来。如果没有给出任何参数，或只给出了
+.B \-p，
+.B trap
+将打印出与每个信号编号相关的命令列表。每个
+.I sigspec
+可以是 <\fIsignal.h\fP> 定义的信号名，或是一个信号编号。
+如果
+.I sigspec
+是
+.SM
+.B EXIT
+(0)，命令 
+.I arg
+将在 shell 退出时执行。如果
+.I sigspec
+是
+.SM
+.BR DEBUG ,
+命令
+.I arg
+将在每个简单命令 (\fIsimple command\fP，参见上面的
+.SM
+.B SHELL GRAMMAR)
+之后执行。如果
+.I sigspec
+是
+.SM
+.BR ERR ,
+命令
+.I arg
+将在任何命令以非零值退出时执行。如果失败的命令是
+.I until
+或
+.I while
+循环的一部分，
+.I if
+语句的一部分，
+.B &&
+或
+.B \(bv\(bv
+序列的一部分，或者命令的返回值是通过
+.BR !
+转化而来，
+.SM
+.BR ERR
+陷阱将不会执行。选项
+.B \-l
+使得 shell 打印信号名和对应编号的列表。
+shell 忽略的信号不能被捕捉或重置。在子进程中，被捕捉的信号在进程创建时被重置为初始值。
+返回值为假，如果
+.I sigspec
+非法；否则
+.B trap
+返回真。
+.TP
+\fBtype\fP [\fB\-aftpP\fP] \fIname\fP [\fIname\fP ...]
+没有选项时，指示每个
+.I name
+将如何被解释，如果用作一个命令名。如果使用了
+.B \-t
+选项，
+.B type
+打印一个字符串，内容是如下之一：
+.IR alias ,
+.IR keyword ,
+.IR function ,
+.IR builtin ,
+或
+.I file ，
+如果
+.I name
+分别是一个别名，shell 保留字，函数，内建命令或磁盘文件。如果没有找到
+.I name，
+那么不会打印任何东西，返回退出状态假。如果使用了
+.B \-p
+选项，
+.B type
+返回如果
+.I name
+作为命令名，将被执行的磁盘文件名；或者返回空，如果
+.if t \f(CWtype -t name\fP
+.if n ``type -t name''
+不会返回
+.IR file .
+选项
+.B \-P
+选项强制对每个 \fIname\fP 搜索
+.SM
+.B PATH，
+即使
+.if t \f(CWtype -t name\fP
+.if n ``type -t name''
+不会返回
+.IR file .
+如果命令在散列中，
+.B \-p
+和
+.B \-P
+将打印散列的值，而不是
+.SM
+.BR PATH
+中首先出现的那一个文件。如果使用了
+.B \-a
+选项，
+.B type
+打印所有包含可执行的名称
+.IR name 
+的场合。结果包括别名和函数，当且仅当没有同时使用
+.B \-p
+选项。使用
+.BR \-a
+时不会查找散列中的命令表。选项
+.B \-f
+阻止 shell 进行查找，就像在内建命令 \fBcommand\fP 中一样。
+.B type
+返回真，如果找到了任何参数。什么都没找到则返回假。
+.TP
+\fBulimit\fP [\fB\-SHacdflmnpstuv\fP [\fIlimit\fP]]
+在支持它的系统上，对 shell 和它启动的进程，提供对可用资源的控制。
+选项 \fB\-H\fP 和 \fB\-S\fP 指定为所给资源设定的硬性和柔性限额。
+硬性限额在设置后不能增加；柔性限额可以增加，直到与硬性限额相等。
+如果没有给出 \fB\-H\fP 或 \fB\-S\fP 选项，将同时设置硬性和柔性限额。
+.I limit
+的值可以是一个数字，单位是指定资源的单元值，或者是特殊值
+.BR hard ,
+.BR soft ,
+或
+.BR unlimited
+之一，意思分别是当前硬性限额，当前柔性限额和没有限额。如果忽略了
+.I limit，
+将打印出当前对资源的柔性限额值，除非给出了 \fB\-H\fP 选项。当指定多于一个
+资源时，限额名称和单位将在值之前打印出来。其他选项按照如下意义解释：
+.RS
+.PD 0
+.TP
+.B \-a
+报告所有当前限额
+.TP
+.B \-c
+core 文件的最大值
+.TP
+.B \-d
+进程数据段的最大值
+.TP
+.B \-f
+shell 创建的文件的最大值
+.TP
+.B \-l
+内存中可以锁定的最大值
+.TP
+.B \-m
+常驻内存的最大值
+.TP
+.B \-n
+打开的文件描述符最大个数 (大多数系统不允许设置这个值)
+.TP
+.B \-p
+管道大小，以 512 字节的块为单位 (这个值可能不能设置)
+.TP
+.B \-s
+栈的最大值
+.TP
+.B \-t
+cpu 时间总数的最大值，以秒计
+.TP
+.B \-u
+用户可以运行的最大进程数
+.TP
+.B \-v
+shell 可用的虚拟内存总量的最大值
+.PD
+.PP
+如果给出了
+.I limit，
+它将是指定资源的新限额 (选项
+.B \-a
+只显示它们)。如果没有给出选项，则假设有
+.B \-f。
+值的递增间隔是 1024 字节，除了
+.BR \-t 
+单位是 秒，
+.BR \-p
+单位是 512 字节的块个数，
+.B \-n
+和
+.BR \-u
+是不可调节的值。返回 0，除非给出了非法的选项或参数，或者在设置新的限额时发生了错误。
+.RE
+.TP
+\fBumask\fP [\fB\-p\fP] [\fB\-S\fP] [\fImode\fP]
+用户创建文件的掩码被设置为
+.IR mode .
+如果
+.I mode
+以数字开始，它被解释为一个八进制数；否则被解释为类似于
+.IR chmod (1)
+接受的符号形式的模式掩码。如果忽略了
+.I mode，
+将打印当前掩码值。选项
+.B \-S
+使得掩码以符号形式打印；默认输出是八进制数。如果给出了
+.B \-p
+选项，并且忽略了
+.I mode，
+输出将是一种可以重用为输入的形式。返回值是 0，如果成功改变了模式，或者没有给出 \fImode\fP。
+其他情况返回假。
+.TP
+\fBunalias\fP [\-\fBa\fP] [\fIname\fP ...]
+从已定义的别名列表中删除 \fIname\fP。如果给出了
+.B \-a
+将删除所有别名定义。返回值是真，除非给出的
+.I name
+不是已定义的别名。
+.TP
+\fBunset\fP [\-\fBfv\fP] [\fIname\fP ...]
+将每个
+.IR name
+对应的变量或函数删除。如果没有给出选项，或者给出了
+.B \-v
+选项，
+.I name
+仅包括 shell 变量。只读的变量不能被取消定义。如果给出了
+.B \-f
+选项，
+.I name
+仅包括 shell 函数，函数的定义将被删除。每个被取消定义的变量或函数都被从后续命令的环境中删除。
+如果
+.SM
+.BR RANDOM ,
+.SM
+.BR SECONDS ,
+.SM
+.BR LINENO ,
+.SM
+.BR HISTCMD ,
+.SM
+.BR FUNCNAME ,
+.SM
+.BR GROUPS ,
+或者
+.SM
+.B DIRSTACK
+中的任何一个被取消定义，它们将丧失特殊的属性，即使它们后来被重新定义。
+退出状态是真，除非
+.I name
+不存在或是只读的。
+.TP
+\fBwait\fP [\fIn\fP]
+等待指定的进程，返回它的终止状态。
+.I n
+可以是进程 ID 或一个作业号；如果给出的是作业号，将等待作业的管道中所有进程。如果没有给出
+.I n，
+将等待所有当前处于激活状态的子进程，返回状态是 0。如果
+.I n
+指定了不存在的进程或作业，返回状态是 127。否则，返回状态是所等待的最后一个进程或作业的退出状态。
+.\" bash_builtins
+.if \n(zZ=1 .ig zZ
+.SH "受限的shell(RESTRICTED SHELL)"
+.\" rbash.1
+.zY
+.PP
+如果
+.B bash
+以
+.BR rbash 
+名称启动，或者启动时使用了
+.B \-r
+选项，那么它成为受限的 shell。
+受限的 shell 一般用来建立一个比标准的 shell 受到更多控制的环境。
+它的行为与
+.B bash
+一致，除了下列行为是不允许的 (disallowed) 或不会运行的 (not performed)。
+.IP \(bu
+使用 \fBcd\fP 来改变路径；
+.IP \(bu
+设置或取消
+.BR SHELL ,
+.BR PATH ,
+.BR ENV ,
+或
+.B BASH_ENV
+变量的值；
+.IP \(bu
+指定的命令名中包含
+.B /
+；
+.IP \(bu
+指定包含
+.B /
+的文件名作为传递给内建命令
+.B .
+的参数；
+.IP \(bu
+指定包含斜杠 (slash) 的文件名作为
+.B \-p
+选项的参数，传递给
+.B hash
+内建命令；
+.IP \(bu
+启动时从 shell 环境中导入 (import) 函数定义；
+.IP \(bu
+启动时解释 shell 环境中 \fBSHELLOPTS\fP 的值；
+.IP \(bu
+使用 >, >|, <>, >&, &>, 和 >> 等重定向操作符重定向输出；
+.IP \(bu
+使用
+.B exec
+内建命令来以另一个命令替换 shell；
+.IP \(bu
+使用
+.B enable
+内建命令的
+.B \-f
+和
+.B \-d
+选项来增加和删除内建命令；
+.IP \(bu
+使用 \fBenable\fP 内建命令来允许和禁止 shell 内建命令；
+.IP \(bu
+指定
+.B command
+内建命令的
+.B \-p
+选项；
+.IP \(bu
+使用 \fBset +r\fP 或 \fBset +o restricted\fP 来关闭受限模式。
+.PP
+这些限制在所有启动文件读取之后才会生效。
+.PP
+当一个 shell 脚本作为一个命令执行时 (参见上面的
+.SM
+.B "命令执行(COMMAND EXECUTION)"
+章节)，
+.B rbash
+关闭为执行脚本而孵化 (spawn) 的 shell 的所有限制。
+.\" end of rbash.1
+.if \n(zY=1 .ig zY
+.SH 参见("SEE ALSO")
+.PD 0
+.TP
+\fIBash Reference Manual\fP, Brian Fox and Chet Ramey
+.TP
+\fIThe Gnu Readline Library\fP, Brian Fox and Chet Ramey
+.TP
+\fIThe Gnu History Library\fP, Brian Fox and Chet Ramey
+.TP
+\fIPortable Operating System Interface (POSIX) Part 2: Shell and Utilities\fP, IEEE
+.TP
+\fIsh\fP(1), \fIksh\fP(1), \fIcsh\fP(1)
+.TP
+\fIemacs\fP(1), \fIvi\fP(1)
+.TP
+\fIreadline\fP(3)
+.PD
+.SH "文件(FILES)"
+.PD 0
+.TP
+.FN /bin/bash
+\fBbash\fP 可执行文件
+.TP
+.FN /etc/profile
+系统范围的初始化文件，登录 shell 会执行它
+.TP
+.FN ~/.bash_profile
+个人初始化文件，登录 shell 会执行它
+.TP
+.FN ~/.bashrc
+个人的每个交互式 shell 启动时执行的文件
+.TP
+.FN ~/.bash_logout
+个人的登录 shell 清理文件，当一个登录 shell 退出时会执行它
+.TP
+.FN ~/.inputrc
+个人的 \fIreadline\fP 初始化文件
+.PD
+.SH "作者(AUTHORS)"
+Brian Fox, Free Software Foundation
+.br
+bfox@gnu.org
+.PP
+Chet Ramey, Case Western Reserve University
+.br
+chet@ins.CWRU.Edu
+.SH "报告BUGS (BUG REPORTS)"
+如果你发现一个
+.B bash
+中的 bug，你应当报告它。但是首先，
+你应当确定它真的是一个 bug，并且它在你使用的最新版本的
+.B bash
+中存在。
+.PP
+一旦你认定存在那样一个 bug，使用
+.I bashbug
+命令来提交一个错误报告。
+如果你有固定住址，鼓励你用邮政的方式提交一份！
+建议和有关 \fBbash\fP “哲学” (`philosophical') 的 “错误报告” 可以寄给
+\fIbug-bash@gnu.org\fP 或者贴到 Usenet 新闻组
+.BR gnu.bash.bug
+之上。
+.PP
+所有错误报告应当包括：
+.PP
+.PD 0
+.TP 20
+\fBbash\fR 的版本号
+.TP
+硬件信息和操作系统
+.TP
+用来编译的编译器
+.TP
+对 bug 行为的描述
+.TP
+可以激活这个 bug 的一个短小的脚本或者什么 “秘诀” (recipe)
+.PD
+.PP
+.I bashbug
+会自动在它提供的错误报告模板中插入前三项。
+.PP
+关于这份手册页的评论和错误报告请直接提交到
+.IR chet@ins.CWRU.Edu .
+.SH BUGS
+.PP
+它太大了，并且有点慢。
+.PP
+.B bash
+和传统版本的
+.BR sh
+之间有一些细微的差别，大部分是因为
+.SM
+.B POSIX
+规约的要求。
+.PP
+别名机制在一些应用中会混淆。
+.PP
+Shell 内建命令和函数不可终止/重新开始。
+.PP
+组合的命令和使用 `a ; b ; c' 形式的命令序列在进程试图暂停时不能很好处理。
+当一个进程中止，shell 会立即执行序列中的下一条命令。
+也可以将命令的序列放在圆括号中，来强制启动子 shell，这样就可以将它们作为一个单元中止了。
+.PP
+在 \fB$(\fP...\fB)\fP 命令替换中的注释不会被解释，直到执行替换的时候。
+这将延迟报错，直到命令开始执行之后的一段时间。
+.PP
+数组变量还不能导出 (export)。
+.zZ
+.zY
+.SH "[中文版维护人]"
+.B 袁乙钧 <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 2004.03.05
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

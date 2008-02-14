@@ -1,0 +1,78 @@
+.\" free.1 - manpage for the free(1) utility, part of procps
+.\"
+.\" Copyright (C) 2003 Robert Love
+.\" Licensed under the terms of the GNU General Public License, v2
+.TH FREE 1 "10 Aug 2003" "Linux" "Linux User's Manual"
+.SH NAME
+free \- display information about free and used memory on the system
+
+.SH SYNOPSIS
+.BI "free [\-b|-k|-m|-g] [\-l] [\-o] [\-t] [\-s " delay " ] [\-c " count " ]
+
+.SH DESCRIPTION
+.BR free (1)
+displays the total amount of free and used physical memory and swap space in
+the system, as well as the buffers and cache consumed by the kernel.
+
+.SH OPTIONS
+Normal invocation of 
+.BR free (1)
+does not require any options.  The output, however, can be fine-tuned by
+specifying one or more of the following flags:
+.TP
+.B \-b, \-\^\-bytes
+Display output in bytes.
+.TP
+.B \-k, \-\^\-kb
+Display output in kilobytes (KB).  This is the default.
+.TP
+.B \-m, \-\^\-mb
+Display output in megabytes (MB).
+.TP
+.B \-g, \-\^\-gb
+Display output in gigabytes (GB).
+.TP
+.B \-l, \-\^\-lowhigh
+Display detailed information about low vs. high memory usage.
+.TP
+.B \-o, \-\^\-old
+Use old format.  Specifically, do not display -/+ buffers/cache.
+.TP
+.B \-t, \-\^\-total
+Display total summary for physical memory + swap space.
+.TP
+.BI \-c " n" ", \-\^\-count=" n
+Display statistics
+.I n
+times, then exit.  Used in conjunction with the
+.I -s
+flag.  Default is to display only once, unless
+.I -s
+was specified, in which case default is to repeat until interrupted.
+.TP
+.BI \-s " n" ", \-\^\-repeat=" n
+Repeat, pausing every
+.I n
+seconds in-between.
+.TP
+.B \-V, \-\^\-version
+Display version information and exit.
+.TP
+.B \-\^\-help
+Display usage information and exit
+
+.SH FILES
+.IR /proc/meminfo " \-\- memory information"
+
+.SH "SEE ALSO"
+.BR ps (1),
+.BR top (1),
+.BR vmstat (1)
+
+.SH AUTHORS
+Written by Robert Love.
+
+The procps package is maintained by Robert Love and was created by Michael
+Johnson.
+
+Send bug reports to <procps-list@redhat.com>.

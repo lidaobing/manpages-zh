@@ -1,0 +1,78 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH LAST,LASTB 1 "Jul 29, 1999" "" "Linux 系统管理员手册"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+last, lastb \- 显示最近登录的用户列表
+.\"}}}
+.\"{{{  Synopsis
+.SH 总览
+.B last
+.RB [ \-R ]
+.RB [ \-\fInum\fP ]
+.RB "[ \-\fBn\fP \fInum\fP ]"
+.RB [ \-adiox ]
+.RB "[ \-\fBf\fP \fIfile\fP ]"
+.RI [ name... ]
+.RI [ tty... ]
+.br
+.B lastb
+.RB [ \-R ]
+.RB [ \-\fInum\fP ]
+.RB "[ \-\fBn\fP \fInum\fP ]"
+.RB "[ \-\fBf\fP \fIfile\fP ]"
+.RB [ \-adiox ]
+.RI [ name... ]
+.RI [ tty... ]
+.\"}}}
+.\"{{{  Description
+.SH 描述
+.B Last
+向后检索 \fB/var/log/wtmp\fP 文件(也可以用 \fB\-f\fP 选项指定被检索的文件)，并显示自这个文件创建以来所有登录（退出）系统的用户列表。在指定了用户名和终端名的情况下，\fBlast\fP 只显示符合这些参数的记录。终端的名字可以简写，因此 \fBlast 0\fP 等同于 \fBlast tty0\fP.  
+.PP
+当 \fBlast\fP 捕捉到了\s-2SIGINT\s0 信号 （产生于中断键,通常是 control-C）或 \s-2SIGQUIT\s0 信号（产生于退出键，通常是 control-\e）时, \fBlast\fP 会显示它对文件已经检索了多少；在 \s-2SIGINT\s0 信号的情况下 \fBlast\fP 将终止运行。
+.PP
+每次系统重新启动时，虚用户 \fBreboot\fP 都会被记录到日志中。所以\fBlast reboot\fP 会列出自日志文件创建以来的所有重新启动的日志记录。.PP
+\fBLastb\fP 缺省上列出 \fB/var/log/btmp\fP 文件中的日志记录，这个文件包含有所有不良的登录企图。除此之外，等同于 \fBlast\fP。
+.\"}}}
+.\"{{{  Options
+.SH 选项
+.IP 
+\fB\-\fP\fInum\fP指定 \fBlast\fP 要显示多少行。
+.IP
+ "\fB\-n\fP \fInum\fP"等同 \fB\-\fP\fInum\fP.
+.IP
+\fB\-R\fP不显示主机名列。
+.IP 
+\fB\-a\fP在最后一列显示主机名. 和下一个选项合用时很有用
+.IP 
+\fB\-d\fP对于非本地的登录，Linux 不仅保存远程主机名而且保存IP地址（IP number）。这个选项可以将IP地址（IP number）转换为主机名。
+.IP 
+\fB\-i\fP这个选项类似于显示远程主机 IP 地址（IP number）的 \fB-d\fP 选项，只不过它用数字和点符号显示IP数
+.IP
+\fB\-o\fP读取一个旧格式的 wtmp 文件 (用linux-libc5应用程序写入的).
+.IP 
+\fB\-x\fP显示系统关机记录和运行级别改变的日志。
+.\"}}}
+.SH 注意
+\fIwtmp\fP 和 \fIbtmp\fP 等文件也许找不到。只有这些文件存在时，系统才记录日志信息。这是一个本地配置的问题。 要想这些文件起作用，你可以用一条简单的命令  \fBtouch\fP(1) 创建它们(如, \fItouch /var/log/wtmp\fP).
+.\"{{{  Files
+.SH 相关文件
+/var/log/wtmp.br/var/log/btmp
+.\"}}}
+.\"{{{  Author
+.SH 作者
+Miquel van Smoorenburg, miquels@cistron.nl.\
+"}}}
+.\"{{{  See also
+.SH "另见"
+.BR shutdown (8),.BR login (1),.BR init (8)
+.\"}}}
+
+.SH "[中文版维护人]"
+.B Mirnshi <Mirnshi@263.net>
+.SH "[中文版最新更新]"
+.B 2001/07/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

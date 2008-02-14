@@ -1,0 +1,80 @@
+.TH W 1 "8 Dec 1993 " " " "Linux User's Manual"
+.SH NAME
+w \- 显示已经登录的用户以及他们在做什么
+.SH "总览 (SYNOPSIS)"
+.B w \-
+.RB [ husfV ]
+.RI [ user ]
+.SH "描述 (DESCRIPTION)"
+.B "w "
+显示 系统中 当前用户 的 信息, 以及 他们 的 进程.
+第一行 中 依次 显示 当前时间, 系统的 持续运行时间, 登录的 用户数, 和 最近
+1, 5, 15 分钟 的 系统平均负载 (load average).
+.sp
+接下来 的 条目 显示 每位 用户 的:
+登录名, tty 名, 远程主机, 登录时间, 空闲时间, JCPU, PCPU, 以及
+他们 当前进程 的 命令行.
+.sp
+JCPU 时间 指 某个 tty 上 所有 进程 用掉的 时间, 不包括 过去的 后台任务,
+但是 包括 正在 运行 的 后台任务.
+.sp
+PCPU 时间 指 当前进程 用掉的 时间, 可以 在 "what" 域 看到 当前进程.
+
+.PP
+.SH "命令行选项 (OPTIONS)"
+.TP 0.5i
+.B "\-h "
+不显示 首行.
+.TP 0.5i
+.B "\-u "
+确定 当前进程 和 CPU 时间 的 时候 忽略 用户名. 要 展示 这个 效果,
+执行 "su", 然后 执行 "w" 和 "w -u".
+.TP 0.5i
+.B "\-s "
+使用 简短格式. 不显示 登录时间, JCPU 或 PCPU 时间.
+.TP 0.5i
+.B "\-f "
+切换 显示
+.B from
+(远程主机) 域.  缺省的 发行 方式 是 不显示
+.B from
+域, 但是 系统管理员 或者 发行包 维护者 有可能 编译了 一个 缺省行为 是 显示
+.B from
+域 的 版本.
+.TP 0.5i
+.B "\-V "
+显示 版本信息.
+.TP 0.5i
+.B "user "
+仅显示 指定用户 的 信息.
+
+.SH "文件 (FILES)"
+.ta
+.IR /etc/utmp 
+已登录用户 的 信息
+.br
+.IR /proc 
+进程 信息
+.fi
+
+.SH "另见 (SEE ALSO)"
+.BR free (1),
+.BR ps (1),
+.BR top (1),
+.BR uptime (1),
+.BR utmp (5),
+.BR who (1)
+
+.SH "作者 (AUTHORS)"
+.B w
+基于 Larry Greenfield <greenfie@gauss.rutgers.edu> 和 Michael K. Johnson
+<johnsonm@redhat.com> 的 版本, Charles Blake 几乎 做了 彻底 重写.
+
+请将 bug 报告 送往 <procps-bugs@redhat.com>
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

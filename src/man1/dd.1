@@ -1,0 +1,218 @@
+.\" 版权所有 Andries Brouwer, Ragnar Hojlond Espinosa和A Wik 1998.
+.\" 中文版版权所有 astonia,BitBIRD, www.linuxforum.net 2000
+.\" 本文件可以在LDP GENERAL licence 1998年第一版所述条件下拷贝，
+.\" 并且该许可可同本文件一起分发。
+.\"
+.TH DD 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+dd \- 转换和拷贝文件
+.SH 摘要
+.B dd
+.B [\-\-help] [\-\-version]
+.BI [if= file ]
+.BI [of= file ]
+.BI [ibs= bytes ]
+.BI [obs= bytes ]
+.BI [bs= bytes ]
+.BI [cbs= bytes ]
+.BI [skip= blocks ]
+.BI [seek= blocks ]
+.BI [count= blocks ]
+.B "[conv={ascii, ebcdic, ibm, block, unblock, lcase, ucase, swab, noerror, notrunc, sync}]"
+.SH 描述
+当进行非强制的转换的时候，使用指定的输入和输出块大小拷贝文件
+（默认是从标准输入到标准输出。）
+.PP
+它每次从输入读取指定大小的一个块（默认是512字节）。
+如果使用
+.BI bs= bytes
+选项，并且没有转换，除了指定
+.BR sync ", " noerror ", 或 " notrunc
+之外， 那么dd将把全部读到的数据（可以比请求读的少）
+写到独立的输出块去。 这个输出块的长度和读到的数据
+完全一样，除非指定使用
+.B sync（同步）
+转换，那样的话，数据结尾处将追加NUL字符（或空格，见下）。
+.PP
+其他情况下，输入的时候每次读一个块，然后处理，并将
+输出结果收集起来，最后写到指定大小的数据块中去。最
+终的输出块可能会比指定的大小短一些。
+.PP
+数字值选项（以字节或块为单位）后面可以跟一个乘数：
+k=1024，b=512，w=2，c=1（w和c是GNU扩展语法。最好别
+使用w，因为在system V中，它表示2，在4.2 BSD中，它
+表示4）。两个或更多的数值表达式可以通过“x”乘起来。
+GEU fileutils 4.0并且允许在数据块大小的叙述中使用
+下列乘法后缀（用bs=，cbs=，obs=）：M=1048576，G=1073741824，
+同理可得T，P，E，Z，Y。D后缀表示数值是以
+十进制表示的：kD=1000 MD=1000000 GD=1000000000等等。
+（注意，在ls、df、du命令中，M等标记的大小是由环境
+变量确定的，而在DD中，它的值是固定的。）
+.SH 选项
+.TP
+.BI "if=" file
+从
+.I file
+中读而不是标准输入。
+.TP
+.BI "of=" file
+写到
+.I file
+里去而不是标准输出。除非指定
+.B conv=notrunc
+，否则，
+.B dd
+将把
+.I file
+截为O字节（或由
+.BR seek= 
+选项指定的大小）
+.TP
+.BI "ibs=" bytes
+一次读
+.I bytes
+字节。默认是512。
+.TP
+.BI "obs=" bytes
+一次写
+.I bytes
+字节。默认是512。
+.TP
+.BI "bs=" bytes
+一次读和写
+.I bytes
+字节。这将覆盖
+.B ibs
+和
+.BR obs 
+设定的值（并且，设定
+.B bs
+不等于同时将
+.B ibs
+和
+.B obs
+设为同一个值，至少在
+只使用
+.BR sync ,
+.B noerror
+或
+.B notrunc
+转换时是这样的。因为bs规定，每个输入块都应作为单独
+的数据块拷贝到输出，而不把较短的块组合到一起）。
+.TP
+.BI "cbs=" bytes
+为
+.B block
+转换和
+.BR unblock 
+转换指定转换块的大小。
+.TP
+.BI "skip=" blocks
+在拷贝之前，跳过输入文件的前
+.I blocks
+块，每块大小为
+.BR ibs \-byte
+字节。
+.TP
+.BI "seek=" blocks
+在拷贝之前，跳过输出文件的前
+.I blocks
+块，每块大小为
+.BR obs \-byte
+字节。
+.TP
+.BI "count=" blocks
+只拷贝输入文件的前
+.I blocks
+块（每块的大小为
+.BR ibs \-byte
+字节），而不是全部内容，直到文件末尾。
+.TP
+.BI "conv=" 转换"[," 转换"]..."
+将文件按
+.I 转换
+参数指定的方式转换（在“,”两边没有空格）。
+.RS
+.PP
+转换方式包括：
+.PP
+.TP
+.B ascii
+将EBCDIC转换成ascii。
+.TP
+.B ebcdic
+将ascii转换成ebcdic。
+.TP
+.B ibm
+将ascii转换成alternative ebcdic。
+.TP
+.B block
+每一行输入，无论长短，输出都是
+.B cbs
+字节，并且其中的“换行”（NEWLINE，即c中的'\n'）用
+空格替换。如有必要，行尾会填充空格。
+.TP
+.B unblock
+用“换行”替换每个输入块（
+.BR cbs 
+字节大小）末尾的空格。
+.TP
+.B lcase
+将大写字母转换成小写。
+.TP
+.B ucase
+将小写字母转换成大写。
+.TP
+.B swab
+交换每对输入字节。如果读入的字节数是奇数，最后
+一个字节只是简单的复制到输出（因为没有能跟它交换的
+字节了）（POSIX 1003.26，PASC翻译1003.2 3号和4号）。
+.TP
+.B noerror
+发生读错误时，继续进行。
+.TP
+.B notrunc
+不截断输出文件。
+.TP
+.B sync
+用0填充到每个输入块的末尾，使其大小为
+.B ibs
+字节。
+.RE
+.SH "GNU标准选项"
+.TP
+.B "\-\-help"
+将用法信息打印到标准输出，并成功退出。
+.TP
+.B "\-\-version"
+将版本信息打印到标准输出，并成功退出。
+.TP
+.B "\-\-"
+结束选项列表。
+.SH 环境变量
+LANG, LC_ALL, LC_CTYPE和LC_MESSAGES具有其通常含义。
+.SH "遵循标准"
+POSIX 1003.2
+.SH 举例
+磁带机通常不能接受任意大小的数据块，当最后一个数据片
+段不能充满整个块时，
+.B dd
+将出现I/O错误。用'dd if=myfile of=/dev/mytape conv=sync'
+就可以使全部内容存到磁带上。当然，这样做，把文件从磁
+带上读回时回产生一个稍大些的文件，因为其尾部填充了一
+些NUL（空字符）。
+.SH 注
+本手册页描述了fileutils\-4.0软件包中的
+.B dd
+命令。其他版
+本的dd会与此稍有不同。有关更正和补充可以发帖到中国linux
+论坛\-man手册版。报告程序中的错误，请给
+fileutils\-bugs2gnu.ai.wit.edu
+发邮件。
+
+.SH "[中文版维护人]"
+.B astonia <email>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,435 @@
+'\"
+'\" Copyright (c) 1995-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: safe.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: safe.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH "Safe Tcl" n 8.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+Safe\ Base \- 用来建立和操纵安全解释器的机制。
+.SH "总览 SYNOPSIS"
+\fB::safe::interpCreate\fR ?\fIslave\fR? ?\fIoptions...\fR?
+.sp
+\fB::safe::interpInit\fR \fIslave\fR ?\fIoptions...\fR?
+.sp
+\fB::safe::interpConfigure\fR \fIslave\fR ?\fIoptions...\fR?
+.sp
+\fB::safe::interpDelete\fR \fIslave\fR
+.sp
+\fB::safe::interpAddToAccessPath\fR \fIslave\fR \fIdirectory\fR
+.sp
+\fB::safe::interpFindInAccessPath\fR \fIslave\fR \fIdirectory\fR
+.sp
+\fB::safe::setLogCmd\fR ?\fIcmd arg...\fR?
+.SH OPTIONS
+.PP
+?\fB\-accessPath\fR \fIpathList\fR?
+?\fB\-statics\fR \fIboolean\fR? ?\fB\-noStatics\fR?
+?\fB\-nested\fR \fIboolean\fR? ?\fB\-nestedLoadOk\fR?
+?\fB\-deleteHook\fR \fIscript\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+Safe Tcl 是一种机制，用于安全的执行不可信任的 Tcl 
+脚本，并为有潜在危险功能的脚本提供访问中介。
+.PP
+Safe Base 确保不可信任的 Tcl 脚本不能损坏宿主应用。Safe 
+Base 防止完整性和隐私攻击。防止不可信任的 Tcl 
+脚本败坏宿主应用或计算机的状况。防止不可信任的脚本把存储在宿主主机或宿主应用中的信息泄露给任何人群。
+.PP
+Safe Base 
+允许一个主解释器建立安全、受限制的解释器，它包括为  \fBsource\fR,
+\fBload\fR, \fBfile\fR, \fBencoding\fR, 和 \fBexit\fR 命令预定义的一系列别名，并可以使用自动装载和包机制。
+.PP
+不向安全解释器透露文件系统的任何东西，它只能访问包含记号(token)的虚拟的路径。当安全解释器请求 
+source(载入)一个文件的时候，它使用在虚拟路径中的记号作为要 source 的文件名的一部分；主解释器透明的把这个记号转换成一个实际的路径名并执行所要求的操作 (详情参见下面的 \fBSECURITY\fR 安全 章节).
+可以使用下面描述的命令标志来选择不同的安全级别。
+.PP
+Safe Base 在主解释器中提供的所有命令驻留在 \fBsafe\fR 
+名字空间中:
+
+.SH "命令 COMMANDS"
+在主解释器中提供了下列命令:
+.TP
+\fB::safe::interpCreate\fR ?\fIslave\fR? ?\fIoptions...\fR?
+建立一个安全解释器，安装在\fBALIASES\fR  别名 章节中描述的别名并初始化在 \fBOPTIONS\fR 选项 中提供的自动装载和包机制。对可选择的参数的描述请参见下面 \fBOPTIONS\fR 选项 章节。如果省略了\fIslave\fR 参数，则生成一个名字。\fB::safe::interpCreate\fR 总是返回解释器的名字。
+.TP
+\fB::safe::interpInit\fR \fIslave\fR ?\fIoptions...\fR?
+除了不建立安全解释器之外，这个命令类似于 \fBinterpCreate\fR   命令。必须已经通过其他方式如 \fBinterp create -safe\fR建立了这个 \fIslave\fR。
+.TP
+如果未给出 \fIoptions\fR，则把给指名的这个解释器所有选项的设置返回为给这个 \fIslave \fR的选项和它们当前的值的一个列表。如果提供了一个单一的补充参数，它将返回有两个元素 \fIname\fR 和 \fIvalue\fR 的一个列表，这里的 \fIname\fR 是选项的全名而 \fIvalue\fR 是给 \fIslave \fR的这个选项当前值。如果提供多于两个补充选项，它将重新配置这个安全解释器并只改变每个提供的选项。关于选项的描述请参见下面的 OPTIONS 章节。使用的例子:
+.RS
+.CS
+# Create a new interp with the same configuration as "$i0" :
+set i1 [eval safe::interpCreate [safe::interpConfigure $i0]]
+# Get the current deleteHook
+set dh [safe::interpConfigure $i0  \-del]
+# Change (only) the statics loading ok attribute of an interp
+# and its deleteHook (leaving the rest unchanged) :
+safe::interpConfigure $i0  \-delete {foo bar} \-statics 0 ;
+.CE
+.RE
+.TP
+\fB::safe::interpDelete\fR \fIslave\fR
+删除这个安全解释器并清除相应的主解释器数据结构。如果为这个解释器指定了一个 \fIdeleteHook\fR 脚本，则在删除这个解释器之前执行这个脚本，把这个解释器的名字作为一个补充参数。
+.TP
+\fB::safe::interpFindInAccessPath\fR \fIslave\fR \fIdirectory\fR
+这个命令寻找并返回在安全解释器的当前虚拟访问路径中给实际路径 
+\fIdirectory\fR 
+的记号。如果未找到这个路径则生成一个错误。使用的例子:
+.RS
+.CS
+$slave eval [list set tk_library [::safe::interpFindInAccessPath $name $tk_library]]
+.CE
+.RE
+.TP
+\fB::safe::interpAddToAccessPath\fR \fIslave\fR \fIdirectory\fR
+这个命令把 \fIdirectory\fR 添加到在主解释器中为安全解释器维护的虚拟路径中，并返回可在安全解释器中被用来获得到在这个目录中的文件的访问的记号。如果这个路径已经存在于虚拟路径中，则它只返回记号而不再次把这个路径添加到虚拟路径中。使用的例子:
+.RS
+.CS
+$slave eval [list set tk_library [::safe::interpAddToAccessPath $name $tk_library]]
+.CE
+.RE
+.TP
+\fB::safe::setLogCmd\fR ?\fIcmd arg...\fR?
+这个命令安装在一个脚本，在这个安全解释器的特定的生命周期事件发生的时候将被调用。在调用这个命令而不加参数时，它返回当前安装的脚本。在调用并加一个参数空串时，则删除当前安装的脚本并关闭日志记录。调用这个脚本时将加上一个补充参数，它描述所感兴趣的事件。主要的目的是帮助调试安全解释器。在安全解释器只能得到一个一般错误消息的时候你可以使用这个设施获得完整的错误消息。这防止安全解释器见到关于失败的消息和其他可能包含敏感信息如真实路径名的其他事件的消息。
+.RS
+使用的例子:
+.CS
+::safe::setLogCmd puts stderr
+.CE
+下面是一个样本对话的输出，这里一个安全解释器尝试着 source 一个在它的虚拟访问路径中找不到的文件。注意这个安全解释器只接收到一个错误消息，说这个文件未找到:
+.CS
+NOTICE for slave interp10 : Created
+NOTICE for slave interp10 : Setting accessPath=(/foo/bar) staticsok=1 nestedok=0 deletehook=()
+NOTICE for slave interp10 : auto_path in interp10 has been set to {$p(:0:)}
+ERROR for slave interp10 : /foo/bar/init.tcl: no such file or directory
+.CE
+.RE
+
+.SH "选项 OPTIONS"
+下列选项通用于 \fB::safe::interpCreate\fR、\fB::safe::interpInit\fR、和 \fB::safe::interpConfigure\fR。任何选项都可缩写为它的最小的无歧义的名字。选项的名字是大小写不敏感的。
+.TP 
+\fB\-accessPath\fR \fIdirectoryList\fR
+这个选项设置目录的列表，安全解释器可以从中 \fBsource\fR 和 \fBload\fR 文件。如果未指定这个选项，或者它被给定为一个空列表，安全解释器将使用的目录同与它的主解释器用于自动装载的目录。关于虚拟路径、记号和访问控制的详情请参见下面的 \fBSECURITY\fR 安全 章节。
+.TP
+\fB\-statics\fR \fIboolean\fR
+这个选项指定是否允许这个安全解释器装载静态连接包(如 \fBload {} Tk\fR)。缺省值是 \fBtrue\fR : 允许安全解释器装载静态连接包。
+.TP
+\fB\-noStatics\fR
+这个选项是 \fB-statics false\fR     的一个方便的简写，它指定不允许这个安全解释器装载静态连接包。
+.TP
+\fB\-nested\fR \fIboolean\fR
+这个选项指定是否允许这个安全解释器把包装载到它自己的子解释器中。缺省值是     \fBfalse\fR :     不允许安全解释器把包装载到它自己的子解释器中。
+.TP
+\fB\-nestedLoadOk\fR
+这个选项是 \fB-nested true\fR     的一个方便的简写，它指定允许安全解释器把包装载到它自己的子解释器中。
+.TP 
+\fB\-deleteHook\fR \fIscript\fR
+当给这个选项以一个非空的 \fIscript\fR     的时候，它将在实际删除这个从解释器之前在主解释器中被求值，并加上这个安全解释器的名字作为一个补充的参数。给予一个空值则去除任何当前为这个安全解释器安装的删除回调(hook)脚本。缺省值(\fB{}\fR)是没有任何删除回调脚本。
+.SH "别名 ALIASES"
+在安全解释器中提供了下列别名:
+.TP
+\fBsource\fR \fIfileName\fR
+如果找到了要求的这个 Tcl 源文件，则把它 source(装载)到安全解释器中。
+\fBsource\fR 别名只可以从给这个安全解释器的虚拟路径中的目录 source 文件。
+关于在有效文件名上的限制的更多信息请参见 \fBSECURITY\fR 安全 章节。
+.TP
+\fBload\fR \fIfileName\fR
+如果找到了要求的这个共享的目标文件，则把它动态的装载到安全解释器中。为了能成功的找到它，文件名必须包含在给这个安全解释器的虚拟路径中提及的一个记号的名字。还有，这个共享的目标文件必须包含一个安全入口点；详情请参见 \fBload\fR 命令的手册条目。
+.TP
+\fBfile\fR ?\fIsubCmd args...\fR?
+\fBfile\fR 别名提供到 \fBfile\fR命令的子命令的一个安全子集的访问；它只允许 \fBdirname\fR、\fBjoin\fR、  \fBextension\fR、\fBroot\fR、\fBtail\fR、\fBpathname\fR 和 \fBsplit\fR  子命令。关于这些子命令的详情请参见 \fBfile\fR  命令的手册条目。
+.TP
+\fBencoding\fR ?\fIsubCmd args...\fR?
+\fBenconding\fR 别名提供到 \fBencoding\fR 命令的子命令的一个安全子集的访问；它不允许设置系统编码，不允许其他子命令包括 \fBsystem\fR 检查当前编码。
+.TP
+\fBexit\fR
+删除调用它的脚本并停止它的计算，但这个解释器存在于其中的那个 Tcl 进程不被终止。
+
+.SH "安全 SECURITY"
+Safe Base 不尝试完全的防止烦恼(annoyance)和拒绝服务攻击。这些形式的攻击妨碍应用或用户临时的使用计算机来完成有用的工作，例如消耗所有可利用的 CPU 时间或所有可利用的屏幕 real estate。这些攻击尽管很恶劣，但一般不如 Safe Base 主要防护的完整性和隐私攻击那么重要。
+.PP
+除了在 \fBinterp\fR 手册页中定义的安全命令集之外，在安全解释器中可获得的命令还包括给 \fBsource\fR、\fBload\fR、\fBexit\fR 的作为中介的(mediate)别名以及 \fBfile\fR 和 \fBencoding\fR 命令的安全子集。安全解释器还可以自动装载代码并可以请求装载包。
+.PP
+因为这些命令中的一些命令访问本地文件系统，存在着对它的目录结构的潜在的信息泄露。为了防止这个问题，接受文件名作为参数的命令在安全解释器中使用记号来替代真实的目录名。在主解释器中介一个要求例如 
+source 一个文件的时候，把这些记号转换成实际路径名。在主解释器中维护这个虚拟路径系统，针对每个用 
+\fB::safe::interpCreate\fR 建立的或用 \fB::safe::interpInit\fR 
+初始化的安全解释器，这个路径把在安全解释器中可访问的记号映射成在本地文件系统上的真实路径名，这样就防止了安全解释器去获取关于这个解释器在其上执行的主机的文件系统结构的知识。可以提供给从解释器中的 
+\fBsource\fR 和 \fBload\fR 别名的有效的文件名参数只能是下面这种形式的路径：
+\fB[file join \fR\fItoken filename\fR\fB]\fR (比如，在使用本地文件路径格式的时候: 
+在 Unix 上是 \fItoken\fR\fB/\fR\fIfilename\fR，在 Windows 上是 \fItoken\fR\fB\\\fIfilename\fR，在 
+Mac 上是 \fItoken\fR\fB:\fR\fIfilename\fR  )，这里的 \fItoken\fR 表示 
+\fIaccessPath \fR列表中的一个目录而 \fIfilename\fR 是在这个目录中一个文件(不允许访问子目录)。
+.PP
+在一个安全解释器中，当在要 source 或装载一个文件的一个请求中使用一个记号的时候，检查这个记号并把它转换成真实路径名，并在文件系统上定位要被 source 或装载的文件。安全解释器不能获取关于文件系统上在其下存储这个文件的实际路径名的知识。
+.PP
+为了进一步防止潜在的对偶然的包括在可以被安全解释器 source 的文件集中的敏感文件的信息泄露，限制 \fBsource\fR 别名为访问满足下列约束的文件: 文件名必须是十四个字符或更短，必须不包含多于一个的点(“\fB.\fR”)，不许终止于扩展 \fB.tcl\fR 或是被调用的 \fBtclIndex\fR。
+.PP
+初始的访问路径列表中的每个元素将分配一个记号，它们将被设置在从解释器的 
+\fBauto_path\fR 中并且这个列表的第一个元素将被设置为这个从解释器的 \fBtcl_library\fR。
+.PP
+如果未给出访问路径参数或者是一个空列表，缺省的行为是让从解释器访问的包与主解释器已经访问了的包相同(更精确的描述: 
+只允许用 Tcl 写成的包(因为它们将在从解释器中运行所以不可能是危险的)和提供 
+Safe_Init 入口点的 C 扩展)。为此，用主解释器的 \fBauto_path\fR 
+来构造从解释器的访问路径。为了从解释器能成功的装载 Tcl 
+库文件(它自身包括自动装载机制)，如果需要的话，把 \fBtcl_library\fR 
+增加或移动到在从解释器的访问路径中的第一个的位置上，这样从解释器的 \fBtcl_library\fR 将与主解释器的相同(它的真实路径对从解释器仍是不可见的)。为了使自动装载对于从解释器和主解释器在缺省的情况下以相同的方式工作，在主解释器 \fBauto_path\fR 中的每个目录的第一层子目录将被添加(如果未曾包含的话)到从解释器的访问路径中。你总是可以通过显式的使用 \fB-accessPath\fR 标志指定你的目录列表，而不是依赖于这个缺省机制，来指定一个更受限制的路径，它的子目录永远不能被查找。
+.PP
+在首次建立或初始化(例如通过 \fBinterpConfigure -accessPath \fR\fIlist\fR)之后变更 
+\fIaccessPath\fR 的时候，将在安全解释器中自动的求值 \fBauto_reset\fR 
+来使它的 \fBauto_index\fR 与新的记号列表同步。
+
+.SH "参见 SEE ALSO"
+interp(n), library(n), load(n), package(n), source(n), unknown(n)
+ 
+.SH "关键字 KEYWORDS"
+alias, auto\-loading, auto_mkindex, load, master interpreter, safe
+interpreter, slave interpreter, source
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/11/07
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

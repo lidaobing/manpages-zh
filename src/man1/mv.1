@@ -1,0 +1,94 @@
+.TH MV "1" "March 2002" "mv (fileutils) 4.1" 自由软件基金会
+.SH NAME
+mv \- 移动 (改名) 文件
+.SH 摘要
+.B mv
+[\fI选项\fR]... \fI源文件 目标文件\fR
+.br
+.B mv
+[\fI选项\fR]... \fI源文件\fR... \fI目录\fR
+.br
+.B mv
+[\fI选项\fR]... \fI--target-directory=DIRECTORY SOURCE\fR...
+.SH 描述
+.\" Add any additional description here
+.PP
+改“源文件”名到“目标文件”名, 或移动“源文件”(可以不只一个)到一个“目录”。
+.TP
+\fB\-\-backup\fR[=\fICONTROL\fR]
+为现有的每一个目标文件作一个备份
+.TP
+\fB\-b\fR
+和\fB\-\-backup\fR一样但是不接受参数
+.TP
+\fB\-f\fR, \fB\-\-force\fR
+覆盖前永不提示
+.TP
+\fB\-i\fR, \fB\-\-interactive\fR
+覆盖前提示
+.TP
+\fB\-\-strip\-trailing\-slashes\fR
+删除任何“源文件”参数后面跟随的斜杠
+.TP
+\fB\-S\fR, \fB\-\-suffix\fR=\fISUFFIX\fR
+省略一般的备份后缀
+.TP
+\fB\-\-target\-directory\fR=\fIDIRECTORY\fR
+移动全部“源文件”参数到“目录”中
+.TP
+\fB\-u\fR, \fB\-\-update\fR
+只移动更老的或者标记新的非目录
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+说明完成了什么
+.TP
+\fB\-\-help\fR
+显示帮助且退出程序
+.TP
+\fB\-\-version\fR
+输出版本信息且退出程序
+.PP
+这是备份后缀 `~', 除非设定 \fB\-\-suffix\fR 或 SIMPLE_BACKUP_SUFFIX。
+这个版本管理方法可以选择通过 \fB\-\-backup\fR 选项或通过
+ VERSION_CONTROL 环境变量。这些值是：
+.TP
+none, off
+永不做备份 (即使用 \fB\-\-backup\fR)
+.TP
+numbered, t
+做备份编号
+.TP
+existing, nil
+编号，如果编号备份存在，用其它的简单方法
+.TP
+simple, never
+总是做简单备份
+.SH 作者
+写作 by Mike Parker，David MacKenzie和Jim Meyering.
+.SH "报告错误"
+回复错误到<bug-fileutils@gnu.org>。
+.SH 版权
+版权 \(co 2001 自由软件基金会
+.br
+这是自由软件； 可以复制原代码。 这没有保证；
+甚至不能适应一个特别的任务。
+.SH "相关"
+关于
+.B mv
+的全部文档维护是 Texinfo 指南。如果
+.B info
+和
+.B mv
+程序都已经装在你的机器上，可以用命令
+.IP
+.B info mv
+.PP
+启动并读这个指南。
+
+
+.SH "[中文版维护人]"
+.B wide288 <email>
+.SH "[中文版最新更新]"
+.B 2003/11/22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

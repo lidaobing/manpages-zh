@@ -1,0 +1,84 @@
+.TH WISH 1
+.SH NAME
+.B wish - 简单的窗口式(windowing) shell
+.SH 总览
+.B wish [filename] [arg] [arg ...]
+.SH 选项
+.TP
+-colormap new 
+指定窗口使用一个新的私有的调色板(colormap)而不使用给屏幕的缺省的调色板。
+.TP
+-display display 
+指定显示窗口的显示器(和屏幕)。
+.TP
+-geometry geometry 
+初始化用于窗口的几何(位置、大小)。如果指定了这个选项，它的值存储在应用的 Tcl 解释器的 geometry 全局变量中。
+.TP
+-name name 
+用 name 作为窗口中显示的标题(title)，作为被 send 命令使用的解释器的名字。
+.TP
+-sync 
+同步的执行所有 X 服务器命令，这样出错就可以立即报告。这将导致执行更慢，但对调试有用。　-use id 指定应用的主窗口要被嵌入标识符(identifier)为 id 的窗口中，而不是被建立为一个独立的顶层窗口。必须用与 toplevel 组件的 -use 选项的值相同的方式指定 Id (例如，它必须与 winfo id 的返回有一样的形式(form))。
+.TP
+-visual visual 
+指定这个窗口使用的视觉效果(visual)。Visual 必须用 Tk_GetVisual 过程所支持的形式。
+.TP
+- - 
+传递所有剩下的参数到脚本的 argv 变量而不解释它们。这提供了一种机制来传递象 -name 这样的参数到一个脚本而不让 wish 解释它们。
+
+.SH 描述
+Wish 是一个由 Tcl 命令语言、Tk 工具箱和一个从标准输入或文件读命令的主程序构成的简单的程序。它建立一个主窗口接着就处理 Tcl 命令。如果不加参数的调用 wish，或者第一个参数以“-”开始，则从标准输入交互的读 Tcl 命令。它将连续的处理命令直到删除了所有的窗口或在标准输入上到达文件结束。如果在用户的主(home)目录中存在文件 .wishrc，在从标准输入读第一条命令之前，wish 把这个文件作为一个 Tcl 脚本来求值。
+
+如果调用 wish 时加了一个初始化 fileName 参数，则 fileName 被作为一个脚本文件的名字对待。Wish 将对 fileName 中的脚本进行求值(可能是建立一个用户界面)，接着它将响应事件直到所有窗口被删除。将不从标准输入读命令。 在这种情况下不自动的对 .wishrc 求值，如果需要的话，脚本文件总是可以 source(包含)它。
+
+　
+.SH 关于选项
+Wish 自动的处理在上面选项总结中描述的所有命令行选项。任何其他的命令行参数被用后面描述的 argc 和 argv 变量直接传递给应用(程序)。
+
+应用的名字用于象 send 这样的命令，从如果指定了 -name 选项，则从其中获得；否则若指定了fileName则接受之，或者接受调用 wish 所使用的名字。在后两种情况，如果名字包含“/”字符，则只有在最后一个反斜杠后面的字符被作为应用的名字。
+
+应用(程序)的类被用于通过 RESOURCE_MANAGER 属性或 .Xdefaults 文件来指定选项，除了第一个字母是大写的之外，类的名字同于应用的名字。
+.SH 变量
+Wish 设置了下列 Tcl 变量:
+
+argc 包含 arg 参数的个数(没有则为 0)，不包括上面描述的选项。
+
+argv 包含一个 Tcl 列表，其成员依次是在 - - 选项后面或不匹配在上面的选项段落描述的任何选项的 arg 参数，如果没有这些参数则是一个空串。
+
+argv0 如果指定了 fileName 则在此包含。否则。包含调用 wish 使用的名字。　geometry 如果指定了 -geometry 选项，wish 把它的值复制到这个变量中。如果在 fileName 被求值之后这个变量仍然存在，wish 在一个 wm geometry 命令中使用这个值来设置主窗口的几何(位置、大小)。
+
+tcl_interactive 如果交互式运行 wish 则包含 1(不指定 fileName 并且标准输入是一个终端类设备)，否则是 0。
+
+.SH 脚本文件
+如果你建立的 Tcl 脚本文件的第一行是
+
+\fI#!/usr/local/bin/wish\fR
+
+则如果你把它标记为可执行的，接着就可以直接在你的 shell 中调用这个脚本文件。这里假定了 wish  被安装在缺省的位置 /usr/local/bin；如果它被安装在其他地方，那么你需要修改上述行来匹配之。许多 UNIX 系统不允许 #! 行超出 30 个字符的长度，所以要确定 wish 可执行文件能被用短文件名访问。
+
+一个更好的途径是用下面三行来开始你的脚本文件:
+
+.nf
+#!/bin/sh
+# the next line restarts using wish \\
+exec wish "$0" "$@"
+.fi
+
+这种方法比起前面的段落有三个好处。首先，wish 二进制文件的位置不需要填入(hard-wired into)  脚本中: 它可以在你的 shell 查找路径中的任何地方。其次，他超越了(get around)了上种方法的 30 字符的文件名的限制。第三，这种方法在 wish 自身也是 shell 脚本时仍可运行(一些系统要处理多体系或操作系统:  wish 脚本选择某个二进制文件来运行)。第三行导致 sh 和 wish  两者来处理脚本，但 exec 只被 sh 执行。 sh 首先处理脚本文件；它把第二行作为脚本文件对待并执行第三行。exec 语句导致 shell 停止处理而启动 wish 来重新处理整个脚本。当 wish 启动时，因为第二行的反斜线导致第三行被作为第二行注释的一部分，它把所有三行都作为注释对待。
+提示符
+
+当交互式的调用  wish 时，它通常为每条命令提示“%”。你可以通过设置变量 tcl_prompt1 和 tcl_prompt2 来改变提示符。如果存在变量 tcl_prompt1 则它必须由一个输出一个提示符的 Tcl 脚本组成；tclsh 对 tcl_prompt1 中的脚本求值而不是输出一个提示符。变量 tcl_prompt2 以类似的方式用在键入了换行而当前命令却不完整的时候；如果没设置 tcl_prompt2 则对不完整的命令不给以提示符。
+.SH 关键字
+shell, 工具箱
+.SH 作者
+.nf
+Copyright © 1991-1994 The Regents of the University of California.
+Copyright © 1994-1996 Sun Microsystems, Inc.
+Copyright © 1995-1997 Roger E. Critchlow Jr.
+.fi
+.SH [中文版维护人]
+.B 寒蝉退士
+.SH [中文版最新更新]
+.B 2001/06/20
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

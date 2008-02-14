@@ -1,0 +1,109 @@
+.TH XARGS 1L \" -*- nroff -*-
+
+.SH NAME
+xargs \- 从标准输入重建并执行命令行
+
+.SH "总览 (SYNOPSIS)"
+.B xargs
+[\-0prtx] [\-e[eof-str]] [\-i[replace-str]] [\-l[max-lines]]
+[\-n max-args] [\-s max-chars] [\-P max-procs] [\-\-null] [\-\-eof[=eof-str]]
+[\-\-replace[=replace-str]] [\-\-max-lines[=max-lines]] [\-\-interactive]
+[\-\-max-chars=max-chars] [\-\-verbose] [\-\-exit] [\-\-max-procs=max-procs]
+[\-\-max-args=max-args] [\-\-no-run-if-empty] [\-\-version] [\-\-help]
+[command [initial-arguments]]
+
+.SH "描述 (DESCRIPTION)"
+此 手册页 描述 GNU 版本 的
+.BR xargs .
+.B xargs
+从 标准 输入 读入 参数. 参数 用 空格(可以 用 双引号 单引号 或 反斜杠 转意) 或者 回车 隔开.
+然后 一次 或者 多次 执行 命令
+.I command
+(默认 是 /bin/echo), 其 参数 是
+.I initial-arguments
+后面 再 加上 从 标准 输入 读入 的 参数. 标准 输入中 的 空格 被 忽略.
+.P
+.B xargs
+退出 可以有 如下 状态:
+.nf
+0 如果 成功
+123 如果 任何 一个 被 调用 的 命令 command 退出 状态 为 1-125
+124 如果 命令 command 退出 状态 为 255
+125 如果 命令 command 被 信号 终止
+126 如果 不能 执行 命令 command
+127 如果 命令 command 没有 找到
+1 如果 发生 其它 错误
+.fi
+
+.SS "选项 (OPTIONS)"
+.TP
+.I "\-\-null, \-0"
+输入 的 文件名 以 null 字符 结尾, 而不是 空格, 引号 和 反斜杠 并不 特殊 处理
+(所有 字符 都以 字面 意思 解释). 禁止 文件尾 字符串, 当 另一个 参数 处理. 当
+参数 含有 空格, 引号, 反斜杠 时 很方便. GNU find 的 \-print0 选项 产生 适合
+这种 模式 的 输出.
+.TP
+.I "\-\-eof[=eof-str], \-e[eof-str]"
+把 文件尾 字符串 设置 成\fIeof-str\fR. 如果 文件尾 字符串 出现 在 输入中 的
+某行, 余下的 行 将被 忽略. 如果 没有 \fIeof-str\fR , 就 没有 文件尾 字符串.
+如果 没有 这个 选项, 文件尾 字符串 默认 是 "_".
+.TP
+.I "\-\-help"
+显示
+.B xargs
+的 选项, 然后 退出.
+.TP
+.I "\-\-replace[=replace-str], \-i[replace-str]"
+把 initial-arguments 里的 所有 \fIreplace-str\fR 替换为 从 标准 输入 里 读入
+的 名称. 同时, 没有 用 引号 括起来 的 空格 不会 结束 参数. 如果 没有
+\fIreplace-str\fR , 它 默认为 "{}" (同 `find \-exec' 一样). 此 选项 隐含有
+\fI\-x\fP 和 \fI\-l 1\fP 选项.
+.TP
+.I "\-\-max-lines[=max-lines], -l[max-lines]"
+每个 命令行 最多 可以 有 \fImax-lines\fR 行 非空格 输入; \fImax-lines\fR 默认
+是 1.  后面 跟着 的 空格 会使 后面 一行 逻辑 上 是 一个 输入行 的 继续. 此 选项
+隐含有 \fI\-x\fR 选项.
+.TP
+.I "\-\-max-args=max-args, \-n max-args"
+每个 命令行 最多 可以 有 \fImax-args\fR 个 参数. 如果 大小 超出了 (见 \-s 选项)
+那么 参数 个数 将 会用 比 \fImax-args\fR 小; 除非 用了 \-x 选项, 那么
+\fBxargs\fR 将 退出.
+.TP
+.I "\-\-interactive, \-p"
+提示 用户 是否 运行 每个 命令行, 然后 从 终端 读入 一行. 只有 当 此行 以 'y'
+或 'Y' 开头 才会 运行 此 命令行. 此 选项 隐含有 \fI\-t\fR 选项.
+.TP
+.I "\-\-no-run-if-empty, \-r"
+如果 标准 输入 不 包含 任何 非空格, 将 不运行 命令. 一般 情况下, 就算 没有
+输入, 命令 也会 运行 一次.
+.TP
+.I "\-\-max-chars=max-chars, \-s max-chars"
+每个 命令行 最多 可以 有 \fImax-chars\fR 个 字符, 包括 命令 和 初始 参数, 还
+包括 参数 后面 结尾 的 null. 默认 是 尽可能的 大, 有 20k 个 字符.
+.TP
+.I "\-\-verbose, \-t"
+在 执行 之前 在 标准 错误 输出 显示 命令行.
+.TP
+.I "\-\-version"
+显示
+.B xargs
+的 版本号, 然后 退出.
+.TP
+.I "\-\-exit, \-x"
+如果 大小 超出 (见 \fI\-s\fR 选项) 就 退出.
+.TP
+.I "\-\-max-procs=max-procs, \-P max-procs"
+同时 最多 运行 \fImax-procs\fR 个 进程; 默认 是 1. 如果 \fImax-procs\fR 为 0,
+\fBxargs\fR 将 同时 运行 尽可能 多 的 进程. 最好 同时 用 \fI\-n\fR 选项; 不然
+很 可能 只会 做 一次 exec.
+
+.SH "参见 (SEE ALSO)"
+\fBfind\fP(1L), \fBlocate\fP(1L), \fBlocatedb\fP(5L), \fBupdatedb\fP(1)
+\fBFinding Files\fP (在线 Info, 或者 打印的)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/10/31
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

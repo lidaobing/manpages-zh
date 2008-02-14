@@ -1,0 +1,214 @@
+.\" Copyright (c) 1996 Eric S. Raymond 
+.\" and Andries Brouwer 
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" This is combined from many sources, including notes by aeb and
+.\" research by esr. Portions derive from a writeup by Ramon Czybora.
+.TH CHARSETS 7 "November 5th, 1996" "Linux" "Linux Programmer's Manual"
+.SH NAME
+charsets \- 程序员对字符集和国际化的观点
+.SH 描述
+Linux 是一个国际性的操作系统。它的各种各样实用程序和设
+备驱动程序 (包括控制台驱动程序 ) 支持多种语言的字符集，
+包括带有附加符号的拉丁字母表字符，重音符，连字(字母结合),
+和全部非拉丁文字母表（包括希腊语，古代斯拉夫语，阿拉伯语，
+和希伯来语。 )
+.LP
+这份手册以程序员的眼光去看待不同的字符集标准，以及它们是如何
+在 Linux 中调和在一起的。讨论的标准包括 ASCII，ISO 8859，KOI8-R ，
+Unicode，ISO 2022 和 ISO 4873 。
+.SH ASCII
+ASCII (,美国国家信息交换(用)标准(代)码) 是最初的 7-bit字符集,
+原先是为美式英语设计的。当前它被 ECMA-6 标准所描述。
+.LP
+在英国使用一种 ASCII的变体（这变体是：用英国磅值的符号代替美国的
+crosshatch/octothorpe/hash 的磅值符号）;当需要时，
+美国的（符号）和英国的变体（符号）可以用"US ASCII"和"UK ASCII"
+作为区别。
+.LP
+因为 Linux 是为美国设计的硬件写的, 它生来就支持 US ASCII 。
+
+.SH ISO 8859
+ISO 8859 是一系列 10 ８-bit 字符集,它包含美国 ASCII 的低位 (7 -bit ), 
+128 ～159 范围内的不可见控制字符，和 96 个定宽图形（字符）在 160-255 里。
+。LP
+这些字符集中，最重要是 ISO 8859-1 ( Latin-1 )。
+它生来就被 Linux 控制台驱动程序支持，
+X11R6 的支持得也很好，并且是 HTML 的基础字符集。
+.LP
+
+Linux 下控制台也支持其他的 8859 字符集
+，通过用户模式实用程序( 例如 
+.BR setfont ( 8 ))
+来修改键盘绑定和 EGA 图形表格，
+以及进行控制台驱动程序里的字体表格中的“user mapping（用户影射）”。
+.LP
+下面是每个集合简短的描述：
+.TP
+8859-1 (Latin-1) 
+Latin-1 覆盖大多数的西欧语言，比如阿尔巴尼亚, 加泰罗尼亚语, 丹麦,
+荷兰,英语,法罗群岛,芬兰,法语,德语,加利西亚,爱尔兰,冰岛,
+意大利，挪威，葡萄牙，西班牙和瑞典。缺少荷兰的 ij连字（i与j合字） ，
+法国的 oe（o与e合字）和旧风格的',,' 而德语中``（这样的）引号是可以的。
+.TP
+8859-2 (Latin-2)
+Latin-2 支持大多数的拉丁文书写的斯拉夫语和中欧的语言：
+克罗地亚 , 捷克语, 德语, 匈牙利, 波兰，罗马尼亚，斯洛伐克，
+和斯洛文尼亚。
+.TP
+8859-3 (Latin-3)
+Latin-3 是世界语,加里西亚 , 马耳他人, 和土耳其语作者受欢迎的（语言）。
+.TP
+8859-4 (Latin-4)
+Latin-4 介绍了爱沙尼亚语，拉托维亚，和立陶宛的字符 。它是实质上过时的;
+参见 8859-10 (Latin-6 ) 。
+.TP
+8859-5 
+古代斯拉夫语字母支持保加利亚语, 白俄罗斯语,马其顿语, 俄语, 塞尔维亚语和乌克兰语。
+乌克兰人读带有下挑笔的`geh'为`heh',和（当）需要用带有上挑笔的 ghe
+写正确的ghe.参见下面的（关于）KOI8-R 的讨论。
+（译注：这些外国人书写习惯我们也不怎么需要理解吧，希望上面的解释不要
+把人搞糊涂了）
+.TP
+8859-6
+支持阿拉伯语。 8859-6 字型表是分离字符格式的一种固定的字体，但是一个合适
+的显示引擎应该联合这些来使用合适的词首，中间字母，和最后表格式。
+.TP
+8859-7
+支持现代的希腊语。
+.TP
+8859-8
+支持希伯来语。
+.TP
+8859-9 (Latin-5)
+这是Latin-1 的一种变体，它用土耳其语的一些（字符）代替很少用的冰岛语。
+.TP
+8859-10 (Latin-6) 
+Latin 6 增加末因纽特(译：对于last Inuit 我不知道是否是对的) (格陵兰语) 和 
+Sami ( 拉普兰语 ) ，这些是 Lattin 4 中缺少的，来覆盖整个北欧地区（的字符集）。
+RFC 1345 列出了初步的和不同的“ latin 6 "。 Skolt Sami 仍然比这些需要更多的
+重音符号。
+
+.TP
+8859-13 (Latin-7)
+.TP
+8859-14 (Latin-8)
+.TP
+8859-15
+增加了欧洲符号和法国连字，它们是 Latin-1 里缺漏的。
+.SH KOI8-R
+KOI8-R 是在俄国流行的一个非 ISO 字符集。下半部分是 US ASCII;
+上部是比 ISO 8859-5 设计的更好的古斯拉夫字符集。
+.LP
+控制台为了支持 KOI8-R 字符集，在 Linux 下，
+可以利用用户模式实用程序修改键盘绑定和 EGA 图形表格，
+以及在控制台的驱动程序中使用字体表“user mapping（用户映射）”。
+.SH UNICODE（统[单]一代码,宽[双]字节字符集）
+Unicode（ ISO 10646 ) 是一个标准，它的目标是明白地表现
+在每种人类语言中的每种已知字符。Unicode 的编码是 32 位的
+( 旧些的版本使用了 16 位 ) 。在 Unicode 
+的一些信息可以在<http://www.unicode.com>获得。
+.LP
+Linux 使用８位的 Unicode 转移格式 (UTF-8 ) 表示 Unicode 。
+UTF-8 是可变长的 Unicode 编码。使用１个字节给 7 bit
+编码，使用２个字节给 １１ bit 编码，
+使用３个字节给 １６ bit 编码，使用４个字节给 ２１ bit 编码，使用５个字节给
+２６ bit 编码，使用６个字节给 ３１ bit 编码 
+.LP
+让 0,1 , x 代表零，一，或任意的位。字节0xxxxxxx 代表Unicode 00000000 0xxxxxxx，
+这个符号和 ASCII 0xxxxxxx 编码的符号是一样。 
+这样， ASCII 没有改为 UTF-8，并且只用 ASCII 的人不会注意到任何变化：
+不在代码，并且不在文件大小。
+.LP
+字节 110xxxxx 是一个2 字节代码的开始，
+110xxxxx 10yyyyyy 组装成 00000xxx xxyyyyyy 。
+字节 1110xxxx 是一个 ３ 字节代码的开始，
+1110xxxx 10yyyyyy 10zzzzzz 被组装成 xxxxyyyy yyzzzzzz。
+（如果 UTF-8 使用 31-bit ISO 10646 编码，那么这个级数就会延伸
+到 6 字节编码）
+.LP
+对于 ISO-8859-1 的用户而言，这意味着带高位的字符编码成两个字节。
+这会令普通的文本文件增大１到２个百分点。不过没有变换问题,
+因为 Unicode ISO-8859-1 符号的值等于他们的 ISO-8859-1 值
+(用 8 个前导零做前缀) 。对于日语的用户，这意味着原来常用的 16 位编码将
+占 3 个字节，并且还要求有扩展的映射表。许多日本人因此比较喜欢 
+ISO 2022 。
+.LP
+注意 UTF-8 是自我同步的： 10xxxxxx 是一条尾巴, 任何其它
+的字节是编码的头。ASCII 字节出现在 UTF-8 流中唯一的可能是
+作为自己出现。特别是, 不会有 NULs 或 " /'s 嵌入在那些比较大的编码中。
+.LP
+因为编码中的 ASCII，特别是, NUL 和'/', 没有变化, 所以内核不会注意到
+在使用 UTF-8。它根本不在乎它正在处理的那字节代表什么东西。
+.LP
+Unicode 数据流的呈现通常是通过" subfont "表来操作，这个表是
+Unicode 的一个子集到字符表格的映射。内核内部使用 Unicode 
+描述装载入显示内存的 subfont。这意味着在 UTF-8 中的一个模式
+能使用 512 个不同的符号。这对于日语，汉语和朝鲜语来说是不够的，
+但是它满足了大多数其它用途。
+.SH ISO 2022 AND ISO 4873
+ISO 2022 和 4873 标准描述了一个基于 VT100 实现的字体控制模型．
+Linux 内核和 xterm (1) ( 部分 ) 支持这个模型。
+它在日本和韩国很流行。
+.LP
+它有 4 个图形的字符集，称为 G0 ， G1 ， G2 和 G3 ，并且
+其中之一是当前的高位为０ 的编码的字符集(最初 G0 ),而他们之
+一是当前的高位为１的编码的字符集(最初 G1 )。每种图形的字符集有
+94 或 96 个字符 ，并且是实际上是一个 7-bit字符集。
+它使用 040-0177 ( 041-0176 ) 或 0240-0377 ( 0241-0376 )编码
+中的一个。G0 大小总是为 94，并且使用 041-0176 之间的编码。
+.LP
+字符之间切换用转换（shift functions）功能
+^N (SO 或 LS1), ^O (SI 或 LS0), ESC n (LS2), ESC o (LS3),
+ESC N (SS2), ESC O (SS3), ESC ~ (LS1R), ESC } (LS2R), ESC | (LS3R).
+LS\fIn\fP 把字符集G\fIn\fP标记为当前字符集，用于高位为０的编码。
+LS\fIn\fPR 把字符集 G\fIn\fP标记为当前字符集，用于高位为１的编码。
+SS\fIn\fP 把字符集G\fIn\fP (\fIn\fP=2 or 3) 标记为当前字符集，
+只用于下一个字符（
+不管它的高位的值是什么）
+.LP
+94 字符的集合用做 G\fIn\f 字符集是用一个逃逸序列
+ESC ( xx （用于 G0），ESC ) xx （用于 G1），
+ESC * xx （用于 G2），ESC + xx （用于 G3），等代表的．这里的 xx 是一个符号
+或者是在 ISO 2375 国际注册编码字符集中的一对符号。
+例如，ESC ( @ 选用 ISO 646 字符集作为GO，
+ESC ( A 选用 UK 标准字符集(用磅代替数字记号), ESC ( B 选择 ASCII (
+用美元代替流通货币), ESC ( M 为非洲语言选择一个字符集， ESC ( ! A 
+选择古巴字符集, 等等. 等等.
+.LP
+94 字符的集合用做 G\fIn\f 字符集是用一个逃逸序列
+ESC - xx （对于 G1）, ESC . xx （对于 G2）
+或 ESC / xx （对于 G3）等表示．
+例如, ESC - G 选择希伯莱字母表作为 G1.
+.LP
+多字节的字符集用做 G\fIn\fP 字符集是用一个逃逸序列
+ESC $ xx 或者 ESC $ ( xx （对于 G0），
+ESC $ ) xx （对于 G1），ESC $ * xx （对于 G2），ESC $ + xx （对于 G3）等来表示．
+例如, ESC $ ( C 为 G0选择韩国字符集.
+日本字符集合由 ESC $ B选择
+更多临近的版本由ESC & @ ESC $ B选择.
+.LP
+ISO 4873 规定了一个范围比较窄的使用字符集，它的 G0是固定的 (总是 ASCII),
+所以 G1, G2 和 G3只能被调用于高次序位编码集。
+尤其是，不再使用 ^N 和 ^O，ESC ( xx
+仅用于 xx=B, 和 ESC ) xx, ESC * xx, ESC + xx
+分别等价于 ESC - xx, ESC . xx, ESC / xx．
+
+.SH 参考
+.BR console (4),
+.BR console_ioctl (4),
+.BR console_codes (4),
+.BR ascii (7),
+.BR iso_8859_1 (7),
+.BR unicode (7),
+.BR utf-8 (7)
+.br
+.SH "[中文版维护人]"
+.B Scorpio <rawk@chinese.com>
+.SH "[中文版最新更新]"
+.B 2000/10/23
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

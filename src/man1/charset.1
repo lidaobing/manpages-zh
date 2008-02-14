@@ -1,0 +1,81 @@
+.TH CHARSET 1 "10 Aug 1998" "Console tools" "Linux User's Manual"
+
+.SH NAME
+charset \- 设置 G0/G1 字符集槽中的一个的 ACM
+
+.SH "总览 (SYNOPSIS)"
+.BI "charset [" -v "] " G0 | G1 " [" cp437 | iso01 | vt100 | user | <acm_name> ]
+
+.SH "描述 (DESCRIPTION)"
+linux 终端 有 两个 字符集 槽 (charset slot)， 分别 用
+.I G0
+和
+.IR G1
+表示。
+.B charset
+把 当前 虚拟 终端 用的 槽 改为
+.I G0
+或者
+.IR G1
+并且 填入 3个 预定义的 ACM
+.RI ( cp437 ", " iso01 ", " vt100 )
+或者 是 用户 定义的 ACM 中 的 一个。 你 可以 指定
+.IR user
+来 查询 当前 用户 定义的 ACM, 或者 指定 一个 文件名， 把 文件 中 的 新的
+ACM 装进 一个 槽。
+
+注意 虽然 每个 虚拟 终端 都有 自己 的 槽 设置， 但是 对 所有 的 虚拟 终端
+只能 有 一个 用户 定义 的 ACM, 也就是 说 当你 的 tty1 设置 是
+.I G0=cp437
+和
+.IR G1=vt100
+tty2 设置 是
+.I G0=iso01
+和
+.I G1=iso02
+(用户 定义) 时, 你
+.B 不能
+同时 tty1 用
+.I iso02
+tty2 用
+.IR iso03 。
+这是 linux 内核 的 限制。
+
+注意 你可以 用
+.BR filterm (1)
+实用 程序 来 模拟 这样 的 设置。 在 终端 是 UTF8 模式 时， 告诉
+.B filterm
+在 运行 中 把 屏幕 的 输出 转换 为 UTF8.
+
+你 可以 在 Marcin Kowalczyk 写的
+.BR konwert (1)
+包中 找到
+.BR filterm (1) ,
+包 可以 从
+.IR http://qrczak.home.ml.org/
+获得。
+
+.SH "选项 (OPTIONS)"
+.TP
+.I -v
+详细 显示。
+.B charset
+会 显示 它 正在 做什么。
+
+.SH "错误 (BUGS)"
+.B charset
+在 指定 的 时间 并 不能 判断 2 个 槽 中 的 哪个 正在 被 使用， 所以 如果 你
+不 希望 改变 另外 一个， 你 必须 告诉 它 你 希望 的 是 哪一个。 这个 是 终端
+驱动 程序 的 限制。
+
+.SH "参见 (SEE ALSO)"
+.BR consolechars (8),
+.BR unicode_start (1),
+.BR filterm (1).
+
+.SH "[中文版维护人]"
+.B 唐友 <tony_ty@263.net>
+.SH "[中文版最新更新]"
+.BR 2001/9/20
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

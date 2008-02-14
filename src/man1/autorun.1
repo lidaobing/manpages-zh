@@ -1,0 +1,163 @@
+.if n .ds Q \&"
+.if t .ds Q ``
+.if n .ds U \&"
+.if t .ds U ''
+.TH "autorun" 1 
+.tr \&
+.nr bi 0
+.nr ll 0
+.nr el 0
+.de DS
+..
+.de DE
+..
+.de Pp
+.ie \\n(ll>0 \{\
+.ie \\n(bi=1 \{\
+.nr bi 0
+.if \\n(t\\n(ll=0 \{.IP \\(bu\}
+.if \\n(t\\n(ll=1 \{.IP \\n+(e\\n(el.\}
+.\}
+.el .sp 
+.\}
+.el \{\
+.ie \\nh=1 \{\
+.LP
+.nr h 0
+.\}
+.el .PP 
+.\}
+..
+.SH NAME
+
+.Pp
+autorun - 自动装载/卸载CDROMs并在装载后执行/path/to/cdrom/autorun
+.SH 总览
+
+.Pp
+\fBautorun\fP 
+[-lmqv?V] [-a EXEC] [-c CDPLAYER] [-e STRING] [-i MILLISEC] 
+[-n STRING] [-t STRING]
+[--autorun=EXEC] [--cdplayer=CDPLAYER] [--interval=MILLISEC] [--lock]
+[--mountonly] [--notify=STRING] [--notify-insert=STRING] [--notify-eject=STRING] 
+[--quiet] [--verbose] [--help] [--usage]
+[--version] [cdromdevices...]
+.SH 描述
+
+.Pp
+autorun自动识别系统上所有可获得的CDROMs，在插入CD时载装它
+们，并执行CD上可能包含的'autorun'可执行文件。要让普通用户
+使用这样的功能，你必须在/etc/fstab中想要使用的CDROMs条目
+上加入选项user,exec。
+
+.Pp
+你也可以在KDE中使用Autorun.kdelnk。只要把它放到你的
+Autostart文件夹中即可。
+
+.Pp
+程序分析命令字串并用装载点路径来替换%P%参数。用设备路径来
+替换%D%。然后就用/bin/sh -c "command string"来执行命令字
+串；
+
+.SH 选项
+
+.Pp
+.nr ll +1
+.nr t\n(ll 2
+.if \n(ll>1 .RS
+.IP "\fI-a, --autorun=EXEC\fP"
+.nr bi 1
+.Pp
+如果换CD盘的话执行EXEC。该可执行文件必须位于CD盘上。例如，
+如果你指定"--autorun=myprogram"，而你的CD盘装载到了
+/mnt/cdrom下的话，在换盘后，autorun会尝试运行
+"/mnt/cdrom/myprogram"。
+(缺省为"/autorun")
+.IP "\fI-c, --cdplayer=CDPLAYER\fP"
+.nr bi 1
+.Pp
+如果插入的是唱片的话，运行CDPLAYER
+(缺省为"/usr/bin/kscd")
+.IP "\fI-i, --interval=MILLISEC\fP"
+.nr bi 1
+.Pp
+每次检查之间间隔MILLISEC
+(缺省为1000000)
+.IP "\fI-l, --lock\fP"
+.nr bi 1
+.Pp
+锁定装载好的介质(手工卸载)
+.IP "\fI-m, --mountonly\fP"
+.nr bi 1
+.Pp
+只进行装载/卸载(不执行任何内容)
+.IP "\fI-n, --notify=STRING\fP"
+.nr bi 1
+.Pp
+如果换盘则执行命令STRING
+(缺省为"/usr/bin/kfmclient refreshDesktop")
+.IP "\fI-t, --notify-insert=STRING\fP"
+.nr bi 1
+.Pp
+如果插入盘片则执行命令STRING，就不执行"/autorun"以及用
+--autorun指定了的内容
+(缺省为"/usr/bin/kfmclient openURL %P%")
+.IP "\fI-e, --notify-eject=STRING\fP"
+.nr bi 1
+.Pp
+Command STRING that will executed if a CD was ejected 
+如果取出盘片则执行命令STRING
+(缺省为"")
+.IP "\fI-q, --quiet\fP"
+.nr bi 1
+.Pp
+不产生任何输出
+.IP "\fI-v, --verbose\fP"
+.nr bi 1
+.Pp
+产生详细的输出
+.IP "\fI-?, --help,\fP"
+.nr bi 1
+.Pp
+列出此帮助信息
+.IP "\fI--usage\fP"
+.nr bi 1
+.Pp
+列出一份简要用法信息
+.IP "\fI-V, --version\fP"
+.nr bi 1
+.Pp
+列出程序版本
+.if \n(ll>1 .RE
+.nr ll -1
+.Pp
+长选项所有的强制或可选参数也适合任何相应的短选项。
+.SH 作者
+
+.Pp
+.DS
+.sp 
+.ft RR
+.nf
+主要作者：
+===============
+
+Harald Hoyer    E-Mail:
+                        Harald.Hoyer@redhat.de
+                        autorun@parzelle.de
+                HTTP:
+                        http://parzelle.de/
+ 
+.DE
+.fi 
+.ec
+.ft P
+.sp
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.BR 2001/03/26
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

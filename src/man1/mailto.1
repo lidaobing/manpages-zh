@@ -1,0 +1,507 @@
+.TH MAILTO 1 "Release 1" "Bellcore Prototype"
+.SH NAME
+mailto - 简单多媒体邮件发送程序
+.SH SYNOPSIS
+.ta 8n
+\fBmailto\fP	[-a] [-c] [-s] [recipient name(s)]
+.br
+.SH DESCRIPTION
+.I mailto
+程序是一个用于发送MIME格式的多媒体邮件(MIME格式是Internet
+上多媒体邮件格式的推荐标准)的非常简单的用户接口. 该程序
+基本上按照Berkeley的"mail"程序构建, 但没有使用Berkeley 
+mail的任何代码, 而是完全重新实现. 
+
+如其名字所示, 
+.I 
+mailto
+仅用于
+.I 
+发送
+邮件, 而不能用来读取邮件. 
+在
+.I 
+mailto
+中并没有实现任何Berkeley mail的邮件阅读功能. 
+
+熟悉Berkeley mail 程序邮件发送命令的用户可以跳过下一小节, 
+其内容早已为你所熟悉. 更后面的部分的内容着重于mailto的
+增强的功能, 特别是包含复杂文本, 多媒体对象, 以及象希伯来语, 
+俄罗斯语这样的非ASCII 码文本, 正是这些特色使mailto区别于
+Berkeley mail程序.
+
+.SH BASIC USE基本用法
+[对于已经熟悉Berkeley mail程序的读者, 本部分可以略过]
+
+mailto的基本操作非常简单. 如果你只键入"mailto", 你会被要求
+给出一个收件人列表("To:"),一个邮件主题("Subject:"), 以及可
+能的复件接收者列表("CC:").你也可以在命令行里给出这些参数, 
+"-s"选项用于指定主题, "-c"选项指明复件接受地址. 其它的命令
+行参数都被加入到列表中. 下面的命令发送邮件给nsb和jxr, 邮件
+主题是"Test message", 附件发送给kraut: 
+
+mailto nsb jxr -s "Test message" -c kraut
+
+某些用户习惯以逗号分隔地址的邮件阅读器, 为方便这些用户, 也
+可以在每个地址后面跟一个逗号, 但这并不是必须的.
+
+完成这些预备工作后, 你可以开始键入你的信件内容. 你键入的任
+何东西都被包括在你的信件里, 除了以"~"(tilde)字符开头的行. 
+这样的行被看作TILDE ESCAPE, 用于向邮件程序发送特殊命令, 我
+们将马上讨论这种情况.
+
+当你完成了信件, 你只要简单地键入文尾字符 (通常是CONTRAL-D)
+就可以发送邮件给你指定的接收者. 依据选项设置的不同, 你也可
+以在单独一行键入"."或者"~."来发送邮件.
+
+这就是你用mailto发送邮件所需要知道的. 但是, 要想完全发挥它
+的功能, 还需学习一些关于tilde escape的东西. 在这一部分里, 
+我们将描述tilde escape最基本的内容, 这些内容是mailto程序与
+Berkeley mail 程序所共有的. 在更后面部分我们将描述最有趣, 
+同时也是
+.I mailto
+所独有的tilde escape.
+
+如果觉得这部分的内容费解的话, 参考mail(1) 程序的手册页将有
+助于理解, 实际上两者的用户接口是非常相似的.
+
+任何以tilde 开头的行都是tilde escape. 该行的第二个字符, 也
+就是紧跟在tilde 后面的, 就被解释作对mailto程序的一个特殊命
+令. mailto和mail所共有的简单tilde escape命令如下: 
+
+    ~? 显示tilde escape的帮助信息
+    ~! Shell escape (例如"~! ls")
+    ~~ 输入以tilde开头的文本行. tilde "引领"自身, 这样就可
+       以输入一个以tilde开头的文本行
+    ~. 发送邮件并退出
+    ~c 将其后内容加入到CC列表中(例如"~c nsb")
+    ~d 读入"~/dead.letter" 的内容(或者一个指定的文件, 例如
+       "~d filename")
+    ~e 用EDITOR环境变量所指定的编辑器编辑正在撰写的消息
+    ~h 编辑To, Subject, 以及CC信头
+    ~p 打印出到目前为止的消息所有内容
+    ~q 退出, 并将草稿存入~/dead.letter文件
+    ~r 将指定文件内容读入信件
+    ~s 重新设定subject信头
+    ~t 将其后内容加入到To列表
+    ~v 用VISUAL环境变量所指定的编辑器编辑正在撰写的消息
+    ~w 将正在撰写的消息写到指定文件(例如"~w filename")
+
+还可以在你的home目录下的".mailrc" 文件里加入命令, 以此在一
+定程度上控制mailto程序的行为. 这些命令包括为常用的邮件地址
+定义别名等. 详细内容可以参看本手册页后面以"MAILRC功能简介"
+命名的部分.
+
+.SH BERKELEY MAIL中缺少的增强功能
+
+mail与mailto的主要差别是后者可以生成MIME格式的增强邮件, 该
+格式是Internet下多媒体邮件格式的建议标准. 然而, mailto的意
+图是做成一个
+.I 非常简单
+的多媒体邮件生成器, 因而, 也就有很多
+事情是它所做不到的. 但是, 极度简单也正是它的优点, mailto还
+极其类似于众所周知的mail程序, 具有高度的可配置性. 我们将在
+下面描述mailto使用"mailcap" 文件进行配置的机制.
+
+mailto主要可以在邮件中包含下列内容: 
+
+1.  使用MIME的"text/richtext" 类型的简单格式化文本. 这使你
+可以在你的信件中用下划线, 粗体字, 斜体字(反相显示), 置中等
+诸如此类的手段来突出你的消息. 
+
+2.  非文本数据. Metamail可在任何邮件中包括图片, 声音, 以及
+其他非文本数据. mailcap配置机制甚至可使得该过程相当友好, 
+而一个很了解mailto的用户在没有设置适当的mailcap条目的情况
+下也可以将非文本数据包含在邮件里.
+
+3.  含有非ASCII 字符的文本, 如希伯来语或俄罗斯语等. 到目前
+mailto直接支持的只有ISO-8859-*系列的字符集, 这意味着它不能
+满足亚洲用户的要求. 但是, 不能用ISO-8859系列表达的语言仍然
+可以用非文本数据的方式包括在邮件里.
+
+下面将分三个小节讨论各自讨论这三个机制.
+
+.SH 复杂文本
+
+Mailto使你可以用一些简单而有效的方法修改你的文本格式. 就象
+处理其他事情一样, 这也可以用一些简单的tilde escape办到, 列
+表如下: 
+
+    ~b 开关粗体模式(开或关粗体模式)
+    ~i 开关斜体模式(开或关 斜体/反相显示 模式)
+    ~j 改变对齐模式, 特别有:
+        ~jc 将后面的文本置中
+        ~jl 左对齐随后的文本
+        ~jr 右对齐随后的文本
+    ~k 决定是否保留信件的"盲"复件.
+    ~n 强制换行(硬断行)
+    ~u 开关下划线模式(开或关下划线模式)
+    ~> 左边缘缩进
+    ~< 取消左边缘缩进
+    ~<R 右边缘缩进
+    ~>R 取消左边缘缩进
+    ~Q 开关引用模式
+    ~z 将~/.signature的内容加为文本签名
+
+部分内容或许需要解释一下. 粗体, 斜体以及下划线方式可以分别
+使用~b, ~i及~u来交替开关. 另外, 对齐可以简单地在居中, 左对
+齐以及右对齐三种方式中切换. 
+
+要理解"~n"命令, 首先要注意到复杂文本是自动对齐的, 这意味着
+你键入的换行符号只不过是空格符. 这使得文本可以在不同宽度的
+窗口都很好的展示.(例外的情况是当你键入了多个空行, 这时换行
+符就起作用了.)"~n"命令就可以强制换行. 要记住你可以在任何时
+候用"~p"命令来看看你的邮件象什么样子.  
+
+通过"~Q"来切换的引用模式用于格式化引用. 比如, 你打开引用模
+式, 插入了一个文件, 然后退出引用模式, 插入文件的内容就作为
+一个引用. 大多数的浏览器都以缩排方式和(或)"> "居先引领的方
+式显示引用, 以此和正文的其它部分区别开来
+
+最后要说的是, "~z"命令可将你的签名文件简单地包括进邮件, 但在
+格式上显示出它是签名. 大多数复杂文本浏览器都会以较小的字体
+显示签名, 或者将它和你信件的其他部分分开些距离. 
+
+.SH 包含多媒体对象
+
+在mailto邮件里插入多媒体对象的基本命令是"~*". 当你键入该命
+令时, 你会得到一个选项列表, 该列表依赖于你配置的不同而不同
+(至于怎么配置该列表稍候将有描述). 下面是一个例子:
+
+ Please choose which kind of data you wish to insert:
+
+ 0: A raw file, possibly binary, of no particular data type.
+ 1: Raw data from a file, with you specifying the content-type by hand.
+ 1: An audio clip
+ 2: Data in 'application/andrew-inset' format
+ 3: An X11 window image dump
+ 4: An interactive mail-based survey
+
+这些选项中只有头两个(即选项0和1)在所有站点的配置中都出现.
+
+如果你选择了选项0或1, 你会被要求给出含有你想要包括的数据的
+文件. (如果你输入一些以"|"开头的命令, 那么你所要包括的就是
+命令的输出而不是文件的内容.) 如果你选择选项1, 你将被要求给
+出正确的"content-type"名字以说明数据类型. "content-type"的
+值是按MIME标准定义的, 典型地都是类型/子类型对的格式, 分别
+描述粗略的数据类型及其详细格式. 例如, 一个GIF 格式的图片其
+content-type是"image/gif", 而一个简单 u-law 格式的音频夹其
+content-type是"audio/basic". 对于选项0, 通常所使用的类型是
+"application/octet-stream".要得到content-type域的完全文档,
+请查阅推荐标准MIME, RFC1341.
+
+更常见的情形是你所在的是一个配置得很好的站点, 这样你就无需
+了解任何有关content-type的东西----你选择的将是一个非零项. 
+在这些情况下, 会运行一个程序使你可以处理给定类型的数据. 该
+进程的用户接口这里不描述, 因为这些接口通常都是与站点相关的, 
+但这样的程序通常都设计得即使是新手也能很容易就搞定.
+
+mailto中另外一个用于包括多媒体对象的命令是"~z"命令. 该命令
+可以用于包括多媒体签名文件, 这些签名文件应该是完全MIME格式
+的文件, 其顶部有一个content-type头域. 
+
+.SH 用MAILCAP文件作配置
+  
+注意: 本部分是写给那些想要扩展mailto的能力, 使其能轻易包括
+新文件类型的用户. 在一个管理得很好的站点上用户是不太可能需
+要经常做这些的, 管理员应该已经替你做好了.
+
+要得到更完全的mailcap 机制的说明, 可以参考metamail(1) 的手
+册页. 这里只是简略给出mailcap 文件中与mailto程序配置相关的
+方面. 
+
+首先, mailto依靠一个搜索路径去寻找mailcap 文件(组), 以其内
+容为参考. 不象大多数的路径搜索, mailto总是读完它搜索路径中
+.I 所有的
+mailcap 文件. 这就是说, 它将一直遍历完所有mailcap 
+文件, 搜集所有的mailcap 条目. 缺省的搜索路径是
+
+$HOME/.mailcap:/etc/mailcap:/usr/etc/mailcap:/usr/local/etc/mailcap
+
+可以通过设置MAILCAPS环境变量来覆盖该设置. 要注意的是mailto
+实际上并不解释搜索路径中象$HOME这样的环境变量, 也不对"~"语
+法作解释. 
+
+mailcap 文件的语法非常简单, 至少与termcap 文件相比是这样. 
+以"#" 开头的行都被看作注释, 空的行被忽略. 此外, 每行单独对
+一个content type定义一个mailcap 条目. 当有很长的行的时候, 
+就放一个反斜杠字符\\ 在行末以续行. 
+
+每个mailcap 条目都包含有一个content-type说明, 以及一个在邮
+件被读取时执行的命令(典型是由metamail(1) 程序执行), 可能的
+话还有一个任选的"flag"集. mailto程序仅仅处理mailcap条目中
+"compose", "composetyped", "edit"这三个任选的flag及其组合.
+compose 标志为mailto指明处理给定格式数据的程序, 而edit标志
+通知mailto如何以给定格式编辑数据. 下面的mailcap 条目给出了
+处理和编辑音频数据的一个例子: 
+
+audio/basic; showaudio %s; compose=audiocompose %s; edit=audiocompose %s; description="An audio clip"
+
+"composetyped"标志很象compose,除了其输出假定是MIME格式, 还
+包括至少一个content-type, 如果必要的话, 还有一个content-
+transfer-encoding头域. 如果各种信息需要通过content-type中
+的参数转达的话, composetyped就是必不可少的了. 
+
+可选的"description"域用于组成mailto响应"~*"命令而打印出来
+的提示符, 排字程序使用该格式排组数据, 而编辑程序则使用该格
+式编辑数据. 在这两种情况的中的任一种, 任何"%s"的出现都会以
+要排组或要编辑的文件名替代. 如果在排字命令中没有"%s", 这实
+际上就等价于在排字命令的末尾附加"> %s". 
+
+请注意mailcap 文件中各项出现的顺序是极其严格的. metamail程
+序用第一个匹配的mailcap条目来
+.I 展示
+数据. 另一方面, 对
+.I 每个
+带有"compose" 命令的mailcap条目, mailto也给用户提供了一个
+替代方案. 但要注意到mailto使用了mailcap 条目的content-type
+来组成其content-type头. 因而, 排字和编辑命令在mailcap的通
+配条目中是无需指明的. 如果你有一个可以展示许多不同子类型的
+程序, 你可能要对基本类型的展示和排组分开做条目. 
+
+ image/*; showpicture %s
+ image/gif; showpicture %s; compose="xwd -frame | xwdtoppm | ppmtogif"; description="An X11 window image dump in GIF format"
+ image/x-xwd; showpicture %s; compose="xwd -frame"; description="An X11 window image dump in XWD format"
+
+要得到更多mailcap 文件的格式和语法信息, 请参考 metamail(1)
+手册页里的条目.
+
+.SH 非ASCII语言的文本
+Mailto为在邮件中使用非ASCII 字符集提供了初步的支持. 目前, 
+mailto支持ISO-8859系列的字符集, 这些字符集具有一个很好的特
+性, 就是它们都是ASCII的完全超集. 这就是说, 所有ISO-8859字
+符集的ASCII 字符都是一致的. 在其中任何一个字符集你都可以象
+通常一样使用所有ASCII字符. 
+
+但是mailto缺省认为你使用的是US-ASCII字符集, 而不允许包含非
+ASCII字符. 要想通知mailto你正在使用的终端或终端窗口可以支
+持ISO-8859字符集, 你可以使用-a开关或者MM-CHARSET环境变量. 
+例如, 键入 "mailto -a ISO-8859-8" 就可以通知mailto你的终端
+支持ISO-8859-8, ASCII+Hebrew字符集. 如果你是在一个确实支持
+该字符集的终端上,这就是你所要使用的方法. 如果你是在一个诸
+如X11之类的窗口系统上, 而你也需要确保你的终端模拟器使用的
+是正确的字体, 这样如果你有一个名为"heb6x13" 的字体, 就可以
+通过命令"xterm -fn heb6x13 -e mailto -a iso-8859-8" 打开一
+个兼容的xterm 和mailto来发送英语与希伯来语混杂的邮件. 通常
+应该使得所安装的字体具有和字符集一样的名字, 特别是在你使用
+shownonascii(1) 的时候.
+
+一旦你使mailto以正确的字符集开始, 有两个办法可以使其进入到
+非ASCII 字符集里. 第一个也是到目前为止最容易的一个, 就是使
+用标记了的键, 这要求你所在物理终端使用那些字符集中的一个. 
+然而, 如果你象大多数X11用户那样使用标准的ASCII键盘, 就需
+要一些别的办法来进入到非ASCII 字符里. mialto有一种八位模式
+来达成该任务.在八位模式里, 你键入的所有可打印字符都带有第八
+位, 这样就可以将它们转化成非ASCII 字符. 可以用tilde escape
+"~+"来进入八位模式, 而用"~-"离开. 要查看从你的键盘到八位模
+式字符的映射, 只要使用命令"~?+". 
+
+最后, ISO-8859系列支持的某些语言, 如希伯来语和阿拉伯语, 它
+们是从右到左而不是从左到右的顺序. 为了使文本编辑变得容易, 
+mailto设定了一种"从右到左"模式, 该模式可以用"~^"命令开关. 
+要更方便, 还可以用单独一个命令"~S"(Semitic模式)来同时开关
+从右到左和八位两个模式. 
+
+.SH TILDE ESCAPES总表
+
+为便于查阅, 这里列出了mailto程序中tilde escape的全部摘要: 
+
+    ~? 显示tilde escape的帮助信息
+    ~! Shell escape
+    ~~ 输入以一个tilde字符开头的文本行
+    ~. 发送邮件并退出
+    ~/ 设定最大报文, 超过该值报文就被分成多个部分
+    ~?+ 显示扩展(八位)字符的帮助信息
+    ~> 左边缘缩进
+    ~< 取消左边缘缩进
+    ~<R 右边缘缩进
+    ~>R 取消右边缘缩进
+    ~+ 为使用非ASCII字符而进入八位模式
+    ~- 退出八位模式(返回到ASCII)
+    ~^ 开关\"Upside-down\"(从右到左)模式.
+    ~* 将非文本数据(图片, 声音等.)加入为一个新的MIME部件
+       (try it!)
+    ~b 切换粗体模式
+    ~c 添加到CC列表中
+    ~d 从dead.letter(或指定的文件, ~d filename)中读取数据
+    ~e 编辑所撰写的消息
+    ~h 编辑邮件头部
+    ~i 开关斜体模式
+    ~j 变更对齐(~jc = 置中, ~jl = 左对齐, ~jr = 右对齐.)
+    ~n 强制换行(硬断行)
+    ~p 打印出到目前为止的信件所有内容
+    ~q 退出, 并将内容保存到dead.letter文件
+    ~Q 开关引用模式
+    ~r 将指定文件的内容读入信件
+    ~s 重新设定主题
+    ~S 开关Semitic模式(从右到左以及八位模式)
+    ~t 加入到To列表中
+    ~u 开关下划线模式
+    ~v 以可视化编辑器编辑
+    ~w 将消息写到指定的文件
+    ~z 将~/.signature的内容加做文本签名.
+    ~Z 将~/.signature的内容加做非文本(MIME格式)签名.
+
+.SH MAILRC功能简介
+
+Home目录下的.mailrc文件用于定制Berkeley mail程序. mailto
+程序也对其中部分定制信息敏感, 虽然不是全部. 特别地, 你可以
+使用.mailrc文件设置如下变量, 以影响mailto的行为 (通过"set
+变量名"或者"unset 变量名"): 
+
+   askcc      -- 控制是否征询CC列表
+   dot        -- 控制是否将单独一行的句号解释为邮件结束
+   ignore     -- 控制是否忽略断行
+   verbose    -- 控制/usr/lib/sendmail输出的冗余
+   quiet      -- 控制mailto程序输出的冗余
+   keepblind  -- 控制是否保留邮件的"盲"复件
+   commasonly -- 决定是否将空格符解释为邮件地址分隔符号. 
+                 为与BSD mail兼容, 缺省是这么解释空格的, 
+                 但commasonly选项使mailto可以更像一个现代
+                 的Inertnet mailer. 
+
+该文件还实现了的一个功能就是个人邮件别名. 比如, 你有一个朋
+友, 而他(她)有一个长得可怕的邮件地址, 你可以在你的.mailrc 
+文件里添加一行, 用一个比较简短友好的别名指向该地址: 
+
+   alias boygeorge  George.Herbert.Walker.Bush%white-house.uucp@nsf-relay.com
+
+mailto以与Berkeley mail 相兼容的方式来实现别名特色. 此外, 
+mailto还知道如何读取CMU's Andrew系统所使用的".AMS_aliases"
+别名文件. 这样Andrew的用户就不必为要同时使用Andrew和mailto
+而不得不维护两个不同的别名文件. 
+
+.SH 与BERKELEY MAIL的其他差异
+
+虽然mailto程序是以Berkeley mail为蓝本构建的, 它们的用户接
+口却不是毫无差别. 下面是除多媒体增强之外的其它主要差异, 习
+惯于Berkeley mail 程序的用户常常被这些差异弄糊涂. 
+
+.I 地址分隔: 
+Berkeley mail里的地址是以空格分隔的, 这被邮件
+用户们深恶痛绝. 为保持向后兼容性, mailto也保持了这一格式, 
+但是只要是正常的人就会用逗号来代替空格. 
+
+.I 换行语法:
+不像Berkeley mail, mailto里单个断行通常被看作
+是"软"的. 这意味着当接收者看到你的邮件的时候, 信件因为自动
+对齐看起来将是满满当当的. 直接的断行可以用"~n"命令添加, 而
+多个连续的断行符也可以得到理想的效果. 倒过来, 任何以空格或
+tab 字符开始的行都被看作以一个断行领先. 
+
+.I 包含dead.letter文件的内容:
+~d命令用于将"dead.letter"文件
+内容包含在当前邮件中. Mailto对该功能的实现与mail相比有两点
+不同: 首先, 信息是以封装形式而不是纯文本形式包含在邮件里. 
+虽然这有时有些不方便, 但它允许将多媒体dead.letter 文件完整
+地取回. 其次, mailto中的"~d"命令可以带一个参数, 就是用于取
+代缺省的"~/dead.letter" 文件的文件名. 
+
+.I 与Sun的版本不一致的地方:
+Sun Microsystems(毫无疑问许多
+别的厂商的版本是作者有所不熟识的)在几个地方增强了Berkeley 
+mail的命令, 而其中一些是与mailto不兼容的. 特别地, 至少Sun
+版本中的"~b", "~i", 及"~<"命令是与mailto中的命令不一致. 
+
+.I ~p失败的潜在可能: 
+在标准的Berkeley mail程序里, 难以想象
+"~p"命令竟然会失败. 在mailto里面, ~p依靠调用metamail(1)程
+序工作, 如果metamail没有列入用户搜索路径里, ~p将会失败. 
+
+.I 扩展别名搜索:
+mailto程序既象Berkeley mail一样读取.mailrc 
+文件中的别名, 也象CMU's Andrew消息报文系统一样读取
+.AMS_aliases文件中的别名. 
+
+.I 编辑行为的变化:
+~e和~v命令, 虽然都用于编辑消息, 但如果邮
+件中含有非文本部分的话, 它们在mailto中的行为是不一样的. 在
+这样的情形下, 各部分是按顺序分开编辑的, 这使得用户不可能在
+偶然的情况下弄乱各部分的界限. 此外, 如果一个对于给定数据类
+型的mailcap 条目包含有"edit"域, 用户会面临选择是以这里给定
+的程序编辑还是以通常的文本编辑器编辑. 大多数情况都是要选择
+使用一个结构化的编辑器或者选择编辑原始数据流.
+
+.I 大邮件行为的变化:
+Mailto用splitmail(1)程序来发送你的邮件. 
+当邮件较大的时候, 就被分成一系列遵循MIME的小文件, 这样MIME
+的读取器在收到邮件时就可以自动重组. 缺省是所有超过100K字节
+的邮件都被分裂, 但可以通过设置SPLITSIZE环境变量来控制.要了
+解更多信息, 可以参看splitmail(1)的手册页.
+
+.I 新的-r命令行选项:
+在标准Berkeley mail中是没有-r命令行选
+项的. 
+
+.SH SUMMARY OF OPTIONS选项总览
+-a <charset> -- 指明要使用的替代字符集. 最好是你的终端实际
+在用的. 目前必须是属于iso-8859字符集系列. 
+
+-c name -- 指明CC域的名字. 如果你想要包括多个名字, 就必须
+用引号把名字括起来, 比如 -c "name1, name2, name3".
+
+-r message-id -- 指明构造In-Reply-To头域所用message-id. 
+
+-s subject -- 指明邮件主题. 如果主题中包括空格, 必须用双引
+号括起来. 
+
+.SH 环境变量
+
+.TP 8
+.B MAILCAPS
+该变量用于覆盖mailcap 文件的缺省搜索路径. 
+.TP 8
+.B PAGER
+如果设置了该变量, 就取代"more"作为你的解释器的翻页
+程序名
+.TP 8
+.B MM_CHARSET
+该变量可以取代-a开关, 将你的终端或模拟终端上实现的
+非US-ASCII字符集通知mailto. 
+.TP 8
+.B TERM
+该变量将你的终端类型通知mailto. 再配合termcap(5)工
+具, 就可以确定如何在你的终端上实现粗体字符, 反相显
+示, 下划线等格式元素
+.TP 8
+.B EDITOR
+如果你以~e命令请求编辑你正在撰写的邮件, 该变量就指
+定mailto所使用的编辑工具. 
+.TP 8
+.B VISUAL
+如果你以~v命令请求编辑你正在撰写的邮件, 该变量就指
+定mailto所使用的可视化编辑工具
+.SH SEE ALSO
+metamail(1), mmencode(1), richtext(1), audiocompose(1), getfilename(1), mailto-hebrew(1), splitmail(1), shownonasci(1)
+.SH BUGS
+目前是用fgets取得所输入的每行内容, 一个较好的替代方案是让
+从右到左模式, 八位模式, 以及加边和对齐相关命令的效果能够即
+时体现. 如果能实现, 这将是一个巨大的改进. 
+
+虽然mailto程序是以Berkeley mail为蓝本构建的, 其用户接口却
+与之不尽相同. 上面以"与BERKELEY MAIL的其他差异"命名的部分
+有时也被人们视为这个"BUGS"部分的扩展. 
+
+.SH COPYRIGHT
+Copyright (c) 1992 Bell Communications Research, Inc. (Bellcore)
+
+Permission to use, copy, modify, and distribute this material 
+for any purpose and without fee is hereby granted, provided 
+that the above copyright notice and this permission notice 
+appear in all copies, and that the name of Bellcore not be 
+used in advertising or publicity pertaining to this 
+material without the specific, prior written permission 
+of an authorized representative of Bellcore.  BELLCORE 
+MAKES NO REPRESENTATIONS ABOUT THE ACCURACY OR SUITABILITY 
+OF THIS MATERIAL FOR ANY PURPOSE.  IT IS PROVIDED "AS IS", 
+WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+.SH AUTHOR
+Nathaniel S. Borenstein
+
+.SH "[中文版维护人]"
+.B mapping <mapping@263.net>
+./" 中文版维护请mailto: mapping@263.net
+.SH "[中文版最新更新]"
+.B 2003/11/22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

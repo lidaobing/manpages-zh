@@ -1,0 +1,99 @@
+.\" -*- nroff -*-
+.TH CHATTR 1 "1999年11月" "E2fsprogs version 1.18"
+.SH NAME(名称)
+chattr \- 修改文件在Linux第二扩展文件系统(E2fs)上的特有属性
+.SH SYNOPSIS(总览)
+.B chattr
+[
+.B \-RV
+]
+[
+.B \-v
+.I version
+]
+[
+.I mode
+]
+.I files...
+.SH DESCRIPTION(描述)
+.B chattr
+修改文件在Linux第二扩展文件系统(E2fs)上的特有属性
+.PP
+符号模式有+-=[ASacdisu]几种格式.
+.PP
+操作符`+'用来在文件已有属性的基础上增加选定的属性;
+`-'用来去掉文件上的选定的属性;而`='用来指定该文件的唯一属性.
+.PP
+字符`ASacdisu'用作文件新属性的选项:
+不更新atime(A),同步更新(S),只能添加(a),
+压缩(c),不可变(i),不可转移(d),删除保护(s)以及不可删除(u).
+.SH OPTIONS(选项)
+.TP
+.B \-R
+递归地修改目录以及其下内容的属性.
+如果在递归目录时遇到了符号链接,遍历将跳过.
+.TP
+.B \-V
+详尽地给出chattr的输出信息并打印出程序的版本.
+.TP
+.BI \-v " version"
+设置文件系统的版本.
+.SH ATTRIBUTES(属性)
+当修改设置了'A'属性的文件时,它的atime记录不会改变.
+这可以在笔记本电脑系统中避免某些磁盘I/O处理.
+.PP
+设置了`a'属性的文件只能在添加模式下打开用于写入.
+只有超级用户可以设置或清除该属性.
+.PP
+设置了`c'属性的文件在磁盘上由内核自动进行压缩处理.
+从该文件读取时返回的是未压缩的数据.
+对该文件的一次写入会在保存它们到磁盘之前进行数据压缩.
+.PP
+设置了`d'属性的文件不能对其运行
+.BR dump (8)
+程序进行备份.
+.PP
+设置了`i'属性的文件不能进行修改:你既不能删除它,
+也不能给它重新命名,你不能对该文件创建链接,
+而且也不能对该文件写入任何数据.
+只有超级用户可以设置或清除该属性.
+.PP
+当删除设置了`s'属性的文件时,将对其数据块清零
+并写回到磁盘上.
+.PP
+当修改设置了`S'属性的文件时,
+修改会同步写入到磁盘上;这与应用
+到文件子系统上的`sync'挂载选项有相同的效果.
+.PP
+当删除设置了`u'属性的文件时,
+将会保存其内容.
+这使得用户可以请求恢复被删除的文件.
+.PP
+.SH AUTHOR(作者)
+.B chattr
+的作者为Remy Card <card@masi.ibp.fr>,
+他是ext2 fs的开发和维护者.
+.SH BUGS AND LIMITATIONS(BUGS和局限性)
+对于ext2 fs 0.5a来说,`c'和`u'属性是不被
+内核代码所承认的.
+对于Linux 2.0内核而言,'A'属性也是不被
+内核代码所支持的.
+(noatime代码仍在测试中.)
+.PP
+这些属性将在未来的ext2 fs版本中实现.
+.SH AVAILABILITY(怎样获取)
+.B chattr
+是e2fsprogs包的一部分,
+你可以通过
+对tsx-11.mit.edu的匿名ftp访问在
+/pub/linux/packages/ext2fs下找到它.
+.SH SEE ALSO(另见)
+.BR lsattr (1)
+
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

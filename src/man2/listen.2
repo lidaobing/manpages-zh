@@ -1,0 +1,125 @@
+.\" Copyright (c) 1983, 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\" Modified Fri Jul 23 22:07:54 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified 950727 by aeb, following a suggestion by Urs Thuermann
+.\" <urs@isnogud.escape.de>
+.\" Modified Tue Oct 22 08:11:14 EDT 1996 by Eric S. Raymond <esr@thyrsus.com>
+.\" Modified 1998 by Andi Kleen
+.\" 中文版 Copyright (c) 2002 byeyear 和 www.linuxforum.net  
+.\"
+.TH LISTEN 2 "23 July 1993" "BSD Man Page" "Linux Programmer's Manual"
+.SH NAME 名称
+listen \- listen for connections on a socket 在一个套接字上倾听连接
+.SH SYNOPSIS 概述
+.B #include <sys/socket.h>
+.sp
+.BI "int listen(int " s ", int " backlog );
+.SH DESCRIPTION 描述
+在接收连接之前,首先要使用
+.BR socket (2)
+创建一个套接字,然后调用
+.BR listen
+使其能够自动接收到来的连接并且为连接队列指定一个长度限制.
+之后就可以使用
+.BR accept (2)
+接收连接.
+.B listen
+调用仅适用于
+.B SOCK_STREAM
+或者
+.BR SOCK_SEQPACKET
+类型的套接字.
+.PP
+参数
+.I backlog
+指定未完成连接队列的最大长度.如果一个连接请求到达时未完成连接
+队列已满,那么客户端将接收到错误
+.B ECONNREFUSED.
+或者,如果下层协议支持重发,那么这个连接请求将被忽略,这样客户端
+在重试的时候就有成功的机会.
+.SH NOTES 注意
+在TCP套接字中
+.I backlog 
+的含义在Linux 2.2中已经改变.
+它指定了已经完成连接正等待应用程序接收的套接字队列的长度,而不是
+未完成连接的数目.未完成连接套接字队列的最大长度可以使用
+.B tcp_max_syn_backlog
+sysctl设置
+当打开syncookies时不存在逻辑上的最大长度,此设置将被忽略.参见
+.BR tcp (7)
+以获取更多信息.
+
+.SH "RETURN VALUE" "返回值"
+函数执行成功时返回0.错误时返回\-1,并置相应错误代码.
+.I errno
+.SH ERRORS 错误
+.TP
+.B EBADF
+参数
+.I s
+不是合法的描述符.
+.TP
+.B ENOTSOCK
+参数
+.I s
+不是一个套接字.
+.TP
+.B EOPNOTSUPP
+套接字类型不支持
+.B listen 
+操作.
+.SH "CONFORMING TO" "兼容于"
+Single Unix, 4.4BSD, POSIX 1003.1g.
+.B listen
+函数调用最初出现于4.2BSD. 
+.SH BUGS 勘误
+如果套接字类型是 
+.BR AF_INET , 
+并且参数
+.I backlog
+大于常量 
+.B SOMAXCONN 
+(Linux 2.0&2.2中是128),它将被自动截断为
+.BR SOMAXCONN
+的值. 
+有的BSD系统(以及一些BSD扩展)将backlog值限制为5.
+.SH "SEE ALSO" "参见"
+.BR accept (2),
+.BR connect (2),
+.BR socket (2)
+
+.SH "[中文版维护人]"
+.B byeyear <love_my_love@263.net >
+.SH "[中文版最新更新]"
+.B 2002.01.27
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

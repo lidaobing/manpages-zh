@@ -1,0 +1,164 @@
+.\" 發信人: hendrix.bbs@bbs.mis.cycu.edu.tw (啾...), 信區: Linux
+.\" 標  題: printcap man page 中譯
+.\" 發信站: 中原資管森林站 (Sun Mar 30 16:55:48 1997)
+.\" 轉信站: cis_nctu!news.cis.nctu!news-peer.nctu!news.nctu!spring!News.csie.ncu!F
+.\" --
+.\" 
+.TH PRINTCAP 5  "UNIX Programmer's Manual"  "4.2 Berkeley Distribution"  "May 10, 1991"
+.SH NAME
+.B printcap - 打印机相容性数据库
+.SH "总览 SYNOPSIS"
+.B printcap
+.SH "描述 DESCRIPTION"
+.B Printcap 
+是 
+.B termcap(5) 
+的簡單版, 用來描述 line printers. 當用到 spool 系
+統時, 一定會去參考 printcap 這個檔. 允許動態地加入及刪除印表機. 在這資料
+庫中的每一段敘述代表一台印表機. 
+This data base may not be substituted for, as is possible for termcap, 
+because it may allow accounting to be bypassed.
+.PP
+預設的印表機是 lp, 雖然環境變數 PRINTER 可能優於(override)此. 每一
+個用到 spool 的軟體都支援 -p 的選項, 用以選擇印表機. 如果想知道如何為一
+台印表機設定資料的討論, 請參照 4.3 BSD Line Printer Spooler Manual.
+.SH "相容性 CAPABILITIES"
+根據 
+.BI termcap(5) 
+對檔案輸出的描述.
+.nf
+     Name       Type      Description
+     af         str       NULL                   name of accounting file
+     br         num       none                   if lp is a tty, set the baud
+                                                 rate (ioctl(2) call)
+     cf         str       NULL                   cifplot data filter
+     df         str       NULL                   tex data filter (DVI format)
+     fc         num       0                      if lp is a tty, clear flag 
+                                                 bits (sgtty.h)
+     ff         str       `\f'                   string to send for a form
+                                                 feed
+     fo         bool      false                  print a form feed when 
+                                                 device is opened
+     fs         num       0                      like `fc' but set bits
+     gf         str       NULL                   graph data filter (plot(3) 
+                                                 format)
+     hl         bool      false                  print the burst header page
+                                                 last
+     ic         bool      false                  driver supports(non standard)
+                                                 ioctl to indent printout
+     if         str       NULL                   name of text filter which 
+                                                 does accounting
+     lf         str       /dev/console           error logging file name
+     lo         str       lock                   name of lock file
+     lp         str       /dev/lp                device name to open for 
+                                                 output
+     mx         num       1000                   maximum file size (in BUFSIZ
+                                                 blocks), zero = unlimited
+     nd         str       NULL                   next directory for list of
+                                                 queues (unimplemented)
+     nf         str       NULL                   ditroff data filter (device
+                                                 independent troff)
+     of         str       NULL                   name of output filtering
+                                                 program
+     pc         num       200                    price per foot or page in
+                                                 hundredths of cents
+     pl         num       66                     page length (in lines)
+     pw         num       132                    page width (in characters)
+     px         num       0                      page width in pixels
+                                                 (horizontal)
+     py         num       0                      page length in pixels 
+                                                 (vertical)
+     rf         str       NULL                   filter for printing FORTRAN
+                                                 style text files
+     rg         str       NULL                   restricted group. Only
+                                              members of group allowed access
+     rm         str       NULL                   machine name for remote
+                                                 printer
+     rp         str       ``lp''                 remote printer name argument
+     rs         bool      false                  restrict remote users to
+                                                 those with local accounts
+     rw         bool      false                  open the printer device for
+                                                 reading and writing
+     sb         bool      false                  short banner (one line only)
+     sc         bool      false                  suppress multiple copies
+     sd         str       /var/spool/lpd         spool directory
+     sf         bool      false                  suppress form feeds
+     sh         bool      false                  suppress printing of burst
+                                                 page header
+     st         str       status                 status file name
+     tf         str       NULL                   troff data filter (cat
+                                                 phototypesetter)
+     tr         str       NULL                   trailer string to print when
+                                                 queue empties
+     vf         str       NULL                   raster image filter
+.fi
+.PP
+如果本地端印表機(local line printer) driver 支援 indentation 的話, daemon 將
+知道如何去用它.
+.SH "过滤器 FILTERS"
+.B lpd(8) 
+守护进程將創造出一個過濾的管線 (pipeline of filters) 來處理各個不同印
+表機的檔案. 過濾器將依照旗標來選擇將何者送到 
+.B lpr(1) . 
+管線的設定值有:
+.nf
+           p            pr | if regular text + pr(1)
+           none         If         regular text
+           c            cf         cifplot
+           d            df         DVI (tex)
+           g            gf         plot(3)
+           n            nf         ditroff
+           f            rf         Fortran
+           t            tf         troff
+           v            vf         raster image
+.fi
+.PP
+if 過濾器的用法是:
+.CS
+           if [-c] -wwidth -llength -iindent -n login -h host acct-file
+.CE
+.PP
+\fI-c\fP 這個旗標只有在 -l 旗標有列在 lpr 中時才可忽略. width 和 length 定義
+了 page 的長和寬 (from pw and pl respectively). -n 和 -h 可指定列印工作擁有者
+的 login name 和 host name. Acct-file 將忽略 printcap 中的描述. 
+.PP
+If no if is specified, of is used instead, with the distinction that of
+is opened only once, while if is opened for every individual job.  Thus,
+if is better suited to performing accounting.  The of is only given the
+width and length flags.
+.PP
+其它過濾器的呼叫用法如下:
+.CS
+           filter -xwidth -ylength -n login -h host acct-file
+.CE
+.PP
+如果要用 pixels 為單位來定長寬的話, 用 px 和 py 這二個變數.
+所有的過濾器都經由 stdin 輸入檔案, stdout 輸出到印表機, 用 stderr 或 
+.B syslog(3) 
+來記錄(log), 而且不會忽略 SIGINT. 
+.SH "日志 LOGGING"
+Error messages generated by the line printer programs themselves (that
+is, the lp*  programs) are logged by syslog(3) using the LPR facility.
+Messages printed on stderr of one of the filters are sent to the corre-
+sponding lf file.  The filters may, of course, use syslog themselves.
+.PP
+Error messages sent to the console have a carriage return and a line feed
+appended to them, rather than just a line feed.
+.SH "参见 SEE ALSO"
+termcap(5),  lpc(8),  lpd(8),  pac(8),  lpr(1),  lpq(1),  lprm(1)
+.br
+4.3 BSD Line Printer Spooler Manual.
+.SH "历史 HISTORY"
+The printcap file format appeared in 4.2BSD..
+
+.SH "[中文版维护人]"
+.B 中原資管森林站 <u8313115@mis.cycu.edu.tw>
+.\" --
+.\" 啾~~~  ^_^
+.\" u8313115@mis.cycu.edu.tw
+.\" http://140.135.137.1/~u8313115/
+.\" 中原資管森林站:140.135.137.11
+.SH "[中文版最新更新]"
+.B 1997.01.01
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

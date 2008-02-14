@@ -1,0 +1,189 @@
+.TH LOADKEYS 1 "09 Oct 1997" "Console tools" "Linux User's Manual"
+
+.SH NAME
+loadkeys \- 调入键盘翻译表
+
+.SH "总览 (SYNOPSIS)"
+.B loadkeys [
+.I \-d \-\-default
+.B ] [
+.I \-h \-\-help
+.B ] [
+.I \-q \-\-quiet
+.B ] [
+.I \-v \-\-verbose
+.B [
+.I \-v \-\-verbose
+.B ]...] [
+.I \-m \-\-mktable
+.B ] [
+.I \-c \-\-clearcompose
+.B ] [
+.I \-s \-\-clearstrings
+.B ] [ filename... ]
+
+.SH "描述 (DESCRIPTION)"
+.IX "loadkeys command" "" "\fLloadkeys\fR command"  
+
+.B Loadkeys
+读取 由
+.I filename...
+指定的 文件 内容.
+它的 主要目的 是 为 控制台 调入 内核键盘映射表(kernel keymap).
+
+.SH "设为缺省 (RESET TO DEFAULT)"
+如果 指定了
+.I -d
+(或
+.I --default
+) 选项,
+.B loadkeys
+调入 缺省的 键盘映射 文件 
+.I defkeymap.map,
+可能 在
+.I /usr/share/keymaps
+或
+.IR /usr/src/linux/drivers/char 
+目录 下. (前者 可能是 用户定义的, 而 后者 是 针对 PC 机 qwerty 键盘 的 映射 
+\- 也许 你 不需要.) 某些情况下, 如果 遇上 奇怪的 键盘映射 (把 减号 '\-' 
+弄成了 某种 陌生的 修饰组合), 你 只要 轻松的 键入 `loadkeys defkeymap' 就
+可以了.
+
+(译注: qwerty 是一种常用的 PC 键盘布局, 由 键盘 字母区 左上角 的 连续
+横向 六个 字母键 得名)
+
+.SH "调入内核键盘映射 (KERNEL KEYMAP)"
+.B loadkeys
+的 主要作用 是 调入 或 修改 键盘驱动程序 的 翻译表.
+当 指出了 文件名 的 时候, 标准输入 用 短横线(\-) 表示. 如果 没有
+指出 文件名, loadkeys 就 从 标准输入 读取 数据.
+.LP
+对于 许多 国家 和 各种 键盘类型, 系统 已经 提供了 对应的 键盘映射表,
+只需 用一条 诸如 `loadkeys uk' 的 命令 就可以 满足 需要. 而且 很容易
+设计 自己的 键盘映射表. 用户 必须 识别 哪些 符号 属于 哪些 键.
+可以 用
+.BR showkey (1)
+命令 查出 键值(keycode), 手册页
+.BR keymaps (5)
+对 键盘映射表 格式 做了 说明, 也可以 参考
+.BR dumpkeys (1)
+命令 输出 的 内容.
+
+.SH "调入内核 ACCENT 表"
+如果 输入文件 没有 定义 任何 组合键(compose key), 内核 accent 表 就 
+保持 不变, 除非 使用了
+.I -c
+(或
+.I --clearcompose
+) 选项, 此时 内核 accent 表 被 清空. 如果 输入文件 定义了 组合键,
+那么 清除 原有 定义, 换成 新的 定义. 内核 accent 表 是 一组 表项
+(缺省为 68 项), 用来 描述 区分符(dead diacritical sign) 和 组合键 怎么 工作.
+例如, 这行
+.LP
+.RS
+compose ',' 'c' to ccedilla
+.RE
+.LP
+表示 <ComposeKey><,><c> 组合 产生 <ccedilla>.
+使用 命令 `dumpkeys \-\-compose\-only' 能够 查看 当前 accent 表.
+
+(译注: Compose 键 可以 用 dumpkeys 命令 查出, 我的 系统上 是 ctrl+句号,
+因此 相继 按下 'ctrl-.', ',', 'c' 就可以 产生 上述的 'ccedilla'.)
+
+.SH "调入内核字符串表 (KERNEL STRING TABLE)"
+选项
+.I -s
+(或
+.I --clearstrings
+) 用于 清除 内核字符串表. 如果 不使用 这个 选项,
+.B loadkeys
+只会 添加 或 调换 字符串, 而不是 清除 它们.
+(因而 需要 选项 \-s 实现 友好定义 状态.)
+内核字符串表 是 一组 命名 字符串, 就象 F31. 例如, 你 可以 使 功能键 F5
+(普通 PC 键盘上 有) 产生 字符串 `Hello!', 使 Shift+F5 产生 `Goodbye!':
+.LP
+.RS
+keycode 63 = F70 F71
+.br
+string F70 = "Hello!"
+.br
+string F71 = "Goodbye!"
+.RE
+.LP
+把 这三行 加进 键盘映射表 即可. 缺省的 功能键 定义 大多是
+来自 VT100 终端 的 转码序列 (escape sequence).
+
+.SH "创建内核源文件表 (KERNEL SOURCE TABLE)"
+如果 给出了
+.I -m
+(或
+.I --mktable
+) 选项, 
+.B loadkeys
+在 标准输出 产生 一个文件, 可以 用做
+.I /usr/src/linux\%/drivers\%/char\%/defkeymap.c,
+它 定义了 内核的 缺省 键盘编联 (但 不影响 当前 键盘映射).
+
+.SH "选项 (OPTION)"
+.TP
+.I \-h \-\-help
+在 标准错误 上 显示 版本号 和 简短 的 用法, 然后 结束.
+
+.TP
+.I \-v \-\-verbose
+显示 更新 细节, 用的越多, 细节越细.
+
+.TP
+.I \-q \-\-quiet
+不要 显示 一般信息.
+
+.TP
+.I \-c \-\-clearcompose
+清除 内核的 组合键表 (就是 accent 表). 如果 没有 使用 这个选项, 而且
+输入文件 没有 定义 组合键, 内核组合键表 保持 不变.
+
+.TP
+.I \-s  \-\-clearstrings
+清除 内核的 字符串表. 如果 没有 使用 这个选项,
+.B loadkeys
+将 添加 或 调换 字符串, 而不是 删除 它们.
+
+.SH "文件 (FILE)"
+.I /usr/lib/kbd/keymaps/
+键盘映射文件 的 缺省目录.
+
+.I /usr/lib/kbd/keymaps/defkeymap.kmap
+用
+.I \-d
+选项 调入的 缺省 键盘映射文件.
+(译注: 对于 比较 新的 系统 请查看 /usr/lib/kbd/keymaps/i386/qwerty/, 注意 
+这里 最后面的 两个 目录, 前者 是 系统平台, 后者 是 键盘类型)
+
+.SH BUGS
+任何人 只要有 对
+.I /dev/console
+的 读访问权 就能够 运行
+.B loadkeys ,
+从而 改变 键盘布局, 使 它 可能 无法使用. 键盘翻译表 由 所有 虚拟控制台
+共用, 所以 任何 对 键盘编联 的 改变 会 同时 影响 所有的 虚拟控制台.
+
+注意, 由于 改变 能够 影响 所有的 虚拟控制台, 因此 它 比 用户的 会话期 更长.
+这意味着 即使 在 登录 提示 阶段, 键值编联 也会 影响 用户 的 使用.
+
+缺省的 键盘映射 应该 编译在 内核中. (
+.IR /usr/src/linux/drivers/char/defkeymap.c
+).
+
+.SH "另见 (SEE ALSO)"
+.BR dumpkeys (1),
+.BR kbd_mode (1),
+.BR keymaps (5).
+
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

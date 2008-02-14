@@ -1,0 +1,104 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Copyright 王炎,BitBIRD,Scorpio,www.linuxforum.net 2000.
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH DF 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+df \- 报告文件系统磁盘空间的使用情况
+.SH 总览
+.BI "df [" OPTION "]... ["FILE]...
+.sp
+POSIX 选项:
+.B [\-kP]
+.sp
+GNU 选项 (最短方式):
+.B [\-ahHiklmPv]
+.BI "[\-t " fstype ]
+.BI "[\-x " fstype ]
+.BI "[\-\-block\-size=" size ]
+.B [\-\-print\-type]
+.B [\-\-no\-sync]
+.B [\-\-sync]
+.B "[\-\-help] [\-\-version] [\-\-]"
+.SH 描述
+此手册页文档是df的GNU版本.
+df命令列出指定的每一个文件名所在的文件系统上可用磁盘空间的数量。
+如果没有指定文件名,则显示当前所有使用中的文件系统.缺省设置时,
+磁盘空间以1K为一块显示,如果环境变量POSIXLY_CORRECT已设
+置,则采用512字节为一块显示.
+如果参数是一个包含已使用文件系统的磁盘设备名,
+df命令显示出的是该文件系统的可用空间,而非包含设备结点的文件系
+统(只能是根文件系统).此版本的df不能显示未使用文件系统的可用空
+间,这是由于大多数系统在响应这样的请求时必须很清楚该文件系统的
+结构.
+
+
+.SH GNU 参数说明
+
+.TP
+.B "\-a, \-\-all"
+列出包括BLOCK为0的文件系统
+.TP
+.B "\-\-block\-size=SIZE use SIZE\-byte blocks"
+指定块的大小
+.TP
+.B \-h,\--huma\-readable"
+用常见的格式显示出大小(例如:1K 234M 2G)
+.TP
+.B \-H,\--si"
+同上,但是这里的1k等于1000字节而不是1024字节
+.TP
+.B "\-i, \-\-inodes"
+用信息索引点代替块表示使用状况
+
+.TP
+.B "\-k, \-\-kilobytes"
+指定块大小等于1024字节来显示使用状况
+.TP
+.B "\-l, \-\-local"
+只显示本地文件系统使用状况
+.TP
+.B "\-m, \-\-megabytes"
+以指定块大小等于1048576字节(1M)来显示使用状况
+.TP
+.B "\-\-no\-sync"
+在取得使用信息前禁止调用同步
+(default)
+.TP
+.B "\-P, \-\-portability"
+使用POSIX格式输出
+.TP
+.B "\-\-sync"
+在取得使用信息前调用同步
+.TP
+.B "\-t, \-\-type=TYPE"
+只显示指定类型(TYPE)的文件系统
+.TP
+.B "\-T, \-\-print\-type"
+输出每个文件系统的类型
+.TP
+.B "\-x, \-\-exclude\-type=TYPE"
+只显示指定类型(TYPE)之外的文件系统.
+.TP
+.B "\-v" (忽略)
+.TP
+.B "\-\-"
+输出该命令的帮助信息并退出
+.TP
+.B "\-\-version"
+输出版本信息并退出
+
+.SH 作者
+由 Torbjorn Granlund, David MacKenzie, Larry
+McVoy, 和 Paul Eggert 写作．
+.SH 错误报告
+将错误发到<bu\-fileutils@gnu.org>
+
+.SH "[中文版维护人]"
+.B 王炎 <wyd@263.net>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,34 @@
+.TH CHVT 1 "1997年10月7日" "控制台工具" "Linux用户手册"
+
+.SH NAME(名称)
+chvt \- 修改虚拟终端的前台环境
+
+.SH SYNOPSIS(总览)
+.BI chvt N
+
+.SH DESCRIPTION(描述)
+.B chvt
+.I N
+命令用来生成
+.RI /dev/tty N
+的前台终端.如果它本来不存在,即创建相应的屏幕.为了删除掉
+不用的VT(虚拟终端),可使用
+.BR deallocvt (1).
+键映射操作
+.RI `Console_ N '
+(通常绑定为键组合
+.RI (Ctrl\-)LeftAlt\-F N ,
+.I N
+在1-12的范围里取值,
+而
+.RI RightAlt\-F N\-12
+中的
+.I N 
+则在13-24的范围里取值)也允许切换到其它的VT,不过实际的切换
+只能在它已经分配的前提下进行.这防止了分配给新的VT一个错位
+的键值.
+
+.SH "SEE ALSO"(另见)
+
+.BR deallocvt (1).
+

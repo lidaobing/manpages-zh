@@ -1,0 +1,187 @@
+.TH ROUTE 8 "2 January 2000" "net-tools" "Linux Programmer's Manual"
+.SH NAME
+.B route - 显示 / 操作IP选路表
+
+.SH 总览 SYNOPSIS
+\fBroute\fR [-CFvnee]
+
+\fBroute\fR  [-v]  [-A	 family] add [-net|-host] target [netmask Nm] [gw Gw] [metric N] [mss M] [window W] [irtt  I][reject] [mod] [dyn] [reinstate] [[dev] If]
+
+\fBroute\fR  [-v]  [-A	 family]  del [-net|-host] target [gw Gw][netmask Nm] [metric N] [[dev] If]
+
+\fBroute\fR  [-V] [--version] [-h] [--help]
+
+.SH 描述 DESCRIPTION
+route程序对内核的IP选路表进行操作。它主要用于通过已用ifconfig(8)程序配置好的接口来指定的主机或网络设置静态路由。
+
+.SH 选项 OPTIONS
+.TP
+-v     
+选用细节操作模式
+.TP
+-A family
+用指定的地址族(如`inet'，`inet6')。
+.TP
+-n     
+以数字形式代替解释主机名形式来显示地址。此项对试图检测对域名服务器进行路由发生故障的原因非常有用。
+.TP
+-e     
+用netstat(8)的格式来显示选路表。-ee将产生包括选路表所有参数在内的大量信息。
+.TP
+-net   
+路由目标为网络。
+.TP
+-host  
+路由目标为主机。
+.TP
+-F     
+显示内核的FIB选路表。其格式可以用-e 和 -ee选项改变。
+.TP
+-C     
+显示内核的路由缓存。
+.TP
+del    
+删除一条路由。
+.TP
+add    
+添加一条路由。
+.TP
+target 
+指定目标网络或主机。可以用点分十进制形式的IP地址或主机/网络名。
+.TP
+netmask Nm
+为添加的路由指定网络掩码。
+.TP
+gw Gw  
+为发往目标网络/主机的任何分组指定网关。注意：指定的网关首先必须是可达的。也就是说必须为该网关预先指定一条静态路由。如果你为本地接口之一指定这个网关地址的话，那么此网关地址将用于决定此接口上的分组将如何进行路由。这是BSD风格所兼容的。
+.TP
+metric M
+把选路表中的路由值字段(由选路进程使用)设为M。
+.TP
+mss M  
+把基于此路由之上的连接的TCP最大报文段长度设为M字节。这通常只用于优化选路设置。默认值为536。
+.TP
+window W
+把基于此路由之上的连接的TCP窗口长度设为W字节。这通常只用于AX.25网络和不能处理背对背形式的帧的设备。
+.TP
+irtt I 
+把基于此路由之上的TCP连接的初始往返时间设为I毫秒(1-12000)。这通常也只用于AX.25网络。如果省略此选项，则使用RFC1122的缺省值300ms。
+.TP
+reject 
+设置一条阻塞路由以使一条路由查找失败。这用于在使用缺省路由前先屏蔽掉一些网络。但这并不起到防火墙的作用。
+.TP
+mod, dyn, reinstate
+设置一条动态的或更改过的路由。这些标志通常只由选路进程来设置。这只用于诊断目的，
+.TP
+dev If 
+强制使路由与指定的设备关联，因为否则内核会自己来试图检测相应的设备(通常检查已存在的路由和加入路由的设备的规格)。在多数正常的网络上无需使用。
+
+如果dev If是命令行上最后一个指定的选项，那么可以省略关键字dev，因为它是缺省值。否则路由修改对象(metric - netmask- gw - dev)无关紧要。
+.SH 范例 EXAMPLES
+.TP
+route add -net 127.0.0.0
+加入正常的环回接口项，它使用掩码255.0.0.0(由目标地址决定了它是A类网络)并与设备"lo"相关联(假定该设备先前已由ifconfig(8)正确设置)。
+.TP
+route add -net 192.56.76.0 netmask 255.255.255.0 dev eth0
+向"eth0"添加一条指向网络192.56.76.x的路由。其中的C类子网掩码并不必须，因为192.*是个C类的IP地址。在此关键字"dev"可省略。
+.TP
+route add default gw mango-gw
+加入一条缺省路由(如果无法匹配其它路由则用它)。使用此路由的所有分组将通过网关"mango-gw"进行传输。实际使用此路由的设备取决于如何到达"mango-gw" - 先前必须设好到"mango-gw"的静态路由。
+.TP
+route add ipx4 sl0
+向SLIP接口添加一条指向"ipx4"的路由(假定"ipx4"是使用SLIP的主机)。
+.TP
+route add -net 192.57.66.0 netmask 255.255.255.0 gw ipx4
+此命令为先前SLIP接口的网关ipx4添加到网络"192.57.66.x"的路由。
+.TP
+route add 224.0.0.0 netmask 240.0.0.0 dev eth0
+此命令为"eth0"设定所有D类地址(用于组播)的路由。这是用于组播内核的正确配置行。
+.TP
+route add 10.0.0.0 netmask 255.0.0.0 reject
+此命令为私有网络"10.x.x.x."设置一条阻塞路由。
+
+.SH 输出信息 OUTPUT
+内核选路表的输出信息由以下栏目组成：
+.TP
+Destination
+目标网络或目标主机。
+.TP
+Gateway
+网关地址或'*'(如未设)。
+.TP
+Genmask
+目标网络的子网掩码；'255.255.255.255'为主机，'0.0.0.0'为缺省路由。
+.TP
+Flags  
+可能出现的标志有：
+.br
+U (route is up)
+路由正常
+.br
+H (target is a host)
+主机路由
+.br
+G (use gateway)
+使用网关的间接路由
+.br
+R (reinstate route for dynamic routing)
+为动态选路恢复路由
+.br
+D (dynamically installed by daemon or redirect)
+该路由由选路进程或重定向动态创建
+.br
+M (modified from routing daemon or rederict)
+该路由已由选路进程或重定向修改
+.br
+! (reject route)
+阻塞路由
+.TP
+Metric 
+通向目标的距离(通常以跳来计算)。新内核不使用此概念，而选路进程可能会用。
+.TP
+Ref    
+使用此路由的活动进程个数(Linux内核并不使用)。
+.TP
+Use    
+查找此路由的次数。根据-F  和 -C的使用，此数值是路由缓存的损失数或采样数。
+.TP
+Iface  
+使用此路由发送分组的接口。
+.TP
+MSS    
+基于此路由的TCP连接的缺省最大报文段长度。
+.TP
+Window 
+基于此路由的TCP连接的缺省窗口长度。
+.TP
+irtt   
+初始往返时间。内核用它来猜测最佳TCP协议参数而无须等待(可能很慢的)应答。
+.TP
+HH (cached only)
+为缓存过的路由而访问硬件报头缓存的ARP记录和缓存路由的数量。如果缓存过路由的接口(如lo)无须硬件地址则值为-1。
+.TP
+Arp (cached only)
+无论缓存路由所用的硬件地址情况如何都进行更新。
+
+.SH 文件 FILES
+.B  /proc/net/ipv6_route
+.br
+.B /proc/net/route
+.br
+.B /proc/net/rt_cache
+.br
+.SH 参见SEE ALSO
+.B ifconfig(8), netstat(8), arp(8), rarp(8)
+
+.SH 历史 HISTORY
+Linux所用的route程序最初由Fred	 N.   van Kempen <waltje@uwalt.nl.mugnet.org>开发，并由Johannes Stille 和Linus  Torvalds对pl15进行修改。Alan  Cox为Linux 1.1.22加入了mss 和 window选项。对irtt的支持和与netstat的合并来自BerndEckenfels的工作。
+
+.SH 作者 AUTHOR
+当前由Phil Blundell <Philip.Blundell@pobox.com>维护。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2001/02/24
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

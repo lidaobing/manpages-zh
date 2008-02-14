@@ -1,0 +1,156 @@
+.\" -*- nroff -*-
+.\" Copyright (C) 1998, 1999, 2001 Thorsten Kukuk
+.\" This file is part of the yp-tools.
+.\" Author: Thorsten Kukuk <kukuk@suse.de>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License version 2 as
+.\"  published by the Free Software Foundation.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software Foundation,
+.\" Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"
+.TH yppasswd 1 "May 1998" "YP Tools 2.8"
+.SH NAME
+yppasswd, ypchfn, ypchsh \- change your password in the NIS database
+.SH SYNOPSIS
+.B "yppasswd [-f] [-l] [-p] [user]"
+.br
+.B "ypchfn [user]"
+.br
+.B "ypchsh [user]"
+.SH DESCRIPTION
+The standard
+.BR passwd (1),
+.BR chfn (1)
+and
+.BR chsh (1)
+cannot be used under Linux to change the users NIS password, shell and GECOS
+information, because they only modify the password file on the local host.
+For changing the NIS information, they are replaced by their NIS
+counterparts,
+.BR yppasswd ,
+.B ypchfn
+and
+.BR ypchsh .
+.P
+These commands are the same program, linked to different names.
+Using the command line switches, you can choose whether to update your
+password
+.BR \-p ,
+your login shell
+.BR \-l ,
+or your GECOS field
+.BR \-f ,
+or a combination of them.
+.B yppasswd
+implies the
+.B \-p
+option, if no other option is given. If you use the
+.B \-f
+or
+.B \-l
+option, you also need to add the
+.B \-p
+flag.
+.B ypchfn
+implies the
+.B \-f
+option, and
+.B ypchsh
+.BR \-l .
+.P
+When invoked without the
+.I user
+argument, the account information for the invoking user will be updated,
+otherwise that of
+.I user
+will be updated. This option is only available to the super-user. If the
+yppasswdd daemon on the server supports it, you can give the root password
+of the server instead of the users [old] password.
+.P
+All tools will first prompt the user for the current NIS password needed
+for authentication with the
+.BR yppasswdd (8)
+daemon. Subsequently, the
+program prompts for the updated information:
+.\"
+.\"
+.IP "\fByppasswd\fP or \fB-l\fP"
+Change the user's NIS password.	The user is prompted for the new password.
+While typing the password, echoing is turned off, so the password does not
+appear on the screen. An empty password is rejected, as are passwords shorter
+than six characters. The user will then be requested to retype the
+password to make sure it wasn't	misspelled the first time.
+.\"
+.\"
+.IP "\fBypchsh\fP or \fB-l\fP"
+Change the user's login shell. The user is prompted for a new shell,
+offering the old one as default:
+.IP
+.in +2n
+.ft B
+.nf
+Login shell [/bin/sh]: _
+.fi
+.ft
+.in
+.IP
+To accept the default, simply press return. To clear the shell field in
+your
+.BR passwd (5)
+file entry (so that the system's default shell is selected),
+enter the string
+.IR none .
+.\"
+.\"
+.IP "\fBypchfn\fP or \fB-f\fP"
+Change the user's full name and related information. Traditionally, some
+applications expect the GECOS field (field 4) of the
+.BR passwd (5)
+file to
+contain the user's real name (as opposed to the login name) plus some
+additional information like the office phone number. This information is
+displayed by
+.BR finger (1)
+and probably some other tools, too.
+.IP
+When setting the full name,
+.B ypchfn
+displays the following prompts, with the defaults in brackets:
+.IP
+.in +2n
+.ft B
+.nf
+Name [Joe Doe]:
+Location [2nd floor, bldg 34]:
+Office Phone [12345]:
+Home Phone []:
+.fi
+.ft
+.in
+.IP
+To accept a default, simply press return. To clear a field, enter the string
+.IR none .
+.SH SEE ALSO
+.BR chfn (1),
+.BR chsh (1),
+.BR finger (1),
+.BR passwd (5),
+.BR passwd (1),
+.BR ypcat (1),
+.BR yppasswdd (8),
+.BR ypserv (8),
+.BR ypwhich (1)
+.LP
+.SH AUTHOR
+.B yppasswd
+is part of the
+.B yp-tools
+package, which was written by Thorsten Kukuk <kukuk@suse.de>.

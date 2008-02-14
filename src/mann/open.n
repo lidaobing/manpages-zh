@@ -1,0 +1,436 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: open.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: open.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH open n 7.6 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+open \- 打开基于文件或命令管道的一个通道
+.SH "总览 SYNOPSIS"
+.sp
+\fBopen \fIfileName\fR
+.br
+\fBopen \fIfileName access\fR
+.br
+\fBopen \fIfileName access permissions\fR
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+.VS
+这个命令打开一个文件、串行端口、或命令管道并返回一个
+.VE
+通道标识符用于将来被命令如 \fBread\fR、\fBputs\fR、和\fBclose \fR调用。如果 \fIfileName\fR 的第一个字符不是“|”则命令打开一个文件: \fIfileName\fR 给出要打开的文件的名字，并且它必须符合在 \fBfilename\fR 手册条目中描述的规范。
+.PP
+如果存在 \fIaccess\fR 参数，则它指示以何种方式访问文件(或命令管道)。在第一种形式下 \fIaccess\fR 可以是下列值:
+.TP 15
+\fBr\fR
+为只读而打开文件；文件必须已经存在。如果未指定 \fIaccess\fR     则这个值是缺省值。
+.TP 15
+\fBr+\fR
+为读写而打开文件；文件必须已经存在。
+.TP 15
+\fBw\fR
+为只写而打开文件。如果文件已经存在则截断(truncate)它，如果文件不存在则建立一个新文件。
+.TP 15
+\fBw+\fR
+为读写而打开文件。如果文件已经存在则截断(truncate)它，如果文件不存在则建立一个新文件。
+.TP 15
+\fBa\fR
+为只读而打开文件。如果文件不存在，则建立一个新的空文件。设置初始访问位置为文件的结束处。
+.TP 15
+\fBa+\fR
+为读写而打开文件。如果文件不存在，则建立一个新的空文件。设置初始访问位置为文件的结束处。
+.PP
+在第二种形式下，\fIaccess\fR 由某些下列标志的一个列表构成，所有这些都有标准的 POSIX 意义。 必须有一个标志是 \fBRDONLY\fR、\fBWRONLY\fR 或 \fBRDWR\fR 中的一个。
+.TP 15
+\fBRDONLY\fR
+为只读而打开文件。
+.TP 15
+\fBWRONLY\fR
+为只写而打开文件。
+.TP 15
+\fBRDWR\fR
+为读写而打开文件。
+.TP 15
+\fBAPPEND\fR
+在每次写之前把指针设置到文件的结束处。
+.TP 15
+\fBCREAT\fR
+如果文件不存在则建立这个文件(如果没有这个标志，在文件不存在时返回一个错误)。
+.TP 15
+\fBEXCL\fR
+如果还指定了 \fBCREAT\fR，如果文件已经存在则返回一个错误。
+.TP 15
+\fBNOCTTY\fR
+如果文件是一个终端设备，这个标志防止这个文件成为这个进程的控制终端。
+.TP 15
+\fBNONBLOCK\fR
+在打开文件和可能的后续 I/O 
+    操作期间防止过程阻塞。这个标志的真实行为是依赖于系统的和依赖于设备的；不鼓励使用它(更好是使用     \fBfconfigure\fR     命令来使一个文件进入非阻塞模式)。详情参见你的系统文档中的  \fBopen\fR 系统调用的 \fBO_NONBLOCK\fR 标志。
+.TP 15
+\fBTRUNC\fR
+如果文件存在则截断其为零长度。
+.PP
+如果作为打开过程的一部分而建立了一个新文件，使用 \fIpermissions\fR (一个整数)并联合进程的文件模式建立掩码为新文件设置权限。\fIPermissions\fR 缺省为 0666。
+.PP
+'\" Not versioned as advice applies to all recent versions of Tcl.
+'\" Prior to that, Tcl didn't really support binary files anyway...
+.VS
+Note that if you are going to be reading or writing binary data from
+the channel created by this command, you should use the
+\fBfconfigure\fR command to change the \fB-translation\fR option of
+the channel to \fBbinary\fR before transferring any binary data.  This
+is in contrast to the ``b'' character passed as part of the equivalent
+of the \fIaccess\fR parameter to some versions of the C library
+\fIfopen()\fR function.
+.VE
+.SH "命令管道 COMMAND PIPELINES"
+.PP
+如果 \fIfileName\fR is 的第一个字符是“|”，则把 \fIfileName\fR 的余下的字符被作为描述要调用的一个命令管道的参数的一个列表来对待，与 \fBexec \fR对待参数的方式相同。在这种情况下，依赖于 access 的值，使用由 \fBopen\fR 返回的通道标识符来向这个命令的输入管道写或从它的输出管道读。如果使用了只写访问(例如， \fIaccess\fR 是 \fBw\fR)，则除非被这个命令所屏弃(override)，这个(命令)管道的标准输出被定向到当前的标准输出上。如果使用了只读访问(例如，\fIaccess\fR 是 \fBr\fR)，则除非被这个命令所屏弃(override)，这个(命令)管道的标准输入接受当前的标准输入。
+.PP
+译注
+.CS
+打开用来写的命令管道
+
+                    Tcl     ==>   Pipeline  ==>   command
+
++--------+       +--------+      +--------+      +--------+
+| stdin  |<------+ stdin  |  +-->| pipein |   +--+ stdin  |
++--------+       +--------+  |   +--------+   |  +--------+
+| stdout |<--+---+ stdout |  |   | pipeout|<--+  | stdout +--+
++--------+   |   +--------+  |   +--------+      +--------+  |
+             |   | stderr |  |                   | stderr |  |
+             |   +--------+  |                   +--------+  |
+             |   | channel+--+                               |
+             |   +--------+                                  |
+             +-----------------------------------------------+
+
+
+打开一个用来读的命令管道
+
+             +-----------------------------------------------+
+             |                                               |
++--------+   |   +--------+      +--------+      +--------+  |
+| stdin  |<--+---+ stdin  |      | pipein |<--+  | stdin  +--+
++--------+       +--------+      +--------+   |  +--------+
+| stdout |<------+ stdout |  +-->| pipeout|   +--+ stdout |
++--------+       +--------+  |   +--------+      +--------+
+                 | stderr |  |                   | stderr |
+                 +--------+  |                   +--------+
+                 | channel+--+
+                 +--------+
+                    Tcl     <==    Pipeline  <==  command
+
+.CE
+.SH "串行通信 SERIAL COMMUNICATIONS"
+.VS
+.PP
+如果 \fIfileName\fR 参照一个串行端口，则打开特定的串行端口并以依赖于平台的方式初始化。给 \fIfileName\fR 用以打开一个串行端口的可接受的值在移植要点中描述。
+
+.SH "配置选项 CONFIGURATION OPTIONS"
+使用 \fBfconfigure\fR 命令来为打开的串行端口查询和设置下列选项:
+.TP
+\fB\-mode \fIbaud\fB,\fIparity\fB,\fIdata\fB,\fIstop\fR
+.
+这个选项是由逗号分隔的四个值的一个集合:     这个串行端口的波特(baud)率、奇偶校验(parity)、数据位数、和停止位。\fIbaud\fR     率是指定连接速度的一个简单整数。\fIParity\fR     是下列字母之一: \fBn\fR、\fBo\fR、\fBe\fR、\fBm\fR、\fBs\fR；分别表示奇偶校验选项“none”、“odd”、“even”、“mark”、或“space”。\fIData\fR     是数据位数，应当是从 5 到 8 中的一个整数，而 \fIstop\fR     是停止位的数目，应当是整数 1 或 2。
+.TP
+\fB\-pollinterval \fImsec\fR
+.
+只在 Windows     上串行端口能获得这个选项，它被用来设置文件事件轮询(poll)之间的最大时间。这影响整个     Tcl 解释器检查事件中间的时间间隔(总是采用最小的值)。只有在你想要使轮询这个串行端口的时间间隔小于     10 msec (缺省值)时才使用这个选项。
+.TP
+\fB\-lasterror\fR
+.
+只在 Windows 上串行端口能获得这个选项，并只能查询(只在直接请求时报告)。在串行通信出错的情况下，\fBread\fR     或 \fBputs\fR 返回一个一般 Tcl 文件 I/O     错误。可以调用 \fBfconfigure -lasterror\fR     来得到错误详情的一个列表(例如，FRAME RXOVER)。
+.VE
+
+.VS
+.SH "移植要点 PORTABILITY ISSUES"
+.sp
+.TP
+\fBWindows \fR(所有版本)
+.
+给 \fIfileName\fR 来打开一个串行端口的有效值的形式是 \fBcom\fIX\fB:\fR，这里     \fIX\fR 是一个数，一般是从 1 到 4。如果系统有多于四个串行端口，则这个符号(notation)可以表示串行端口从     1 到 9。尝试打开一个不存在或序号大于 9     的串行端口将导致错误。打开串行端口的可替代的方法是使用文件名    \fB\e\e.\ecomX\fR，这里 X 是对应于一个串行端口的任何(整)数；请注意，这个方法在     Windows 95 和 Windows 98 上相当的慢。
+.TP
+\fBWindows NT\fR
+.
+在交互运行 Tcl     的时候，如果存在一个控制台，则在真实的控制台和使用标准输入或输出的一个命令管道之间可能有一些奇怪的相互作用。如果为读而打开一个命令管道，在这个控制台键入的一些行将被发送到命令管道而一些行将别发送到     Tcl     求值器。如果为写而打开一个命令管道，在管道关闭之前，在这个控制台中键入的击键(keystroke)将一直是不可见的。在执行     16-bit 或 32-bit     应用程序时都可能发生这种事情。这些问题只发生在 Tcl     和子应用程序同时竞争这个控制台的时候。如果命令管道是从一个脚本中启动的，所以     Tcl     不访问控制台，或者命令管道不使用标准输出或输出，而是重定向(从或)到一个文件，那么上述问题不发生。
+.TP
+\fBWindows 95\fR 
+.
+不能同时为读写而打开一个命令管道来执行一个 16-bit DOS     应用程序，因为从一个管道接收标准输入和向一个管道发送标准输出的(两个)     16-bit DOS 应用程序同步运行。不执行 16-bit DOS     应用程序的命令管道异步运行并且可以同时为读写而打开。
+.sp
+在交互运行 Tcl     的时候，如果存在一个控制台，则在真实的控制台和使用标准输入或输出的一个命令管道之间可能有一些奇怪的相互作用。如果为从一个     32-bit     应用程序读而打开一个命令管道，在这个控制台键入的一些击键将被发送到命令管道而一些击键将别发送到     Tcl 求值器。如果为向一个 32-bit     应用程序写而打开一个命令管道，在管道关闭之前，在控制台中将一直没有输出是可见的。这些问题只发生在     Tcl     和子应用程序同时竞争这个控制台的时候。如果命令管道是从一个脚本中启动的，所以     Tcl     不访问控制台，或者命令管道不使用标准输出或输出，而是重定向(从或)到一个文件，那么上述问题不发生。
+.sp
+不论 Tcl 是否在交互的运行，如果为从一个 16-bit DOS     应用程序读而打开一个命令管道，在从命令管道的标准输出收到文件结束之前，对     \fBopen\fR 的调用一直不返回。如果为向一个 16-bit DOS     应用程序写而打开一个命令管道，在管道实际上被关闭之前，没有数据被发送到命令管道的标准输出。象上面描述的那样，这个问题发生的原因是     16-bit DOS 应用程序同步运行。
+.TP
+\fBMacintosh\fR
+.
+在 Macintosh 下目前未实现打开串行端口。
+.sp
+在 Macintosh     不支持打开命令管道，原因是应用程序不支持标准输入或输出的概念。
+.TP
+\fBUnix\fR\0\0\0\0\0\0\0
+.
+给 \fIfileName\fR 来打开一个串行端口的有效值的形式是 \fB/dev/tty\fIX\fR，这里的     \fIX\fR 是 \fBa\fR 或 \fBb\fR，但是可以使用映射到一个串行端口的任何伪文件(pseudo-file)的名字。
+.sp
+在交互运行 Tcl     的时候，如果存在一个控制台，则在真实的控制台和使用标准输入或输出的一个命令管道之间可能有一些奇怪的相互作用。如果为读而打开一个命令管道，在这个控制台键入的一些行将被发送到命令管道而一些行将别发送到     Tcl 求值器。这些问题只发生在 Tcl     和子应用程序同时竞争这个控制台的时候。如果命令管道是从一个脚本中启动的，所以     Tcl     不访问控制台，或者命令管道不使用标准输出或输出，而是重定向(从或)到一个文件，那么上述问题不发生。
+.LP
+关于在不同平台上执行应用程序请参见 \fBexec\fR 命令的\fB移植要点\fR章节来得到不特定于命令管道的额外的信息。
+
+.SH "参见 SEE ALSO"
+file(n), close(n), filename(n), fconfigure(n), gets(n), read(n),
+puts(n), exec(n), fopen(1)
+
+.SH "关键字 KEYWORDS"
+access mode, append, create, file, non-blocking, open, permissions,
+pipeline, process, serial
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/10/16
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

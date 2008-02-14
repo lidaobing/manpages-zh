@@ -1,0 +1,59 @@
+.\"
+.\"  chsh.1 -- change your login shell
+.\"  (c) 1994 by salvatore valente <svalente@athena.mit.edu>
+.\"
+.\"  this program is free software.  you can redistribute it and
+.\"  modify it under the terms of the gnu general public license.
+.\"  there is no warranty.
+.\"
+.TH CHSH 1 "7 October 1998" "chsh" "Linux Reference Manual"
+.SH NAME
+chsh \- 改变登录 shell
+
+.SH 总览 (SYNOPSIS)
+.B chsh
+[\ \-s\ shell\ ] [\ \-l\ ] [\ \-u\ ] [\ \-v\ ] [\ username\ ]
+
+.SH 描述 (DESCRIPTION)
+.B chsh
+用于 改变 用户的 登录 shell. 如果 没有在 命令行上 指定 shell,
+.B chsh
+能够 做出 提示.
+
+.SS 有效的 SHELL (VALID SHELLS)
+.B chsh
+接受 系统中 任何 可执行文件 的 全路径名称.
+然而, 如果 它们 没有 在
+.I /etc/shells
+中 列举, chsh 将 发出 警告. 另一方面, 可以 把 chsh 配置成 只接受 这个文件中
+列举的 shell, 除非 你是 超级用户.
+
+.SH 选项 (OPTIONS)
+.TP
+.I "\-s, \-\-shell"
+指定 用户的 登录 shell.
+.TP
+.I "\-l, \-\-list-shells"
+显示
+.I /etc/shells
+中的 shell 列表, 然后退出.
+.TP
+.I "\-u, \-\-help"
+显示 使用方法, 然后退出.
+.TP
+.I "-v, \-\-version"
+显示 版本信息, 然后退出.
+.SH "另见 (SEE ALSO)"
+.BR login (1),
+.BR passwd (5),
+.BR shells (5)
+.SH 作者 (AUTHOR)
+Salvatore Valente <svalente@mit.edu>
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/10/24
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

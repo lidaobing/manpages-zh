@@ -1,0 +1,117 @@
+.\" Copyright (c) 1996 Andries Brouwer
+.\" This page is somewhat derived from a page that was
+.\" (c) 1980, 1989, 1991 The Regents of the University of California
+.\" and had been heavily modified by Rik Faith and myself.
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+.\" USA.
+.\"
+.TH UMOUNT 8 "26 July 1997" "Linux 2.0" "Linux 程序员手册"
+.SH "NAME 名字"
+umount \- 卸载文件系统
+.SH 总览
+.BI "umount [\-hV]"
+.LP
+.BI "umount -a [\-nrv] [\-t " vfstype ]
+.br
+.BI "umount [\-nrv] " "device " | " dir " [...]
+.SH 描述
+.B umount
+可以卸除当前挂载在文件层次目录中的文件系统。
+文件系统形式可以是以它所在的目录的形式指定，
+也可以是以它所在的特殊设备的形式来指定。
+
+请注意当文件系统正处于使用状态时，不能进行卸载操作，
+必须等工作完成后才能进行卸除。例如，如果在当前文件系统中
+有打开的文件或某些进程正工作在该文件系统的某个目录下时，
+或者是它上面的一个交换文件正在使用。
+干涉的进程甚至可以是
+.B umount
+本身 - 它打开 libc，而随后 libc 可能会打开本地文件．
+
+.B umount
+命令的选项：
+.TP
+.B \-V
+打印版本信息并退出。
+.TP
+.B \-h
+显示帮助信息并退出。
+.TP
+.B \-v
+以冗长模式运行。
+.TP
+.B \-n
+在卸载后不将相应信息写入
+.IR /etc/mtab 
+文件。
+.TP
+.B \-r
+如果卸载失败，试图以只读方式进行重新挂载。
+.TP
+.B \-a
+卸载所有在
+.I /etc/mtab
+文件中描述的文件系统。（在
+.B umount
+版本或以后的版本中，不会卸载
+.I proc
+文件系统）
+.TP
+.BI \-t " vfstype"
+只卸载指定类型的文件系统。如果要一次指定多个文件系统，
+可以用逗号分隔。如在指定文件系统前加
+.B no
+，则可卸载除些文件系统以外的其它文件系统。
+.TP
+.B \-f
+强制卸载（比如不可达的 NFS ）。
+（此选项须在高于 2.1.116 的版本上使用）
+
+.SH "环路设备"
+如果在
+.IR /etc/mtab
+文件中存在有 `loop=...' 这样的参数，
+.B umount
+命令将释放与挂载相关联的环路设备．
+任何挂起的环路设备可以用 `losetup -d' 命令来释放。
+参阅
+.BR losetup (8)．
+
+
+.SH 相关文件
+.I /etc/mtab
+已挂载文件系统的清单。
+
+.SH "另见"
+.BR umount (2),
+.BR mount (8),
+.BR losetup (8).
+
+.SH 历史
+.B umount
+命令最早出现在版本 6 的 AT&T UNIX.
+
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.B Nov 20 2000
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

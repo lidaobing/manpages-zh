@@ -1,0 +1,146 @@
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de),
+.\" Fri Apr 2 11:32:09 MET DST 1993
+.\" and Andries Brouwer (aeb@cwi.nl), Fri Feb 14 21:47:50 1997.
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\" Chinese Version Copyright mhss, www.linuxforum.net, 2000
+.\" 
+.\" Modified Sun Jul 25 10:45:30 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Sun Jul 21 21:25:26 1996 by Andries Brouwer (aeb@cwi.nl)
+.\" Modified Mon Oct 21 17:47:19 1996 by Eric S. Raymond (esr@thyrsus.com)
+.\" Modified Wed Aug 27 20:28:58 1997 by Nicol醩 Lichtmaier 
+.\" Modified Mon Sep 21 00:00:26 1998 by Andries Brouwer (aeb@cwi.nl)
+.TH ENVIRON(5) Linux Programmer's Manual ENVIRON(5)
+
+
+.SH NAME
+environ - 用户环境(变量)
+
+.SH SYNOPSIS 总览
+.ad l
+.nf 
+extern char **environ;
+.br
+.fi
+.ad b
+.SH DESCRIPTION 描述
+变量 environ 指向的是一个叫 'environment'(环境)的字符串数组
+(这个变量必须在用户程序中声明，但是在使用 libc4 或 libc5 以
+及使用 glibc 并且定义了 _GNU_SOURCE 的情况下 ，它是在头文件
+unistd.h 中声明的)。对于一个进程，这个字符串的数组是通过开
+始进程的 exec(3) 调用来得到，习惯上，这些字符串的格式是
+'name=value'(名称=值)。常用的例子是：
+.TP
+.B USER
+登录用户的名字(被一些从 BSD 派生来程序所使用)。
+.TP
+.B LOGNAME
+登录用户的名字(被一些从 System-V 派生来程序所使用)。
+.TP
+.B HOME
+用户的登录目录，被login(1)按口令文件 passwd(5) 设置。
+.TP
+.B LANG
+当不被 LC_ALL 或更特殊的环境变量所忽略的时候，是用
+于地域分类的地域名。
+.TP
+.B PATH
+预先设定的目录前缀的序列，sh(1) 和许多程序可借此查找路径
+名不完全的文件。前缀由':'分隔。(类似的，有一些 shell
+用 CDPATH 查找位于不同目录的命令，以及用 MANPATH 找
+手册页等等。)
+.TP
+.B PWD
+当前的工作路径。被一些 shell 设置。
+.TP
+.B SHELL
+用户的登录 shell 的文件名。
+.TP
+.B TERM
+用于准备输出的终端类型。 
+.TP
+.B PAGER
+用户指定的显示文本文件的工具。
+.TP
+.B EDITOR/VISUAL
+用户指定的编辑文本文件的工具。
+.PP
+更多的名字可以通过和在 sh(1) 中的 export 命令和 'name=value'，或 csh(1) 中
+的 setenv 命令设置。参数也可以在
+执行 exec(2) 的时候被放置在环境中。一个 C 程序可以使用函数
+.BR getenv(3) 、
+.BR putenv(3) 、
+.BR setenv(3) 
+和 
+.BR unsetenv(3)
+来操纵自身的环境。
+
+注意许多程序和库例程的行为受特定的环境变量的存在和值的影响。
+随便的搜集一下就有：
+.LP
+环境变量 LANG、LANGUAGE、NLSPATH、LOCPATH、LC_ALL、
+LC_MESSAGES 等影响地域的处理。
+.LP
+TMPDIR 影响 tmpnam(3) 生成名字的路径名前缀和其他一些例程，
+sort(1) 和其他程序用的临时文件目录等等。
+.LP 
+LD_LIBRARY_PATH、LD_PRELOAD 和其他 LD_* 变量影响动态 
+(装载器/连接器)的行为。
+.LP
+POSIXLY_CORRECT 使特定的程序和库例程遵循 POSIX 规定。 
+.LP
+MALLOC_* 变量影响 malloc(3) 的行为。
+.LP
+HOSTALIASES 变量给出包含 gethostbyname(3) 用的别名的文件的
+文件名。
+.LP
+TZ 和 TZDIR 给出时区信息。
+.LP
+TERMCAP 给出给定终端的窗口大小(或给出包含这种信息的文件的
+文件名)。
+.LP
+等等，还有很多。
+
+这里有一个明显的安全风险。不止一个系统命令曾经被一个使用了一
+个不寻常的
+.BR IFS " 或 " LD_LIBRARY_PATH
+变量值的用户诱入骗局中。
+
+
+.SH SEE ALSO 又见
+.BR login(1),
+.BR sh(1),
+.BR bash(1),
+.BR csh(1),
+.BR tcsh(1),
+.BR execve(2),
+.BR exec(3), 
+.BR getenv(3),
+.BR putenv(3),
+.BR setenv(3),
+.BR unsetenv(3).
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+.B 2000/11/26
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,136 @@
+.TH CBDSQR l "15 June 2000" "LAPACK version 3.0" ")"
+.SH NAME
+CBDSQR - compute the singular value decomposition (SVD) of a real N-by-N (upper or lower) bidiagonal matrix B
+.SH SYNOPSIS
+.TP 19
+SUBROUTINE CBDSQR(
+UPLO, N, NCVT, NRU, NCC, D, E, VT, LDVT, U,
+LDU, C, LDC, RWORK, INFO )
+.TP 19
+.ti +4
+CHARACTER
+UPLO
+.TP 19
+.ti +4
+INTEGER
+INFO, LDC, LDU, LDVT, N, NCC, NCVT, NRU
+.TP 19
+.ti +4
+REAL
+D( * ), E( * ), RWORK( * )
+.TP 19
+.ti +4
+COMPLEX
+C( LDC, * ), U( LDU, * ), VT( LDVT, * )
+.SH PURPOSE
+CBDSQR computes the singular value decomposition (SVD) of a real N-by-N (upper or lower) bidiagonal matrix B: B = Q * S * P' (P' denotes the transpose of P), where S is a diagonal matrix with
+non-negative diagonal elements (the singular values of B), and Q
+and P are orthogonal matrices.
+.br
+
+The routine computes S, and optionally computes U * Q, P' * VT,
+or Q' * C, for given complex input matrices U, VT, and C.
+
+See "Computing  Small Singular Values of Bidiagonal Matrices With
+Guaranteed High Relative Accuracy," by J. Demmel and W. Kahan,
+LAPACK Working Note #3 (or SIAM J. Sci. Statist. Comput. vol. 11,
+no. 5, pp. 873-912, Sept 1990) and
+.br
+"Accurate singular values and differential qd algorithms," by
+B. Parlett and V. Fernando, Technical Report CPAM-554, Mathematics
+Department, University of California at Berkeley, July 1992
+for a detailed description of the algorithm.
+.br
+
+.SH ARGUMENTS
+.TP 8
+UPLO    (input) CHARACTER*1
+= 'U':  B is upper bidiagonal;
+.br
+= 'L':  B is lower bidiagonal.
+.TP 8
+N       (input) INTEGER
+The order of the matrix B.  N >= 0.
+.TP 8
+NCVT    (input) INTEGER
+The number of columns of the matrix VT. NCVT >= 0.
+.TP 8
+NRU     (input) INTEGER
+The number of rows of the matrix U. NRU >= 0.
+.TP 8
+NCC     (input) INTEGER
+The number of columns of the matrix C. NCC >= 0.
+.TP 8
+D       (input/output) REAL array, dimension (N)
+On entry, the n diagonal elements of the bidiagonal matrix B.
+On exit, if INFO=0, the singular values of B in decreasing
+order.
+.TP 8
+E       (input/output) REAL array, dimension (N)
+On entry, the elements of E contain the
+offdiagonal elements of of the bidiagonal matrix whose SVD
+is desired. On normal exit (INFO = 0), E is destroyed.
+If the algorithm does not converge (INFO > 0), D and E
+will contain the diagonal and superdiagonal elements of a
+bidiagonal matrix orthogonally equivalent to the one given
+as input. E(N) is used for workspace.
+.TP 8
+VT      (input/output) COMPLEX array, dimension (LDVT, NCVT)
+On entry, an N-by-NCVT matrix VT.
+On exit, VT is overwritten by P' * VT.
+VT is not referenced if NCVT = 0.
+.TP 8
+LDVT    (input) INTEGER
+The leading dimension of the array VT.
+LDVT >= max(1,N) if NCVT > 0; LDVT >= 1 if NCVT = 0.
+.TP 8
+U       (input/output) COMPLEX array, dimension (LDU, N)
+On entry, an NRU-by-N matrix U.
+On exit, U is overwritten by U * Q.
+U is not referenced if NRU = 0.
+.TP 8
+LDU     (input) INTEGER
+The leading dimension of the array U.  LDU >= max(1,NRU).
+.TP 8
+C       (input/output) COMPLEX array, dimension (LDC, NCC)
+On entry, an N-by-NCC matrix C.
+On exit, C is overwritten by Q' * C.
+C is not referenced if NCC = 0.
+.TP 8
+LDC     (input) INTEGER
+The leading dimension of the array C.
+LDC >= max(1,N) if NCC > 0; LDC >=1 if NCC = 0.
+.TP 8
+RWORK   (workspace) REAL array, dimension (4*N)
+.TP 8
+INFO    (output) INTEGER
+= 0:  successful exit
+.br
+< 0:  If INFO = -i, the i-th argument had an illegal value
+.br
+> 0:  the algorithm did not converge; D and E contain the
+elements of a bidiagonal matrix which is orthogonally
+similar to the input matrix B;  if INFO = i, i
+elements of E have not converged to zero.
+.SH PARAMETERS
+.TP 8
+TOLMUL  REAL, default = max(10,min(100,EPS**(-1/8)))
+TOLMUL controls the convergence criterion of the QR loop.
+If it is positive, TOLMUL*EPS is the desired relative
+precision in the computed singular values.
+If it is negative, abs(TOLMUL*EPS*sigma_max) is the
+desired absolute accuracy in the computed singular
+values (corresponds to relative accuracy
+abs(TOLMUL*EPS) in the largest singular value.
+abs(TOLMUL) should be between 1 and 1/EPS, and preferably
+between 10 (for fast convergence) and .1/EPS
+(for there to be some accuracy in the results).
+Default is to lose at either one eighth or 2 of the
+available decimal digits in each computed singular value
+(whichever is smaller).
+.TP 8
+MAXITR  INTEGER, default = 6
+MAXITR controls the maximum number of passes of the
+algorithm through its inner loop. The algorithms stops
+(and so fails to converge) if the number of passes
+through the inner loop exceeds MAXITR*N**2.

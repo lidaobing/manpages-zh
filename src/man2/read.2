@@ -1,0 +1,138 @@
+.\" Hey Emacs! This file is -*- nroff -*- source.
+.\"
+.\" This manpage is Copyright (C) 1992 Drew Eckhardt;
+.\"                               1993 Michael Haardt, Ian Jackson.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified Sat Jul 24 00:06:00 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Wed Jan 17 16:02:32 1996 by Michael Haardt
+.\"   <michael@cantor.informatik.rwth-aachen.de>
+.\" Modified Thu Apr 11 19:26:35 1996 by Andries Brouwer <aeb@cwi.nl>
+.\" Modified Sun Jul 21 18:59:33 1996 by Andries Brouwer <aeb@cwi.nl>
+.\" Modified Fri Jan 31 16:47:33 1997 by Eric S. Raymond <esr@thyrsus.com>
+.\" Modified Sat Jul 12 20:45:39 1997 by Michael Haardt
+.\"   <michael@cantor.informatik.rwth-aachen.de>
+.\" 中文版版权所有 byeyear AND www.linuxforum.net 2002
+.\"
+.TH READ 2 "July 12, 1997" "Linux 2.0.32" "Linux Programmer's Manual"
+.SH NAME
+read \- 在文件描述符上执行读操作
+.SH 概述
+.nf
+.B #include <unistd.h>
+.sp
+.BI "ssize_t read(int " fd ", void *" buf ", size_t " count );
+.fi
+.SH 描述
+.B read()
+从文件描述符
+.I fd
+中读取
+.I count
+字节的数据并放入从
+.IR buf
+开始的缓冲区中.
+.PP
+如果
+.I count
+为零,\fBread()\fP返回0,不执行其他任何操作.
+如果
+.I count
+大于SSIZE_MAX,那么结果将不可预料.
+.PP
+.SH "返回值"
+成功时返回读取到的字节数(为零表示读到文件描述符),
+此返回值受文件剩余字节数限制.当返回值小于指定的字节数时
+并不意味着错误;这可能是因为当前可读取的字节数小于指定的
+字节数(比如已经接近文件结尾,或者正在从管道或者终端读取数
+据,或者
+\fBread()\fP被信号中断).
+发生错误时返回\-1,并置
+.I errno
+为相应值.在这种情况下无法得知文件偏移位置是否有变化.
+.SH 错误代码
+.TP
+.B EINTR
+在读取到数据以前调用被信号所中断.
+.TP
+.B EAGAIN 
+使用
+.B O_NONBLOCK
+标志指定了非阻塞式输入输出,但当前没有数据可读.
+.TP
+.B EIO
+输入输出错误.可能是正处于后台进程组进程试图读取其
+控制终端,但读操作无效,或者被信号SIGTTIN所阻塞,
+或者其进程组是孤儿进程组.也可能执行的是读磁盘或者
+磁带机这样的底层输入输出错误.
+.TP
+.B EISDIR
+.I fd
+指向一个目录.
+.TP
+.B EBADF
+.I fd
+不是一个合法的文件描述符,或者不是为读操作而打开.
+.TP
+.B EINVAL
+.I fd
+所连接的对象不可读.
+.TP
+.B EFAULT
+.I buf
+超出用户可访问的地址空间.
+.PP
+也可能发生其他错误,具体情况和
+.IR fd
+所连接的对象有关.
+POSIX 允许
+.B read
+在读取了一定量的数据后被信号所中断,并返回
+\-1(且
+.I errno
+被设置为EINTR),或者返回已读取的数据量.
+.SH 兼容于
+SVr4, SVID, AT&T, POSIX, X/OPEN, BSD 4.3
+.SH 限制
+在NFS文件系统中,读取小块数据仅更新时间标记,之后的调用
+不再读取服务器端的数据.这是因为客户端把数据放在缓存里.
+由于大多数情况下不存在NFS服务器向客户端的读操作,
+所以NFS客户必须将更新时间标记的操作放在服务器端,而
+数据可以放在客户端的缓存里留待以后更新.UNIX也可以禁用
+客户端的缓存,但那样的话大多数情况下会导致服务器性能下降.
+.SH 参见
+.BR close (2),
+.BR fcntl (2),
+.BR ioctl (2),
+.BR lseek (2),
+.BR readdir (2),
+.BR readlink (2),
+.BR select (2),
+.BR write (2),
+.BR fread (3)
+
+.SH "[中文版维护人]"
+.B byeyear <love_my_love@263.net >
+.SH "[中文版最新更新]"
+.B 2002.02.02
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

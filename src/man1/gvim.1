@@ -1,0 +1,360 @@
+.TH VIM 1 "1998 December 28"
+
+.SH NAME
+vim \- Vi IMproved, 一个程序员的文本编辑器
+
+.SH "总览 (SYNOPSIS)"
+.br
+.B vim
+[options] [file ..]
+.br
+.B vim
+[options] -
+.br
+.B vim
+[options] \-t tag
+.br
+.B vim
+[options] \-q [errorfile]
+.PP
+.br
+.B ex
+.br
+.B view
+.br
+.B gvim
+.B gview
+.br
+.B rvim
+.B rview
+.B rgvim
+.B rgview
+
+.SH "描述 (DESCRIPTION)"
+.B Vim
+是 一个 同 Vi 向上兼容的 文本 编辑器, 可以 用来 编辑
+任何 ASCII 文本, 特别 适合 用来 编辑 程序.
+.PP
+它对 Vi 作了 许多 增强: 多层撤销, 多窗口, 多缓冲区(buffer),
+高亮度 语法显示, 命令行编辑, 文件名匹配, 在线帮助, 可视选定,
+等等. 用
+":help vi_diff.txt" 看
+.B Vim
+和 Vi 的差别 的 摘要.
+.PP
+在运行
+.B Vim
+的时候 可以用 ":help" 命令 获得 很多 帮助.
+参考 下面的 在线帮助 一节.
+.PP
+一般 可用
+.PP
+	vim file
+.PP
+命令 打开
+.B Vim
+来 编辑 一个 文件. 概括的说, 可以用
+.PP
+	vim [options] [filelist]
+.PP
+命令 来运行
+.B Vim .
+如果 没有 文件名, 编辑器 就会 打开 一个 空的 缓冲区.
+否则 就会用 下面 四个中的一个 来选择 要编辑的 文件.
+.TP 12
+file ..
+文件名列表. 第一个 会 作为 当前 文件 读入 缓冲区, 光标 会
+停在 缓冲区的 第一行. 你 可以用 ":next" 命令 转到 其它的 文件.
+如果 要编辑 一个以 "-" 开头的 文件. 在文件 列表 前面 加上 "--".
+.TP
+-
+从 标准输入 读取 被编辑的 文件. 从 标准 错误输出 (应该 是个
+终端) 读入 命令.
+.TP
+-t {tag}
+被 编辑的 文件 和 光标的 初始位置 由 标记 (tag) 决定， 标记
+有点像 一种 goto 标签 (goto label).
+在 标记文件中 找到 标记, 相应的 文件 成为 当前文件, 相应的 命令
+被执行. 这种方式 常用于 C 程序, 标记 就是 函数名, 当前文件 就是
+包含 那个函数的 文件, 光标 停留在 函数的 开始处.
+见 ":help tag-commands"。
+.TP
+-q [errorfile]
+运行时 进入 快速修复模式.
+读取 [errorfile] 文件 并显示 第一个 错误. 如果 没有 [errorfile] 文件,
+文件名 由 'errorfile' 选项 决定 (在 Amiga 为 "AztecC.Err", 在
+其他系统中 为 "errors.vim"). 可以 用 ":cn" 命令 跳到 其它错误处.
+见 ":help quickfix"。
+.PP
+.B Vim
+会 根据 不同命令 有 不同的 表现, 尽管 它们 可能 是 一个 可执行 文件.
+.TP 10
+vim
+正常 模式, 所有 都是 默认状态.
+.TP
+ex
+以 Ex 模式 运行. 用 ":vi" 命令 进入 正常模式. 也可以 加上 "-e" 选项
+进入 此模式.
+.TP
+view
+以 只读模式 运行. 你被禁止 写文件. 也可以 加上 "-R" 选项 进入 此模式.
+.TP
+gvim gview
+GUI 版本。
+开启 一个 新的窗口. 也可以 加上 "-g" 选项 进入 此模式.
+.TP
+rvim rview rgvim rgview
+同 上面的 相同, 只是 加上了 限制, 不能运行 shell 程序, 也 不能 暂停
+.B Vim .
+也 可以 加上 "-Z" 选项 进入 此模式.
+
+.SH "选项 (OPTIONS)"
+所有选项 都可以 以 任何顺序 出现, 可以 在文件名前, 也可以 在文件名后.
+没有 参数的 选项 可以 出现在 一个 "-" 后面.
+.TP 12
++[num]
+对于 第一个 文件, 光标 会停在 第 "num" 行. 如果 没有 "num" , 则 光标
+会停在 最后一行.
+.TP
++/{pat}
+对于 第一个文件, 光标 会停在 {pat} 第一次 出现的 地方. 搜寻 模式
+见 ":help search-pattern"。
+.TP
++{command}
+.TP
+-c {command}
+读入 第一个 文件后 会 执行 {command} 命令. {command} 应为 Ex 命令.
+如果 {command} 中 包含有 空格, 必须 用双引号 括住 (这个取决于所用的 shell).
+例: Vim "+set si" main.c
+.br
+注意: 你 最多 可以用 10 个 "+" 或者 "-c" 命令.
+.TP
+-b
+二进制模式. 设置 一些选项, 这样 就可以 用来 编辑 二进制 和 可执行 文件 了.
+.TP
+-C
+兼容. 设置 'compatible' 选项. 这样 就算 存在 .vimrc 文件
+.B Vim
+也会 基本上 象 Vi 一样了.
+.TP
+-d {device}
+打开 {device} 用作终端， 只在 Amiga 下。
+例：
+"\-d con:20/30/600/150".
+.TP
+-e
+以 Ex 模式 运行
+.B Vim ，
+就像 运行 "ex" 一样。
+.TP
+-f
+前台 运行。 对于 GUI 版本， 
+.B Vim
+不会 同运行它的 shell 分离。
+在 Amiga 中，
+.B Vim
+不会 重新启动 来 开启一个 新窗口. 这个选项 会用在当
+.B Vim
+被 另外一个 程序执行, 并且 这个程序 想等编辑动作 结束后 再运行
+的 时候 (如 mail). 在 Amiga 上 ":sh" 和 ":!" 不会起作用.
+.TP
+-F
+如果
+.B Vim
+编译时 加入了 对 从右到左 书写的 文件 FKMAP 以及 Farsi 键盘映射 的支持,
+.B Vim
+会 以 Farsi 模式 运行, 比如 设置 'fkmap' 和 'rightleft' 选项.不然
+.B Vim
+会 显示 一条 错误信息 并 终止.
+.TP
+-g
+如果
+.B Vim
+编译时 加入 GUI 支持, 会开启 GUI, 不然
+.B Vim
+会 显示 一条 错误信息 并 终止.
+.TP
+-h
+.B Vim
+显示 命令行 参数 和 选项的 帮助, 然后 终止.
+.TP
+-H
+如果
+.B Vim
+编译时 加入了 对 从右到左 书写的 文件 RIGHTLEFT 以及 Hebrew 键盘映射
+的支持， 
+.B Vim
+会以 Hebrew 模式 运行, 比如 设置 'hkmap' 和 'rightleft' 选项. 不然
+.B Vim
+会 显示 一条 错误信息 并 终止.
+.TP
+-i {viminfo}
+准许 使用 viminfo 文件, 这个 选项 设置 使用的 文件名, 默认的 是
+"~/.viminfo". 用 "NONE" 文件名 也可以 跳过 使用 .viminfo 文件.
+.TP
+-L
+同 -r 一样.
+.TP
+-l
+Lisp 模式.
+打开 'lisp' 和 'showmatch' 选项.
+.TP
+-m
+禁止 修改文件. 设置 'write' 选项, 这样 就不能 写文件了.
+.TP
+-N
+非兼容 模式. 设置 'compatible' 选项. 这样
+.B Vim
+会 表现得 更好, 就算 .vimrc 文件 不存在 也会 同 Vi 不兼容.
+.TP
+-n
+禁止 交换文件, 这样 在崩溃后 就 不能 恢复 文件了. 对于 编辑
+在很慢的 媒体中的 文件 很有好处 (比如软盘), 也可以 用 ":set uc=0"
+禁止交换, 用 ":set uc=200" 开启 交换.
+.TP
+-o[N]
+打开 N 个窗口. 如果没有 N, 为 每个文件 开一个 窗口.
+.TP
+-R
+只读 模式.  设置 'readonly' 选项. 你 仍然 可以 编辑 缓冲区, 但是 不能
+重写文件. 如果 你要 重写文件, 必须在 Ex 命令中 用惊叹号, 比如 ":w!".
+-R 选项 隐含了 -n 选项 (见下). 'readonly' 选项 可以 用 ":set noro" 设置.
+见 ":help 'readonly'".
+.TP
+-r
+列出 交换文件, 显示 关于 恢复文件的 信息.
+.TP
+-r {file}
+恢复 模式. 交换文件 是 用来 恢复 在 编辑过程中 崩溃了的 文件.
+交换 文件名 是 被编辑文件名 后面 加上 ".swp". 见 ":help recovery".
+.TP
+-s
+安静 模式. 只在 用 "Ex" 启动 或者 用了 "-e" 选项 才有用.
+.TP
+-s {scriptin}
+读入 脚本文件 {scriptin}. 文件里的 字符 就像 你 直接 输入 一样的, 也
+可以 用 ":source! {scriptin}" 命令 实现 这个功能. 如果 在 编辑器 结束前
+就 读到了 文件尾, 就 接着 从键盘 读入.
+.TP
+-T {terminal}
+告诉
+.B Vim
+你 用的 终端的 名字, 只有 当 不能 自动确定 的时候 才这样. 它 必须是
+.B Vim
+(builtin) 能辨认的 终端 或者是 在 termcap 或者 terminfo 文件中 定义了的.
+.TP
+-u {vimrc}
+用 {vimrc} 文件 里的 命令 来初始化, 跳过 所有 其它的 初始化, 用 这个
+来编辑 特殊类型的 文件. 也可以 用 "NONE" 来 跳过 所有初始化. 在 vim 中
+用 ":help initialization" 查看 更多信息.
+.TP
+-U {gvimrc}
+用 {gvimrc} 文件 里的 命令 来初始化 GUI, 跳过 所有 其它的 GUI 初始化, 也
+可以 用 "NONE" 来跳过 所有 GUI 初始化. 在 vim 中 用 ":help gui-init" 查看
+更多信息.
+.TP
+-V
+冗长 显示. 显示 执行 初始化代码 和 读入的 文件, 并且 写 viminfo 文件.
+.TP
+-v
+以 Vi 模式运行
+.B Vim ,
+就像 运行 "vi" 一样, 只有 运行 "ex" 时 才有用.
+.TP
+-w {scriptout}
+所有 在
+.B Vim
+退出前 你键入的 字符 都会被 存入 {scriptout} 文件. 这 用来 创建一个
+脚本文件, 你 可以用 "vim -s" 和 ":source!" 来使用. 如果 {scriptout} 存在, 会
+把 字符 追加到 后面.
+.TP
+-W {scriptout}
+同 -w 一样， 但是 是覆盖 原来的文件.
+.TP
+-x
+写文件时 加密. 会提示你 输入密码.
+.TP
+-Z
+受限 模式. 同运行 以 "r" 开头的 程序 同效.
+.TP
+--
+表明 选项结束. 在此之后的 参数 都会被认为 是 文件名, 可以 用这个
+来编辑 一个 以 '-' 开头 的文件.
+.SH "在线帮助 (ON-LINE HELP)"
+在
+.B Vim
+中键入 ":help" 来 获得 帮助. 用 ":help subject" 来 获得 关于 一个
+特定主题的 帮助. 例如 用 ":help ZZ" 来 获得 关于 "ZZ" 的帮助.
+用 <Tab> 和 CTRL-D 来 完成 帮助主题 (":help cmdline-completion").
+可以 用 标记 从 一个地方 跳到 另一个 地方 (有点像 超文本连接, 见 ":help").
+所有的 文档 都可以 这样 来浏览, 比如 ":help syntax.txt".
+.SH "文件 (FILES)"
+.TP 15
+/usr/share/vim/vim56/doc/*.txt
+.B Vim
+文档文件. 用 ":help doc-file-list" 获得 完整的 列表.
+.TP
+/usr/share/vim/vim56/doc/tags
+在 文档文件中 查找信息 用的 标签文件.
+.TP
+/usr/share/vim/vim56/syntax/syntax.vim
+系统 语法 初始化 文件.
+.TP
+/usr/share/vim/vim56/syntax/*.vim
+各种语言的 语法文件.
+.TP
+/usr/share/vim/vimrc
+系统
+.B Vim
+初始化文件.
+.TP
+/usr/share/vim/gvimrc
+系统 gvim 初始化文件.
+.TP
+/usr/share/vim/vim56/optwin.vim
+":options" 命令 所用的 脚本文件, 这是个 查看 和 设置选项的 很好的 办法.
+.TP
+/usr/share/vim/vim56/menu.vim
+gvim 的 系统菜单 初始化文件.
+.TP
+/usr/share/vim/vim56/bugreport.vim
+用来 生成 错误报告的 脚本文件, 见 ":help bugs".
+.TP
+/usr/share/vim/vim56/filetype.vim
+根据 文件名 来判定 文件类型 的 脚本文件, 见 ":help 'filetype'".
+.TP
+/usr/share/vim/vim56/scripts.vim
+根据 文件内容 来判定 文件类型 的 脚本文件, 见 ":help 'filetype'".
+.PP
+最新 信息 参见 VIM 主页：
+.br
+\<URL:http://www.vim.org/\>
+
+.SH "参见 (SEE ALSO)"
+vimtutor(1)
+
+.SH "作者 (AUTHOR)"
+Most of
+.B Vim
+的大部分 都是 Bram Moolenaar 在 很多人的 帮助下 完成的.
+见 ":help credits".
+.br
+虽然 不大会有 最早的 代码存在, 但是
+.B Vim
+基于 Stevie 写的代码, 之后被 Tim Thompson，
+Tony Andrews and G.R. (Fred) Walter 修改, 然后 才形成的.
+
+.SH "错误 (BUGS)"
+多半都有. 用 ":help todo" 看 已知问题的 列表.
+.PP
+注意 有些 被 报告为 错误的 事实上 是 应为 太相信 所有的 行为
+都应该 同 Vi 一样, 如果 你因为 它 和 Vi 不一样 而 认为 它 是个
+错误, 你 应该 好好 看看 vi_diff.txt 文件 (或者 在 Vim 中
+键入 :help vi_diff.txt), 并且 看看 'compatible' 和 'cpoptions' 选项.
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/8/30
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,94 @@
+.\" Reboot/halt and Linux information extracted from Rick Faith's original
+.\" sync(8) manpage, dating back to the Linux 0.99 days. The Linux-specific
+.\" information is attributed to Linus Torvalds
+.\" Copyright 1992, 1993 Rickard E. Faith (faith@cs.unc.edu)
+.\"; 中文版版权所有 scorpio, Laser www.linuxforum.net 2000
+.\" May be distributed under the GNU General Public License
+.TH SYNC 8 "November 1998" "GNU fileutils 4.0"
+.SH NAME 名称
+sync \- 同步内存与磁盘的数据
+.SH 总览
+.B "sync [\-\-help] [\-\-version]"
+.SH
+描述
+.B sync
+把任何在内存中缓冲的数据写到磁盘上。
+这能包括（但不仅限于）修改了的超级块，
+i 节点，和延迟的读写。这必须由内核执行；
+.B sync
+除了执行
+.BR sync (2)
+系统调用外什么都不做.
+.PP
+内核把数据保持在内存里以避免磁盘读写（磁盘相对来说比较慢）
+这能改进性能，但如果计算机跨掉，结果就可能是数据丢失，
+或者文件系统损坏．
+.B sync
+保证任把何在内存里的东西写入磁盘.
+.PP
+.B sync
+应该在处理器异常停止前调用
+(例如，在因为调试新的内核代码引起内核恐慌
+（？可能是灾难发生吧）之前)
+一般而言，处理器应该使用
+.BR shutdown (8)
+或者
+.BR reboot (8)
+或者
+.BR halt (8)
+命令来停止, 那会试图，在调用
+.BR sync (2)
+前让系统处于静止状态．
+(这些命令有好几种不同的实现，
+请参考你的文档，在一些系统上你
+不能直接调用
+.BR reboot (8)
+和
+.BR halt (8)
+.)
+.SH "GNU 标准选项"
+.TP
+.B "\-\-help"
+在标准输出上印出用法信息并退出。
+.TP
+.B "\-\-version"
+在标准输出上印出版本信息并退出。
+.TP
+.B "\-\-"
+结束选项列表
+.SH 环境（变量）
+变量 LANG, LC_ALL, LC_CTYPE 和 LC_MESSAGES 有通常的意义.
+.SH "遵循"
+POSIX 1003.2
+.SH 注意
+在 Linux 上,
+.B sync
+仅保证安排脏数据块进入等待：
+实际上在真正写入前要花费一点时间．
+.BR reboot (8)
+和
+.BR halt (8)
+在调用
+.BR sync (2)
+之后会睡眠几秒以考虑这些延时．
+.PP
+这份
+.B sync
+的描述可以在
+file\%utils-4.0 包你找到;
+其他版本也许有些微的差别.
+把修正和新增邮到 aeb@cwi.nl.
+程序缺陷邮到 fileutils-bugs@gnu.ai.mit.edu.
+.SH "又见"
+.BR sync (2),
+.BR halt (8),
+.BR reboot (8),
+.BR update (8)
+.br
+
+.SH "[中文版维护人]"
+.B Scorpio <rawk@chinese.com>
+.SH "[中文版最新更新]"
+2000/11/26
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

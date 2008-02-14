@@ -1,0 +1,352 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: glob.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: glob.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH glob n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+glob \- 返回匹配模式的文件名
+.SH "总览 SYNOPSIS"
+\fBglob \fR?\fIswitches\fR? \fIpattern \fR?\fIpattern ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令用与 csh shell 类似的方式进行文件名的“通配符匹配”。它返回文件名匹配 \fIpattern\fR (模式)参数中的所有文件的一个列表。
+.LP
+如果给 \fBglob\fR 的初始参数以 \fB\-\fR 开始，则它们将被作为选项来对待。当前支持下列选项开关: 
+.VS 8.3
+.TP
+\fB\-directory\fR \fIdirectory\fR
+在这个给定的 \fIdirectory \fR(目录)中开始查找匹配给定模式的文件。这允许查找名字中包含通配符敏感字符的目录而不需要显式的引用这些字符。这个选项不能与\fB\-path\fR 联合使用。
+.TP
+\fB\-join\fR
+把通过剩余的模式参数用目录分隔符连接起来作为一个单一的模式来对待。  
+.VE 8.3
+.TP
+\fB\-nocomplain\fR
+允许返回一个空列表而不是返回一个错误；要是没有这个开关的话，如果结果列表为空则返回一个错误。
+.VS 8.3
+.TP
+\fB\-path\fR \fIpathPrefix\fR
+查找有给定的 \fIpathPrefix\fR  (路径前缀)的文件，名字中余下的部分匹配给定模式。这个选项允许查找与一个给定文件有类似的名字的文件，包括名字中包含通配符敏感的字符的情况。这个选项不能与\fB-directory\fR 联合使用。
+.TP
+\fB\-types\fR \fItypeList\fR
+只列出匹配 \fItypeList \fR(类型列表)的文件或目录，在这个列表中的元素有两种形式。第一种形式类似 Unix find 命令的 -type 选项:     
+\fIb\fR (块特殊文件 block special file),
+\fIc\fR (字符特殊文件 character special file),
+\fId\fR (目录 directory),
+\fIf\fR (单纯文件 plain file),
+\fIl\fR (符号连接 symbolic link),
+\fIp\fR (命名管道 named pipe),
+or \fIs\fR (套接口 socket), 
+在这个列表中可以指定多个类型。\fBGlob\fR 返回至少匹配一个类型的所有文件。
+.RS
+.PP
+对于第二种形式指定的类型，所有给出的类型都必须匹配。它们是作为文件权限的 \fIr\fR、\fIw\fR、\fIx\fR和作为特殊权限的实例的 \fIreadonly\fR、\fIhidden\fR。在 Macintosh 上，还支持 MacOS 类型和建立者，假定任何四个字符长的项目都是一个 MacOS  类型(例如 \fBTEXT\fR)。有\fI{macintosh type XXXX}\fR 或 \fI{macintosh creator XXXX} \fR形式的项目将分别的匹配类型或建立者。不可识别的类型，或多个 MacOS 类型/建立者指定将导致错误。
+.PP
+以混合两种类型，所以 \fB-types {d f r w}\fR 将找到有读\fB和\fR写权限的正规文件\fB或\fR目录。下列命令等价:    
+.RS
+.CS
+\fBglob \-type d *\fR
+\fBglob */\fR
+.CE
+.RE
+但第一种情况不返回尾部的 ``/'' 并且更加不依赖平台。
+.RE
+.VE 8.3
+.TP
+\fB\-\|\-\fR
+标志着选项的结束。此后的参数即使以 \fB- \fR开始仍将被作为\fIpattern\fR  对待。         
+.PP
+\fIpattern\fR  参数可以包含任意下列特殊字符:  
+.TP 10
+\fB?\fR
+匹配任何单一字符。
+.TP 10
+\fB*\fR
+匹配零个或多个字符的任何序列。
+.TP 10
+\fB[\fIchars\fB]\fR
+匹配在 \fIchars \fR中的任何单一字符。如果 \fIchars\fR 包含 \fIa\fR\fB-\fR\fIb\fR  形式的一个序列则匹配在 \fIa\fR 和 \fIb\fR  之间(包括它们在内)的任何字符。        
+.TP 10
+\fB\e\fIx\fR
+匹配字符 \fIx\fR。
+.TP 10
+\fB{\fIa\fB,\fIb\fB,\fI...\fR}
+匹配字符串 \fIa\fR、\fIb\fR\fI \fR等中的任何一个。  
+.LP
+与 csh 一样， 在一个文件的名字的开始处或紧随“/”之后的那个“.”必须被显式的(explicit)匹配或与一个 {}  构造(construct)相匹配。额外的，所有“/”字符必须显式的匹配。
+.LP
+如果在一个 \fIpattern\fR中的第一个是“~”，则它参照一个用户的主目录，这个用户的名字紧随在“~”之后。如果 “~”的后面紧随着一个“/”，则使用 HOME 环境变量的值。
+.LP
+\fBglob\fR与 csh globbing 在两个方面有区别。首先，它不排序它的结果列表(如果你想排序的话使用 \fBlsort\fR 命令)。其次，\fBglob\fR  只返回实际存在的文件的名字；在 csh  中除非一个模式包含一个 ?、*、或 [] 构造，否则不检查文件是否存在。
+
+.SH "移植要点 PORTABILITY ISSUES"
+.PP
+不象其他 Tcl 命令那样接受网络和本地式样的两种名字(关于如何指定本地和网络名字的详情参见 \fBfilename\fR手册条目)，而 \fBglob\fR  命令只接受本地名字。
+
+.TP
+\fBWindows\fR
+.
+对于 Windows UNC 名字，路径组成部分中的服务器名和共享名不能包含?、*、或 [] 构造。在 Windows NT 上，如果 \fIpattern\fR  有 ``\fB~\fIusername\fB@\fIdomain\fR'' 的形式，则它参照一个用户的主目录，这个用户的帐号信息驻留在指定 NT  域控制器上。否则，从本地计算机获取用户帐号信息。在 Windows 95  和 98 上，\fBglob\fR  接受象“.../” 和 “..../”这样的模式，用于连续的更上层的父目录。 
+
+.TP 
+\fBMacintosh\fR 
+. 
+在使用了选项 \fB\-dir\fR、\fB\-join\fR 或 \fB\-path \fR的时候，glob 假定给整个模式的目录分隔符是标准的“:”。在不使用这些选项的时候，glob  检查每个模式参数，除非这个模式包含一个“:”，否则使用“/”。
+
+.SH "参见 SEE ALSO"
+file(n)
+
+.SH "关键字 KEYWORDS"
+exist, file, glob, pattern
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/09/03
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

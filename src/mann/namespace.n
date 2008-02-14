@@ -1,0 +1,499 @@
+'\"
+'\" Copyright (c) 1993-1997 Bell Labs Innovations for Lucent Technologies
+'\" Copyright (c) 1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: namespace.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: namespace.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH namespace n 8.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+namespace \- 建立及操作给命令和变量的上下文
+.SH "总览 SYNOPSIS"
+\fBnamespace \fR?\fIoption\fR? ?\fIarg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+\fBnamespace\fR 命令让你建立、访问、和销毁给命令和变量的独立的上下文。名字空间的概述参见下面的\fBWHAT IS A NAMESPACE?\fR (什么是名字空间) 章节。下面列出了合法的 \fIoption \fR。注意你可以缩写这些 \fIoption \fR。
+.TP
+\fBnamespace children \fR?\fInamespace\fR? ?\fIpattern\fR?
+返回属于名字空间 \fInamespace \fR的所有子名字空间的一个列表。如果未指定\fInamespace\fR，则返回当前名字空间的所有子名字空间。这个命令返回完全限制的(fully-qualified)的名字，它们以 \fB:: \fR开始。如果给出了可选的 \fIpattern\fR  ，则这个命令只返回匹配通配符式样模式的名字。确定实际使用的模式如下: 以 \fB::\fR  开始的模式直接使用，否则把命令空间 \fInamespace\fR  (或当前名字空间的完全限制的名字) 加在这个模式的前面。
+.TP
+\fBnamespace code \fIscript\fR
+为以后执行脚本 \fIscript \fR而捕获(Capture)当前的名字空间上下文。它返回一个新脚本，在这个结果脚本中 \fIscript\fR  被包裹在一个 \fBnamespace inscope\fR 命令中。新脚本有两个重要的特性。首先，它可以在任何名字空间中被求值，而导致 \fIscript\fR  在当前的名字空间(调用 \fBnamespace code\fR命令的那个名字空间)中被求值。其次，可以向结果脚本添加补充的参数   并且它们将被作为补充参数而传递给 \fIscript\fR   。例如，假设在名字空间 \fB::a::b\fR 中调用命令\fBset script [namespace code {foo bar}]\fR。则可以在任何名字空间中执行 \fBeval "$script x y"\fR   (假定 \fBscript\fR  的值已经被正确的传递进来) 而与命令 \fBnamespace eval ::a::b {foo bar x y} \fR有相同的效果。这个命令是必须有的，因为象 Tk   这样的扩展一般在全局名字空间中执行回调脚本。一个有作用域的(scoped)命令把一个命令和它的名字空间上下文一起捕获，在这种方式下就能在以后正确的执行它。如何使用这个命令建立回调脚本的例子参见\fBSCOPED VALUES\fR (有作用域的值)章节。
+.TP
+\fBnamespace current\fR
+返回给当前名字空间的完全限定的名字。全局名字空间的实际的名字是“”(一个空串)，但这个命令为了编程者的方便而为全局名字空间返回 \fB::\fR。
+.TP
+\fBnamespace delete \fR?\fInamespace namespace ...\fR?
+删除所有的名字空间 \fInamespace\fR  和这些名字空间包含的所有变量、过程、和子名字空间。如果在名字空间中一个过程正在执行，在这个过程返回之前这个过程保持存在；但是，会标记这个名字空间来防止其他代码通过名字查找它。如果一个名字空间不存在，这个命令返回一个错误。如果未给出名字空间名字，这个命令什么也不做。
+.TP
+\fBnamespace eval\fR \fInamespace arg\fR ?\fIarg ...\fR?
+激活叫 \fInamespace\fR  的名字空间并在这个上下文中对某些脚本进行求值。如果这个名字空间不存在，则建立它。如果指定了多于一个 \fIarg\fR    参数，则用与 \fBeval\fR命令一样的方式把这些参数串联起来并用空格彼此分隔，并对结果进行求值。
+.br
+.sp
+如果 \fInamespace\fR  有前导的名字空间限定符并且有的前导名字空间不存在，则自动建立它们。
+.TP
+\fBnamespace export \fR?\-\fBclear\fR? ?\fIpattern pattern ...\fR?
+指定从一个名字空间中导出那些命令。导出的那些命令以后可以被其他名字空间用 \fBnamespace import\fR 命令导入。在一个名字空间中定义的命令和这个名字空间以前导入的命令二者都可以被这个名字空间导出。在执行\fBnamespace export\fR  命令的时候，这些(要导出的)命令不是必须已经被定义了。每个 \fIpattern\fR   可以包含通配符式样的特殊字符，但不可以包含任何名字空间限定符。就是说，模式只能指定在当前(导出)的名字空间中的命令。把所有 \fIpattern   \fR添加到这个名字空间的导出模式列表上。如果给出了 -\fBclear\fR  标志，则在添加任何    \fIpattern\fR 参数之前，重置这个名字空间的导出模式列表为空。如果未给出 \fIpattern\fRs 并且未给出 -\fBclear\fR标志，这个命令返回这个名字空间当前的导出列表。
+.TP
+\fBnamespace forget \fR?\fIpattern pattern ...\fR?
+删除以前从一个名字空间导入的命令。所有 \fIpattern\fR 都是一个限定的命令如 \fBfoo::x\fR 或 \fBa::b::p*\fR。限定的名字包含 \fB::\fR并且用一个或多个名字空间的名字限制一个名字。每个 \fIpattern\fR   被一个导出名字空间的名字所限制，并且在限定的名字的结束处可以有通配符式样的特殊字符。通配字符可以不出现在名字空间的名字中。这个命令首先查找匹配的导出命令。接着检查是否有些命令是以前由当前名字空间导入的。如果有，这个命令删除相应的导入的命令。效果上，这个命令撤消 \fBnamespace import\fR命令的动作。
+.TP
+\fBnamespace import \fR?\fB\-force\fR? ?\fIpattern\fR \fIpattern ...\fR?
+导入命令到一个名字空间中。所有 \fIpattern\fR都是一个限定的命令如\fBfoo::x\fR 或 \fBa::p*\fR。就是说，它包括一个导出名字空间的名字，并且在限定的名字的结束处可以有通配符式样的特殊字符。通配字符可以不出现在名字空间的名字中。把所有匹配某个 \fIpattern\fR 字符串并且被它们的名字空间导出的命令添加到当前名字空间中。这是通过在当前名字空间中建立一个新命令，这个新命令指向在它的原始名字空间中的导出命令；当调用这个新导入的命令的时候，它调用那个导出的命令。如果一个导入的命令与一个现存的命令有冲突，则这个命令通常返回一个错误。但是，如果给出了 -\fBforce\fR 选项，在则导入命令将悄无声息的替换现存的命令。\fBnamespace import\fR  命令有当前快照(snapshot)语义: 就是说，在要求(导入)的命令中，只导入在导出的名字空间中定义了的那些命令。换句话说，你只能导入在执行 \fBnamespace import\fR 的时候在一个名字空间中(已经存在)的命令。如果此后又定义并导出了其他命令，则不会导入它们。
+.TP
+\fBnamespace inscope\fR \fInamespace arg\fR ?\fIarg ...\fR?
+在一个特定的名字空间的上下文中执行一个脚本。不希望编程者直接执行这个命令；例如，在应用使用 \fBnamespace code\fR命令建立回调脚本，并且应用接着要向 Tk组件注册它的时候，隐式的生成对它的调用。除了有 \fBlappend\fR语义并且名字空间必须已经存在之外，\fBnamespace inscope\fR命令与 \fBnamespace eval\fR 命令非常相似。它把第一个参数作为一个列表来对待，接着把后面的所有参数作为适当的列表元素添加到第一个参数的尾部。\fBnamespace inscope ::foo a x y z\fR 等价于\fBnamespace eval ::foo [concat a [list x y z]]\fR。这个 \fBlappend>\fR语义很重要，因为许多回调 脚本实际上是前缀。
+.TP
+\fBnamespace origin \fIcommand\fR
+返回导入的命令 \fIcommand\fR所引用的原始命令的完全限定的名字。当一个命令被导入一个名字空间的时候，在这个名字空间中建立一个新命令，它指向在导出名字空间中的实际命令。如果一个命令被导入到一个名字空间的序列 \fIa, b,...,n \fR之中，这里每一个后续的名字空间只从前面的名字空间中导入命令，这个命令返回在第一个名字空间中的原始命令的完全限定的名字 \fIa\fR。如果 \fIcommand\fR不引用一个导入的命令，返回这个(\fIcommand\fR)命令自己的完全限定的名字。
+.TP
+\fBnamespace parent\fR ?\fInamespace\fR?
+返回给名字空间 \fInamespace\fR 的父名字空间的完全限定的名字。如果未指定 \fInamespace\fR，返回当前名字空间的父名字空间的完全限定的命令。
+.TP
+\fBnamespace qualifiers\fR \fIstring\fR
+返回给 \fIstring \fR的所有前导的名字空间限定符。限定符是由 \fB::\fR分隔的名字空间的名字。对于 \fIstring\fR \fB::foo::bar::x\fR，这个命令返回 \fB::foo::bar\fR，而对于 \fB::\fR它返回一个空串。这个命令与 \fBnamespace tail\fR 命令互补。注意，它不检查名字空间的名字事实上是否是目前定义的名字空间的名字。
+.TP
+\fBnamespace tail\fR \fIstring\fR
+返回在一个限定的字符串尾部的简单名字。限定符是由 \fB::\fR分隔的名字空间的名字。对于 \fIstring\fR \fB::foo::bar::x\fR，这个命令返回 \fBx\fR，而对于 \fB::\fR它返回一个空串。这个命令与 \fBnamespace qualifiers\fR命令互补。它不检查名字空间的名字事实上是否是目前定义的名字空间的名字。
+.TP
+\fBnamespace which\fR ?\-\fBcommand\fR? ?\-\fBvariable\fR? \fIname\fR
+把 \fIname\fR  作为一个命令或者变量来查找并返回它的完全限定的名字。例如，如果 \fIname\fR 在当前名字空间中不存在但在全局名字空间中存在，这个命令返回在全局名字空间中的一个完全限定的名字。如果这个命令或变量不存在，这个命令返回空串。如果变量已经建立但未被定义，比如通过 \fBvariable\fR 命令或通过在变量上\fBtrace\fR(进行追踪)，这个命令返回这个变量的完全限定的名字。如果未给出标志，\fIname\fR被作为一个命令的名字。关于名字解析的规则的解释请参见下面的\fBNAME RESOLUTION\fR (名字解析)章节。
+
+.SH "什么名字空间 WHAT IS A NAMESPACE?"
+.PP
+一个名字空间是命令和变量的一个集合(collection)。它封装命令和变量来确保它们不会被其他名字空间中命令和变量所干扰。Tcl 总是有一个这样的集合，它被引用为\fIglobal namespace\fR (全局名字空间)。全局名字空间持有所有全局变量和命令。\fBnamespace eval\fR命令让你建立一个新的名字空间。例如，
+.CS
+\fBnamespace eval Counter {
+    namespace export bump
+    variable num 0
+
+    proc bump {} {
+        variable num
+        incr num
+    }
+}\fR
+.CE
+建立包含变量 \fBnum\fR  和过程 \fBbump \fR的一个新的名字空间。在这个名字空间中的命令和变量独立于在同一个程序中的其他命令和变量。例如，如果在全局名字空间中有一个叫 \fBbump\fR的命令，它不同的于在 \fBCounter\fR 名字空间中的 \fBbump\fR  命令。
+.PP
+名字空间变量类似于在 Tcl 中的全局变量。它们存在于名字空间中的过程之外，但象在上面的例子中展示的那样，在同一个名字空间中的过程可以通过 \fBvariable\fR 命令访问它。
+.PP
+名字空间是动态的。你可以在任意时候增加及删除命令和变量，所以你可以使用一系列 \fBnamespace eval\fR命令分几次(over time)来建造一个名字空间的内容。例如，下面的一系列命令与上面展示的定义有相同的效果:  
+.CS
+\fBnamespace eval Counter {
+    variable num 0
+    proc bump {} {
+        variable num
+        return [incr num]
+    }
+}
+namespace eval Counter {
+    proc test {args} {
+        return $args
+    }
+}
+namespace eval Counter {
+    rename test ""
+}\fR
+.CE
+注意在例子中向 \fBCounter\fR  名字空间增加了 \fBtest\fR 过程，后来又用 \fBrename\fR命令把它删除了。
+.PP
+在名字空间内可以又其他的名字空间，它们是有层次的嵌套。一个嵌套的名字空间被封装在它的父名字空间中并且不会被其他名字空间所干扰。      
+
+.SH "限定的名字 QUALIFIED NAMES"
+.PP
+每个名字空间都有一个文本名字比如\fBhistory\fR 或 \fB::safe::interp\fR。因为名字空间可以嵌套，使用限定的名字来引用在名字空间中的命令、变量、和包含子名字空间。除了使用 \fB::\fR作为分隔符而不是 \fB/\fR 或 \fB.\fR 之外，限定的(qualified)名字类似于给 Unix 文件或 Tk 组件的有层次的路径，最顶层或全局名字空间拥有名字“” (一个空串)，而 \fB::\fR 是它的同义词。例如，名字 \fB::safe::interp::create\fR  引用在名字空间 \fB::safe \fR的子名字空间 \fBinterp\fR 中的命令 \fBcreate\fR，\fB::safe \fR是全局名字空间 \fB:: \fR的子名字空间。
+.PP
+如果你打算从其他的名字空间中访问命令和变量，你必须使用额外的语法。名字必须被包含它们的名字空间所限定。例如我们可以象下面这样访问 \fBCounter\fR 的过程: 
+.CS
+\fBCounter::bump 5
+Counter::Reset\fR
+.CE
+我们可以象下面这样访问当前的 count (变量的值):  
+.CS
+\fBputs "count = $Counter::num"\fR
+.CE
+当一个名字空间包含另一个的时候，要到达它的元素你可能需要多于一个的限定符。如果我们有一个名字空间 \fBFoo\fR，它包含名字空间 \fBCounter\fR，你可以象下面这样从全局名字空间调用它的 \fBbump\fR 过程:
+.CS
+\fBFoo::Counter::bump 3\fR
+.CE
+.PP
+你还可以在建立和重命名命令的时候使用限定的名字。例如，你可以象下面这样向 \fBFoo\fR增加一个过程:  
+.CS
+\fBproc Foo::Test {args} {return $args}\fR
+.CE
+你可以象下面这样把同一个过程移动到另一个名字空间中: 
+.CS
+\fBrename Foo::Test Bar::Test\fR
+.CE
+.PP
+我们覆盖(cover)剩下的一些关于限定的名字的要点。除了全局名字空间之外名字空间有非空的名字。除了作为名字空间分隔符，不允许 \fB::\fR  在简单命令、变量、和名字空间名字中使用。在限定的名字中忽略额外的 \fB:\fR ；就是说，两个或更多的 \fB: \fR被作为一个名字空间分隔符。在一个限定的变量或命令名字中的尾随的 \fB::\fR 引用叫做 {} 的变量或命令。但是忽略在一个限定的名字空间名中的尾随的 \fB::\fR。 
+
+.SH NAME
+.PP
+一般的，所有接受变量和命令的名字的 Tcl 命令都支持限定的名字。这意味着你可以把限定的名字给这样的命令如\fBset\fR、\fBproc\fR、\fBrename\fR、和 \fBinterp alias\fR。如果你提供了以 \fB:: \fR开始的一个完全限定的名字，对任何命令、变量、或名字空间多没有问题。但是，如果这个名字不以一个 \fB::\fR    开始(它是\fI相对的\fR)，Tcl 依据一个固定的规则来查找它: 解析命令和变量名字总是首先在当前的名字空间中查找，接着在全局名字空间中查找。另一方面，解析名字空间总是在当前名字空间中查找。
+.PP
+在下列例子中, 
+.CS
+\fBset traceLevel 0
+namespace eval Debug {
+    printTrace $traceLevel
+}\fR
+.CE
+Tcl 在名字空间 \fBDebug\fR 中查找 \fBtraceLevel\fR接着在全局名字空间中查找，它以相同的方式查找命令 \fBprintTrace\fR。如果一个变量或命令的名字在这两个上下文中都找不到，则这个名字是未定义的。为了使这一点绝对清楚，考虑下列例子:   
+.CS
+\fBset traceLevel 0
+namespace eval Foo {
+    variable traceLevel 3
+
+    namespace eval Debug {
+        printTrace $traceLevel
+    }
+}\fR
+.CE
+这里 Tcl 首先在名字空间 \fBFoo::Debug \fR中查找 \fBtraceLevel\fR。因为在这里未找到，Tcl 接着在全局名字空间中查找。在名字解析过程中完全忽略了变量 \fBFoo::traceLevel\fR。
+.PP
+你可以使用 \fBnamespace which\fR  命令来清除关于名字解析的任何问题: 
+.CS
+\fBnamespace eval Foo::Debug {namespace which \-variable traceLevel}\fR
+.CE
+返回  \fB::traceLevel\fR。另一方面，命令，
+.CS
+\fBnamespace eval Foo {namespace which \-variable traceLevel}\fR
+.CE
+返回 \fB::Foo::traceLevel\fR.
+.PP
+如上面提及的那样，查找名字空间名字与变量和命令的名字不同。总是在当前名字空间中解析名字空间名字。这意味除非新名字空间的名字以一个 \fB::\fR开始，否则建立一个新名字空间的 \fBnamespace eval\fR 命令总是建立当前名字空间的一个子名字空间。
+.PP
+Tcl 对你可以引用的变量、命令、或名字空间没有访问控制。如果你能提供一个限定的名字来通过名字解析规则解析到一个元素，你就可以访问这个元素。
+.PP
+你可以通过 \fBvariable\fR  命令从同一个名字空间中的一个过程中访问一个名字空间变量。非常象 \fBglobal\fR 命令，它建立到名字空间变量的一个本地连接。如果需要，这个命令还在当前的名字空间中建立这个变量并初始化它。注意：\fBglobal\fR命令只建立到在全局名字空间中的变量的连接。如果你总是使用一个适当的限定的名字来引用名字空间变量，则使用 \fBvariable\fR 命令不是必须的。 
+
+.SH "导入命令 IMPORTING COMMANDS"
+.PP
+名字空间经常用来表示库。一些库命令使用的如此频繁以至于键入它们的限定的名字是极其烦人的。例如， 假设在一个包如 BLT 中的所有命令都包含在一个叫 \fBBlt \fR的名字空间中。则你可以象下面这样访问这些命令: 
+.CS
+\fBBlt::graph .g \-background red
+Blt::table . .g 0,0\fR
+.CE
+如果你频繁使用 \fBgraph\fR 和 \fBtable\fR  命令，你可能希望访问它们而不用加 \fBBlt::\fR前缀。你可以通过把它导入到当前名字空间中的方式来达到此目的。例如: 
+.CS
+\fBnamespace import Blt::*\fR
+.CE
+这个例子把从 \fBBlt\fR名字空间导出的所有命令增加到当前名字空间上下文中，所以你可以象下面这样写代码: 
+.CS
+\fBgraph .g \-background red
+table . .g 0,0\fR
+.CE
+\fBnamespace import\fR命令从一个名字空间导入的命令只能是那个名字空间中用 \fBnamespace export\fR命令导出的命令。
+.PP
+从一个名字空间导入\fI所有\fR命令一般是一个坏主意，因为你不知道你将会得到些什么。更好的方式是只导入你需要的命令。例如，命令
+.CS
+\fBnamespace import Blt::graph Blt::table\fR
+.CE
+只把 \fBgraph\fR 和 \fBtable\fR  命令导入到当前上下文。
+.PP
+如果你要导入一个已经存在的命令，你将得到一个错误。这防止你从两个不同的包导入同一个命令。但是有的时候(可能在调试时)，你可能希望超越这个限制。你可能希望重新发起(reissue) \fBnamespace import\fR命令来导入(pick up)一个新命令，而同名的命令在这个名字空间中已经出现过了。在这种情况下，你可以使用 \fB-force\fR   选项，现存命令将悄无声息的被覆写(overwritten): 
+.CS
+\fBnamespace import \-force Blt::graph Blt::table\fR
+.CE
+如果出于某种原因，你打算停止使用导入的命令，你可以用 \fBnamespace forget\fR 命令删除它们，例如: 
+.CS
+\fBnamespace forget Blt::*\fR
+.CE
+它在当前名子空间中查找从 \fBBlt \fR导入的所有命令，如果找到则删除它们。否则，它什么都不做。此后，访问 \fBBlt\fR命令必须使用 \fBBlt::\fR  前缀。
+.PP
+当你从导出(命令的)名字空间删除一个命令的时候，例如:
+.CS
+\fBrename Blt::graph ""\fR
+.CE
+则从所有导入它的名字空间中自动删除这个命令。 
+
+.SH "导出命令 EXPORTING COMMANDS"
+你可以从一个名字空间中导出命令，例如: 
+.CS
+\fBnamespace eval Counter {
+    namespace export bump reset
+    variable Num 0
+    variable Max 100
+
+    proc bump {{by 1}} {
+        variable Num
+        incr Num $by
+        Check
+        return $Num
+    }
+    proc reset {} {
+        variable Num
+        set Num 0
+    }
+    proc Check {} {
+        variable Num
+        variable Max
+        if {$Num > $Max} {
+            error "too high!"
+        }
+    }
+}\fR
+.CE
+过程 \fBbump\fR  和 \fBreset\fR  被导出，所以当你从 \fBCounter\fR 名字空间导入的时候，它们被包括在内。例如:  
+.CS
+\fBnamespace import Counter::*\fR
+.CE
+但是 \fBCheck\fR  过程未被导出，所以它被导入操作所忽略。
+.PP
+\fBnamespace import\fR，命令只导入被它们的名字空间导出的命令。\fBnamespace export\fR 命令指定什么命令可以被其他名字空间导入。如果一个 \fBnamespace import\fR命令指定了一个未被导出的命令，则不导入这个命令。
+
+.SH "参见 SEE ALSO"
+variable(n)
+
+.SH "关键字 KEYWORDS"
+exported, internal, variable
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/10/12
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

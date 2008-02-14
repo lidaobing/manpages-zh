@@ -1,0 +1,356 @@
+.\" (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\" Chinese Version Copyright LetBright, www.linuxforum.net, 2000
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date. The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein. The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" License.
+.\" Modified Sun Jul 25 11:05:58 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Sat Feb 10 16:18:03 1996 by Urs Thuermann (urs@isnogud.escape.de)
+.\" Modified Mon Jun 16 20:02:00 1997 by Nicol醩 Lichtmaier 
+.\" Modified Mon Feb 6 16:41:00 1999 by Nicol醩 Lichtmaier 
+.\" Modified Tue Feb 8 16:46:45 2000 by Chris Pepper 
+.\" 中文版 Copyright (c) 2000 LetBright 和 www.linuxforum.net
+.TH HIER 7 "June 16, 1997" "Linux" "Linux Programmer's Manual"
+.SH NAME 名称
+hier \- 文件系统描述
+.SH DESCRIPTION 描述
+一个典型的Linux系统具有以下几个目录：
+.TP
+.I /
+根目录，是所有目录树开始的地方。
+.TP
+.I /bin
+此目录下包括了单用户方式及系统启动或修复所用到的所有执行程序。
+.TP
+.I /boot
+包括了引导程序的静态文件。此目录下包括了在引导过程中所必需的文件。
+系统装载程序及配制文件在
+.I /sbin
+和
+.IR /etc
+目录中找到。
+.TP
+.I /dev
+对应物理设备的指定文件或驱动程序。参见mknod(1)。
+.TP
+.I /dos
+如果MS\-DOS和Linux共存于一台计算机时，这里通常用于存放DOS
+文件系统。
+.TP
+.I /etc
+用于存放本地机的配置文件。一些大型软件包，如X11，在
+.IR /etc
+下有它们自己的子目录。系统配置文件可以放在这里或在
+.IR /usr/etc。
+不过所有程序总是在
+.BR /etc
+目录下查找所需的配置文件，你也可以将这些文件连结到目录
+.IR /usr/etc .
+.TP
+.I /etc/skel
+当建立一个新用户帐号时，此目录下的文件通常被复制到用户的主目录下。
+.TP
+.I /etc/X11
+X11 window system所需的配置文件。
+.TP
+.I /home
+在Linux机器上，用户主目录通常直接或间接地置在此目录下。其结构通
+常由本地机的管理员来决定。
+.TP
+.I /lib
+此目录下包含系统引导和在根用户执行命令所必需用到的共享库。
+.TP
+.I /mnt
+挂载临时文件系统的挂载点。
+.TP
+.I /proc
+这是提供运行过程和核心文件系统
+.BR proc
+挂载点。这一"伪"文件系统在以下章节中有详细叙述
+.BR proc (5)。
+.TP
+.I /sbin
+类似于
+.IR /bin
+此目录保存了系统引导所需的命令，但这些命令一般用户不能执行。
+.TP
+.I /tmp
+此目录用于保存临时文件，临时文件在日常维护或在系统启动时无需通知便
+可删除
+.TP
+.I /usr
+此目录通常用于从一个独立的分区上挂载文件。它应保存共享只读类文件，
+这样它可以被运行Linux的不同主机挂载。
+.TP
+.I /usr/X11R6
+X\-Window系统 Version 11 release 6.
+.TP
+.I /usr/X11R6/bin
+X\-Windows系统使用的二进制文件；通常是在对更传统的
+.BR /usr/bin/X11
+中文件的符号连接。
+.TP
+.I /usr/X11R6/lib
+保存与X\-Windows系统有关数据文件。
+.TP
+.I /usr/X11R6/lib/X11
+此目录保存与运行X\-Windows系统有关其他文件。通常是对来自
+.BR /usr/lib/X11
+中文件的符号连接。
+.TP
+.I /usr/X11R6/include/X11
+此目录保存包括使用X11视窗系统进行编译程序所需的文件。通常是对来自
+.BR /usr/lib/X11
+中文件的符号连接。
+.TP
+.I /usr/bin
+这是执行程序的主要目录，其中的绝大多数为一般用户使用，
+除了那些启动系统或修复系统或不是本地安装的程序一般都
+放在此目录下。
+.TP
+.I /usr/bin/X11
+X11执行文件放置的地方；在Linux系统中，它通常是对
+.IR /usr/X11R6/bin .
+符号连接表
+.TP
+.I /usr/dict
+此目录保存拼写检查器所使用的词汇表文件。
+.TP
+.I /usr/doc
+此目录下应可以找到那些已安装的软件文档。
+.TP
+.I /usr/etc
+此目录可用来那些存放整个网共用的配置文件。然而那可执行命
+令指向总是使用参照使用
+.I /etc
+目录下的文件。
+.I /etc
+目录下连接文件应指向
+.IR /usr/etc .
+目录下适当的文件。
+.TP
+.I /usr/include
+C程序语言编译使用的Include"包括"文件。
+.TP
+.I /usr/include/X11
+C程序语言编译和X\-Windows系统使用的 Include"包括"文件。它通
+常中指向
+.I /usr/X11R6/include/X11.
+符号连接表。
+.TP
+.I /usr/include/asm
+申明汇编函数的Include"包括"文件，它通常是指向
+.IR /usr/src/linux/include/asm 
+目录的符号连接
+.TP
+.I /usr/include/linux
+包含系统变更的信息通常是指向
+.I /usr/src/linux/include/linux
+目录的符号连接表，来获得操作系统特定信息。
+
+(注：用户应在此自行包含那些保证自己开发的程序正常运行所需的libc
+函数库。不管怎样，Linux核心系统不是设计用来执行直接运行用户程序
+的，它并不知道用户程序需要使用哪个版本的libc库 。如果你随意将
+.I /usr/include/asm
+和
+.I /usr/include/linux
+指向一个系统内核，系统很可能崩溃。Debian系统不这么做。它使用
+libc*-dev运行包中提供的内核系统标识，以保证启动所有正确的文件。)
+.TP
+.I /usr/include/g++
+GNU C++编译器所使用的Include"包括"文件。
+.TP
+.I /usr/lib
+目标库文件，包括动态连接库加上一些通常不是直接调用的可执行文件。一
+些复杂的程序可能在此占用整个子目录。
+.TP
+.I /usr/lib/X11
+存放X系统数据文件及系统配置文件的地方。
+Linux中通常是指向
+.IR /usr/X11R6/lib/X11 
+目录的符号连接表。
+.TP
+.I /usr/lib/gcc-lib
+GNU C 编译器所使用的可执行文件和"包括"文件。
+.BR gcc (1).
+.TP
+.I /usr/lib/groff
+GNU groff 文档格式系统所使用的文件。
+.TP
+.I /usr/lib/uucp
+.BR uucp (1)
+所使用的文件。
+.TP
+.I /usr/lib/zoneinfo
+有关时区信息文件文件。
+.TP
+.I /usr/local
+安装在本地执行程序的地方。
+.TP
+.I /usr/local/bin
+在此地放置本地执行程序的二进制文件。
+.TP
+.I /usr/local/doc
+放置本地文档。
+.TP
+.I /usr/local/etc
+安装在本地程序的配置文件。
+.TP
+.I /usr/local/lib
+安装在本地程序的库文件。
+.TP
+.I /usr/local/info
+安装在本地程序有关信息文件。
+.TP
+.I /usr/local/man
+安装在本地程序使用手册。
+.TP
+.I /usr/local/sbin
+安装在本地的系统管理程序。
+.TP
+.I /usr/local/src
+安装在本地程序的源代码。
+.TP
+.I /usr/man
+手册页通常放在此目录，或相关子目录下。
+.TP
+.I /usr/man//man[1-9]
+此目录在指定的地方以源代码形式存放手册页。系统在所有的手册
+页中使用自己独特的语言及代码集，可能会省略
+.BR substring
+子字串。
+.TP
+.I /usr/sbin
+此目录保存系统管理程序的二进制码，这些文件不是系统启动或文件
+系统挂载
+.BR /usr
+目录或修复系统所必需的。
+.TP
+.I /usr/share
+在此目录下不同的子目录中保存了同一个操作系统在不同构架下工作
+时特定应用程序的共享资料。用户可以找到通常放在
+.I /usr/doc
+或
+.I /usr/lib
+或
+.IR /usr/man
+目录下的这些资料。
+.TP
+.I /usr/src
+系统不同组成部份的源文件包括参考资料包。不要将你自己与项目有关的文
+件放这里，因为在安装软件外，/usr下的文件属性除通常设为只读。
+.TP
+.I /usr/src/linux
+系统内核资源通常拆包安装于此。这是系统中重要的一环，因为
+.BR /usr/include/linux
+符号连接表指向此目录。你应当使用其他目录来来编译建立新内核。
+.TP
+.I /usr/tmp
+此目录不再使用了。它应指向目录
+.IR /var/tmp 。
+这个链接只是出于系统兼容的目的，一般不再使用。
+.TP
+.I /var
+此目录下文件的大小可能会改变，如缓冲文件可日志文件。
+.TP
+.I /var/adm
+此目录为
+.I /var/log
+甩替代，通常是指向
+.IR /var/log
+的符号连接表。
+.TP
+.I /var/backups
+此目录用来存放重要系统文件的后备文件
+.TP
+.IR /var/catman/cat[1-9] " or " /var/cache/man/cat[1-9]
+此目录存放根据手册分类预先格式化的参考手册页。(这些参考手册
+页是相互独立的)
+.TP
+.I /var/lock
+此目录存放锁定文件。依据命名习惯，设备锁定文件是
+.I LCKxxxxx
+xxxxx与在文件系统中该设备名相同，使用的格式是HDU UUCP锁定文件，
+例如包含进程标识PID的锁定文件是一个10字节的ASCII格式的数字，
+后面跟一个换行符。
+.TP
+.I /var/log
+各种日志文件。
+.TP
+.I /var/preserve
+这是
+.BR vi (1)
+存放正在编辑中的文件，以便以后可以恢复。
+.TP
+.I /var/run
+运行时的变量文件，如存放进程标识和登录用户信息的文件。
+.BR (utmp) 
+此目录下文件在系统启动时被自动清除。
+.TP
+.I /var/spool
+各种程序产生的缓冲或排除等待的文件
+.TP
+.I /var/spool/at
+.BR at (1)
+的作业存缓区
+.TP
+.I /var/spool/cron
+.BR cron (1)
+的作业存缓区
+.TP
+.I /var/spool/lpd
+打印缓存文件。
+.TP
+.I /var/spool/mail
+用户邮箱。
+.TP
+.I /var/spool/smail
+存放
+.BR smail (1)
+邮件发送程序的缓冲文件。
+.TP
+.I /var/spool/news
+新闻子系统的缓冲目录
+.TP
+.I /var/spool/uucp
+.BR uucp (1)
+的缓冲文件
+.TP
+.I /var/tmp
+类似
+.IR /tmp ,
+此目录保存未指定持续时间的临时文件。
+.SH "CONFORMS TO 适用于"
+Linux 文件系统，1.2版
+.SH BUGS缺陷
+这份列表是不详尽的。因为不同的系统配置是不同。
+.SH "参见"
+.BR find (1),
+.BR ln (1),
+.BR mount (1), 
+.BR proc (5),
+Linux 文件系统标准的相关内容。
+
+.SH "[中文版维护人]"
+.B LetBright <letbright@netease.com>
+.SH "[中文版最新更新]"
+.B 2000/10/30
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

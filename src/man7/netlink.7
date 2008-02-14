@@ -1,0 +1,251 @@
+.\" t
+.\" Don't change the first line, it tells man that tbl is needed.
+.\" This man page copyright 1998 by Andi Kleen. Subject to the GPL.
+.\" This manpage copyright 1998 by Andi Kleen. Subject to the GPL.
+.\" Based on the original comments from Alexey Kuznetsov
+.\" 中文版 Copyright (c) 2000 LetBright，BitBIRD 和 www.linuxforum.net
+.TH NETLINK 7 "27 Apr 1999" "Linux Man Page" "Linux Programmer's Manual"
+.SH NAME 名称
+netlink, PF_NETLINK \- 内核与用户之间的通讯
+.SH SYNOPSIS 总揽
+.nf
+.\" XXX
+.B #include <asm/types.h>
+.br
+.B #include <sys/socket.h>
+.br
+.B #include <linux/netlink.h> 
+.br
+.PP
+.BI "netlink_socket = socket(PF_NETLINK, " socket_type ", " netlink_family ); 
+.SH DESCRIPTION 描述
+Netlink 用于在内核模块与在用户地址空间中的进程之间传递消息的。它包
+含了用于用户进程的基于标准套接字的接口和用于内核模块的一个内部核心
+API。有关这个内部核心接口的资料没有包含在此手册页中。同样还有
+一个过时的通过 netlink 字符设备的接口也没有包含在此，它只是提供
+向下兼容特性。
+
+Netlink 是一个面向数据包的服务。
+.B SOCK_RAW
+和
+.B SOCK_DGRAM
+都是
+.IR socket_type
+的有效值。然而 netlink 协议对数据包 datagram 和原套接字（raw sockets）
+并不作区分。
+
+.I netlink_family
+选择核心模块或 netlink 组进行通讯。现有可指定的 netlink 的种类有： 
+.TP
+.B NETLINK_ROUTE
+接收路由更新信息，可以用来修改 IPv4 的路由表。(参见
+.BR rtnetlink (7))。
+.TP
+.B NETLINK_FIREWALL
+接收 IPv4 防火墙编码发送的数据包。
+.TP
+.B NETLINK_ARPD
+用以维护用户地址空间里的 arp 表
+.TP
+.B NETLINK_ROUTE6
+接收和发送 IPv6 路由表更新消息。
+.TP
+.B NETLINK_IP6_FW
+接收未通过 IPv6 防火墙检查的数据包(尚未实现)
+.TP
+.BR NETLINK_TAPBASE ... NETLINK_TAPBASE+15
+是
+.B ethertap
+设备实例。Ethertap 是从用户程序空间对以太网驱动程序进行
+仿真的“伪”网络通道设备。
+.TP
+.B NETLINK_SKIP
+Enskip 的保留选项。
+.TP
+.B NETLINK_USERSOCK
+为今后用户程序空间协议用保留选项。
+.PP
+Netlink 数据信息由具有一个或多个
+.B nlmsghdr
+数据报头及其有效数据的字节流组成。对于分成多个数据包的 Netlink 信息，
+数据报头中的
+.B NLM_F_MULTI
+标志位将被设置，除了最后一个包的报头具有标志
+.BR NLMSG_DONE 外。
+字节流应只能用标准的
+.B NLMSG_*
+宏来访问，参阅
+.BR netlink (3). 
+
+Netlink 不是可靠的协议。它只是尽可能地将信息传输到目的地，但在内存耗
+尽或发生其他错误时，它会丢失信息。为保证信息可靠传输，可以设置标志
+.B NLM_F_ACK
+来要求接收方确认。数据接收确认是一个
+.B NLMSG_ERROR
+数据包，包中的出错字段设置为 0。应用程序必须自己创建收到信息确认消息。
+在信息传送过程中，内核一直(尝试)对每个出错的数据包发送
+.B NLMSG_ERROR
+消息。用户进程也应当遵循这一个惯例。
+
+每一个 netlink 数据类都有一个32位广播分组，当
+对套接字调用
+.BR bind (2)
+时， 
+.B sockaddr_nl
+中的
+.B nl_groups
+字段设置成所要侦听的广播组的位掩码。其默认值为 0，表示不接收任何广播。
+
+一个套接字可以对任意一个多址广播组广播消息，只要在调用
+.BR sendmsg (2) 
+或调用
+.BR connect (2) 
+时，将位掩码
+.B nl_groups
+设置成要发送消息的广播组的值就可以了。
+只有具有有效 uid 为 0 的用户或具有
+
+.B CAP_NET_ADMIN
+权限的用户才可能发送或侦听针对 netlink 多址广播组的消息。
+任何一个对多址广播组消息的响应需发回进程标识 pid 和广播组地址。
+
+.RS
+.nf
+.ta 4 13 25
+struct nlmsghdr
+{
+__u32 nlmsg_len; /* 包括报头在内的消息长度*/
+__u16 nlmsg_type; /* 消息正文 */
+__u16 nlmsg_flags; /* 附加标志*/
+__u32 nlmsg_seq; /* 序列号*/
+__u32 nlmsg_pid; /* 发送进程号 PID */
+};
+
+
+struct nlmsgerr
+{
+int error; /* 负数表示的出错号 errno 或为 0 要求确认 acks*/ 
+struct nlmsghdr msg; /* 造成出错的消息报头*/ 
+};
+.ta
+.fi
+.RE
+
+在每个
+.B nlmsghdr
+后跟随着有效数据。
+.B nlmsg_type
+可以成为标准消息的类型：
+.B NLMSG_NOOP
+可以忽略的消息，
+.B NLMSG_ERROR
+发出错误发生的消息，有关数据中包含一个 
+.I nlmsgerr 
+结构，
+.B NLMSG_DONE
+一个多数据包消息结束的信息。
+.\" 2.1.130 好象不再使用它。
+.\" .B NLMSG_OVERRUN
+.\" 数据丢弃. 
+
+一个 netlink 类通常指定更多的消息类型，请参阅有关手册页，如
+.IR NETLINK_ROUTE .
+中的 
+.BR rtnetlink (7)
+
+.TS 
+tab(:); 
+l s 
+l l.
+nlmsg_flags 的标准标志位
+NLM_F_REQUEST: 设置全部请求消息
+NLM_F_MULTI:T{
+此消息是多数据包消息之一，通过标志
+.B NLMSG_DONE
+结束。
+.\" XXX describe that
+T}
+NLM_F_ACK: 数据成功接收返回确认消息
+NLM_F_ECHO: 要求响应请求信息
+.TE
+
+.TS
+tab(:);
+l s 
+l l.
+为 GET 请求设立的附加标志位
+NLM_F_ROOT: 返回对象表而不是单个数据项
+NLM_F_MATCH: 尚未实现
+NLM_F_ATOMIC: 返回对象表的原子快照(atomic snapshot) 
+NLM_F_DUMP: 尚未列入文档
+.TE
+
+.TS
+tab(:);
+l s
+l l.
+对新建 NEW 请求设立的附加标志位
+NLM_F_REPLACE: 替换现有的对象
+NLM_F_EXCL: 如对象已存在，不作替换
+NLM_F_CREATE: 创建对象，如果对象不存在
+NLM_F_APPEND: 对象表添加对象项
+.TE
+
+注 NLM_F_ATOMIC 要求用户有 CAP_NET_ADMIN 或超级用户权。
+
+.SH 地址格式
+
+.B sockaddr_nl
+描述了在用户空间或在核心空间里一个 netlink 客户对象的数据结构。
+一个 sockaddr_nl 对象可以是单址广播或对一个 netlink 多址组
+(nl_groups 不为 0).
+
+.RS
+.nf
+struct sockaddr_nl
+{
+sa_family_t nl_family; /* AF_NETLINK */
+unsigned short nl_pad; /* 零 */
+pid_t nl_pid; /* 进程标识号pid */
+__u32 nl_groups; /* 多址广播组掩码*/
+};
+.fi
+.RE
+
+.B nl_pid 
+是用户空间中 netlink 的进程标识号 pid，如果是在内核时此值为 0。
+.B nl_groups 
+是一个代表 neltlink 组号的位掩码。
+.\" XXX describe what that is. 
+
+
+.SH BUGS
+本手册页并不完整。
+
+
+.SH  NOTES 注意
+通过
+.B libnetlink
+调用 netlink 功能通常比通过低层内核接口要来得好些。
+
+
+.SH VERSIONS 版本
+netlink 套接字接口是 Linux 2.2 新特性
+
+Linux 2.0 支持更多的基于netlink接口的原始设备(作为向下兼容特性，
+这些设备目前仍可使用。旧接口特性没有在此叙述。
+
+.SH 另见
+.BR cmsg (3),
+.BR rtnetlink (7),
+.BR netlink (3).
+.PP
+.BR ftp://ftp.inr.ac.ru/ip-routing/iproute2* 
+有关 libnetlink 部分
+
+.SH "[中文版维护人]"
+.B LetBright <letbright@netease.com>
+.SH "[中文版最新更新]"
+.B 2000/11/09
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

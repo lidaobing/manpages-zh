@@ -1,0 +1,97 @@
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\" 
+.\" Modified Sat Jul 24 16:56:20 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Mon Oct 21 21:38:51 1996 by Eric S. Raymond <esr@thyrsus.com>
+.\" (and some more by aeb)
+.\"
+.TH HD 4 1992-12-17 "Linux" "Linux Programmer's Manual"
+.SH NAME
+hd \- MFM/IDE 硬盘设备
+.SH "描述 DESCRIPTION"
+\fBhd*\fP 开头的设备是以裸模式(raw mode)访问MFM/IDE类型硬盘的块
+设备. 第一个IDE驱动控制器上的主盘(主设备号3)是 \fBhda\fR ;从盘是 \fBhdb\fR.
+第二个IDE驱动器控制器(主设备号22)是 \fBhdc\fR ,从为 \fBhdd\fR.
+.LP
+大多数IDE 块设备以
+.BI hd X\c
+, 或者
+.BI hd XP\c
+的形式命名,  其中字母
+.I X
+代表任意字母以表示各个物理设备.其中P表示各个物理设备中分区的代号.
+.I P
+表示各个物理设备中分区的代号。第一种形式
+.BI hd X,
+代表整个驱动器的地址,而分区号是按照每个分区
+被发现的顺序分配的,并且只有非空和非扩展分区才能有这个号码
+然而不管这个分区是未使用过的还是扩展的,在MBR中只纪录四个分区
+号码依次为1-4. 因此逻辑分区只能从
+.BI hd X 5\c
+开始。支持DOS 风格的分区以及BSD-磁盘卷标分区。
+你最多可以在一个IDE磁盘上建立63个分区.
+.LP
+例如，
+.B /dev/hda
+代表第一个IDE驱动器的全部；
+.B /dev/hdb3
+代表第二块IDE硬盘上的第三DOS 主分区.
+.LP
+典型如下建立:
+.RS
+.sp
+mknod -m 660 /dev/hda b 3 0
+.br
+mknod -m 660 /dev/hda1 b 3 1
+.br
+mknod -m 660 /dev/hda2 b 3 2
+.br
+\&...
+.br
+mknod -m 660 /dev/hda8 b 3 8
+.br
+mknod -m 660 /dev/hdb b 3 64
+.br
+mknod -m 660 /dev/hdb1 b 3 65
+.br
+mknod -m 660 /dev/hdb2 b 3 66
+.br
+\&...
+.br
+mknod -m 660 /dev/hdb8 b 3 72
+.br
+chown root:disk /dev/hd*
+.RE
+.SH "文件 FILES"
+/dev/hd*
+.SH "参见 SEE ALSO"
+.BR mknod (1),
+.BR chown (1),
+.BR mount (8),
+.BR sd (4)
+
+.SH "[中文版维护人]"
+.B trcbilg <email>
+.SH "[中文版最新更新]"
+.B 2000.11.22
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

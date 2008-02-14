@@ -1,0 +1,63 @@
+.\" Copyright 1993 Rick Sladkey <jrs@world.std.com>
+.TH SHOWMOUNT 8 "11 August 1997"
+.SH NAME
+showmount \- 显示关于 NFS 服务器文件系统挂载的信息
+.SH 总览
+.ad l
+.B /usr/sbin/showmount
+.B "[\ \-adehv\ ]"
+.B "[\ \-\-all\ ]"
+.B "[\ \-\-directories\ ]"
+.B "[\ \-\-exports\ ]"
+.B "[\ \-\-help\ ]"
+.B "[\ \-\-version\ ]"
+.B "[\ host\ ]"
+.ad b
+.SH 描述
+.B showmount
+showmount 在远程主机上查询关于该 NFS 服务器的挂载进程状态。
+如果不使用任何参数，
+.B showmount
+显示所有从该服务器上挂载到本地的客户清单。
+.B showmount
+的输出格式设计成类似于经过 ``sort -u''
+命令格式化后一样。
+.SH 选项
+.TP
+.BR \-a 或 \-\-all
+以 host:dir 这样的格式来显示客户主机名和挂载点目录。
+.TP
+.BR \-d 或 \-\-directories
+仅显示被客户挂载的目录名。
+.TP
+.BR \-e 或 \-\-exports
+显示NFS服务器的输出清单。
+.TP
+.BR \-h 或 \-\-help
+显示帮助信息。
+.TP
+.BR \-v 或 \-\-version
+显示版本信。
+.TP
+.B \-\-no\-headers
+禁止输出描述头部信息。
+.SH 参见
+.BR rpc.mountd (8),
+.BR rpc.nfsd (8)
+.SH BUGS
+.B showmount
+所显示输出内容的完整性和准确性将视 NFS 实现的好坏而定。
+.PP
+由于
+.B showmount
+的输出是唯一的和经过排序的，
+所以无法列出当前挂载点目录是否被挂载一次以上。
+.SH 作者
+.B Rick Sladkey <jrs@world.std.com>
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.B 2001/05/01
+.SH 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net
+

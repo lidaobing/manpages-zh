@@ -1,0 +1,117 @@
+.TH MKFS 8 "Jun 1995" "Version 1.9"
+.SH NAME
+mkfs \- 创建一个 Linux 文件系统
+.SH 总览
+.B mkfs
+[
+.B \-V
+]
+[
+.B \-t
+.I 文件系统类型
+]
+[
+.B fs-选项
+]
+.I 文件系统
+[
+.I 块
+]
+.SH 描述
+.B mkfs
+mkfs 用来在指定设备创建一个 Linux 文件系统，
+通常是在硬盘上。
+.I 文件系统
+既可以是设备名，（如：
+.IR /dev/hda1 ，
+.IR /dev/sdb2 ）
+也可以是文件系统的挂载点，（如：
+.IR / ，
+.IR /usr ，
+.IR /home ）。
+.I 块
+是指该文件系统用的块数。
+.PP
+如果
+.B mkfs
+成功执行时返回值为 0，反之，则是 1。
+.PP
+事实上，
+.B mkfs
+是在 Linux 下各文件系统专用程序
+（\fBmkfs\fR.\fIfstype\fR）
+的前端程序。各文件系统专用程序可以在
+.IR /sbin ，
+.IR /sbin/fs ，
+.IR /sbin/fs.d ，
+.IR /etc/fs ，
+.I /etc
+等目录中找到，
+（精确定义一般都在编译内核时定义，但通常包含有
+.I /sbin
+和
+.IR /sbin/fs ），
+并最终在环境变量 PATH 列出的目录中．
+如要获取更多关于相应文件系统的创建工具的信息，可参考相应帮助手册。
+.SH 选项
+.TP
+.B -V
+输出冗长的帮助信息，其中包括执行的各种系统相关的命令．
+一行命令中出现多个此参数可禁止所有系统相关命令的执行。
+这个做法实际上之是在测试时有用。
+.TP
+.BI -t \ 文件系统类型
+指定所要创建的文件系统类型。如没有任何指定，
+则使用缺省的文件系统类型（目前是 ext2）。
+.TP
+.B fs-选项
+要传递给实际的文件系统制作工具的文件系统相关的选项。
+虽然我们不能保证，但是绝大部分文件系统制作工具支持下面的选项。
+.TP
+.B -c
+在创建文件系统之前进行设备坏块检查。
+.TP
+.BI -l \ filename
+从指定文件
+.I filename
+中读取坏块信息。
+.TP
+.B -v
+产生冗长输出信息。
+.SH 臭虫
+所有通用选项须首先定义并且不能与文件系统相关的
+选项合并。
+一些指定文件系统创建工具不支持
+.I -v
+选项，也不会返回有意义的返回值。
+某些指定文件系统创建工具不会自动侦测磁盘设备的大小，因此需要声明
+.I blocks
+。
+.SH 开发人员
+
+David Engel (david@ods.com)
+.br
+Fred N. van Kempen (waltje@uwalt.nl.mugnet.org)
+.br
+Ron Sommeling (sommel@sci.kun.nl)
+.br
+这个手册页是无耻地从 Remy Card 为 ext2 文件系统
+写的版本搞过来的。
+.SH 又见
+.BR fs (5),
+.BR badblocks (8),
+.BR fsck (8),
+.BR mkdosfs (8),
+.BR mke2fs (8),
+.BR mkfs.ext2 (8),
+.BR mkfs.minix (8),
+.BR mkfs.msdos (8),
+.BR mkfs.xiafs (8)
+
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.B 2001/05/01
+.SH 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net
+

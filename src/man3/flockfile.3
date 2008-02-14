@@ -1,0 +1,64 @@
+.\" Copyright (C) 2001 Andries Brouwer <aeb@cwi.nl>.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.TH LOCKFILE 3  2001-10-18 "" "Linux Programmer's Manual"
+.SH NAME
+flockfile, ftrylockfile, funlockfile \- 为标准输入输出锁定文件 FILE
+.SH "SYNOPSIS 总览"
+.nf
+.B #include <stdio.h>
+.sp
+.BI "void flockfile(FILE *" filehandle );
+.br
+.BI "int ftrylockfile(FILE *" filehandle );
+.br
+.BI "void funlockfile(FILE *" filehandle );
+.fi
+.SH "DESCRIPTION 描述"
+标准输入输出库 stdio 函数是线程安全的。这是通过为每个文件对象 FILE 赋予一个锁定计数和 (当锁定计数非零时) 一个所有者线程来实现的。对每个库函数调用，这些函数等待直到文件对象 FILE 不再被一个不同的线程锁定，然后锁定它，进行所需的 I/O 操作，再次对它解锁。
+.LP
+(注意：这个锁定与由函数
+.BR flock (2)
+和
+.BR lockf (3)
+实现的锁定无关。)
+.LP
+所有这些操作对 C 程序员来说都是不可见的，但是有两种理由，需要进行更加细节的控制。其一，也许某个线程需要进行不可分割的一系列 I/O 操作，不应当被其他线程的 I/O 所终端。其二，出于效率因素，应当避免进行过多的锁定来提高效率。
+.LP
+为此，一个线程可以显式地锁定文件对象 FILE，接着进行它的一系列 I/O 操作，然后解锁。这样可以避免其他线程干扰。如果这样做的原因是需要达到更高的效率，应当使用 stdio 函数的非锁定版本来进行 I/O 操作：使用 \fIgetc_unlocked\fP() 和 \fIputc_unlocked\fP() 来代替 \fIgetc\fP() 和 \fIputc\fP()。
+.LP
+函数 \fBflockfile()\fP 等待 *\fIfilehandle\fP 不再被其他的线程锁定，然后使当前线程成为 *\fIfilehandle\fP 的所有者，然后增加锁定计数 lockcount。
+.LP
+函数 \fBfunlockfile()\fP 减少锁定计数。
+.LP
+函数 \fBftrylockfile()\fP 是 \fBflockfile()\fP 的非锁定版本。它在其他线程拥有 *\fIfilehandle\fP 时不做任何处理，否则取得所有权并增加锁定计数。
+.SH "RETURN VALUE 返回值"
+函数 \fBftrylockfile()\fP 返回零，如果成功的话 (获得了锁定)；如果失败就返回非零。
+.SH ERRORS
+无。
+.SH AVAILABILITY
+这些函数当定义了 _POSIX_THREAD_SAFE_FUNCTIONS 时可用。它们存在于 libc 5.1.1 之后的 libc 版本中，以及 glibc 2.0 之后的 glibc 版本中
+.SH "CONFORMING TO 标准参考"
+POSIX.1
+.SH "SEE ALSO 参见"
+.BR unlocked_stdio (3)
+

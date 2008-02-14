@@ -1,0 +1,176 @@
+'\"t
+.\" @(#)lilo.8 1.0 950728 aeb
+.\" This page is based on the lilo docs, which carry the following
+.\" COPYING condition:
+.\"
+.\" LILO program code, documentation and auxiliary programs are
+.\" Copyright 1992-1994 Werner Almesberger.
+.\" All rights reserved.
+.\" 
+.\" Redistribution and use in source and binary forms of parts of or the
+.\" whole original or derived work are permitted provided that the
+.\" original work is properly attributed to the author. The name of the
+.\" author may not be used to endorse or promote products derived from
+.\" this software without specific prior written permission. This work
+.\" is provided "as is" and without any express or implied warranties.
+.\"
+.\" Original version, Andries Brouwer (aeb@cwi.nl), 950728
+.\" Added t directive, as Daniel Quinlan asked, 950824
+.\"
+.TH LILO 8 "28 July 1995"
+
+
+.SH NAME
+lilo \- 安装引导装入程序
+
+.SH 总述
+主要功能:
+.LP
+.B ” /sbin/lilo”
+\- 安装引导装入程序
+.LP
+辅助用途:
+.LP
+.B ”/sbin/lilo –q”
+\- 查询影射表
+.br
+.B ”/sbin/lilo –R”
+\- 设置下次启动的默认命令行
+.br
+.B ”/sbin/lilo –I”
+\- 查询当前内核的路径
+.br
+.B ”/sbin/lilo {-u|-U}”
+\- 卸载lilo
+
+.SH 使用说明
+.LP
+lilo 安装一个你在下一次启动时被激活的引导装入程序
+它有多项的选择.
+.LP
+.TP
+.B \-\^v
+增加冗余.给出一个或更多的-v选项
+使lilo 更详细.
+.TP
+.B \-\^q
+列表当前已被影射的文件.
+.B lilo
+维护着一个文件,缺省的是
+.IR ”/boot/map”,
+包含了启动内核的名称和定位（位置）。
+这个选项列出在其中的名字.
+.BI ”\-\^m “ 影射文件名
+使用指定的影射文件代替默认的.
+.TP
+.BI ”\-\^C” 配置文件名
+.B lilo
+从这个文件中读取有关影射文件的指令, 省缺的是
+.IR ”/etc/lilo.conf”.
+这个选项能使用一个指定的非默认的配置文件.
+.TP
+.BI ”\-\^d “ 延迟
+如果你有几个指定的内核, 在启动时按下Shift 键, 引导程序会提供一个你选
+择使用哪个系统内核去启动的机会. 一个预期的时间后列表的第一项将被引导. 
+这个选项指定一个以十分之一秒为单位的超时延迟.
+.TP
+.BI ”\-\^D ” 标记
+使用给出标记的内核去代替第一个来作为默认的引导.
+.TP
+.BI ”\-\^r ” root-目录
+做任何（修改）之前，改变root的位置到指出的目录.
+习惯上用于纠正从软盘启动的安装.
+.TP
+.BI ”\-\^t ”
+只进行测试. 不会真正的写入新的启动或影射文件.
+和\fB-v\fP一起使用得知.B lilo
+大约有什么要做.
+.TP
+.B ”\-\^c ”
+影射压缩.将合并读入从临近部分的请求.
+加速启动(尤其从软盘).
+.TP
+.BI ”\-\^f ” disk-tab
+指定磁盘参数文件. (省缺的是
+.IR /etc/disktab.)
+.TP
+.BI ”\-\^i ” boot-sector
+指定一个文件作为boot sector使用.(省缺的是 
+.IR /boot/boot.b.)
+.TP
+.BI ”\-\^l ”
+产生线性sector地址代替sector/head/cylinder 地址.
+.TP
+.BI ”\-\^P ” ”{fix|ignore}”
+修理(或忽略)被破坏的分区表, 例如,
+分区表用线性的和sector/head/cylinder 地址不协调.
+.TP
+.BI ”\-\^s ” save-file
+当
+.B lilo
+覆盖 boot sector, 保存旧的内容在一个文件里,
+省缺的是
+.I /boot/boot.NNNN
+这个NNNN依赖与设备.
+这选项为boot sector 指定一个后选的挽救文件.
+(或者, 和
+\fB-u\fP 一起使用,从哪里恢复boot sector.)
+.TP
+.BI ”\-\^S ” 挽救文件
+通常地,
+.B lilo
+不会覆盖已存在的挽救文件.
+这个选项就是告诉它可以覆盖（这个文件）.
+.TP
+.BI ”\-\^u ” device-name
+卸载
+.BR lilo,
+通过检查时间标记，拷回一个保存了的boot sector.
+.TP
+.BI ”\-\^U ” device-name
+同上, 但不检查时间标记.
+.TP
+.BI ”\-\^R ” command line
+设定下次启动的命令行.boot loader会删除这行的:
+这是个一次性命令.代表性的用在reboot 脚本, 只在调用shutdown -r'之前使
+用.
+.TP
+.BI ”\-\^I ” 标记
+启动后可以在环境变量BOOT_IMAGE 找到这个标记.
+在标准输出设备上，这个命令列出相应的路径名.
+.TP
+.B ”\-\^V”
+列出版本号.
+.LP
+上面的命令行选项相对应于下面在配置文件指出的关键字。
+.IP
+.TS
+1.1
+-b bootdev boot=bootdev
+-c compact
+-d dsec delay=dsec
+-D label default=label
+-i bootsector install=bootsector
+-f file disktab=file
+-l linear
+-m mapfile map=mapfile
+-P fix fix-table
+-P ignore ignore-table
+-s file backup=file
+-S file force-backup=file
+-v verbose=level
+.TE
+.SH ”请参阅”
+lilo.conf(5).
+.br
+lilo 分发的非常广泛的文档.
+.SH ”作者”
+Werner Almesberger (almesber@bernina.ethz.ch).
+.br
+
+.SH ”[中文版维护人]”
+.B Scorpio <rawk@chinese.com>
+.SH ”[中文版最新更新]”
+2000/10/9
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,55 @@
+.\" This man page is Copyright (C) 1999 Claus Fischer.
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.\" 
+.\" 990620 - page created - aeb@cwi.nl
+.\"
+.TH FIFO 4 "20 Jun 1999" "Linux Man Page" "Linux Programmer's Manual" 
+
+.SH NAME
+fifo \- 先进先出的特殊文件, 又名管道
+
+.SH "描述 (DESCRIPTION)"
+一个 FIFO 特殊 文件 (又名 管道) 同 管道线 相似, 但是 它是 作为 文件 系统 的
+一部分 访问的. 可以 有 多个 进程 打开它 以供 读写. 当 进程 通过 FIFO 交换 数据
+的时候, 内核 在内部 传送 所有 数据 而 不会 把它 写入 文件 系统, 也就是说 FIFO
+特殊 文件 在 文件 系统 中 没有 任何 内容, 文件 系统 项 只是 作为  进程 可以 用
+文件 系统 中的 一个 名字 来 访问 管道 的 一个 参照点.
+.PP
+内核 会 为 至少 有 一个 进程 打开 了的 FIFO 特殊 文件 维护 并且 也只 维护 一个
+管道 对象. 在 数据 传给 FIFO 之前, FIFO 的 两端 (读 和 写) 必须 同时 打开.
+一般 来说 打开 FIFO 会 阻塞 直至 另一端 也 打开.
+.PP
+一个 进程 可以 以 非阻塞 模式 打开 一个 FIFO. 这种 情况下, 即使 写端 没有 打开,
+打开 读端 还是 会 成功, 但是, 如果 读端 没有 打开, 打开 写端 会 失败, 并且 得到
+一个 ENXIO (设备 或 地址 不存在).
+.PP
+在 Linux 下, 不管 是 阻塞 还是 非阻塞 模式, 打开 一个 FIFO 用作 读 和 写 都会
+成功. POSIX 关于 这种 情况 没有 定义. 这个 可以 用来 在 读端 没有 打开 的 情况
+下 打开 写端. 一个 进程 在 同时 用 FIFO 的 两端 来 和 自己 通信 的 时候 要 特别
+注意 以防 死锁.
+.SH "注意 (NOTES)"
+当 一个 进程 企图 向 读端 没有 打开 的 FIFO 写 数据 的 时候, 进程 会 收到 一个
+SIGPIPE 信号. FIFO 特殊 文件 可以 用
+.BR mkfifo (3)
+来 创建 并且
+.IR "ls -l"
+会 给它 一个 特殊 的 标记.
+
+.SH "参见 (SEE ALSO)"
+.BR mkfifo (3),
+.BR mkfifo (1),
+.BR pipe (2),
+.BR socketpair (2),
+.BR open (2),
+.BR signal (2),
+.BR sigaction (2)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/10/9
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

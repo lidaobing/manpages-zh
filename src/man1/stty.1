@@ -1,0 +1,407 @@
+.TH STTY "1" "August 1999" "GNU sh-utils 2.0" FSF
+.SH NAME
+stty \- 改变并打印终端行设置
+.SH 总览
+.B stty
+[\fI-F device\fR] [\fI--file=device\fR] [\fISETTING\fR]...
+.br
+.B stty
+[\fI-F device\fR] [\fI--file=device\fR] [\fI-a|--all\fR]
+.br
+.B stty
+[\fI-F device\fR] [\fI--file=device\fR] [\fI-g|--save\fR]
+.SH 描述
+.PP
+.\" Add any additional description here
+.PP
+打印或改变终端属性.
+.TP
+\fB\-a\fR, \fB\-\-all\fR
+以可读的格式打印当前的所有设置
+.TP
+\fB\-g\fR, \fB\-\-save\fR
+以终端可读的格式打印当前的所有设置
+.TP
+\fB\-F\fR, \fB\-\-file\fR
+打开指定的设备,并用此设备作为输入来代替标准输入
+.TP
+\fB\-\-help\fR
+显示帮助并退出
+.TP
+\fB\-\-version\fR
+显示版本信息并退出
+.PP
+选项-在SETTING之前使用这些选项将被视为无效  星号*表明是非POSIX设置.
+以下是一些系统定义了的可用设置：
+.PP
+.SS "特殊字符"
+.PP
+* dsusp CHAR    
+CHAR表示输入满时，发一个停止信号给终端
+.TP
+eof CHAR
+CHAR表示一个文件结束 (结束输入)
+.TP
+eol CHAR
+CHAR表示当前行结束
+.PP
+* eol2 CHAR     
+CHAR是另一个表示结束当前行的字符
+.TP
+erase CHAR
+CHAR表示擦除最后一个输入字符
+.TP
+intr CHAR
+CHAR表示发一个中断信号
+.TP
+kill CHAR
+CHAR表示擦除当前行
+.PP
+* lnext CHAR    
+CHAR表示输入下一个字符
+.TP
+quit CHAR
+CHAR表示发出一个退出信号
+.PP
+* rprnt CHAR    
+CHAR表示刷新当前行
+.TP
+start CHAR
+CHAR表示在停止输出后重新开始输出
+.TP
+stop CHAR
+CHAR表示停止输出
+.TP
+susp CHAR
+CHAR表示发送一个终端停止信号
+.PP
+* swtch CHAR    
+CHAR表示切换到不同的外壳层
+.PP
+* werase CHAR   
+CHAR表示擦除已经输入的最后一个单词
+.SS "特殊设置"
+.TP
+N
+把输入和输出的波特率设为N
+.PP
+* cols N        
+通知内核终端有N列
+.PP
+* columns N     
+与cols N 相同
+.TP
+ispeed N
+设置输入速度为N
+.PP
+* line N        
+用行约束规则N
+.TP
+min N
+用 \fB\-icanon\fR, 设置一次完整的读操作最小为N个字符
+.TP
+ospeed N
+设置输出速度为N 
+.PP
+* rows N        
+通知内核终端有N行
+.PP
+* size          
+根据内核打印出终端的行数和列数
+.TP
+speed
+打印出终端的速度
+.TP
+time N
+同时用 \fB\-icanon\fR, 设置读超时为十分之N秒
+.SS "控制设置"
+.TP
+[-]clocal
+关闭解调器的控制信号
+.TP
+[-]cread
+允许接收输入
+.PP
+* [-]crtscts    
+允许 RTS/CTS 的握手
+.TP
+csN
+把字符长度设为N, N 为[5..8]
+.TP
+[-]cstopb
+对每字符使用两个停止位 (一个带有 `-')
+.TP
+[-]hup
+当最后一个进程关闭终端后，发一个挂起信号
+.TP
+[-]hupcl
+同 [-]hup
+.TP
+[-]parenb
+在输出中产生奇偶校验位，并要求在输入中也有奇偶校验位
+.TP
+[-]parodd
+设置奇校验 (偶校验用 `-')
+.SS "输入设置:"
+.TP
+[-]brkint
+暂停并产生中断信号
+.TP
+[-]icrnl
+将回车解释为换行
+.TP
+[-]ignbrk
+忽略中断信号
+.TP
+[-]igncr
+忽略回车符
+.TP
+[-]ignpar
+忽略有奇偶校验错的字符
+.PP
+* [-]imaxbel    
+对一个字符产生嘟叫，但不刷新已满的输入缓冲区
+.TP
+[-]inlcr
+将换行解释为回车
+.TP
+[-]inpck
+打开输入奇偶校验
+.TP
+[-]istrip
+清除输入字符的高位（第8位）
+.PP
+* [-]iuclc      
+将大写字符转换成小写字符
+.PP
+* [-]ixany      
+使任何字符都重新开始输出（而 不仅仅是重新输出字符能实现此功能）
+.TP
+[-]ixoff
+打开发送开始/停止字符的开关
+.TP
+[-]ixon
+打开XON/XOFF的流量控制
+.TP
+[-]parmrk
+标记奇偶校验错误 (使用255-0-character 字符序列)
+.TP
+[-]tandem
+同 [-]ixoff
+.PP
+输出设置:
+.PP
+* bsN           
+回退延迟, N 为 [0..1]
+.PP
+* crN           
+回车延迟, N 为 [0..3]
+.PP
+* ffN           
+换页延迟, N 为 [0..1]
+.PP
+* nlN           
+换行延迟, N 为 [0..1]
+.PP
+* [-]ocrnl      
+将回车解释为换行
+.PP
+* [-]ofdel      
+使用删除字符来填充，而不是用空字符填充
+.PP
+* [-]ofill      
+使用填充字符，不使用定时延迟
+.PP
+* [-]olcuc      
+将小写字符转换成大写
+.PP
+* [-]onlcr      
+将换行解释为回车-换行
+.PP
+* [-]onlret     
+换行执行一次回车
+.PP
+* [-]onocr      
+不在第一列打印回车
+.TP
+[-]opost
+postprocess 输出
+.PP
+* tabN          
+水平tab键延迟, N 为 [0..3]
+.PP
+* tabs          
+同tab0 
+.PP
+* \fB\-tabs\fR  同tab3
+.PP
+* vtN           
+垂直方向tab键延迟。。。, N 为 [0..1]
+.SS "本地设置:"
+.TP
+[-]crterase
+将擦除字符显示为：退格-空格-退格
+.PP
+* crtkill       
+根据echoprt和echoe的设置去除所有行
+.PP
+* \fB\-crtkill\fR    
+根据echoctl和echok设置去除所有行
+.PP
+* [-]ctlecho    
+在头部符号中显示控制字符'^c')
+.TP
+[-]echo
+显示输入字符
+.PP
+* [-]echoctl    同 [-]ctlecho 
+.TP
+[-]echoe
+同[-]crterase
+.TP
+[-]echok
+在一个杀死字符后显示一个换行
+.PP
+* [-]echoke     同 [-]crtkill
+.TP
+[-]echonl
+即使不显示其它字符也换行
+.PP
+* [-]echoprt    
+向后显示在 '\' 和 '/'之间的擦除字符 
+.TP
+[-]icanon
+打开 erase, kill, werase, 和 rprnt 这些特殊字符
+.TP
+[-]iexten
+打开 非POSIX 特殊字符
+.TP
+[-]isig
+打开中断，退出和挂起这些特殊字符
+.TP
+[-]noflsh
+在中断和退出这些特殊字符后禁止刷新
+.PP
+* [-]prterase   
+同 [-]echoprt 
+.PP
+* [-]tostop     
+停止试图写终端的后台作业
+.PP
+* [-]xcase      
+与icanon同时使用, 表示用`\'退出大写状态
+.PP
+综合设置:
+.PP
+* [-]LCASE      同 [-]lcase
+.TP
+cbreak
+同 \fB\-icanon\fR
+.TP
+\fB\-cbreak\fR
+同 icanon
+.TP
+cooked
+同 brkint ignpar istrip icrnl ixon opost isig
+icanon, eof 和 eol 字符被设为默认值
+.TP
+\fB\-cooked\fR
+同 raw
+.TP
+crt
+同 echoe echoctl echoke
+.TP
+dec
+同 echoe echoctl echoke \fB\-ixany\fR intr ^c erase 0177
+kill ^u
+.PP
+* [-]decctlq    同 [-]ixany
+.TP
+ek
+将擦除，杀死字符设为它们的默认值
+.TP
+evenp
+同 parenb \fB\-parodd\fR cs7
+.TP
+\fB\-evenp\fR
+同 \fB\-parenb\fR cs8
+.PP
+* [-]lcase      同 xcase iuclc olcuc
+.TP
+litout
+同 fB\-parenb\fR \fB\-istrip\fR \fB\-opost\fR cs8
+.TP
+\fB\-litout\fR
+同 parenb istrip opost cs7
+.TP
+nl
+同 \fB\-icrnl\fR \fB\-onlcr\fR
+.TP
+\fB\-nl\fR
+同 icrnl \fB\-inlcr\fR \fB\-igncr\fR onlcr \fB\-ocrnl\fR \fB\-onlret\fR
+.TP
+oddp
+同 parenb parodd cs7
+.TP
+\fB\-oddp\fR
+同 \fB\-parenb\fR cs8
+.TP
+[-]parity
+同 [-]evenp
+.TP
+pass8
+同 \fB\-parenb\fR \fB\-istrip\fR cs8
+.TP
+\fB\-pass8\fR
+同 parenb istrip cs7
+.TP
+raw
+同 \fB\-ignbrk\fR \fB\-brkint\fR \fB\-ignpar\fR \fB\-parmrk\fR \fB\-inpck\fR \fB
+\-istrip\fR
+\fB\-inlcr\fR \fB\-igncr\fR \fB\-icrnl\fR  \fB\-ixon\fR  \fB\-ixoff\fR  \fB\-iuc
+lc\fR  \fB\-ixany\fR
+\fB\-imaxbel\fR \fB\-opost\fR \fB\-isig\fR \fB\-icanon\fR \fB\-xcase\fR min 1 ti
+me 0
+.TP
+\fB\-raw\fR
+同 cooked
+.TP
+sane
+同 cread \fB\-ignbrk\fR brkint \fB\-inlcr\fR \fB\-igncr\fR icrnl
+\fB\-ixoff\fR \fB\-iuclc\fR \fB\-ixany\fR imaxbel opost \fB\-olcuc\fR \fB\-ocrnl
+\fR onlcr
+\fB\-onocr\fR \fB\-onlret\fR \fB\-ofill\fR \fB\-ofdel\fR nl0 cr0 tab0 bs0 vt0 ff
+0
+isig icanon iexten echo echoe echok \fB\-echonl\fR \fB\-noflsh\fR
+\fB\-xcase\fR \fB\-tostop\fR \fB\-echoprt\fR echoctl echoke, 所有特殊字符
+使用缺省值.
+.PP
+本命令处理连接到标准输入的终端行.如不带参数,则输出波特率, 行的约束规则,以及与健全
+的stty相背离的设置.在设置中, CHAR 是逐字读取的, 或是象 ^c, 0x37, 0177 或127这样的
+编码; 特殊值 ^- 或未定义被用来禁止特殊字符.
+.SH "报告臭虫"
+报告臭虫向.
+.SH "参见"
+完整的文档
+.B stty
+保持为Texinfo手册.  如果
+.B info
+及
+.B stty
+在你的机器上正确安装的话, 命令
+.IP
+.B info stty
+.PP
+会使你能够读取完整的手册.
+.SH 版权
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "[中文版维护人]"
+.B hunter77 <email>
+.SH "[中文版最新更新]"
+.BR 2003.11.22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

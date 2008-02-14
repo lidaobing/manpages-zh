@@ -1,0 +1,31 @@
+.TH create_module 2 ""
+.SH NAME
+create_module - 生成一条可加载模块记录.
+.SH 总览
+.B #include <linux/module.h>
+.sp
+caddr_t create_module(const char *name, size_t size);
+.SH 描述
+create_module试图生成一条可加载模块的记录并保留用来容纳模块的内核空间内存.该
+系统调用只对超级用户开放.
+.SH 返回值
+成功时返回模块驻留的内核空间地址,错误时返回-1,errno被相应设置.
+.SH 错误
+.TP
+EPERM 
+    用户非超级用户.
+.TP
+EEXIST 
+    相同名字的模块已经存在.
+.TP
+EINVAL
+    要求的大小即使对模块的头信息来说也太小.
+.TP
+ENOMEM 
+    内核无法给模块分配足够的连续的内存块.
+.TP
+EFAULT 
+    name 越出了程序可访问的地址空间.                  
+
+.SH
+      "雷勇" <nsinit@263.net>

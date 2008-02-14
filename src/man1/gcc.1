@@ -1,0 +1,3984 @@
+.\" Copyright (c) 1991, 1992, 1993, 1994 Free Software Foundation    -*-Text-*-
+.\" See section COPYING for conditions for redistribution
+.\"
+.\" project 工程
+.\" 
+.\" Set up \*(lq, \*(rq if -man hasn't already set it up.
+.if @@\*(lq@ \{\
+.	ds lq "
+.	if t .ds lq ``
+.	if !@@\(lq@ .ds lq "\(lq
+.\}
+.if @@\*(rq@ \{\
+.	ds rq "
+.	if t .ds rq ''
+.	if !@@\(rq@ .ds rq "\(rq
+.\}
+.de Id
+.ds Rv \\$3
+.ds Dt \\$4
+..
+.de Sp
+.if n .sp
+.if t .sp 0.4
+..
+.TH GCC 1 "\*(Dt" "GNU Tools" "GNU Tools"
+.SH NAME
+gcc, g++ \- GNU 工程的 C 和 C++ 编译器 (egcs-1.1.2)
+.SH "总览 (SYNOPSIS)"
+.B gcc
+.RI "[ " option " | " filename " ].\|.\|."
+.br
+.B g++
+.RI "[ " option " | " filename " ].\|.\|."
+
+.SH "警告 (WARNING)"
+本手册页 内容 摘自 GNU C 编译器 的 完整文档, 仅限于 解释 选项 的 含义.
+.PP
+除非 有人 自愿 维护, 否则 本手册页 不再 更新. 如果 发现 手册页 和 软件
+之间 有所矛盾, 请 查对 Info 文件, Info 文件 是 权威 文档.
+.PP
+如果 我们 发觉 本手册页 的 内容 由于 过时 而 导致 明显 的 混乱 和 抱怨 时,
+我们 就 停止 发布 它. 不可能有 其他 选择, 象 更新 Info 文件 同时 更新
+man 手册, 因为 其他 维护 GNU CC 的 工作 没有 留给 我们 时间 做 这个.
+GNU 工程 认为 man 手册 是 过时产物, 应该 把 时间 用到 别的地方.
+.PP
+如果 需要 完整 和 最新 的 文档, 请 查阅 Info 文件 `\|\c
+.B gcc\c
+\&\|' 或 
+.I Using and Porting GNU CC (for version 2.0) (使用和移植 GNU CC 2.0) \c 
+\& 手册.  二者 均 来自 Texinfo 原文件
+.BR gcc.texinfo .
+
+.SH "描述 (DESCRIPTION)"
+C 和 C++ 编译器 是 集成的. 他们 都要 用 四个步骤 中的 一个 或 多个 处理
+输入文件: 预处理(preprocessing), 编译(compilation), 汇编(assembly) 和 
+连接(linking). 源文件后缀名 标识 源文件 的 语言, 但是 对 编译器 来说, 
+后缀名 控制着 缺省设定:
+.TP
+.B gcc
+认为 预处理后的 文件 (\c
+.B .i\c
+\&) 是 C 文件, 并且 设定 C 形式 的 连接.
+.TP
+.B g++
+认为 预处理后的 文件 (\c
+.B .i\c
+\&) 是 C++ 文件, 并且 设定 C++ 形式 的 连接.
+.PP
+源文件后缀名 指出 语言种类 以及 后期 的 操作:
+.Sp
+.nf
+.ta \w'\fB.cxx\fP  'u
+\&\fB.c\fP	C 源程序; 预处理, 编译, 汇编
+\&\fB.C\fP	C++ 源程序; 预处理, 编译, 汇编
+\&\fB.cc\fP	C++ 源程序; 预处理, 编译, 汇编
+\&\fB.cxx\fP	C++ 源程序; 预处理, 编译, 汇编
+\&\fB.m\fP	Objective-C 源程序; 预处理, 编译, 汇编
+\&\fB.i\fP	预处理后的 C 文件; 编译, 汇编
+\&\fB.ii\fP	预处理后的 C++ 文件; 编译, 汇编
+\&\fB.s\fP	汇编语言源程序; 汇编
+\&\fB.S\fP	汇编语言源程序; 预处理, 汇编
+\&\fB.h\fP	预处理器文件; 通常 不出现在 命令行 上
+.Sp
+.fi
+其他 后缀名 的 文件 被传递 给 连接器(linker). 通常 包括:
+.Sp
+.nf
+\&\fB.o\fP	目标文件 (Object file)
+\&\fB.a\fP	归档库文件 (Archive file)
+.br
+.fi
+.Sp
+除非 使用了 
+.BR \-c ,
+.BR \-S ,
+或
+.B \-E
+选项 (或者 编译错误 阻止了 完整 的 过程), 否则 连接 总是 最后的步骤.
+在 连接阶段 中, 所有 对应于 源程序 的
+.B .o
+文件, 
+.B \-l
+库文件, 无法 识别 的 文件名 (包括 指定的
+.B .o
+目标文件 和
+.B .a
+库文件) 按 命令行中 的 顺序 传递给 连接器.
+
+.SH "选项 (OPTIONS)"
+选项 必须 分立 给出: `\|\c
+.B \-dr\c
+\&\|' 完全 不同于 `\|\c
+.B \-d \-r
+\&\|'.
+.PP
+大多数 `\|\c
+.B \-f\c
+\&\|' 和 `\|\c
+.B \-W\c
+\&\|' 选项 有 两个 相反 的 格式:
+.BI \-f name
+和
+.BI \-fno\- name\c
+\& (或
+.BI \-W name
+和
+.BI \-Wno\- name\c
+\&).  这里 只列举 不是 默认选项 的 格式.
+.PP
+下面 是 所有 选项 的 摘要, 按 类型 分组, 解释 放在 后面 的 章节 中.
+.hy 0
+.na
+.TP
+.B 总体选项 (Overall Option)
+.br
+\-c
+\-S
+\-E
+.RI "\-o " file
+\-pipe
+\-v
+.RI "\-x " language
+.TP
+.B 语言选项 (Language Option)
+\-ansi
+\-fall\-virtual
+\-fcond\-mismatch
+\-fdollars\-in\-identifiers
+\-fenum\-int\-equiv
+\-fexternal\-templates
+\-fno\-asm
+\-fno\-builtin
+\-fhosted
+\-fno\-hosted
+\-ffreestanding
+\-fno\-freestanding
+\-fno\-strict\-prototype
+\-fsigned\-bitfields
+\-fsigned\-char
+\-fthis\-is\-variable
+\-funsigned\-bitfields
+\-funsigned\-char
+\-fwritable\-strings
+\-traditional
+\-traditional\-cpp
+\-trigraphs
+.TP
+.B 警告选项 (Warning Option)
+\-fsyntax\-only
+\-pedantic
+\-pedantic\-errors
+\-w
+\-W
+\-Wall
+\-Waggregate\-return
+\-Wcast\-align
+\-Wcast\-qual
+\-Wchar\-subscript
+\-Wcomment
+\-Wconversion
+\-Wenum\-clash
+\-Werror
+\-Wformat
+.RI \-Wid\-clash\- len
+\-Wimplicit
+\-Wimplicit\-int
+\-Wimplicit\-function\-declaration
+\-Winline
+\-Wlong\-long
+\-Wmain
+\-Wmissing\-prototypes
+\-Wmissing\-declarations
+\-Wnested\-externs
+\-Wno\-import
+\-Wparentheses
+\-Wpointer\-arith
+\-Wredundant\-decls
+\-Wreturn\-type
+\-Wshadow
+\-Wstrict\-prototypes
+\-Wswitch
+\-Wtemplate\-debugging
+\-Wtraditional
+\-Wtrigraphs
+\-Wuninitialized
+\-Wunused
+\-Wwrite\-strings
+.TP
+.B 调试选项 (Debugging Option)
+\-a
+.RI \-d letters
+\-fpretend\-float
+\-g
+.RI \-g level
+\-gcoff
+\-gxcoff
+\-gxcoff+
+\-gdwarf
+\-gdwarf+
+\-gstabs
+\-gstabs+
+\-ggdb
+\-p
+\-pg
+\-save\-temps
+.RI \-print\-file\-name= library
+\-print\-libgcc\-file\-name
+.RI \-print\-prog\-name= program
+.TP
+.B 优化选项 (Optimization Option)
+\-fcaller\-saves
+\-fcse\-follow\-jumps
+\-fcse\-skip\-blocks
+\-fdelayed\-branch
+\-felide\-constructors
+\-fexpensive\-optimizations
+\-ffast\-math
+\-ffloat\-store
+\-fforce\-addr
+\-fforce\-mem
+\-finline\-functions
+\-fkeep\-inline\-functions
+\-fmemoize\-lookups
+\-fno\-default\-inline
+\-fno\-defer\-pop
+\-fno\-function\-cse
+\-fno\-inline
+\-fno\-peephole
+\-fomit\-frame\-pointer
+\-frerun\-cse\-after\-loop
+\-fschedule\-insns
+\-fschedule\-insns2
+\-fstrength\-reduce
+\-fthread\-jumps
+\-funroll\-all\-loops
+\-funroll\-loops
+\-O
+\-O2
+\-O3
+.TP
+.B 预处理器选项 (Preprocessor Option)
+.RI \-A assertion
+\-C
+\-dD
+\-dM
+\-dN
+.RI \-D macro [\|= defn \|]
+\-E
+\-H
+.RI "\-idirafter " dir
+.RI "\-include " file
+.RI "\-imacros " file
+.RI "\-iprefix " file
+.RI "\-iwithprefix " dir
+\-M
+\-MD
+\-MM
+\-MMD
+\-nostdinc
+\-P
+.RI \-U macro
+\-undef
+.TP
+.B 汇编器选项 (Assembler Option)
+.RI \-Wa, option
+.TP
+.B 连接器选项 (Linker Option)
+.RI \-l library
+\-nostartfiles
+\-nostdlib
+\-static
+\-shared
+\-symbolic
+.RI "\-Xlinker\ " option
+.RI \-Wl, option
+.RI "\-u " symbol
+.TP
+.B 目录选项 (Directory Option)
+.RI \-B prefix
+.RI \-I dir
+\-I\-
+.RI \-L dir
+.TP
+.B 目标机选项 (Target Option)
+.RI "\-b  " machine
+.RI "\-V " version
+.TP
+.B 配置相关选项 (Configuration Dependent Option)
+.I M680x0\ 选项
+.br
+\-m68000
+\-m68020
+\-m68020\-40
+\-m68030
+\-m68040
+\-m68881
+\-mbitfield
+\-mc68000
+\-mc68020
+\-mfpa
+\-mnobitfield
+\-mrtd
+\-mshort
+\-msoft\-float
+.Sp
+.I VAX 选项
+.br
+\-mg
+\-mgnu
+\-munix
+.Sp
+.I SPARC 选项
+.br
+\-mepilogue
+\-mfpu
+\-mhard\-float
+\-mno\-fpu
+\-mno\-epilogue
+\-msoft\-float
+\-msparclite
+\-mv8
+\-msupersparc
+\-mcypress
+.Sp
+.I Convex 选项
+.br
+\-margcount
+\-mc1
+\-mc2
+\-mnoargcount
+.Sp
+.I AMD29K 选项
+.br
+\-m29000
+\-m29050
+\-mbw
+\-mdw
+\-mkernel\-registers
+\-mlarge
+\-mnbw
+\-mnodw
+\-msmall
+\-mstack\-check
+\-muser\-registers
+.Sp
+.I M88K 选项
+.br
+\-m88000
+\-m88100
+\-m88110
+\-mbig\-pic
+\-mcheck\-zero\-division
+\-mhandle\-large\-shift
+\-midentify\-revision
+\-mno\-check\-zero\-division
+\-mno\-ocs\-debug\-info
+\-mno\-ocs\-frame\-position
+\-mno\-optimize\-arg\-area
+\-mno\-serialize\-volatile
+\-mno\-underscores
+\-mocs\-debug\-info
+\-mocs\-frame\-position
+\-moptimize\-arg\-area
+\-mserialize\-volatile
+.RI \-mshort\-data\- num
+\-msvr3
+\-msvr4
+\-mtrap\-large\-shift
+\-muse\-div\-instruction
+\-mversion\-03.00
+\-mwarn\-passed\-structs
+.Sp
+.I RS6000 选项
+.br
+\-mfp\-in\-toc
+\-mno\-fop\-in\-toc
+.Sp
+.I RT 选项
+.br
+\-mcall\-lib\-mul
+\-mfp\-arg\-in\-fpregs
+\-mfp\-arg\-in\-gregs
+\-mfull\-fp\-blocks
+\-mhc\-struct\-return
+\-min\-line\-mul
+\-mminimum\-fp\-blocks
+\-mnohc\-struct\-return
+.Sp
+.I MIPS 选项
+.br
+\-mcpu=\fIcpu type\fP
+\-mips2
+\-mips3
+\-mint64
+\-mlong64
+\-mmips\-as
+\-mgas
+\-mrnames
+\-mno\-rnames
+\-mgpopt
+\-mno\-gpopt
+\-mstats
+\-mno\-stats
+\-mmemcpy
+\-mno\-memcpy
+\-mno\-mips\-tfile
+\-mmips\-tfile
+\-msoft\-float
+\-mhard\-float
+\-mabicalls
+\-mno\-abicalls
+\-mhalf\-pic
+\-mno\-half\-pic
+\-G \fInum\fP
+\-nocpp
+.Sp
+.I i386 选项
+.br
+\-m486
+\-mno\-486
+\-msoft\-float
+\-mno\-fp\-ret\-in\-387
+.Sp
+.I HPPA 选项
+.br
+\-mpa\-risc\-1\-0
+\-mpa\-risc\-1\-1
+\-mkernel
+\-mshared\-libs
+\-mno\-shared\-libs
+\-mlong\-calls
+\-mdisable\-fpregs
+\-mdisable\-indexing
+\-mtrailing\-colon
+.Sp
+.I i960 选项
+.br
+\-m\fIcpu-type\fP
+\-mnumerics
+\-msoft\-float
+\-mleaf\-procedures
+\-mno\-leaf\-procedures
+\-mtail\-call
+\-mno\-tail\-call
+\-mcomplex\-addr
+\-mno\-complex\-addr
+\-mcode\-align
+\-mno\-code\-align
+\-mic\-compat
+\-mic2.0\-compat
+\-mic3.0\-compat
+\-masm\-compat
+\-mintel\-asm
+\-mstrict\-align
+\-mno\-strict\-align
+\-mold\-align
+\-mno\-old\-align
+.Sp
+.I DEC Alpha 选项
+.br
+\-mfp\-regs
+\-mno\-fp\-regs
+\-mno\-soft\-float
+\-msoft\-float
+.Sp
+.I System V 选项
+.br
+\-G
+\-Qy
+\-Qn
+.RI \-YP, paths
+.RI \-Ym, dir
+.TP
+.B 代码生成选项 (Code Generation Option)
+.RI \-fcall\-saved\- reg
+.RI \-fcall\-used\- reg
+.RI \-ffixed\- reg
+\-finhibit\-size\-directive
+\-fnonnull\-objects
+\-fno\-common
+\-fno\-ident
+\-fno\-gnu\-linker
+\-fpcc\-struct\-return
+\-fpic
+\-fPIC
+\-freg\-struct\-return
+\-fshared\-data
+\-fshort\-enums
+\-fshort\-double
+\-fvolatile
+\-fvolatile\-global
+\-fverbose\-asm
+.ad b
+.hy 1
+
+.SH "总体选项 (Overall Option)"
+.TP
+.BI "\-x " "language"
+明确 指出 后面 输入文件 的 语言 为
+.I language\c
+\& (而不是 从 文件名后缀 得到的 默认选择). 这个选项 应用于 后面 所有的
+输入文件, 直到 遇着 下一个 `\|\c
+.B \-x\c
+\&\|' 选项. \c
+.I language\c
+\& 的 可选值 有
+`\|\c
+.B c\c
+\&\|', `\|\c
+.B objective\-c\c
+\&\|', `\|\c
+.B c\-header\c
+\&\|', `\|\c
+.B c++\c
+\&\|',
+`\|\c
+.B cpp\-output\c
+\&\|', `\|\c
+.B assembler\c
+\&\|', 和 `\|\c
+.B assembler\-with\-cpp\c
+\&\|'.
+.TP
+.B \-x none
+关闭 任何 对 语种 的 明确说明, 因此 依据 文件名后缀 处理 后面 的 文件
+(就象是 从未 使用过 `\|\c
+.B \-x\c
+\&\|'
+选项).
+.PP
+如果 只操作 四个阶段 (预处理, 编译, 汇编, 连接) 中的 一部分,
+可以 使用
+`\|\c
+.B \-x\c
+\&\|' 选项 (或 文件名后缀) 告诉 \c
+.B gcc\c
+\& 从 哪里 开始, 用 `\|\c
+.B \-c\c
+\&\|', `\|\c
+.B \-S\c
+\&\|', 或 `\|\c
+.B \-E\c
+\&\|' 选项 告诉
+.B gcc\c
+\& 到 哪里 结束. 注意, 某些 选项组合 (例如,
+`\|\c
+.B \-x cpp\-output \-E\c
+\&\|') 使 \c
+.B gcc\c
+\& 不作 任何事情.
+.TP
+.B \-c
+编译 或 汇编 源文件, 但是 不作 连接. 编译器 输出 对应于 源文件 的 目标文件.
+.Sp
+缺省情况下, GCC 通过 用 `\|\c
+.B .o\c
+\&\|' 替换 源文件名后缀 `\|\c
+.B .c\c
+\&\|', `\|\c
+.B .i\c
+\&\|', `\|\c
+.B .s\c
+\&\|', 等等, 产生 目标文件名. 可以 使用
+.B \-o\c
+\& 选项 选择 其他 名字.
+.Sp
+GCC 忽略
+.B \-c
+选项 后面 任何 无法 识别 的 输入文件 (他们 不需要 编译 或 汇编).
+.TP
+.B \-S
+编译 后 即停止, 不进行 汇编. 对于 每个 输入的 非汇编语言 文件, 
+输出文件 是 汇编语言 文件.
+.Sp
+缺省情况下, GCC 通过 用 `\|\c
+.B .o\c
+\&\|' 替换 源文件名后缀 `\|\c
+.B .c\c
+\&\|', `\|\c
+.B .i\c
+\&\|', 等等, 产生 目标文件名. 可以 使用
+.B \-o\c
+\& 选项 选择 其他 名字.
+.Sp
+GCC 忽略 任何 不需要 编译 的 输入文件.
+.TP
+.B \-E
+预处理 后 即停止, 不进行 编译. 预处理后的 代码 送往 标准输出.
+.Sp
+GCC 忽略 任何 不需要 预处理 的 输入文件.
+.TP
+.BI "\-o " file
+指定 输出文件 为 \c
+.I file\c
+\&.  该选项 不在乎 GCC 产生 什么 输出, 无论是 可执行文件, 目标文件,
+汇编文件 还是 预处理后的 C 代码.
+.Sp
+由于 只能 指定 一个 输出文件, 因此 编译 多个 输入文件 时, 使用 `\|\c
+.B \-o\c
+\&\|' 选项 没有 意义, 除非 输出 一个 可执行文件.
+.Sp
+如果 没有 使用 `\|\c
+.B \-o\c
+\&\|' 选项, 默认的 输出 结果 是: 可执行文件 为 `\|\c
+.B a.out\c
+\&\|',  `\|\c
+.I source\c
+.B \&.\c
+.I suffix\c
+\&\c 
+\&\|' 的 目标文件 是`\|\c
+.I source\c
+.B \&.o\c
+\&\|', 汇编文件 是 `\|\c
+.I source\c
+.B \&.s\c
+\&\|', 而 预处理后的 C 源代码 送往 标准输出.
+.TP
+.B \-v
+(在 标准错误) 显示 执行 编译 阶段 的 命令. 同时 显示 编译器 驱动程序,
+预处理器, 编译器 的 版本号.
+.TP
+.B \-pipe
+在 编译过程 的 不同 阶段 间 使用 管道 而非 临时文件 进行 通信.
+这个 选项 在 某些 系统 上 无法 工作, 因为 那些 系统 的 汇编器 不能 从 管道
+读取 数据. GNU 的 汇编器 没有 这个问题.
+.PP
+
+.SH "语言选项 (LANGUAGE OPTIONS)"
+下列 选项 控制 编译器 能够 接受 的 C "方言":
+.TP
+.B \-ansi
+支持 符合 ANSI 标准的 C 程序.
+.Sp
+这样 就会 关闭 GNU C 中 某些 不兼容 ANSI C 的 特性, 例如 \c
+.B asm\c
+\&, \c
+.B inline\c
+\& 和 \c
+.B typeof
+关键字, 以及 诸如 \c
+.B unix\c
+\& 和 \c
+.B vax
+这些 表明 当前系统 类型 的 预定义宏. 同时 开启 不受欢迎 和 极少使用的
+ANSI trigraph 特性, 以及 禁止 `\|\c
+.B $\c
+\&\|' 成为 标识符 的 一部分.
+
+.Sp
+尽管 使用了 `\|\c
+.B \-ansi\c
+\&\|' 选项, 下面 这些 可选的 关键字, \c
+.B _\|_asm_\|_\c
+\&, \c
+.B _\|_extension_\|_\c
+\&,
+.B _\|_inline_\|_\c
+\& 和 \c
+.B _\|_typeof_\|_\c
+\& 仍然 有效. 你 当然 不会 把 他们 用在 ANSI C 程序 中, 但可以 把 他们 放在
+头文件 里, 因为 编译 包含 这些 头文件 的 程序 时, 可能会 指定 `\|\c
+.B \-ansi\c
+\&\|' 选项.  另外一些 预定义宏, 如 \c
+.B _\|_unix_\|_\c
+\& 和 \c
+.B _\|_vax_\|_\c
+\&, 无论 有没有 使用 `\|\c
+.B \-ansi\c
+\&\|' 选项, 始终 有效.
+
+.Sp
+使用 `\|\c
+.B \-ansi\c
+\&\|' 选项 不会 自动 拒绝 编译  非ANSI程序, 除非 增加 `\|\c
+.B \-pedantic\c
+\&\|' 选项 作为 `\|\c
+.B \-ansi\c
+\&\|' 选项 的 补充.
+
+.Sp
+使用 `\|\c
+.B \-ansi\c
+\&\|' 选项 的 时候, 预处理器 会 预定义 一个 \c
+.B _\|_STRICT_ANSI_\|_\c
+\& 宏. 有些 头文件 关注 此宏, 以 避免 声明 某些函数, 或者 避免 定义 某些宏,
+这些 函数 和 宏 不被 ANSI 标准 调用; 这样 就不会 干扰 在 其他地方 使用 这些
+名字 的 程序 了.
+
+.TP
+.B \-fno\-asm
+不把 \c
+.B asm\c
+\&, \c
+.B inline\c
+\& 或 \c
+.B typeof\c
+\& 当作 关键字, 因此 这些 词 可以 用做 标识符. 用 \c
+.B _\|_asm_\|_\c
+\&, \c
+.B _\|_inline_\|_\c
+\& 和 \c
+.B _\|_typeof_\|_\c
+\& 能够 替代 他们.
+`\|\c
+.B \-ansi\c
+\&\|' 隐含声明了 `\|\c
+.B \-fno\-asm\c
+\&\|'.
+.TP
+.B \-fno\-builtin
+不接受 不是 两个 下划线 开头 的 内建函数 (built-in function). 
+目前 受影响 的 函数 有 \c
+.B _exit\c
+\&,
+.B abort\c
+\&, \c
+.B abs\c
+\&, \c
+.B alloca\c
+\&, \c
+.B cos\c
+\&, \c
+.B exit\c
+\&,
+.B fabs\c
+\&, \c
+.B labs\c
+\&, \c
+.B memcmp\c
+\&, \c
+.B memcpy\c
+\&, \c
+.B sin\c
+\&,
+.B sqrt\c
+\&, \c
+.B strcmp\c
+\&, \c
+.B strcpy\c
+\&, 和 \c
+.B strlen\c
+\&.
+.Sp
+`\|\c
+.B \-ansi\c
+\&\|' 选项 能够 阻止 \c
+.B alloca\c
+\& 和 \c
+.B _exit\c
+\& 成为 内建函数.
+
+.TP
+.B \-fhosted
+按 宿主环境 编译; 他 隐含 声明了 `\|\c
+.B \-fbuiltin\c
+\&\|' 选项, 而且 警告 不正确的
+.B main\c
+\& 函数 声明.
+.TP
+.B \-ffreestanding
+按 独立环境 编译; 他 隐含 声明了 `\|\c
+.B \-fno-builtin\c
+\&\|' 选项, 而且 对
+.B main\c
+\& 函数 没有 特别要求.
+
+(译注: 宿主环境 (hosted environment) 下 所有的 标准库 可用, main 函数 返回
+一个 int 值, 典型例子 是 除了 内核 以外 几乎 所有的 程序. 对应的 独立环境
+(freestanding environment) 不存在 标准库, 程序 入口 也 不一定是 main, 最明显
+的 例子 就是 操作系统内核. 详情 参考 gcc 网站 最近的 资料)
+
+.TP
+.B \-fno\-strict\-prototype
+对于 没有 参数 的 函数声明, 例如 `\|\c
+.B int foo
+();\c
+\&\|', 按 C 风格 处理\(em\&即 不说明 参数 个数 或 类型. (仅针对 C++).
+正常情况下, 这样的 函数 \c
+.B foo\c
+\& 在 C++ 中 意味着 参数 为 空.
+
+.TP
+.B \-trigraphs
+支持 ANSI C trigraphs. `\|\c
+.B \-ansi\c
+\&\|' 选项 隐含声明了 `\|\c
+.B \-trigraphs\c
+\&\|'.
+
+.TP
+.B \-traditional
+试图 支持 传统 C 编译器 的 某些方面. 详见 GNU C 手册, 我们 已经把 细节清单
+从这里 删除, 这样 当内容 过时后, 人们 也不会 埋怨 我们.
+.Sp
+除了 一件事: 对于 C++ 程序 (不是 C),  `\|\c
+.B \-traditional\c
+\&\|' 选项 带来 一个 附加效应, 允许 对
+.B this
+赋值.  他 和 `\|\c
+.B \-fthis\-is\-variable\c
+\&\|' 选项 的 效果 一样.
+
+.TP
+.B \-traditional\-cpp
+试图 支持 传统 C 预处理器 的 某些方面. 特别是 上面 提到 有关 预处理器 的
+内容, 但是 不包括 `\|\c
+.B \-traditional\c
+\&\|' 选项 的 其他 效应.
+
+.TP
+.B \-fdollars\-in\-identifiers
+允许 在 标识符(identifier) 中 使用 `\|\c
+.B $\c
+\&\|' 字符 (仅针对 C++). 你 可以 指定
+`\|\c
+.B \-fno\-dollars\-in\-identifiers\c
+\&\|' 选项 显明 禁止 使用 `\|\c
+.B $\c
+\&\|' 符.  (GNU C++ 在 某些 目标系统 缺省允许 `\|\c
+.B $\c
+\&\|' 符, 但不是 所有系统.)
+
+.TP
+.B \-fenum\-int\-equiv
+允许 \c
+.B int\c
+\& 类型 到 枚举类型 (enumeration) 的 隐式转换 (仅限于 C++). 正常情况下
+GNU C++ 允许 从 \c
+.B enum\c
+\& 到 \c
+.B int\c
+\& 的 转换, 反之则 不行.
+
+.TP
+.B \-fexternal\-templates
+为 模板声明 (template declaration) 产生 较小的 代码 (仅限于 C++),
+方法 是 对于 每个 模板函数 (template function), 只在 定义 他们 的 地方
+生成 一个 副本. 想要 成功 使用 这个选项, 你 必须 在 所有 使用 模板 的 
+文件 中, 标记 `\|\c
+.B #pragma implementation\c
+\&\|' (定义) 或 `\|\c
+.B #pragma interface\c
+\&\|' (声明).
+
+当 程序 用 `\|\c
+.B \-fexternal\-templates\c
+\&\|' 编译 时, 模板实例 (template instantiation) 全部是 外部类型.
+你 必须 让 需要的 实例 在 实现文件 中 出现. 可以 通过 \c
+.B typedef\c
+\& 实现 这一点, 他 引用 所需的 每个 实例.
+相对应的, 如果 编译时 使用 缺省选项 `\|\c
+.B \-fno\-external\-templates\c
+\&\|', 所有 模板实例 明确的 设为 内置.
+
+.TP
+.B \-fall\-virtual
+所有 可能的 成员函数 默认为 虚函数. 所有的 成员函数 (除了 构造子函数 和
+.B new
+或
+.B delete
+成员操作符) 视为 所在类 的 虚函数.
+.Sp
+这 不表明 每次 调用 成员函数 都将 通过 内部 虚函数表. 有些 情况 下,
+编译器 能够 判断出 可以 直接 调用 某个 虚函数; 这时 就 直接 调用.
+
+.TP
+.B \-fcond\-mismatch
+允许 条件表达式 的 第二 和 第三个 参数 的 类型 不匹配.
+这种 表达式 的 值 是 void.
+
+.TP
+.B \-fthis\-is\-variable
+允许 对 \c
+.B this\c
+\& 赋值 (仅对 C++). 合并 用户自定义 的 自由存储管理 机制 到 C++ 后,
+使 可赋值 的 `\|\c
+.B this\c
+\&\|' 显得 不合时宜. 因此, 默认 情况 下, 类成员函数 内部 对 \c
+.B this\c
+\& 赋值 是 无效操作. 然而 为了 向后兼容, 你 可以 通过 `\|\c
+.B \-fthis-is-variable\c
+\&\|' 选项 使 这种 操作 有效.
+
+.TP
+.B \-funsigned\-char
+把 \c
+.B char\c
+\& 定义为 无符号 类型, 如同 \c
+.B unsigned char\c
+\&.
+.Sp
+各种 机器 都有 自己 缺省的 \c
+.B char\c
+\& 类型.  既 可能 是 \c
+.B unsigned char\c
+\& 也 可能是
+.B signed char\c
+\& .
+.Sp
+理想情况下, 当 依赖于 数据的 符号性 时, 一个 可移植程序 总是 应该 使用 \c
+.B signed char\c
+\& 或
+.B unsigned char\c
+\&. 但是 许多 程序 已经 写成 只用 简单的 \c
+.B char\c
+\&, 并且 期待 这是 有符号数 (或者 无符号数, 具体情况 取决于 编写 程序
+的 目标机器). 这个选项, 和 它的 反义选项, 使 那样的 程序 工作在 对应的
+默认值 上.
+.Sp
+.B char
+的 类型 始终 应该 明确定义 为
+.B signed char\c
+\& 或 \c
+.B unsigned char\c
+\&, 即使 它 表现的 和 其中之一 完全一样.
+
+.TP
+.B \-fsigned\-char
+把 \c
+.B char\c
+\& 定义为 有符号 类型, 如同 \c
+.B signed char\c
+\&.
+.Sp
+这个 选项 等同于 `\|\c
+.B \-fno\-unsigned\-char\c
+\&\|', 他是
+the negative form of `\|\c
+.B \-funsigned\-char\c
+\&\|' 的 相反 选项.  同样, `\|\c
+.B \-fno\-signed\-char\c
+\&\|' 等价于 `\|\c
+.B \-funsigned\-char\c
+\&\|'.
+
+.TP
+.B \-fsigned\-bitfields
+.TP
+.B \-funsigned\-bitfields
+.TP
+.B \-fno\-signed\-bitfields
+.TP
+.B \-fno\-unsigned\-bitfields
+如果 没有 明确 声明 `\|\c
+.B signed\c
+\&\|' 或 `\|\c
+.B unsigned\c
+\&\|' 修饰符, 这些 选项 用来 定义 有符号位域 (bitfield) 或 无符号位域. 
+缺省情况下, 位域 是 有符号 的, 因为 他们 继承的 基本 整数类型, 如
+.B int\c
+\&, 是 有符号数.
+.Sp
+然而, 如果 指定了 `\|\c
+.B \-traditional\c
+\&\|' 选项, 位域 永远 是 无符号数.
+
+.TP
+.B \-fwritable\-strings
+把 字符串常量 存储到 可写数据段, 而且 不做 特别 对待.
+这是 为了 兼容 一些 老程序, 他们 假设 字符串常量 是 可写的. `\|\c
+.B \-traditional\c
+\&\|' 选项 也有 相同 效果.
+.Sp
+篡改 字符串常量 是一个 非常 糟糕的 想法; \*(lq常量\*(rq 就应该是 常量.
+
+.SH "预处理器选项 (Preprocessor Option)"
+下列 选项 针对 C 预处理器, 预处理器 用在 正式 编译 以前, 对 C 源文件
+进行 某种处理.
+.PP
+如果 指定了 `\|\c
+.B \-E\c
+\&\|' 选项, GCC 只进行 预处理 工作. 下面的 某些 选项 必须 和 `\|\c
+.B \-E\c
+\&\|' 选项 一起 才 有意义, 因为 他们的 输出结果 不能 用于 编译.
+
+.TP
+.BI "\-include " "file"
+在 处理 常规 输入文件 之前, 首先 处理 文件 \c
+.I file\c
+\&, 其结果是, 文件 \c
+.I file\c
+\& 的 内容 先得到 编译.  命令行上 任何 `\|\c
+.B \-D\c
+\&\|'
+和 `\|\c
+.B \-U\c
+\&\|' 选项 永远 在 `\|\c
+.B \-include \c
+.I file\c
+\&\c
+\&\|' 之前 处理, 无论 他们 在 命令行上 的 顺序 如何. 然而 `\|\c
+.B \-include\c
+\&\|' 和 `\|\c
+.B \-imacros\c
+\&\|' 选项 按 书写顺序 处理.
+
+.TP
+.BI "\-imacros " file
+在 处理 常规 输入文件 之前, 首先 处理 文件 \c
+.I file\c
+\&, 但是 忽略 输出结果. 由于 丢弃了 文件
+.I file\c
+\& 的 输出内容, `\|\c
+.B \-imacros \c
+.I file\c
+\&\c
+\&\|' 选项 的 唯一 效果 就是 使 文件 \c
+.I file\c
+\& 中 的 宏定义 生效, 可以 用于 其他 输入文件. 在 处理 `\|\c
+.B \-imacros\c
+.I file\c
+\&\|' 选项 之前, 预处理器 首先 处理 `\|\c
+.B \-D\c
+\&\|' 和 `\|\c
+.B \-U\c
+\&\|' 选项, 并不在乎 他们 在 命令行上 的 顺序. 然而 `\|\c
+.B \-include\c
+\&\|' 和 `\|\c
+.B \-imacros\c
+\&\|' 选项 按 书写顺序 处理.
+
+.TP
+.BI "\-idirafter " "dir"
+把 目录 \c
+.I dir\c
+\& 添加到 第二包含路径 中. 如果 某个 头文件 在 主包含路径 (用`\|\c
+.B \-I\c
+\&\|' 添加的 路径) 中 没有 找到, 预处理器 就搜索 第二包含路径.
+
+.TP
+.BI "\-iprefix " "prefix"
+指定 \c
+.I prefix\c
+\& 作为 后续 `\|\c
+.B \-iwithprefix\c
+\&\|'
+选项 的 前缀.
+
+.TP
+.BI "\-iwithprefix " "dir"
+把 目录 添加到 第二包含路径 中. 目录名 由 \c
+.I prefix\c
+\& 和 \c
+.I dir\c
+\& 合并 而成, 这里 \c
+.I prefix
+被 先前的 `\|\c
+.B \-iprefix\c
+\&\|' 选项 指定.
+
+.TP
+.B \-nostdinc
+不要 在 标准系统目录 中 寻找 头文件. 只 搜索 `\|\c
+.B \-I\c
+\&\|' 选项 指定的 目录 (以及 当前目录, 如果 合适).
+.Sp
+结合 使用 `\|\c
+.B \-nostdinc\c
+\&\|' 和 `\|\c
+.B \-I\-\c
+\&\|' 选项, 你 可以 把 包含文件 搜索 限制在 显式 指定的 目录.
+
+.TP
+.B \-nostdinc++
+不要 在 C++ 专用标准目录 中 寻找 头文件, 但是 仍然 搜索 其他 标准目录.
+(当 建立 `\|\c
+.B libg++\c
+\&\|' 时 使用 这个选项.)
+.TP
+.B \-undef
+不要 预定义 任何 非标准宏. (包括 系统结构 标志).
+
+.TP
+.B \-E
+仅运行 C 预处理器. 预处理 所有 指定的 C 源文件, 结果 送往 标准输出
+或 指定的 输出文件.
+
+.TP
+.B \-C
+告诉 预处理器 不要 丢弃 注释. 配合 `\|\c
+.B \-E\c
+\&\|' 选项 使用.
+
+.TP
+.B \-P
+告诉 预处理器 不要 产生 `\|\c
+.B #line\c
+\&\|' 命令. 配合 `\|\c
+.B \-E\c
+\&\|' 选项 使用.
+
+.TP
+.B \-M\  [ \-MG ]
+告诉 预处理器 输出 一个 适合 \c
+.B make
+的 规则, 用于 描述 各目标文件的 依赖 关系. 对于 每个 源文件,
+预处理器 输出 一个 \c
+.B make
+规则, 该规则 的 目标项 (target) 是 源文件 对应的 目标文件名, 依赖项
+(dependency) 是 源文件中 `\|\c
+.B #include\c
+\&\| 引用的 所有文件. 生成的 规则 可以是 单行, 但如果 太长, 就用 `\|\c
+.B \e\c
+\&\|'-换行符 续成 多行. 规则 显示在 标准输出, 不产生 预处理过的 C 程序.
+.Sp
+`\|\c
+.B \-M\c
+\&\|' 隐含了 `\|\c
+.B \-E\c
+\&\|' 选项.
+.Sp
+`\|\c
+.B \-MG\c
+\&\|' 要求 把 缺失的 头文件 按 存在 对待, 并且 假定 他们 和 源程序文件
+在 同一目录 下. 必须 和 `\|\c
+.B \-M\c
+\&\|' 选项 一起用.
+
+.TP
+.B \-MM\  [ \-MG ]
+和 `\|\c
+.B \-M\c
+\&\|' 选项 类似, 但是 输出结果 仅涉及 用户头文件, 象 这样 `\|\c
+.B #include \&"\c
+.I file\c
+\&"\c
+\&\|'.  忽略 系统头文件 如 `\|\c
+.B #include <\c
+.I file\c
+\&>\c
+\&\|'.
+
+.TP
+.B \-MD
+和 `\|\c
+.B \-M\c
+\&\|' 选项 类似, 但是 把 依赖 信息 输出在 文件中, 文件名 通过 把 输出文件名
+末尾的 `\|\c
+.B .o\c
+\&\|' 替换为 `\|\c
+.B .d\c
+\&\|' 产生. 同时 继续 指定的 编译工作 \(em\&`\|\c
+.B \-MD\c
+\&\|' 不象 `\|\c
+.B \-M\c
+\&\|' 那样 阻止 正常的 编译任务.
+.Sp
+Mach 的 实用工具 `\|\c
+.B md\c
+\&\|' 能够 合并 `\|\c
+.B .d\c
+\&\|' 文件, 产生 适用于 `\|\c
+.B make\c
+\&\|' 命令 的 单一的 依赖文件.
+
+.TP
+.B \-MMD
+和 `\|\c
+.B \-MD\c
+\&\|' 选项 类似, 但是 输出结果 仅涉及 用户头文件, 忽略 系统头文件.
+
+.TP
+.B \-H
+除了 其他 普通 的 操作, GCC 显示 引用过的 头文件 名.
+
+.TP
+.BI "\-A" "question" ( answer )
+如果 预处理器 做 条件测试, 如 `\|\c
+.BI "#if #" question ( answer )\c
+\&\|', 该选项 可以 断言 (Assert)
+.I question
+的 答案 是
+.I answer.
+.B \-A\-\c
+\&\|' 关闭 一般用于 描述 目标机 的 标准 断言.
+
+.TP
+.BI \-D macro
+定义 宏 \c
+.I macro\c
+\&, 宏 的 内容 定义为 字符串 `\|\c
+.B 1\c
+\&\|'.
+
+.TP
+.BI \-D macro = defn
+定义 宏 \c
+.I macro\c
+\& 的 内容 为 \c
+.I defn\c
+\&. 命令行 上 所有的 `\|\c
+.B \-D\c
+\&\|' 选项 在 `\|\c
+.B \-U\c
+\&\|' 选项 之前 处理.
+
+.TP
+.BI \-U macro
+取消 宏 \c
+.I macro\c
+\&.  `\|\c
+.B \-U\c
+\&\|' 选项 在 所有的 `\|\c
+.B \-D\c
+\&\|' 选项 之后 处理, 但是 优先于 任何 `\|\c
+.B \-include\c
+\&\|' 或 `\|\c
+.B \-imacros\c
+\&\|' 选项.
+
+.TP
+.B \-dM
+告诉 预处理器 输出 有效的 宏定义 列表 (预处理 结束时 仍然 有效的 宏定义).
+该选项 需 结合 `\|\c
+.B \-E\c
+\&\|'
+选项 使用.
+
+.TP
+.B \-dD
+告诉 预处理器 把 所有的 宏定义 传递到 输出端, 按照 出现的 顺序 显示.
+
+.TP
+.B \-dN
+和 `\|\c
+.B \-dD\c
+\&\|'选项 类似, 但是 忽略 宏的 参量 或 内容. 只在 输出端 显示 `\|\c
+.B #define \c
+.I name\c
+\&\c.
+
+.SH "汇编器选项 (ASSEMBLER OPTION)"
+.TP
+.BI "\-Wa," "option"
+把 选项 \c
+.I option\c
+\& 传递给 汇编器.  如果 \c
+.I option
+含有 逗号, 就在 逗号 处 分割成 多个 选项.
+
+.SH "连接器选项 (LINKER OPTION)"
+下面的 选项 用于 编译器 连接 目标文件, 输出 可执行文件 的 时候.
+如果 编译器 不进行 连接, 他们 就 毫无意义.
+
+.TP
+.I object-file-name
+如果 某些文件 没有 特别明确的 后缀 a special recognized suffix,
+GCC 就 认为 他们 是 目标文件 或 库文件. (根据 文件内容, 连接器 能够 区分
+目标文件 和 库文件). 如果 GCC 执行 连接 操作, 这些 目标文件 将 成为
+连接器 的 输入文件.
+
+.TP
+.BI \-l library
+连接 名为 \c
+.I library\c
+\& 的 库文件.
+.Sp
+连接器 在 标准搜索目录 中 寻找 这个 库文件, 库文件 的 真正 名字 是 `\|\c
+.B lib\c
+.I library\c
+\&.a\c
+\&\|'.  连接器 会 当做 文件名 得到 准确 说明 一样 引用 这个文件.
+.Sp
+搜索目录 除了 一些 系统标准目录 外, 还包括 用户 以 `\|\c
+.B \-L\c
+\&\|' 选项 指定 的 路径.
+.Sp
+一般说来 用 这个方法 找到的 文件 是 库文件\(em\&即由 目标文件 组成的 
+归档文件 (archive file).
+连接器 处理 归档文件 的 方法 是: 扫描 归档文件, 寻找 某些 成员,
+这些 成员 的 符号 目前 已 被引用, 不过 还没有 被定义.
+但是, 如果 连接器 找到 普通的 目标文件, 而不是 库文件, 就把 这个 目标文件
+按 平常方式 连接 进来. 指定 `\|\c
+.B \-l\c
+\&\|' 选项 和 指定 文件名 的 唯一 区别 是, `\|\c
+.B \-l\c
+选项 用 `\|\c
+.B lib\c
+\&\|' 和 `\|\c
+.B .a\c
+\&\|' 把 
+.I library
+包裹 起来, 而且 搜索 一些 目录.
+
+.TP
+.B \-lobjc
+这个
+.B \-l
+选项 的 特殊形式 用于 连接 Objective C 程序.
+
+.TP
+.B \-nostartfiles
+不连接 系统 标准启动文件, 而 标准库文件 仍然 正常 使用.
+
+.TP
+.B \-nostdlib
+不连接 系统 标准启动文件 和 标准库文件. 只把 指定的 文件 传递给 连接器.
+
+.TP
+.B \-static
+在 支持 动态连接 (dynamic linking) 的 系统 上, 阻止 连接 共享库.
+该选项 在 其他系统上 无效.
+
+.TP
+.B \-shared
+生成 一个 共享目标文件, 他 可以 和 其他 目标文件 连接 产生 可执行文件.
+只有 部分 系统 支持 该选项.
+
+.TP
+.B \-symbolic
+建立 共享目标文件 的 时候, 把 引用 绑定到 全局符号上.
+对 所有 无法解析的 引用 作出 警告 (除非 用 连接编辑选项 `\|\c
+.B
+\-Xlinker \-z \-Xlinker defs\c
+\&\|' 取代).  
+只有 部分 系统 支持 该选项.
+
+
+.TP
+.BI "\-Xlinker " "option"
+把 选项 \c
+.I option
+传递给 连接器. 可以 用 他 传递 系统 特定的 连接 选项, GNU CC 无法 识别 
+这些 选项.
+.Sp
+如果 需要 传递 携带 参数 的 选项, 你 必须 使用 两次 `\|\c
+.B \-Xlinker\c
+\&\|', 一次 传递 选项, 另一次 传递 他的 参数. 例如, 如果 传递 `\|\c
+.B
+\-assert definitions\c
+\&\|', 你 必须 写成 `\|\c
+.B
+\-Xlinker \-assert \-Xlinker definitions\c
+\&\|',  而不能 写成 `\|\c
+.B
+\-Xlinker "\-assert definitions"\c
+\&\|', 因为 这样 会把 整个 字符串 当做 一个 参数 传递, 显然 这 不是
+连接器 期待的.
+
+.TP
+.BI "\-Wl," "option"
+把 选项 \c
+.I option\c
+\& 传递给 连接器.  如果 \c
+.I option\c
+\& 中 含有 逗号, 就在 逗号 处 分割成 多个 选项. 
+
+.TP
+.BI "\-u " "symbol"
+使 连接器 认为 取消了
+.I symbol
+的 符号定义, 从而 连接 库模块 以 取得 定义. 你 可以 使用 多个 `\|\c
+.B \-u\c
+\&\|' 选项, 各自 跟上 不同的 符号, 使得 连接器 调入 附加的 库模块.
+
+.SH "目录选项 (DIRECTORY OPTION)
+下列 选项 指定 搜索路径, 用于 查找 头文件, 库文件, 或 编译器 的 某些成员:
+.TP
+.BI "\-I" "dir"
+在 头文件 的 搜索路径 列表 中 添加
+.I dir 
+目录.
+
+.TP
+.B \-I\-
+任何 在 `\|\c
+.B \-I\-\c
+\&\|' 前面 用 `\|\c
+.B \-I\c
+\&\|' 选项 指定 的 搜索路径 只适用于 `\|\c
+.B
+#include "\c
+.I file\c
+.B
+\&"\c
+\&\|' 这种 情况; 他们 不能 用来 搜索 `\|\c
+.B #include <\c
+.I file\c
+\&>\c
+\&\|' 包含 的 头文件.
+.Sp
+如果 用 `\|\c
+.B \-I\c
+\&\|' 选项 指定的 搜索路径 位于 `\|\c
+.B \-I\-\c
+\&\|' 选项 后面, 就可以 在 这些 路径 中 搜索 所有的 `\|\c
+.B #include\c
+\&\|'
+指令. (一般说来
+.B \-I
+选项 就是 这么 用的.)
+.Sp
+还有, `\|\c
+.B \-I\-\c
+\&\|' 选项 能够 阻止 当前目录 (存放 当前 输入文件 的 地方) 成为 搜索 `\|\c
+.B
+#include "\c
+.I file\c
+.B
+\&"\c
+\&\|' 的 第一选择. 没有 办法 克服 `\|\c
+.B \-I\-\c
+\&\|' 选项 的 这个效应.  你 可以 指定 `\|\c
+.B \-I.\c
+\&\|' 搜索 那个目录, 它 在 调用 编译器 时 是 当前目录. 
+这 和 预处理器 的 默认行为 不完全 一样, 但是 结果 通常 令人满意.
+.Sp
+`\|\c
+.B \-I\-\c
+\&\|' 不影响 使用 系统标准目录, 因此, `\|\c
+.B \-I\-\c
+\&\|' 和 `\|\c
+.B \-nostdinc\c
+\&\|' 是 不同的 选项.
+
+.TP
+.BI "\-L" "dir"
+在 `\|\c
+.B \-l\c
+\&\|' 选项 的 搜索路径 列表 中 添加 \c
+.I dir\c
+\& 目录.
+
+.TP
+.BI "\-B" "prefix"
+这个选项 指出 在何处 寻找 可执行文件, 库文件, 以及 编译器 自己 的 数据文件.
+.Sp
+编译器 驱动程序 需要 执行 某些 下面的 子程序: `\|\c
+.B cpp\c
+\&\|', `\|\c
+.B cc1\c
+\&\|' (或 C++ 的 `\|\c
+.B cc1plus\c
+\&\|'), `\|\c
+.B as\c
+\&\|' 和 `\|\c
+.B ld\c
+\&\|'.  他 把 
+.I prefix\c
+\& 当作 欲执行的 程序 的 前缀, 既可以 包括 也可以 不包括 `\|\c
+.I machine\c
+.B /\c
+.I version\c
+.B /\c
+\&\|'.
+.Sp
+对于 要运行的 子程序, 编译器 驱动程序 首先 试着 加上 `\|\c
+.B \-B\c
+\&\|' 前缀 (如果存在).  如果 没有 找到 文件, 或 没有 指定 `\|\c
+.B \-B\c
+\&\|' 选项, 编译器 接着 会 试验 两个 标准 前缀 `\|\c
+.B /usr/lib/gcc/\c
+\&\|' 和 `\|\c
+.B /usr/local/lib/gcc-lib/\c
+\&\|'.  如果 仍然 没能够 找到 所需文件, 编译器 就在 `\|\c
+.B PATH\c
+\&\|' 环境变量 指定的 路径 中 寻找 没加 任何 前缀 的 文件名.
+.Sp
+如果 有需要, 运行时 (run-time) 支持文件 `\|\c
+.B libgcc.a\c
+\&\|' 也在 `\|\c
+.B \-B\c
+\&\|' 前缀 的 搜索 范围 之内. 如果 这里 没有 找到, 就在 上面 提到的
+两个 标准 前缀 中 寻找, 仅此而已. 如果 上述 方法 没有 找到 这个 文件,
+就 不连接 他了. 多数 情况 的 多数 机器 上, `\|\c
+.B libgcc.a\c
+\&\|' 并非 必不可少.
+.Sp
+你 可以 通过 环境变量
+.B GCC_EXEC_PREFIX\c
+\& 获得 近似的 效果; 如果 定义了 这个 变量, 其值 就和 上面 说的 一样
+用做 前缀. 如果 同时 指定了 `\|\c
+.B \-B\c
+\&\|' 选项 和
+.B GCC_EXEC_PREFIX\c
+\& 变量, 编译器 首先 使用 `\|\c
+.B \-B\c
+\&\|' 选项, 然后 才尝试 环境变量值.
+
+.SH "警告选项 (WARNING OPTION)"
+警告 是 针对 程序结构 的 诊断信息, 程序 不一定 有错误, 而是 存在
+风险, 或者 可能 存在 错误.
+.Sp
+下列 选项 控制 GNU CC 产生 的 警告 的 数量 和 类型:
+
+.TP
+.B \-fsyntax\-only
+检查 程序 中 的 语法错误, 但是 不产生 输出信息.
+.TP
+.B \-w
+禁止 所有 警告信息.
+.TP
+.B \-Wno\-import
+禁止 所有 关于
+.BR #import 
+的 警告信息.
+.TP
+.B \-pedantic
+打开 完全服从 ANSI C 标准 所需的 全部 警告诊断; 拒绝接受 采用了
+被禁止的 语法扩展 的 程序.
+.Sp
+无论 有没有 这个 选项, 符合 ANSI C 标准 的 程序 应该 能够 被 正确 编译
+(虽然 极少数 程序 需要 `\|\c
+.B \-ansi\c
+\&\|' 选项).  然而, 如果 没有 这个 选项, 某些 GNU 扩展 和 传统 C 特性
+也 得到 支持. 使用 这个 选项 可以 拒绝 这些 程序. 没有 理由 使用 这个
+选项, 他 存在 只是 为了 满足 一些 书呆子 (pedant).
+.Sp
+对于 替选关键字 (他们 以 `\|\c
+.B _\|_\c
+\&\|' 开始 和 结束) `\|\c
+.B \-pedantic\c
+\&\|' 不会 产生 警告信息. Pedantic 也 不警告 跟在
+.B _\|_extension_\|_\c
+\& 后面 的 表达式. 不过 只应该 在 系统头文件 中 使用 这种 转义措施,
+应用程序 最好 避免.
+.TP
+.B \-pedantic\-errors
+该 选项 和 `\|\c
+.B \-pedantic\c
+\&\|' 类似, 但是 显示 错误 而不是 警告.
+.TP
+.B \-W
+对 下列 事件 显示 额外的 警告信息:
+.TP
+\ \ \ \(bu
+非易变自动变量 (nonvolatile automatic variable) 可能 在 调用
+.B longjmp\c
+\& 时 发生 改变. 这些 警告 仅在 优化编译 时 发生.
+.Sp
+编译器 只知道 对 \c
+.B setjmp\c
+\& 的 调用, 他 不可能 知道 会 在哪里 调用 \c
+.B longjmp\c
+\&, 事实上 一个 信号处理例程 可以 在 程序 的 任何 地点 调用 他.
+其结果是, 即使 程序 没有 问题, 你 也可能会 得到 警告, 因为 无法 在
+可能 出现 问题 的 地方 调用 \c
+.B longjmp\c
+\&.
+
+.TP
+\ \ \ \(bu
+既可以 返回 值, 也可以 不返回 值 的 函数. (缺少 结尾 的 函数体 被看作
+不返回 函数值) 例如, 下面的 函数 将 导致 这种 警告:
+.Sp
+.nf
+foo (a)
+{
+  if (a > 0)
+    return a;
+}
+.Sp
+.fi
+由于 GNU CC 不知道 某些 函数 永不返回 (含有 \c
+.B abort\c
+\& 和 \c
+.B longjmp\c
+\&), 因此 有可能 出现 虚假 警告.
+
+.TP
+\ \ \ \(bu
+表达式语句 或 逗号表达式 的 左侧 没有 产生 作用 (side effect).
+如果要 防止 这种 警告, 应该把 未使用的 表达式 强制转换 为 void 类型.
+例如, 这样的 表达式 `\|\c
+.B x[i,j]\c
+\&\|' 会 导致 警告, 而 `\|\c
+.B x[(void)i,j]\c
+\&\|' 就 不会.
+
+.TP
+\ \ \ \(bu
+无符号数 用 `\|\c
+.B >\c
+\&\|' 或 `\|\c
+.B <=\c
+\&\|' 和 零 做比较.
+.PP
+
+.TP
+.B \-Wimplicit-int
+警告 没有 指定 类型 的 声明.
+
+.TP
+.B \-Wimplicit-function-declaration
+警告 在 声明 之前 就 使用 的 函数.
+
+.TP
+.B \-Wimplicit
+同 -Wimplicit-int 和 -Wimplicit-function-declaration.
+
+.TP
+.B \-Wmain
+如果 把
+.B main
+函数 声明 或 定义 成 奇怪 的 类型, 编译器 就 发出 警告.
+典型情况下, 这个 函数 用于 外部连接, 返回 
+.B int\c
+\& 数值, 不需要 参数, 或 指定 两个 参数.
+
+.TP
+.B \-Wreturn\-type
+如果 函数 定义了 返回类型, 而 默认 类型 是 \c
+.B int\c
+\& 型, 编译器 就 发出 警告. 同时 警告 那些 不带 返回值 的 \c
+.B return\c
+\& 语句, 如果 他们 所属的 函数 并非 \c
+.B void\c
+\& 类型.
+
+.TP
+.B \-Wunused
+如果 某个 局部变量 除了 声明 就 没再 使用, 或者 声明了 静态函数 但是 没有
+定义, 或者 某条 语句 的 运算结果 显然 没有 使用, 编译器 就 发出 警告.
+
+.TP
+.B \-Wswitch
+如果 某条 \c
+.B switch\c
+\& 语句 的 参数 属于 枚举类型, 但是 没有 对应的 \c
+.B case\c
+\& 语句 使用 枚举元素, 编译器 就 发出 警告. ( \c
+.B default\c
+\& 语句 的 出现 能够 防止 这个 警告.) 超出 枚举 范围 的 \c
+.B case\c
+\& 语句 同样 会 导致 这个 警告.
+
+.TP
+.B \-Wcomment
+如果 注释起始序列 `\|\c
+.B /\(**\c
+\&\|' 出现在 注释 中, 编译器 就 发出 警告.
+
+.TP
+.B \-Wtrigraphs
+警告 任何 出现的 trigraph (假设 允许 使用 他们).
+
+.TP
+.B \-Wformat
+检查 对 \c
+.B printf\c
+\& 和 \c
+.B scanf\c
+\& 等 函数 的 调用, 确认 各个 参数 类型 和 格式串 中的 一致.
+
+.TP
+.B \-Wchar\-subscripts
+警告 类型 是
+.BR char 
+的 数组 下标. 这是 常见 错误, 程序员 经常 忘记 在 某些 机器 上 char 有 符号.
+
+.TP
+.B \-Wuninitialized
+在 初始化 之前 就 使用 自动变量.
+.Sp
+这些警告 只可能 做 优化编译 时 出现, 因为 他们 需要 数据流信息, 只有
+做 优化 的 时候 才 估算 数据流信息. 如果 不指定 `\|\c
+.B \-O\c
+\&\|' 选项, 就不会 出现 这些警告.
+.Sp
+这些警告 仅针对 等候 分配 寄存器 的 变量. 因此 不会 发生在 声明为 \c
+.B volatile\c
+\& 的 变量 上面, 不会 发生在 已经 取得 地址 的 变量, 或 长度 不等于 
+1, 2, 4, 8 字节 的 变量. 同样 也不会 发生在 结构, 联合 或 数组 上面, 
+即使 他们 在 寄存器 中.
+.Sp
+注意, 如果 某个变量 只 计算了 一个 从未使用过 的 值, 这里 可能 不会 警告.
+因为 在 显示 警告 之前, 这样 的 计算 已经 被 数据流分析 删除 了.
+.Sp
+这些警告 作为 可选项 是因为 GNU CC 还没有 智能到 判别 所有的 情况, 知道
+有些 看上去 错误 的 代码 其实 是 正确的. 下面 是 一个 这样的 例子:
+.Sp
+.nf
+{
+  int x;
+  switch (y)
+    {
+    case 1: x = 1;
+      break;
+    case 2: x = 4;
+      break;
+    case 3: x = 5;
+    }
+  foo (x);
+}
+.Sp
+.fi
+如果 \c
+.B y\c
+\& 始终是 1, 2 或 3, 那么 \c
+.B x\c
+\& 总会被 初始化, 但是 GNU CC 不知道 这一点. 下面 是 另一个 普遍案例:
+.Sp
+.nf
+{
+  int save_y;
+  if (change_y) save_y = y, y = new_y;
+  .\|.\|.
+  if (change_y) y = save_y;
+}
+.Sp
+.fi
+这里 没有 错误, 因为 只有 设置了 \c
+.B save_y\c
+\& 才 使用 他.
+.Sp
+把 所有 不返回 的 函数 定义为
+.B volatile\c
+\& 可以 避免 某些 似是而非的 警告.
+
+.TP
+.B \-Wparentheses
+在 某些 情况 下 如果 忽略了 括号, 编译器 就 发出 警告.
+
+.TP
+.B \-Wtemplate\-debugging
+当 在 C++ 程序 中 使用 template 的 时候, 如果 调试 (debugging) 没有 完全 生效,
+编译器 就 发出 警告. (仅用于 C++).
+
+.TP
+.B \-Wall
+结合 所有 上述 的 `\|\c
+.B \-W\c
+\&\|' 选项. 通常 我们 建议 避免 这些 被警告的 用法，我们 相信,
+恰当 结合 宏 的 使用 能够 轻易 避免 这些 用法。
+
+.PP
+剩下的 `\|\c
+.B \-W.\|.\|.\c
+\&\|' 选项 不包括 在 `\|\c
+.B \-Wall\c
+\&\|' 中, 因为 我们 认为 在 必要情况 下, 这些 被 编译器 警告 的 程序结构, 
+可以 合理的 用在 "干净的" 程序 中.
+
+.TP
+.B \-Wtraditional
+如果 某些 程序结构 在 传统 C 中 的 表现 和 ANSI C 不同, 编译器 就 发出 警告.
+
+.TP
+\ \ \ \(bu
+宏参 出现在 宏体 的 字符串常量 内部. 传统 C 会 替换 宏参, 而 ANSI C 
+则 视其为 常量 的 一部分.
+
+.TP
+\ \ \ \(bu
+某个函数 在 块(block) 中 声明为 外部, 但在 块 结束后 才 调用.
+
+.TP
+\ \ \ \(bu
+.B switch\c
+\& 语句 的 操作数 类型 是 \c
+.B long\c
+\&.
+
+.PP
+.TP
+.B \-Wshadow
+一旦 某个 局部变量 屏蔽了 另一个 局部变量, 编译器 就 发出 警告.
+
+.TP
+.BI "\-Wid\-clash\-" "len"
+一旦 两个 确定的 标识符 具有 相同的 前 \c
+.I len
+个 字符, 编译器 就 发出 警告. 他 可以 协助 你 开发 一些 将要在
+某些 过时的, 危害大脑的 编译器 上 编译 的 程序.
+
+.TP
+.B \-Wpointer\-arith
+任何 语句 如果 依赖于 函数类型 的 大小(size) 或者 \c
+.B void\c
+\& 类型 的 大小, 编译器 就 发出 警告.  GNU C 为了 便于 计算 \c
+.B void \(**\c
+\& 指针 和 函数指针, 就把 这些 类型 的 大小 定义 为 1.
+
+.TP
+.B \-Wcast\-qual
+一旦 某个 指针 强制类型转换 以便 移除 类型修饰符 时, 编译器 就 发出 警告.
+例如, 如果 把 \c
+.B const char \(**\c
+\& 强制转换 为 普通的 \c
+.B char \(**\c
+\& 时, 警告 就会 出现.
+
+.TP
+.B \-Wcast\-align
+一旦 某个 指针类型 强制转换 时, 导致 目标 所需的 地址对齐 (alignment)  
+增加, 编译器 就 发出 警告.
+例如, 某些 机器 上 只能 在 2 或 4 字节 边界 上 访问 整数, 如果 在 
+这种 机型 上 把 \c
+.B char \(**\c
+\& 强制转换 成 \c
+.B int \(**\c
+\& 类型, 编译器 就 发出 警告.
+
+.TP
+.B \-Wwrite\-strings
+规定 字符串常量 的 类型 是 \c
+.B const char[\c
+.I length\c
+.B ]\c
+\&, 因此, 把 这样的 地址 复制给 non-\c
+.B const\c
+\& \c
+.B char \(**
+指针 将 产生 警告.  
+这些 警告 能够 帮助 你 在 编译期间 发现 企图 写入 字符串常量 的 代码,
+但是 你 必须 非常 仔细 的 在 声明 和 原形 中 使用 \c
+.B const\c
+\&, 否则 他们 只能 带来 麻烦; 所以 我们 没有 让 `\|\c
+.B \-Wall\c
+\&\|' 提供 这些 警告.
+
+.TP
+.B \-Wconversion
+如果 某函数原形 导致 的 类型转换 和 无函数原形 时的 类型转换 不同,
+编译器 就 发出 警告.
+这里 包括 定点数 和 浮点数 的 互相转换, 改变 定点数 的 宽度 或 符号,
+除非 他们 和 缺省声明 (default promotion) 相同.
+
+.TP
+.B \-Waggregate\-return
+如果 定义 或 调用 了 返回 结构 或 联合 的 函数, 编译器 就 发出 警告.
+(从 语言角度 你 可以 返回 一个 数组, 然而 同样 会 导致 警告.)
+
+.TP
+.B \-Wstrict\-prototypes
+如果 函数 的 声明 或 定义 没有 指出 参数类型, 编译器 就 发出 警告.
+(如果 函数 的 前向引用说明 指出了 参数类型, 则 允许 后面 使用 旧式风格
+的 函数定义, 而 不会产生 警告.)
+
+.TP
+.B \-Wmissing\-prototypes
+如果 没有 预先 声明 函数原形 就 定义了 全局函数, 编译器 就 发出 警告.
+即使 函数定义 自身 提供了 函数原形 也会 产生 这个 警告. 他 的 目的
+是 检查 没有 在 头文件 中 声明 的 全局函数.
+
+.TP
+.B \-Wmissing\-declarations
+如果 没有 预先 声明 就 定义了 全局函数, 编译器 就 发出 警告.
+即使 函数定义 自身 提供了 函数原形 也会 产生 这个 警告. 这个选项 的 目的
+是 检查 没有 在 头文件 中 声明 的 全局函数.
+
+.TP
+.B \-Wredundant-decls
+如果 在 同一个 可见域 某定义 多次 声明, 编译器 就 发出 警告, 即使 这些
+重复声明 有效 并且 毫无差别.
+
+.TP
+.B \-Wnested-externs
+如果 某 \c
+.B extern\c
+\& 声明 出现在 函数 内部, 编译器 就 发出 警告.
+
+.TP
+.B \-Wenum\-clash
+对于 不同 枚举类型 之间 的 转换 发出 警告 (仅适用于 C++).
+
+.TP
+.B \-Wlong\-long
+如果 使用了
+.B long long \c
+类型 就 发出 警告. 该 警告 是 缺省项. 使用 `\|\c
+.B \-Wno\-long\-long\c
+\&\|' 选项 能够 防止 这个 警告.  `\|\c
+.B \-Wlong\-long\c
+\&\|' 和 `\|\c
+.B \-Wno\-long\-long\c
+\&\|' 仅 在 `\|\c
+.B \-pedantic\c
+\&\|' 之下 才起作用.
+
+.TP
+.B \-Woverloaded\-virtual
+(仅适用于 C++.) 在继承类中, 虚函数 的 定义 必须 匹配 虚函数 在 基类
+中 声明 的 类型特征 (type signature).
+当 继承类 声明了 某个函数, 它 可能 是个 错误的 尝试 企图 定义一个 虚函数,
+使用 这个 选项 能够 产生 警告:
+就是说, 当 某个函数 和 基类 中的 虚函数 同名, 但是 类型特征 不符合 基类
+的 任何 虚函数, 编译器 将发出 警告.
+
+.TP
+.B \-Winline
+如果 某函数 不能 内嵌(inline), 无论 是 声明为 inline 或者是 指定了
+.B \-finline\-functions
+选项, 编译器 都将 发出 警告.
+
+.TP
+.B \-Werror
+视 警告 为 错误; 出现 任何 警告 即 放弃 编译.
+
+.SH "调试选项 (DEBUGGING OPTION)"
+GNU CC 拥有 许多 特别选项, 既可以 调试 用户的 程序, 也可以 对 GCC 排错:
+.TP
+.B \-g
+以 操作系统 的 本地格式 (stabs, COFF, XCOFF, 或 DWARF).
+产生 调试信息. GDB 能够 使用 这些 调试信息.
+.Sp
+在 大多数 使用 stabs 格式 的 系统 上, `\|\c
+.B \-g\c
+\&\|' 选项 启动 只有 GDB 才使用 的 额外调试信息; 这些信息 使 GDB 调试
+效果 更好, 但是 有可能 导致 其他 调试器 崩溃, 或 拒绝 读入 程序.
+如果 你 确定 要 控制 是否 生成 额外的 信息, 使用`\|\c
+.B \-gstabs+\c
+\&\|', `\|\c
+.B \-gstabs\c
+\&\|',
+`\|\c
+.B \-gxcoff+\c
+\&\|', `\|\c
+.B \-gxcoff\c
+\&\|', `\|\c
+.B \-gdwarf+\c
+\&\|', 或 `\|\c
+.B \-gdwarf\c
+\&\|'
+(见下文).
+.Sp
+和 大多数 C 编译器 不同, GNU CC 允许 结合使用 `\|\c
+.B \-g\c
+\&\|' 和 `\|\c
+.B \-O\c
+\&\|' 选项. 优化的 代码 偶尔 制造 一些 惊异的 结果: 某些 声明过的 变量
+根本 不存在; 控制流程 直接 跑到 没有 预料到的 地方; 某些语句 因为 计算结果
+是 常量 或 已经确定 而 没有 执行; 某些语句 在 其他 地方 执行, 因为 他们
+被移到 循环 外面 了.
+.Sp
+然而 它 证明了 调试 优化的输出 是 可能的. 对 可能 含有 错误 的 程序
+使用 优化器 是 合理的.
+.PP
+如果 GNU CC 支持 输出 多种 调试信息, 下面的 选项 则 非常有用.
+
+.TP
+.B \-ggdb
+以 本地格式 (如果支持) 输出 调试信息, 尽可能 包括 GDB 扩展.
+
+.TP
+.B \-gstabs
+以 stabs 格式 (如果支持) 输出 调试信息, 不包括 GDB 扩展.
+这是 大多数 BSD 系统 上 DBX 使用 的 格式.
+
+.TP
+.B \-gstabs+
+以 stabs 格式 (如果支持) 输出 调试信息, 使用 只有 GNU 调试器 (GDB)
+理解的 GNU 扩展. 使用 这些扩展 有可能 导致 其他 调试器 崩溃 或 拒绝
+读入 程序.
+
+.TP
+.B \-gcoff
+以 COFF 格式 (如果支持) 输出 调试信息. 这是 在 System V 第四版 以前
+的 大多数 System V 系统 上 SDB 使用 的 格式.
+
+.TP
+.B \-gxcoff
+以 XCOFF 格式 (如果支持) 输出 调试信息. 这是 IBM RS/6000 系统
+上 DBX 调试器 使用 的 格式.
+
+.TP
+.B \-gxcoff+
+以 XCOFF 格式 (如果支持) 输出 调试信息, 使用 只有 GNU 调试器 (GDB)
+理解的 GNU 扩展. 使用 这些扩展 有可能 导致 其他 调试器 崩溃 或 拒绝
+读入 程序.
+
+.TP
+.B \-gdwarf
+以 DWARF 格式 (如果支持) 输出 调试信息. 这是 大多数 System V 第四版
+系统 上 SDB 使用 的 格式.
+
+.TP
+.B \-gdwarf+
+以 DWARF 格式 (如果支持) 输出 调试信息, 使用 只有 GNU 调试器 (GDB)
+理解的 GNU 扩展. 使用 这些扩展 有可能 导致 其他 调试器 崩溃 或 拒绝
+读入 程序.
+
+.PP
+.BI "\-g" "level"
+.br
+.BI "\-ggdb" "level"
+.br
+.BI "\-gstabs" "level"
+.br
+.BI "\-gcoff" "level"
+.BI "\-gxcoff" "level"
+.TP
+.BI "\-gdwarf" "level"
+请求 生成 调试信息, 同时 用 \c
+.I level\c
+\& 指出 需要 多少 信息. 默认的 level 值 是 2.
+.Sp
+Level 1 输出 最少量 的 信息, 仅够 在 不打算 调试 的 程序段 内 backtrace.
+包括 函数 和 外部变量 的 描述, 但是 没有 局部变量 和 行号 信息.
+.Sp
+Level 3 包含 更多的 信息, 如 程序中出现 的 所有 宏定义. 当 使用 `\|\c
+.B \-g3\c
+\&\|' 选项 的 时候, 某些 调试器 支持 宏扩展.
+
+.TP
+.B \-p
+产生 额外代码, 用于 输出 profile 信息, 供 分析程序 \c
+.B prof\c
+\& 使用.
+
+.TP
+.B \-pg
+产生 额外代码, 用于 输出 profile 信息, 供 分析程序 \c
+.B gprof\c
+\& 使用.
+
+.TP
+.B \-a
+产生 额外代码, 用于 输出 基本块 (basic block) 的 profile 信息,
+它 记录 各个 基本块 的 执行 次数, 供 诸如 \c
+.B tcov\c
+\& 此类 的 程序 分析.  但是 注意, 这个 数据格式 并非 \c
+.B tcov\c
+\& 期待的. 最终 GNU \c
+.B gprof\c
+\& 将 处理 这些数据.
+.TP
+.B \-ax
+产生 额外代码, 用于 从 'bb.in' 文件 读取 基本块 的 profile 参数, 
+把 profile 的 结果 写到 'bb.out' 文件.
+`bb.in' 包含 一张 函数 列表. 一旦 进入 列表 中的 某个 函数, profile 操作
+就 开始, 离开 最外层 的 函数 后, profile 操作 就 结束.
+以 `-' 为 前缀名 的 函数 排除在 profile 操作 之外. 
+如果 函数名 不是 唯一的, 它 可以 写成
+`/path/filename.d:functionname' 来 澄清. `bb.out' 将 列出 一些 有效的
+文件名. 这四个 函数名 具有 特殊含义:
+`__bb_jumps__' 导致 跳转 (jump) 频率 写进 `bb.out'.
+`__bb_trace__' 导致 基本块 序列 通过 管道 传到 `gzip', 输出 `bbtrace.gz' 文件.
+`__bb_hidecall__' 导致 从 跟踪 (trace) 中 排除 call 指令.
+`__bb_showret__' 导致 在 跟踪 中 包括 返回指令.
+
+.TP
+.BI "\-d" "letters"
+编译 的 时候, 在 \c
+.I letters\c
+\& 指定 的 时刻 做 调试转储 (dump). 用于 调试 编译器.
+大多数 转储 的 文件名 通过 源文件名 添加 字词 获得 (例如  `\|\c
+.B foo.c.rtl\c
+\&\|' 或 `\|\c
+.B foo.c.jump\c
+\&\|').
+
+.TP
+.B \-dM
+预处理 结束 的 时候 转储 所有的 宏定义, 不输出到 文件.
+
+.TP
+.B \-dN
+预处理 结束 的 时候 转储 所有的 宏名.
+
+.TP
+.B \-dD
+预处理 结束 的 时候 转储 所有的 宏定义, 同时 进行 正常 输出.
+
+.TP
+.B \-dy
+语法分析 (parse) 的 时候 在 标准错误 转储 调试信息.
+
+.TP
+.B \-dr
+RTL 阶段 后 转储到 `\|\c
+.I file\c
+.B \&.rtl\c
+\&\|'.
+
+.TP
+.B \-dx
+仅对 函数 生成 RTL, 而不是 编译. 通常 和 `\|\c
+.B r\c
+\&\|' 联用.
+
+.TP
+.B \-dj
+第一次 跳转优化 后 转储到 `\|\c
+.I file\c
+.B \&.jump\c
+\&\|'.
+
+.TP
+.B \-ds
+CSE (包括 有时候 跟在 CSE 后面的 跳转优化) 后 转储到 `\|\c
+.I file\c
+.B \&.cse\c
+\&\|'.
+
+.TP
+.B \-dL
+循环优化 后 转储到 `\|\c
+.I file\c
+.B \&.loop\c
+\&\|'.
+
+.TP
+.B \-dt
+第二次 CSE 处理 (包括 有时候 跟在 CSE 后面的 跳转优化) 后 转储到 `\|\c
+.I file\c
+.B \&.cse2\c
+\&\|'.
+
+.TP
+.B \-df
+流程分析 (flow analysis) 后 转储到 `\|\c
+.I file\c
+.B \&.flow\c
+\&\|'.
+
+.TP
+.B \-dc
+指令组合 (instruction combination) 后 转储到 `\|\c
+.I file\c
+.B \&.combine\c
+\&\|'.
+
+.TP
+.B \-dS
+第一次 指令安排 (instruction schedule) 后 转储到 `\|\c
+.I file\c
+.B \&.sched\c
+\&\|'.
+
+.TP
+.B \-dl
+局部寄存器分配 后 转储到 `\|\c
+.I file\c
+.B \&.lreg\c
+\&\|'.
+
+.TP
+.B \-dg
+全局寄存器分配 后 转储到 `\|\c
+.I file\c
+.B \&.greg\c
+\&\|'.
+
+.TP
+.B \-dR
+第二次 指令安排 (instruction schedule) 后 转储到 `\|\c
+.I file\c
+.B \&.sched2\c
+\&\|'.
+
+.TP
+.B \-dJ
+最后一次 跳转优化 后 转储到 `\|\c
+.I file\c
+.B \&.jump2\c
+\&\|'.
+
+.TP
+.B \-dd
+推迟分支调度 (delayed branch scheduling) 后 转储到 `\|\c
+.I file\c
+.B \&.dbr\c
+\&\|'.
+
+.TP
+.B \-dk
+寄存器\-堆栈转换 后 转储到 `\|\c
+.I file\c
+.B \&.stack\c
+\&\|'.
+
+.TP
+.B \-da
+产生 以上 所有的 转储.
+
+.TP
+.B \-dm
+运行结束后, 在 标准错误 显示 内存使用统计.
+
+.TP
+.B \-dp
+在 汇编输出 加注 指明 使用了 哪些 模式 (pattern) 及其 替代模式.
+
+.TP
+.B \-fpretend\-float
+交叉编译 的 时候, 假定 目标机 和 宿主机 使用 同样的 浮点格式. 
+它 导致 输出 错误的 浮点常数, 但是 在 目标机 上 运行 的 时候, 
+真实的 指令序列 有可能 和 GNU CC 希望 的 一样.
+
+.TP
+.B \-save\-temps
+保存 那些 通常 是 \*(lq临时\*(rq 的 中间文件; 置于 当前目录 下,
+并且 根据 源文件 命名. 因此, 用 `\|\c
+.B \-c \-save\-temps\c
+\&\|' 选项 编译 `\|\c
+.B foo.c \c
+\&\|' 会 生成 `\|\c 
+.B foo.cpp\c
+\&\|' 和 `\|\c
+.B foo.s\c
+\&\|' 以及 `\|\c
+.B foo.o\c
+\&\|' 文件.
+
+.TP
+.BI "\-print\-file\-name=" "library"
+显示 库文件 \|\c
+.nh
+.I library
+.hy
+\&\| 的 全路径名, 连接 时 会 使用 这个库 \(em\& 其他 什么事情 都不作.
+根据 这个选项, GNU CC 既不编译, 也不连接, 仅仅 显示 文件名.
+
+.TP
+.B \-print\-libgcc\-file\-name
+和 `\|\c
+.B \-print\-file\-name=libgcc.a\c
+\&\|' 一样.
+
+.TP
+.BI "\-print\-prog\-name=" "program"
+类似于 `\|\c
+.B \-print\-file\-name\c
+\&\|', 但是 查找 程序 program 如 `\|\c
+.B cpp\c
+\&\|'.
+
+.SH "优化选项 (OPTIMIZATION OPTION)"
+这些选项 控制 多种 优化措施:
+.TP
+.B \-O
+.TP
+.B \-O1
+优化. 对于 大函数, 优化编译 占用 稍微多 的 时间 和 相当大 的 内存.
+.Sp
+不使用 `\|\c
+.B \-O\c
+\&\|' 选项 时, 编译器 的 目标 是 减少 编译 的 开销, 使 编译结果 能够 调试.
+语句 是 独立的: 如果 在 两条语句 之间 用 断点 中止 程序, 你 可以 对
+任何 变量 重新 赋值, 或者 在 函数体 内 把 程序计数器 指到 其他语句,
+以及 从 源程序 中 精确地 获取 你 期待 的 结果.
+.Sp
+不使用 `\|\c
+.B \-O\c
+\&\|' 选项 时, 只有 声明了 \c
+.B register\c
+\& 的 变量 才 分配使用 寄存器.  编译结果 比 不用 `\|\c
+.B \-O\c
+\&\|' 选项 的 PCC 要 略逊一筹.
+.Sp
+使用了 `\|\c
+.B \-O\c
+\&\|' 选项, 编译器 会试图 减少 目标码 的 大小 和 执行时间.
+.Sp
+如果 指定了 `\|\c
+.B \-O\c
+\&\|' 选项, `\|\c
+.B \-fthread\-jumps\c
+\&\|' 和 `\|\c
+.B \-fdefer\-pop\c
+\&\|' 选项 将被 打开. 在 有 delay slot 的 机器 上, `\|\c
+.B \-fdelayed\-branch\c
+\&\|' 选项 将被 打开. 在 即使 没有 帧指针 (frame pointer) 也支持 调试 
+的 机器 上, `\|\c
+.B \-fomit\-frame\-pointer\c
+\&\|' 选项 将被 打开. 某些机器 上 还可能会 打开 其他选项.
+
+.TP
+.B \-O2
+多优化一些. 除了 涉及 空间 和 速度 交换 的 优化选项, 执行 几乎 所有的
+优化工作. 例如 不进行 循环展开 (loop unrolling) 和 函数内嵌 (inlining). 和 \c
+.B \-O\c
+\& 选项 比较, 这个选项 既增加了 编译时间, 也提高了 生成代码 的 运行效果.
+
+.TP
+.B \-O3
+优化的更多. 除了 打开
+.B \-O2
+所做的 一切, 它 还 打开 了
+.B \-finline\-functions
+选项.
+
+.TP
+.B \-O0
+不优化.
+.Sp
+如果 指定了 多个
+.B \-O
+选项, 不管 带不带 数字, 最后一个 选项 才是 生效 的 选项.
+
+.PP
+诸如 `\|\c
+.B \-f\c
+.I flag\c
+\&\c
+\&\|' 此类 的 选项 描述 一些 机器无关 的 开关. 大多数 开关 具有 肯定 和 
+否定 两种格式; `\|\c
+.B \-ffoo\c
+\&\|' 开关选项 的 否定格式 应该是 `\|\c
+.B \-fno\-foo\c
+\&\|'.  下面的 列表 只展示了 一种 格式 \(em\& 那个 不是 默认选项 的 格式.
+你 可以 通过 去掉 或 添加 `\|\c
+.B no\-\c
+\&\|' 构造出 另一种 格式.
+
+.TP
+.B \-ffloat\-store
+不要 在 寄存器 中 存放 浮点变量. 这样 可以 防止 某些 机器 上 不希望
+的 过高 精度, 如 68000 的 浮点寄存器 (来自 68881) 保存的 精度 超过了 \c
+.B double\c
+\& 应该 具有的 精度.
+.Sp
+对于 大多数 程序, 过高 精度 只有 好处. 但是 有些 程序 严格 依赖于 IEEE 浮点数
+的 定义. 对 这样的 程序 可以 使用 `\|\c
+.B \-ffloat\-store\c
+\&\|' 选项.
+
+.TP
+.B \-fmemoize\-lookups
+.TP
+.B \-fsave\-memoized
+使用 探索法 (heuristic) 进行 更快的 编译 (仅对 C++). 
+默认情况下 不使用 探索法. 由于 探索法 只对 某些 输入文件 有效, 
+其他程序 的 编译速度 会变得 更慢.
+.Sp
+第一次 编译器 必须 对 成员函数 (或对 成员数据 的 引用) 建立 一个 调用.
+它 必须 (1) 判断出 这个类 是否 实现了 那个 名字 的 成员函数; (2) 决定
+调用 哪个 成员函数 (涉及到 推测 需要 做 哪种 类型转换); (3) 检查 成员函数
+对 调用者 是否 可见. 所有 这些 构成 更慢的 编译.
+一般情形, 第二次 对 成员函数 (或对 成员数据 的 引用) 建立 的 调用, 必须
+再次 经过 相同 长度 的 处理. 这 意味着 象 这样的 代码
+.Sp
+\&  cout << "This " << p << " has " << n << " legs.\en";
+.Sp
+对 整个 三步骤 要做 六次 遍历. 通过 使用 软件缓存, \*(lq命中\*(rq 
+能够 显著地 减少 这种 代价. 然而 不幸的 是, 使用 这种 缓存 必须
+实现 其他 机制, 带来了 它 自己的 开销. `\|\c
+.B \-fmemoize\-lookups\c
+\&\|' 选项 打开 软件缓存.
+.Sp
+因为 函数 的 正文环境 不同, 函数 对 成员 和 成员函数 的 访问权 (可见性)
+也可能 不同,
+.B g++
+可能 需要 刷新 缓存. 使用 `\|\c
+.B \-fmemoize\-lookups\c
+\&\|' 选项, 每 编译完 一个 函数 就 刷新 缓存. 而 `\|\c
+\-fsave\-memoized\c
+\&\|' 选项 也 启用 同样的 缓存, 但是 当 编译器 发觉 最后 编译 的 函数
+的 正文环境 产生 的 访问权 和 下一个 待编译的 函数 相同, 编译器 就 保留
+缓存 内容.
+这对 某个类 定义 许多 成员函数 时 非常 有用: 除了 某些 其他类 的 友函数,
+每个 成员函数 拥有 和 其他 成员函数 完全一样 的 访问权, 因而 无需 刷新 缓存.
+
+.TP
+.B \-fno\-default\-inline
+默认为 不要 把 成员函数 内嵌, 因为 它们 定义在 类的 作用域 内 (仅C++).
+
+.TP
+.B \-fno\-defer\-pop
+一旦 函数 返回, 参数 就 立即 弹出. 对于 那些 调用 函数 后 必须 弹出 参数
+的 机器, 编译器 一般情况下 让 几次 函数调用 的 参数 堆积 在 栈 上,
+然后 一次 全部 弹出.
+
+.TP
+.B \-fforce\-mem
+做 数学运算 前 把 将要 使用的 内存操作数 送入 寄存器. 通过 把 内存访问
+转换成 潜在的 公共子表达式, 它 可能 产生 较好的 目标码. 如果 它们 不是
+公共子表达式, 指令组合 应该 消除 各自的 寄存器载荷. 我 乐意 倾听 不同意见.
+
+.TP
+.B \-fforce\-addr
+做 数学运算 前 把 将要 使用的 内存地址常数 送入 寄存器. 它 可能 和 `\|\c
+.B \-fforce\-mem\c
+\&\|' 一样 产生 较好的 目标码. 我 乐意 倾听 不同意见.
+
+.TP
+.B \-fomit\-frame\-pointer
+对于 不需要 帧指针 (frame pointer) 的 函数, 不要 在 寄存器 中 保存 帧指针.
+这样 能够 避免 保存, 设置 和 恢复 帧指针 的 指令; 同时 对 许多 函数 提供
+一个 额外的 寄存器. \c
+.I 但是 在 大多数 机器 上将 无法 调试\c
+\&.
+.Sp
+某些机器上, 如 Vax, 这个 选项 无效, 因为 标准调用序列 自动 处理 帧指针,
+通过 假装 不存在 而 不保存 任何 东西. 机器描述宏 \c
+.B FRAME_POINTER_REQUIRED\c
+\& 控制 目标机 是否 支持 这个选项.
+
+.TP
+.B \-finline\-functions
+把 所有 简单的 函数 集成进 调用者. 编译器 探索式地 决定 哪些 函数 足够
+简单, 值得 这种 集成.
+.Sp
+如果 集成了 所有 给定函数 的 调用, 而且 函数 声明为 \c
+.B static\c
+\&, 那么 一般说来 GCC 有权 不按 汇编代码 输出 函数.
+
+.TP
+.B \-fcaller\-saves
+允许 在 寄存器 里 分配 数值, 但是 这个方案 通常 受到 各个 函数调用 的 冲击,
+因此 GCC 生成 额外的 代码, 在 函数调用 的 前后 保存 和 复原 寄存器 内容.
+仅当 生成代码 看上去 优于 反之结果 时 才 实现 这样 的 分配.
+.Sp
+某些 机器 上 该选项 默认为 允许, 通常 这些 机器 没有 调用保护寄存器 
+代替 使用.
+
+.TP
+.B \-fkeep\-inline\-functions
+即使 集成了 某个 函数 的 所有 调用, 而且 该函数 声明为 \c
+.B static\c
+\&, 仍然 输出 这个函数 一个 独立的, 运行时 可调用 的 版本.
+
+.TP
+.B \-fno\-function\-cse
+不要 把 函数地址 存入 寄存器; 让 调用 固定函数 的 指令 显式 给出 函数地址.
+.Sp
+这个选项 产生 效率 较低 的 目标码, 但是 如果 不用 这个选项, 某些 不寻常
+的 hack, 改变 汇编器 的 输出, 可能 因 优化 而 带来 困惑.
+
+.TP
+.B \-fno\-peephole
+禁止 任何 机器相关的 peephole 优化.
+
+.TP
+.B \-ffast-math
+这个选项 出于 速度优化, 允许 GCC 违反 某些 ANSI 或 IEEE 规则/规格.
+例如, 它 允许 编译器 假设 \c
+.B sqrt\c
+\& 函数 的 参数 是 非负数.
+.Sp
+这个选项 不被 任何 `\|\c
+.B \-O\c
+\&\|' 选项 打开, 因为 对于 严格 依靠 IEEE 或 ANSI 规则/规格 实现
+的 数学函数, 程序 可能 会产生 错误的 结果.
+
+.PP
+下列 选项 控制 特定的 优化. `\|\c
+.B \-O2\c
+\&\|' 选项 打开 下面的 大多数 优化项, 除了 `\|\c
+.B \-funroll\-loops\c
+\&\|' 和 `\|\c
+.B \-funroll\-all\-loops\c
+\&\|' 项.
+.PP
+而 `\|\c
+.B \-O\c
+\&\|' 选项 通常 打开 `\|\c
+.B \-fthread\-jumps\c
+\&\|' 和 `\|\c
+.B \-fdelayed\-branch\c
+\&\|' 优化项, 但是 特定的 机器 上的 默认优化项 有可能 改变.
+.PP
+如果 特别情况 下 非常 需要 \*(lq微调\*(rq 优化, 你 可以 使用 下面的 选项.
+
+.TP
+.B \-fstrength\-reduce
+执行 循环强度缩小 (loop strength reduction) 优化, 并且 消除 重复变量.
+
+.TP
+.B \-fthread\-jumps
+执行 优化 的 地点 是, 如果 某个 跳转分支 的 目的地 存在 另一个 条件比较,
+而且 该 条件比较 包含在 前一个 比较语句 之内, 那么 执行 优化.
+根据 条件 是 true 或者 false, 前面 那条 分支 重定向 到 第二条 分支
+的 目的地 或者 紧跟在 第二条 分支 后面.
+
+.TP
+.B \-funroll\-loops
+执行 循环展开 (loop unrolling) 优化. 仅对 循环次数 能够 在 编译时 或
+运行时 确定 的 循环 实行.
+
+.TP
+.B \-funroll\-all\-loops
+执行 循环展开 (loop unrolling) 优化. 对 所有 循环 实行. 通常 使 
+程序 运行的 更慢.
+
+.TP
+.B \-fcse\-follow\-jumps
+在 公共子表达式消元 (common subexpression elimination) 的 时候,
+如果 没有 其他 路径 到达 某个 跳转 的 目的地, 就 扫过 这条 jump 指令.
+例如, 如果 CSE 遇到 带有 \c
+.B else\c
+从句 的 \c
+.B if\c
+\& 语句, 当 条件测试 为 false 时, CSE 就 跟在 jump 后面.
+
+.TP
+.B \-fcse\-skip\-blocks
+它 类似于 `\|\c
+.B \-fcse\-follow\-jumps\c
+\&\|' 选项, 但是 CSE 跟在 条件跳转 后面, 条件跳转 跳过了 语句块(block).
+如果 CSE 遇到 一条 简单的 \c
+.B if\c
+\& 语句, 不带 else 从句, `\|\c
+.B \-fcse\-skip\-blocks\c
+\&\|' 选项 将导致 CSE 跟在 \c
+.B if\c
+\& 产生 的 跳转 后面.
+
+.TP
+.B \-frerun\-cse\-after\-loop
+执行 循环优化 后, 重新 进行 公共子表达式消元.
+
+.TP
+.B \-felide\-constructors
+如果 看上去 合理 就 省略 构造子 (仅C++). 
+根据 这个选项, 对于 下面的 代码, GNU C++ 直接 从 调用 \c
+.B foo\c
+\& 初始化 \c
+.B y\c
+\&, 而无需 通过 临时变量: 
+.Sp
+A foo ();
+A y = foo ();
+.Sp
+如果 没有 这个选项, GNU C++ 首先 通过 调用 类型 \c
+.B A \c
+合适的  构造子 初始化 \c
+.B y\c
+\&; 然后 把 \c
+.B foo\c
+\& 的 结果 赋给 临时变量; 最后, 用 临时变量 替换 `\|\c
+.B y\c
+\&\|' 的 初始值.
+.Sp
+ANSI C++ 标准草案 规定了 默认行为 (`\|\c
+.B \-fno\-elide\-constructors\c
+\&\|'). 如果 程序的 构造子 存在 副效应, `\|\c
+.B \-felide-constructors\c
+\&\|' 选项 能够 使 程序 有 不同的 表现, 因为 可能 忽略 一些 构造子 的 调用.
+
+.TP
+.B \-fexpensive\-optimizations
+执行 一些 相对 开销 较大 的 次要 优化.
+
+.TP
+.B \-fdelayed\-branch
+如果 对 目标机 支持 这个 功能, 它 试图 重新 排列 指令, 以便 利用
+延迟分支 (delayed branch) 指令 后面的 指令 空隙.
+
+.TP
+.B \-fschedule\-insns
+如果 对 目标机 支持 这个 功能, 它 试图 重新 排列 指令, 以便 消除 因
+数据未绪 造成的 执行停顿. 这可以 帮助 浮点运算 或 内存访问 较慢 的 机器
+调取 指令, 允许 其他 指令 先执行, 直到 调取 指令 或 浮点运算 完成.
+
+.TP
+.B \-fschedule\-insns2
+类似于 `\|\c
+.B \-fschedule\-insns\c
+\&\|' 选项, 但是 在 寄存器分配 完成后, 需要 一个 额外的 指令调度 过程.
+对于 寄存器 数目 相对 较少, 而且 取内存指令 大于 一个周期 的 机器,
+这个选项 特别 有用.
+
+.SH "目标机选项 (TARGET OPTION)"
+缺省情况下, GNU CC 编译出 本机 类型 的 目标码. 然而 也可以 把他 安装成
+交叉编译器, 为 其他 机型 编译 程序. 事实上, 针对 不同的 目标机, 可以 
+同时 安装 GNU CC 相应 的 配置. 然后 用 `\|\c
+.B \-b\c
+\&\|' 选项 指定 目标机种.
+
+.PP
+顺便提一下, 新版本 和 旧版本 的 GNU CC 可以 共存. 其中一个 版本 (可能是
+最新的 那个) 为 缺省 版本, 但是 有时候 你 希望 使用 其他 版本.
+
+.TP
+.BI "\-b " "machine"
+参数 \c
+.I machine\c
+\& 指出 编译的 目标机种. 这个 选项 用于 安装为 交叉编译器 的 GNU CC.
+.Sp
+参数 \c
+.I machine\c
+\& 的 值 和 配置 GNU CC 交叉编译器 时 设置 的 机器类型 一样.
+例如, 如果 交叉编译器 配置有 `\|\c
+.B configure
+i386v\c
+\&\|', 意思是 编译 80386 上的 System V 目标码, 那么 你 可以 通过 `\|\c
+.B \-b i386v\c
+\&\|' 运行 交叉编译器.
+.Sp
+如果 没有 指定 `\|\c
+.B \-b\c
+\&\|' 选项, 通常 指 编译 本机 目标码.
+
+.TP
+.BI "\-V " "version"
+参数 \c
+.I version\c
+\& 指出 运行 哪个 版本 的 GNU CC. 这个 选项 用于 安装了 多个 版本 的 GCC.
+例如, 如果
+.I version\c
+\& 是 `\|\c
+.B 2.0\c
+\&\|', 意味着 运行 GNU CC 2.0 版.
+.Sp
+如果 没有 指定 `\|\c
+.B \-V\c
+\&\|' 选项, 缺省版本 取决于 GNU CC 的 安装方式, 一般说来 推荐 使用 通用版本.
+
+
+.SH "机器相关选项 (MACHINE DEPENDENT OPTION)"
+每一种 目标机型 都有 自己的 特别选项, 这些 选项 用 `\|\c
+.B \-m \c
+\&\|' 开关 引导, 选择 不同的 硬件 型号 或 配置 \(em\& 例如, 68010 还是 68020, 
+有没有 浮点协处理器. 通过 指定 选项, 安装 编译器 的 一个 版本 能够 为 所有的
+型号 或 配置 进行 编译.
+
+.PP
+此外, 编译器 的 某些 配置 支持 附加的 特殊选项, 通常 是 为了 在 命令行 上
+兼容 这个 平台 的 其他 编译器.
+
+.PP
+下面是 针对 68000 系列 定义 的 `\|\c
+.B \-m\c
+\&\|' 选项:
+.TP
+.B \-m68000
+.TP
+.B \-mc68000
+输出 68000 的 目标码. 
+如果 编译器 按 基于 68000 的 系统 配置, 这个 选项 就是 缺省选项.
+
+.TP
+.B \-m68020
+.TP
+.B \-mc68020
+输出 68020 的 目标码 (而不是 68000).  
+如果 编译器 按 基于 68020 的 系统 配置, 这个 选项 就是 缺省选项.
+
+.TP
+.B \-m68881
+输出 包含 68881 浮点指令 的 目标码.
+对于 大多数 基于 68020 的 系统 这是 缺省选项, 除非 设置 编译器 时 指定了
+.B \-nfp .
+
+.TP
+.B \-m68030
+输出 68030 的 目标码.  
+如果 编译器 按 基于 68030 的 系统 配置, 这个 选项 就是 缺省选项.
+
+.TP
+.B \-m68040
+输出 68040 的 目标码.  
+如果 编译器 按 基于 68040 的 系统 配置, 这个 选项 就是 缺省选项.
+
+.TP
+.B \-m68020\-40
+输出 68040 的 目标码, 但是 不使用 新指令. 生成 的 代码 可以 在 68020/68881 
+上, 也可以 在 68030 或 68040 上 较有效地 运行.
+
+.TP
+.B \-mfpa
+输出 包含 SUN FPA 浮点指令 的 目标码.
+
+.TP
+.B \-msoft\-float
+输出 包含 浮点库调用 的 目标码.
+.I 警告:
+所需的库 不是 GNU CC 的 组成部分. 一般说来 GCC 使用 该机型 本地 C 编译器 的
+相应部件, 但是 作 交叉编译 时 却不能 直接 使用. 你 必须 自己 管理 提供 合适的
+函数库 用于 交叉编译.
+
+.TP
+.B \-mshort
+认为 \c
+.B int\c
+\& 类型 是 16 位宽, 相当于 \c
+.B short int\c
+\&.
+
+.TP
+.B \-mnobitfield
+不使用 位域 (bit-field) 指令.  `\|\c
+.B \-m68000\c
+\&\|' 隐含指定了
+`\|\c
+.B \-mnobitfield\c
+\&\|'.
+
+.TP
+.B \-mbitfield
+使用 位域指令.  `\|\c
+.B \-m68020\c
+\&\|' 隐含指定了
+`\|\c
+.B \-mbitfield\c
+\&\|'.  如果 你 使用 未改装的 gcc, 这就是 默认选项.
+
+.TP
+.B \-mrtd
+采用 另一种 函数调用约定, 函数 接受 固定 数目的 参数, 用 \c
+.B rtd
+指令 返回, 该指令 返回时 弹出 栈内的 参数. 这个 方法 能够 使 调用者
+节省 一条 指令, 因为 他 这里 不需要 弹出 参数.
+.Sp
+这种 调用约定 不兼容 UNIX 的 正常 调用. 因此 如果 你 需要 调用 UNIX
+编译器 编译的 库函数, 你 就不能 使用 这个选项.
+.Sp
+此外, 所有 参数数量 可变地 函数 必须 提供 函数原型 (包括 \c
+.B printf\c
+\&); 否则 编译器 会生成 错误的 调用 代码.
+.Sp
+另外, 如果 调用 函数 时 携带了 过多的 参数, 编译器 将 生成 严重错误的
+代码. (正常情况下, 多余的 参数 被 安全无害的 忽略.)
+.Sp
+68010 和 68020 处理器 支持 \c
+.B rtd\c
+\& 指令, 但是 68000 不支持.
+
+.PP
+下面是 针对 VAX 定义 的 `\|\c
+.B \-m\c
+\&\|' 选项:
+
+.TP
+.B \-munix
+禁止 输出 某些 跳转指令 (\c
+.B aobleq\c
+\& 等等), VAX 的 UNIX 汇编器 无法 跨越 长范围 (long ranges) 进行 处理.
+
+.TP
+.B \-mgnu
+如果 使用 GNU 汇编器, 则 输出 那些 跳转指令, 
+
+.TP
+.B \-mg
+输出 g-format 浮点数, 取代 d-format.
+
+.PP
+下面是 SPARC 支持的 `\|\c
+.B \-m\c
+\&\|' 选项开关:
+
+.PP
+.B \-mfpu
+.TP
+.B \-mhard\-float
+输出 包含 浮点指令 的 目标码. 这是 缺省选项.
+
+.PP
+.B \-mno\-fpu
+.TP
+.B \-msoft\-float
+输出 包含 浮点库调用 的 目标码.
+.I 警告:
+没有 为 SPARC 提供 GNU 浮点库. 一般说来 使用 该机型 本地 C 编译器 的
+相应部件, 但是 不能 直接 用于 交叉编译. 你 必须 自己 安排, 提供 用于
+交叉编译 的 库函数.
+.Sp
+.B \-msoft\-float
+改变了 输出文件 中的 调用约定; 因此 只有 用 这个 选项 编译
+.I 整个
+程序 才有 意义.
+
+.PP
+.B \-mno\-epilogue
+.TP
+.B \-mepilogue
+使用
+.B \-mepilogue
+(缺省) 选项 时, 编译器 总是 把 函数 的 退出 代码 放在 函数 的 尾部.
+任何 在 函数 中间 的 退出 语句 (例如 C 中的 return 语句) 将 产生出 
+跳转指令 指向 函数 尾部.
+.Sp
+使用
+.BR \-mno\-epilogue 
+选项 时, 编译器 尽量 在 每个 函数 退出点 嵌入 退出 代码.
+
+.PP
+.B \-mno\-v8
+.TP
+.B \-mv8
+.TP
+.B \-msparclite
+这三个 选项 选择 不同种类 的 SPARC 系统.
+.Sp
+默认情况下 (除非 特别为 Fujitsu SPARClite 配置), GCC 生成 SPARC v7 目标码.
+.Sp
+.B \-mv8
+生成 SPARC v8 目标码. 他 和 v7 目标码 唯一的 区别 是, 编译器 生成 整数乘法
+和 整数除法 指令, SPARC v8 支持 该指令, 而 v7 体系 不支持.
+.Sp
+.B \-msparclite
+生成 SPARClite 目标码. 增加了 SPARClite 支持的 整数乘法, 整数除法单步扫描
+(integer divide step and scan (ffs)) 指令. v7 体系 不支持 这些 指令.
+
+.PP
+.B \-mcypress
+.TP
+.B \-msupersparc
+这两个 选项 选择 处理器 型号, 针对 处理器 进行 代码 优化.
+.Sp
+.B \-mcypress
+选项 (默认项) 使 编译器 对 Cypress CY7C602 芯片 优化 代码, 
+SparcStation/SparcServer 3xx 系列 使用 这种 芯片. 该选项 也 适用于 老式的
+SparcStation 1, 2, IPX 等 机型..
+.Sp
+.B \-msupersparc
+选项 使 编译器 对 SuperSparc 处理器 优化 代码, 
+SparcStation 10, 1000 和 2000 系列 使用 这种 芯片. 同时 该选项 启用
+完整的 SPARC v8 指令集.
+
+.PP
+下面是 针对 Convex 定义 的 `\|\c
+.B \-m\c
+\&\|' 选项:
+
+.TP
+.B \-mc1
+输出 C1 的 目标码. 当 编译器 对 C1 配置时, 这是 默认选项.
+.TP
+.B \-mc2
+输出 C2 的 目标码. 当 编译器 对 C2 配置时, 这是 默认选项.
+.TP
+.B \-margcount
+在 每个 参数列表 的 前面 放置 一个 参数计数字 (argument count word). 
+某些 不可移植 的 Convex 和 Vax 程序 需要 这个 参数计数字.
+(调试器 不需要 他, 除非 函数 带有 变长参数 列表; 这个 信息 存放在 符号表 中.)
+
+.TP
+.B \-mnoargcount
+忽略 参数计数字. 如果 你 使用 未改装 的 gcc, 这是 默认 选项.
+
+.PP
+下面是 针对 AMD Am29000 定义 的 `\|\c
+.B \-m\c
+\&\|' 选项:
+.TP
+.B \-mdw
+生成的 目标码 认为 DW 置位, 就是说, 字节 和 半字 操作 由 硬件 直接 支持.
+该选项 是 默认选项.
+.TP
+.B \-mnodw
+生成的 目标码 认为 DW 没有 置位.
+.TP
+.B \-mbw
+生成的 目标码 认为 系统 支持 字节 和 半字 写操作. 该选项 是 默认选项.
+.TP
+.B \-mnbw
+生成的 目标码 认为 系统 不支持 字节 和 半字 写操作. 该选项 隐含 开启 了 `\|\c
+.B \-mnodw\c
+\&\|' 选项.
+.TP
+.B \-msmall
+使用 小内存模式, 小内存模式 假设 所有 函数 的 地址 位于 某个 256 KB 段内,
+或者 所有 函数 的 绝对地址 小于 256K. 这样 就可以 用 \c
+.B call\c
+\& 指令 代替 \c
+.B const\c
+\&, \c
+.B consth\c
+\&, \c
+.B calli\c
+\& 指令 序列.
+.TP
+.B \-mlarge
+假设 不能 使用 \c
+.B call\c
+\& 指令; 这是 默认选项.
+.TP
+.B \-m29050
+输出 Am29050 的 目标码.
+.TP
+.B \-m29000
+输出 Am29000 的 目标码. 这是 默认选项.
+.TP
+.B \-mkernel\-registers
+生成的 目标码 引用 \c
+.B gr64-gr95\c
+\& 寄存器 而不是
+.B gr96-gr127\c
+\& 寄存器. 该选项 可以 用于 编译 内核代码, 内核 需要 一组 全局寄存器,
+这些 全局寄存器 和 用户模式 使用的 寄存器 完全无关.
+.Sp
+注意, 使用 这个 选项 时, `\|\c
+.B \-f\c
+\&\|' 选项 中的 寄存器名字 必须是 normal, user-mode, names.
+
+.TP
+.B \-muser\-registers
+使用 普通 全局寄存器集 \c
+.B gr96-gr127\c
+\&.  这是 默认选项.
+.TP
+.B \-mstack\-check
+在 每次 堆栈 调整 后 插入 一条 \c
+.B _\|_msp_check\c
+\& 调用. 这个选项 常用于 内核代码.
+
+.PP
+下面是 针对 Motorola 88K 体系 定义 的 `\|\c
+.B \-m\c
+\&\|' 选项:
+.TP
+.B \-m88000
+生成的 目标码 可以 在 m88100 和 m88110 上 正常工作.
+.TP
+.B \-m88100
+生成的 目标码 在 m88100 上 工作的 最好, 但也可以 在 m88110 上 运行.
+.TP
+.B \-m88110
+生成的 目标码 在 m88110 上 工作的 最好, 可能 不能 在 m88100 上 运行.
+.TP
+.B \-midentify\-revision
+在 汇编器 的 输出端 包含 一条 \c
+.B ident\c
+\& 指令, 记录 源文件名, 编译器名字 和 版本, 时标, 以及 使用的 编译选项,
+.TP
+.B \-mno\-underscores
+在 汇编器 的 输出端, 符号名字 前面 不添加 下划线. 默认情况 是 在 每个
+名字 前面 增加 下划线 前缀.
+.TP
+.B \-mno\-check\-zero\-division
+.TP
+.B \-mcheck\-zero\-division
+早期 型号 的 88K 系统 在 除零操作 上 存在 问题, 特定情况下 许多 机器
+无法 自陷. 使用 这些 选项 可以 避免包含 (或 可以 显明包含) 附加的 代码, 
+这些代码 能够 检查 除零错, 发送 例外信号. GCC 所有 88K 的 配置 默认 使用 `\|\c
+.B \-mcheck\-zero\-division\c
+\&\|' 选项.
+.TP
+.B \-mocs\-debug\-info
+.TP
+.B \-mno\-ocs\-debug\-info
+包含 (或忽略) 附加的 调试信息 (关于 每个 栈架结构 中 寄存器 的 使用),
+88Open Object Compatibility Standard, \*(lqOCS\*(rq, 对 此信息 做了 说明.
+GDB 不需要 这些 额外信息.
+DG/UX, SVr4, 和 Delta 88 SVr3.2 的 默认配置 是 包含 调试信息, 其他
+88k 机型 的 默认配置 是 忽略 这个信息.
+.TP
+.B \-mocs\-frame\-position
+.TP
+.B \-mno\-ocs\-frame\-position
+强制 (或 不要求) 把 寄存器值 存储到 栈架结构 中的 指定位置 (按 OCS 的说明).
+DG/UX, Delta88 SVr3.2 和 BCS 的 默认配置 使用 `\|\c
+.B \-mocs\-frame\-position\c
+\&\|' 选项; 其他 88k 机型 的 默认配置 是 `\|\c
+.B \-mno\-ocs\-frame\-position\c
+\&\|'.
+.TP
+.B \-moptimize\-arg\-area
+.TP
+.B \-mno\-optimize\-arg\-area
+控制 如何 在 堆栈结构 中 存储 函数参数. `\|\c
+.B \-moptimize\-arg\-area\c
+\&\|' 节省 空间, 但是 有可能 宕掉 某些 调试器 (不是 GDB). `\|\c
+.B \-mno\-optimize\-arg\-area\c
+\&\|' 证实 比 标准选项 好. 默认情况下 GCC 不优化 参数域.
+
+.TP
+.B \-mshort\-data\-\c
+.I num
+通过 和 \c
+.B r0\c
+\& 关联, 产生 较小的 数据引用 (data reference), 这样 就可以 用 单指令
+调入 一个 数值 (而不是 平常的 双指令). 用户 通过 选项中的 \c
+.I num\c
+\& 控制 改变 哪种 数据引用. 例如, 如果 你 指定了 `\|\c
+.B \-mshort\-data\-512\c
+\&\|', 那么 受影响的 数据引用 是 小于 512 字节 的 数据移动. \c
+.B \-mshort\-data\-\c
+.I num\c
+选项 对 大于 64K 的 \c
+.I num \c
+无效.
+
+.PP
+.B \-mserialize-volatile
+.TP
+.B \-mno-serialize-volatile
+产生, 或 不产生 代码 来保证 对 易变内存访问 的 结果一致.
+.Sp
+对于 常用的 处理器 子型号, GNU CC 始终 默认 保证 这种 一致性.
+如何实现 结果一致 取决于 处理器 子型号.
+.Sp
+m88100 处理器 不对 内存引用 重新安排, 因此 访问结果 始终一致.
+如果 使用了 `\|\c
+.B \-m88100\c
+\&\|' 选项, GNU CC 不产生 任何 针对 结果一致 的 特别指令.
+.Sp
+m88110 处理器 的 内存引用顺序 并不始终 符合 指令 请求的 引用顺序.
+特别是 某条 读取指令 可能 在 先前的 存储指令 之前 执行.
+多处理器 环境下, 乱序访问 扰乱了 易变内存访问 的 结果一致.
+因此 当使用 `\|\c
+.B \-m88000\c
+\&\|' 或 `\|\c
+.B \-m88110\c
+\&\|' 选项时, GNU CC 在 适当的时候 产生 特别的指令 迫使 执行顺序 正确.
+.Sp
+这些 用于 保证 一致性 的 额外代码 有可能 影响 程序 的 性能. 如果 你 确认
+能够 安全地 放弃 这种 保证, 你 可以 使用 `\|\c
+.B \-mno-serialize-volatile\c
+\&\|' 选项.
+.Sp
+如果 你 使用 `\|\c
+.B \-m88100\c
+\&\|' 选项, 但是 需要 在 m88110 处理器 上 运行时 的 结果一致, 
+你 应该 加上 `\|\c
+.B \-mserialize-volatile\c
+\&\|' 选项.
+
+
+.PP
+.B \-msvr4
+.TP
+.B \-msvr3
+打开 (`\|\c
+.B \-msvr4\c
+\&\|') 或 关闭 (`\|\c
+.B \-msvr3\c
+\&\|') 和 System V 第四版 (SVr4) 相关的 编译器扩展. 效果 如下:
+.TP
+\ \ \ \(bu
+输出 哪种 汇编语法 (你 可以 使用 `\|\c
+.B \-mversion\-03.00\c
+\&\|' 选项 单独 选择).
+.TP
+\ \ \ \(bu
+`\|\c
+.B \-msvr4\c
+\&\|' 使 C 预处理器 识别 `\|\c
+.B #pragma weak\c
+\&\|' 指令
+.TP
+\ \ \ \(bu
+`\|\c
+.B \-msvr4\c
+\&\|' 使 GCC 输出 额外的 声明指令(declaration directive), 用于 SVr4.
+.PP
+除了 SVr4 配置, `\|\c
+.B \-msvr3\c
+\&\|' 是 所有 m88K 配置 的 默认选项.
+
+.TP
+.B \-mtrap\-large\-shift
+.TP
+.B \-mhandle\-large\-shift
+包含 一些 指令, 用于 检测 大于 31 位 的 位移 (bit-shift); 
+根据 相应的 选项, 对 这样 的 位移 发出 自陷 (trap) 或 执行 适当 的 处理代码.
+默认情况下, GCC 对 大位移 不做 特别处理.
+
+.TP
+.B \-muse\-div\-instruction
+很早以前 的 88K 型号 没有 (div) 除法指令, 因此 默认情况下 GCC 避免 产生
+这条 指令. 而 这个 选项 告诉 GCC 该指令 是 安全的.
+
+.TP
+.B \-mversion\-03.00
+在 DG/UX 配置 中 存在 两种 风格 的 SVr4. 这个选项 修改
+.B \-msvr4 ,
+选择 hybrid-COFF 或 real-ELF 风格. 其他 配置 均 忽略 该选项.
+
+.TP
+.B \-mwarn\-passed\-structs
+如果 某个函数 把 结构 当做 参数 或 结果 传递, GCC 发出 警告.
+随着 C 语言 的 发展, 人们 已经 改变了 传递 结构 的 约定, 它 往往 导致
+移植问题. 默认情况下, GCC 不会 发出 警告.
+
+.PP
+下面的选项 用于 IBM RS6000:
+.PP
+.B \-mfp\-in\-toc
+.TP
+.B \-mno\-fp\-in\-toc
+控制 是否 把 浮点常量 放到 内容表 (TOC) 中, 内容表 存放 所有的 全局变量
+和 函数地址. 默认情况下, GCC 把 浮点常量 放到 这里; 如果 TOC 溢出, `\|\c
+.B \-mno\-fp\-in\-toc\c
+\&\|' 选项 能够 减少 TOC 的 大小, 这样 就可以 避免 溢出.
+
+.PP
+下面的 `\|\c
+.B \-m\c
+\&\|' 选项 用于 IBM RT PC:
+.TP
+.B \-min\-line\-mul
+对于 整数乘法 使用 嵌入代码. 这是 默认选项.
+.TP
+.B \-mcall\-lib\-mul
+对于 整数乘法 使用 \c
+.B lmul$$\c
+\& .
+.TP
+.B \-mfull\-fp\-blocks
+生成 全尺寸 浮点数据块, 包括 IBM 建议 的 最少数量 的 活动空间 (scratch space).
+这是 默认选项.
+.TP
+.B \-mminimum\-fp\-blocks
+不要 在 浮点数据块 中 包括 额外的 活动空间. 这样 就 产生 较小 但是 略慢
+的 可执行程序, 因为 活动空间 必须 动态分配.
+.TP
+.B \-mfp\-arg\-in\-fpregs
+采用 不兼容 IBM 调用约定 的 调用序列, 通过 浮点寄存器 传送 浮点参数.
+注意, 如果 指定了 这个选项, \c
+.B varargs.h\c
+\& 和 \c
+.B stdargs.h\c
+\& 将 无法 支持 浮点单元.
+
+.TP
+.B \-mfp\-arg\-in\-gregs
+使用 正常的 调用约定 处理 浮点参数. 这是 默认选项.
+
+.TP
+.B \-mhc\-struct\-return
+通过 内存 返回 大于 一个字 的 结构, 而不是 通过 寄存器.
+用于 兼容 MetaWare HighC (hc) 编译器. 使用 `\|\c
+.B \-fpcc\-struct\-return\c
+\&\|' 选项 可以 兼容 Portable C 编译器 (pcc).
+
+.TP
+.B \-mnohc\-struct\-return
+如果可以, 通过 寄存器 返回 某些 大于 一个字 的 结构. 这是 默认选项.
+如果 打算 兼容 IBM 提供 的 编译器, 请使用 `\|\c
+.B \-fpcc\-struct\-return\c
+\&\|' 或
+`\|\c
+.B \-mhc\-struct\-return\c
+\&\|' 选项.
+
+.PP
+下面的  `\|\c
+.B \-m\c
+\&\|' 选项 用于 MIPS 家族 的 计算机:
+.TP
+.BI "\-mcpu=" "cpu-type"
+生成 指令 的 时候, 假设 默认的 机器类型 是
+.I cpu-type .
+默认情况下 的
+.I cpu-type
+是
+.BR default ,
+GCC 将选取 任何机型 上 都是 最长周期时间 的 指令, 这样 才能使 代码
+在 所有的 MIPS 处理器 上 以 合理 的 速度 运行. 
+.I cpu-type
+的 其他 选择 是
+.BR r2000 ,
+.BR r3000 ,
+.BR r4000 ,
+和
+.BR r6000 .
+虽然 选定 某个 
+.I cpu-type
+后, GCC 将 针对 选定的 芯片 安排 对应的 工作, 但是 如果 不指定�
+.B \-mips2
+或
+.B \-mips3
+选项, 编译器 不会 输出 任何 不符合 MIPS ISA (instruction set architecture)
+一级 的 代码.
+
+.TP
+.B \-mips2
+输出 MIPS ISA 二级指令 (可能的扩展, 如平方根指令).
+.B \-mcpu=r4000
+或
+.B \-mcpu=r6000
+选项 必须 和
+.BR \-mips2 
+联用.
+
+.TP
+.B \-mips3
+输出 MIPS ISA 三级指令 (64位指令).
+.B \-mcpu=r4000
+选项 必须 和
+.BR \-mips2 
+联用. (译注: 疑为 \-mips3)
+
+.TP
+.B \-mint64
+.TP
+.B \-mlong64
+.TP
+.B \-mlonglong128
+这些 选项 目前 不起作用.
+
+.TP
+.B \-mmips\-as
+产生 用于 MIPS 汇编器 的 代码, 同时 使用
+.B mips\-tfile
+添加 普通的 调试信息. 对于 大多数 平台 这是 默认选项, 除了
+OSF/1 参考平台, 它 使用 OSF/rose 目标 格式. 如果 打开了 任一个
+.BR \-ggdb ,
+.BR \-gstabs ,
+或
+.B \-gstabs+
+选项开关,
+.B mips\-tfile
+程序 就把 stab 封装在 MIPS ECOFF 里面.
+
+.TP
+.B \-mgas
+产生 用于 GNU 汇编器 的 代码.  在 OSF/1 参考平台 上 这是 默认选项,
+它 使用 OSF/rose 目标 格式.
+
+.TP
+.B \-mrnames
+.TP
+.B \-mno\-rnames
+.B \-mrnames
+开关选项 告诉 输出代码 使用 MIPS 软件名称 说明 寄存器, 而不是 硬件名称
+(就是说, 用
+.B a0
+代替
+.BR $4 ).
+GNU 汇编器 不支持
+.B \-mrnames
+选项, 而 MIPS 汇编器 则 运行 MIPS C 预处理器 处理 源文件.
+.B \-mno\-rnames
+是 默认选项.
+
+.TP
+.B \-mgpopt
+.TP
+.B \-mno\-gpopt
+.B \-mgpopt
+开关选项 要求 在 正文段 中 把 所有的 数据声明 写到 指令 前面, 使 各种 MIPS 
+汇编器 对 短类型 全局 或 静态 数据项 (short global or static data items)
+输出 单字内存访问 而不是 双字内存访问.
+当 打开 编译优化 时, 这是 默认功能.
+
+
+.TP
+.B \-mstats
+.TP
+.B \-mno\-stats
+每次 处理完 非嵌入函数 (non-inline function) 后,
+.B \-mstats
+开关选项 使 编译器 向 标准错误文件 输出 一行 关于 程序 的 统计资料
+(保存的 寄存器 数目, 堆栈 大小, 等等).
+
+.TP
+.B \-mmemcpy
+.TP
+.B \-mno\-memcpy
+.B \-mmemcpy
+开关选项 使 所有 的 块移动 操作 调用 适当的 string 函数
+.RB ( memcpy
+或
+.BR bcopy ),
+而不是 生成 嵌入代码.
+
+.TP
+.B \-mmips\-tfile
+.TP
+.B \-mno\-mips\-tfile
+当 MIPS 汇编器 生成
+.B mips\-tfile
+文件 (用于 帮助 调试) 后, 
+.B \-mno\-mips\-tfile
+开关选项 阻止 编译器 使用 
+.B mips\-tfile
+后期处理 (postprocess) 目标文件. 不运行
+.B mips\-tfile
+就 没有 调试器 关注的 局部变量. 另外, 
+.B stage2
+和
+.B stage3
+目标文件 将把 临时文件名 传递给 汇编器, 嵌在 目标文件 中, 这 意味着
+不比较 目标文件 是否 相同.
+
+.TP
+.B \-msoft\-float
+输出 包含 浮点库调用.
+.I 警告: 
+所需库 不是 GNU CC 的 一部分. 一般说来 使用 该机型 本地 C 编译器 的
+相应部件, 但是 不能 直接 用于 交叉编译, 你 必须 自己 安排, 提供
+交叉编译 适用的 库函数.
+
+.TP
+.B \-mhard\-float
+输出 包含 浮点指令. 如果 编译器 没有 被改动, 这就是 默认选项.
+
+.TP
+.B \-mfp64
+编译器 认为 状态字 的
+.B FR
+置位(on), 也就是说 存在 32 64-bit 浮点寄存器, 而不是 32 32-bit 浮点寄存器.
+同时 必须 打开
+.B \-mcpu=r4000
+和
+.B \-mips3
+开关.
+
+.TP
+.B \-mfp32
+认为 存在 32 32-bit 浮点寄存器. 这是 默认选项.
+
+.PP
+.B \-mabicalls
+.TP
+.B \-mno\-abicalls
+输出 (或 不输出)
+.BR \&.abicalls ,
+.BR \&.cpload ,
+和
+.B \&.cprestore
+伪指令, 某些 System V.4 版本 用于 位置无关代码.
+
+.TP
+.B \-mhalf\-pic
+.TP
+.B \-mno\-half\-pic
+.B \-mhalf\-pic
+开关选项 要求 把 外部引用 的 指针 放到 数据段, 并且 载入 内存, 而不放到
+正文段. 该选项 目前 不起作用.
+
+.TP
+.B \-G num
+把 小于等于
+.I num
+字节 的 全局 或 静态 数据 放到 小的 数据段 或 bss 段, 而不是
+普通的 数据段 或 bss 段. 这样 汇编器 可以 输出 基于 全局指针
+.RB ( gp
+或
+.BR $28 ),
+的 单字内存访问指令 而非 普通的 双字指令.
+默认情况下, 用 MIPS 汇编器 时
+.I num
+是 8, 而 GNU 汇编器 则为 0. 另外,
+.BI \-G num
+选项 也被 传递 给 汇编器 和 连接器. 所有 的 模块 必须在 相同的
+.BI \-G num
+值下 编译.
+
+.TP
+.B \-nocpp
+汇编 用户汇编文件
+(带有 `\|\c
+.B .s\c
+\&\|' 后缀) 时, 告诉 MIPS 汇编器 不要 运行 预处理器.
+
+.PP
+下面的 `\|\c
+.B \-m\c
+\&\|' 选项 用于 Intel 80386 族 计算机:
+.B \-m486
+.TP
+.B \-mno\-486
+控制 是否 生成 对 486 优化 的 代码.
+
+.TP
+.B \-msoft\-float
+输出 包含 浮点库调用.
+.I 警告: 
+所需库 不是 GNU CC 的 一部分. 一般说来 使用 该机型 本地 C 编译器 的
+相应部件, 但是 不能 直接 用于 交叉编译, 你 必须 自己 安排, 提供 
+交叉编译 适用的 库函数.
+.Sp
+在 函数 把 浮点返回值 放在 80387 寄存器栈 的 机器 上, 即使 设置了 `\|\c
+.B \-msoft-float\c
+\&\|' 选项, 也可能会 发出 一些 浮点操作码. 
+
+.TP
+.B \-mno-fp-ret-in-387
+不用 FPU 寄存器 返回 函数值.
+.Sp
+通常 函数调用约定 把
+.B float\c
+\& 和 \c
+.B double\c
+\& 的 返回值 放在 FPU 寄存器 中, 即使 不存在 FPU. 这种作法 的 理念
+是 操作系统 应该 仿真出 FPU.
+.Sp
+而 `\|\c
+.B \-mno-fp-ret-in-387\c
+\&\|' 选项 使 浮点值 通过 普通的 CPU 寄存器 返回.
+
+.PP
+下面的 `\|\c
+.B \-m\c
+\&\|' 选项 用于 HPPA 族 计算机:
+.TP
+.B \-mpa-risc-1-0
+生成 PA 1.0 处理器 的 目标码.
+.TP
+.B \-mpa-risc-1-1
+生成 PA 1.1 处理器 的 目标码.
+
+.TP
+.B \-mkernel
+生成 适用于 内核 的 目标码. 特别要 避免 \c
+.B add\c
+\& 指令, 它 有 一个 参数 是 DP 寄存器; 用 \c
+.B addil\c
+\& 代替 \c
+.B add\c
+指令. 这样 可以 避免 HP-UX 连接器 的 某个 严重 bug.
+
+.TP
+.B \-mshared-libs
+生成 能够 连接 HP-UX 共享库 的 目标码. 该选项 还没有 实现 全部功能, 对
+PA 目标 默认为 关闭. 使用 这个选项 会 导致 编译器 生成 错误的 目标码.
+
+.TP
+.B \-mno-shared-libs
+不生成 连接 HP-UX 共享库 的 目标码. 这是 PA 目标 的 默认选项.
+
+.TP
+.B \-mlong-calls
+生成的 目标码 允许 同一个 源文件 中的 函数调用, 调用点 和 被调函数
+的 距离 可以 超过 256K 之远. 不需要 打开 这个 开关选项, 除非 连接器
+给出 \*(lqbranch out of range errors\*(lq 这样的 错误.
+
+.TP
+.B \-mdisable-fpregs
+防止 任何情况下 使用 浮点寄存器. 编译 内核 需要 这个选项, 内核 切换
+浮点寄存器 的 执行环境 速度 非常缓慢. 如果 打开了 这个 开关选项 同时
+试图 浮点操作, 编译 将 失败.
+
+.TP
+.B \-mdisable-indexing
+防止 编译器 使用 索引地址模式 (indexing address mode).
+这样 在 MACH 上 编译 MIG 生成的 代码 时, 可以 避免 一些 非常 晦涩的 问题.
+
+.TP
+.B \-mtrailing-colon
+在 标记定义 (label definition) 的 末尾 添加 一个 冒号 (用于 ELF 汇编器).
+
+.PP
+下面的 `\|\c
+.B \-m\c
+\&\|' 选项 用于 Intel 80960 族 计算机:
+.TP
+.BI "\-m" "cpu-type"
+默认 机器 类型 为
+.I cpu-type ,
+使 编译器 产生 对应的 指令, 地址模式 和 内存对齐. 默认的
+.I cpu-type
+是
+.BR kb ;
+其他 选择 有
+.BR ka ,
+.BR mc ,
+.BR ca ,
+.BR cf ,
+.BR sa ,
+和
+.BR sb .
+
+.TP
+.B \-mnumerics
+.TP
+.B \-msoft\-float
+.B \-mnumerics
+开关选项 指出 处理器 不支持 浮点指令.
+.B \-msoft\-float
+开关选项 指出 不应该 认为 机器 支持 浮点操作.
+
+.TP
+.B \-mleaf\-procedures
+.TP
+.B \-mno\-leaf\-procedures
+企图 (或防止) 改变 叶过程 (leaf procedure), 使其 可被
+.I bal
+指令 以及
+.IR call 
+指令 调用. 对于 直接函数调用, 如果
+.I bal
+指令 能够 被 汇编器 或 连接器 替换, 这 可以 产生 更有效 的 代码,
+但是 其他 情况下 产生 较低效 的 代码, 例如 通过 函数指针 调用 函数,
+或 使用了 不支持 这种 优化 的 连接器.
+
+.TP
+.B \-mtail\-call
+.TP
+.B \-mno\-tail\-call
+执行 (或不执行) 更多的 尝试 (除过 编译器 那些 机器无关 部分), 优化
+进入 分支 的 尾递归 (tail-recursive) 调用. 你 可能 不需要 这个,
+因为 检测 什么 地方 无效 没有 全部 完成. 默认 开关 是
+.BR \-mno\-tail\-call .
+
+.TP
+.B \-mcomplex\-addr
+.TP
+.B \-mno\-complex\-addr
+认为 (或 不认为) 在 当前的 i960 设备 上, 值得 使用 复合地址模式
+(complex addressing mode). 复合地址模式 可能 不值得 用到 K 系列, 但是
+一定 值得 用在 C 系列. 目前 除了 CB 和 CC 处理器, 其他 处理器 上
+.B \-mcomplex\-addr
+是 默认选项.
+
+.TP
+.B \-mcode\-align
+.TP
+.B \-mno\-code\-align
+把 目标码 对齐到 8 字节 边界 上 (或者 不必), 这样 读取 会 快一些.
+目前 只对 C 系列 默认 打开.
+
+.TP
+.B \-mic\-compat
+.TP
+.B \-mic2.0\-compat
+.TP
+.B \-mic3.0\-compat
+兼容 iC960 v2.0 或 v3.0.
+
+.TP
+.B \-masm\-compat
+.TP
+.B \-mintel\-asm
+兼容 iC960 汇编器.
+
+.TP
+.B \-mstrict\-align
+.TP
+.B \-mno\-strict\-align
+不允许 (或允许) 边界不对齐 的 访问.
+
+.TP
+.B \-mold\-align
+使 结构对齐 (structure-alignment) 兼容 Intel 的 gcc 发行版本 1.3 
+(基于 gcc 1.37). 目前 这个选项 有点问题, 因为
+.B #pragma align 1
+总是 作 同样的 设定, 而且 无法 关掉.
+
+.PP
+下面的 `\|\c
+.B \-m\c
+\&\|' 选项 用于 DEC Alpha 设备:
+.TP
+.B \-mno-soft-float
+.TP
+.B \-msoft-float
+使用 (或 不使用) 硬件浮点指令 进行 浮点运算. 打开 \c
+.B \-msoft-float\c
+\& 时, 将 使用 `\|\c
+.B libgcc1.c\c
+\&\|' 中的 函数 执行 浮点运算. 除非 它们 被 仿真 浮点操作 的 例程 替换,
+或者 类似, 它们 被 编译为 调用 仿真例程, 这些 例程 将发出 浮点操作.
+如果 你 为 不带 浮点操作 的 Alpha 编译 程序, 你 必须 确保 建立了 这个 库,
+以便 不调用 仿真例程.
+.Sp
+注意, 不带 浮点操作 的 Alpha 也要求 拥有 浮点寄存器.
+
+.TP
+.B \-mfp-reg
+.TP
+.B \-mno-fp-regs
+生成 使用 (或 不使用) 浮点寄存器群 的 目标代码.
+.B \-mno-fp-regs\c
+\& 包含有 \c
+.B \-msoft-float\c
+\& 开关选项.  如果 不使用 浮点寄存器, 浮点操作数 就象 整数 一样 通过
+整数寄存器 传送, 浮点运算结果 放到 $0 而不是 $f0. 这是 非标准 调用,
+因此 任何 带有 浮点 参数或返回值 的 函数, 如果 被 \c
+.B \-mno-fp-regs\c
+\& 开关 编译过的 目标码 调用, 它 也必须 用这个 选项 编译.
+.Sp
+这个选项 的 典型用法 是 建立 内核, 内核 不使用 任何 浮点寄存器,
+因此 没必要 保存 和 恢复 这些 寄存器.
+
+.PP
+下面 附加的 选项 出现在 System V 第四版 中, 用于 兼容 这些 系统 中的
+其他 编译器:
+.TP
+.B \-G
+在 SVr4 系统 中, \c
+.B gcc\c
+\& 出于 兼容 接受了 `\|\c
+.B \-G\c
+\&\|' 选项 (然后 传递给 连接器). 可是 我们 建议 使用 `\|\c
+.B \-symbolic\c
+\&\|' 或 `\|\c
+.B \-shared\c
+\&\|'选项, 而不在 \c
+.B gcc
+命令行 上 出现 连接选项.
+
+.TP
+.B \-Qy
+验证 编译器 用的 工具 的 版本, 输出到 \c
+.B .ident\c
+\& 汇编指令.
+
+.TP
+.B \-Qn
+制止 输出端 的 \c
+.B .ident\c
+\& 指令 (默认选项).
+
+.TP
+.BI "\-YP," "dirs"
+对于 `\|\c
+.B \-l\c
+\&\|' 指定的 库文件, 只搜索 \c
+.I dirs\c
+\&. 你 可以 在
+.I dirs\c
+\& 中 用 冒号 隔开 各个 目录项.
+
+.TP
+.BI "\-Ym," "dir"
+在 \c
+.I dir\c
+\& 目录 中 寻找 M4 预处理器. 汇编器 使用 这个 选项.
+
+.SH "代码生成选项 (CODE GENERATION OPTION)"
+下面的 选项 和 平台 无关, 用于 控制 目标码生成 的 接口约定.
+.PP
+大部分 选项 以 `\|\c
+\-f\c
+\&\|' 开始. 这些选项 拥有 确定 和 否定 两种 格式; `\|\c
+.B \-ffoo\c
+\&\|' 的 否定格式 是 `\|\c
+.B \-fno\-foo\c
+\&\|'. 后面的 描述 将 只列举 其中 的 一个 格式 \(em\& 非默认 的 格式.
+你 可以 通过 添加或去掉 `\|\c
+.B no\-\c
+\&\|' 推测出 另一个 格式.
+
+.TP
+.B \-fnonnull\-objects
+假设 通过 引用 (reference) 取得的 对象 不为 null (仅 C++).
+.Sp
+一般说来, GNU C++ 对 通过 引用 取得的 对象 作 保守 假设.
+例如, 编译器 一定会 检查 下似 代码 中的 \c
+.B a
+不为 null:
+.Sp
+obj &a = g ();
+a.f (2);
+.Sp
+检查 类似 的 引用 需要 额外的 代码, 然而 对于 很多 程序 是 不必要的.
+如果 你的 程序 不要求 这种检查, 你 可以 用 `\|\c
+.B \-fnonnull-objects\c
+\&\|' 选项 忽略它.
+
+.TP
+.B \-fpcc\-struct\-return
+函数 返回 \c
+.B struct\c
+\& 和 \c
+.B union
+值时, 采用 和 本地编译器 相同的 参数约定. 对于 较小的结构, 这种约定
+的 效率 偏低, 而且 很多 机器 上 不能 重入; 它的 优点 是 允许 GCC 编译
+的 目标码 和 PCC 编译 的 目标码 互相调用.
+
+.TP
+.B \-freg\-struct\-return
+一有可能 就 通过 寄存器 返回
+.B struct
+和
+.B union
+函数值. 对于 较小的结构, 它 比
+.BR \-fpcc\-struct\-return 
+更有效率.
+.Sp
+如果 既没有 指定
+.B \-fpcc\-struct\-return ,
+也没有 指定
+.BR \-freg\-struct\-return ,
+GNU CC 默认使用 目标机 的 标准约定. 如果 没有 标准约定, GNU CC 默认采用
+.BR \-fpcc\-struct\-return .
+
+.TP
+.B \-fshort\-enums
+给 \c
+.B enum\c
+\& 类型 只分配 它 声明的 值域范围 的 字节数. 就是说, \c
+.B enum\c
+\& 类型 等于 大小足够 的 最小整数类型.
+
+.TP
+.B \-fshort\-double
+使
+.B double
+类型 的 大小 和
+.B float
+\& 一样.
+
+.TP
+.B \-fshared\-data
+要求 编译结果 的 数据 和 非 \c
+.B const\c
+\& 变量 是 共享数据, 而不是 私有数据.
+这种差别 仅在 某些 操作系统 上面 有意义, 那里的 共享数据 在 同一个
+程序 的 若干 进程 间 共享, 而 私有数据 在 每个 进程 内 都有 副件.
+
+.TP
+.B \-fno\-common
+即使 未初始化 的 全局变量 也 分配在 目标文件 的 bss 段, 而不是 把 它们
+当做 普通块 (common block) 建立. 这样的 结果 是, 如果 在 两个 不同 的 
+编译结果 中 声明了 同一个 变量 (没使用 \c
+.B extern \c
+\&), 连接 它们 时 会 产生 错误. 这个选项 可能 有用 的 唯一情况 是,
+你 希望 确认 程序 能 在 其他系统 上 运行, 而 其他系统 总是 这么 做.
+
+.TP
+.B \-fno\-ident
+忽略 `\|\c
+.B #ident\c
+\&\|' 指令.
+
+.TP
+.B \-fno\-gnu\-linker
+不要 把 全局初始化部件 (如 C++ 的 构造子 和 解构子) 输出为 GNU 连接器
+使用 的 格式 (在 GNU 连接器 是 标准方法 的 系统 上).
+当你 打算 使用 非 GNU 连接器 的 时候 可以用 这个选项, 非GNU连接器 也需要
+.B collect2\c
+\& 程序 确保 系统连接器 放入 构造子 (constructor) 和 解构子 (destructor).
+(GNU CC 的 发布包 中 包含有 \c
+.B collect2\c
+\& 程序.) 对于 \c
+.I 必须 \c
+\& 使用 \c
+.B collect2\c
+\& 的 系统, 编译器驱动程序 \c
+.B gcc\c
+\& 自动 配置为 这么做.
+
+.TP
+.B \-finhibit-size-directive
+不要 输出 \c
+.B .size\c
+\& 汇编指令, 或其他 类似指令, 当 某个函数 一分为二, 两部分 在 内存 中
+距离 很远 时 会 引起 问题. 当 编译 `\|\c
+.B crtstuff.c\c
+\&\|' 时 需要 这个选项; 其他情况下 都不应该 使用.
+
+.TP
+.B \-fverbose-asm
+输出 汇编代码 时 放些 额外的 注释信息. 这个选项 仅用于 确实 需要
+阅读 汇编输出 的 时候 (可能 调试 编译器 自己 的 时候).
+
+.TP
+.B \-fvolatile
+使 编译器 认为 所有 通过 指针 访问 的 内存 是 易变内存 (volatile).
+
+.TP
+.B \-fvolatile\-global
+使 编译器 认为 所有的 外部和全局变量 是 易变内存.
+
+.TP
+.B \-fpic
+如果 支持 这种 目标机, 编译器 就生成 位置无关目标码.
+适用于 共享库 (shared library).
+
+.TP
+.B \-fPIC
+如果 支持 这种 目标机, 编译器 就输出 位置无关目标码.
+适用于 动态连接 (dynamic linking), 即使 分支 需要 大范围 转移.
+
+.TP
+.BI "\-ffixed\-" "reg"
+把 名为 \c
+.I reg\c
+\& 的 寄存器 按 固定寄存器 看待 (fixed register); 生成的 目标码
+不应该 引用 它 (除了 或许 用作 栈指针, 帧指针, 或其他 固定的角色).
+.Sp
+.I reg\c
+\& 必须是 寄存器 的 名字. 寄存器 名字 取决于 机器, 用 机器描述宏文件 的 \c
+.B REGISTER_NAMES
+宏 定义.
+.Sp
+这个选项 没有 否定格式, 因为 它 列出 三路选择.
+
+.TP
+.BI "\-fcall\-used\-" "reg"
+把 名为 \c
+.I reg\c
+\& 的 寄存器 按 可分配寄存器 看待, 不能 在 函数调用 间 使用.
+可以 临时使用 或 当做 变量 使用, 生存期 不超过 一个 函数.
+这样编译的 函数 无需 保存 和 恢复 \c
+.I reg\c
+\& 寄存器.
+.Sp
+如果 在 可执行模块 中, 把 这个选项 说明的 寄存器 用作 固定角色 将会
+产生 灾难性结果, 如 栈指针 或 帧指针.
+.Sp
+这个选项 没有 否定格式, 因为 它 列出 三路选择.
+
+.TP
+.BI "\-fcall\-saved\-" "reg"
+把 名为 \c
+.I reg\c
+\& 的 寄存器 按 函数 保护 的 可分配寄存器 看待. 可以 临时使用 或 当做 变量
+使用, 它 甚至能 在 函数 间 生存. 这样编译的 函数 会 保存 和 恢复 使用中 的 \c
+.I reg\c
+\& 寄存器.
+.Sp
+如果 在 可执行模块 中, 把 这个选项 说明的 寄存器 用作 固定角色 将会
+产生 灾难性结果, 如 栈指针 或 帧指针.
+.Sp
+另一种 灾难 是 用 这个选项 说明的 寄存器 返回 函数值.
+.Sp
+这个选项 没有 否定格式, 因为 它 列出 三路选择.
+
+.SH PRAGMAS
+GNU C++ 支持 两条 `\|\c
+.B #pragma\c
+\&\|' 指令 使 同一个 头文件 有 两个用途: 对象类 的 接口定义, 对象类 完整的
+内容定义.
+
+.TP
+.B #pragma interface
+(仅对 C++) 在 定义 对象类 的 头文件 中, 使用 这个指令 可以 节省 大部分
+采用 该类 的 目标文件 的 大小. 
+一般说来, 某些信息 (内嵌成员函数 的 备份副件, 调试信息, 实现 虚函数 的 
+内部表格等) 的 本地副件 必须 保存在 包含 类定义 的 各个 目标文件 中.
+使用 这个 pragma 指令 能够 避免 这样的 复制.
+当 编译 中 引用 包含 `\|\c
+.B #pragma interface\c
+\&\|' 指令 的 头文件 时, 就 不会 产生 这些 辅助信息
+(除非 输入的 主文件 使用了 `\|\c
+.B #pragma implementation\c
+\&\|'指令). 作为替代, 目标文件 将包含 可被 连接时 解析的 引用 (reference).
+
+.TP
+.B #pragma implementation
+.TP
+\fB#pragma implementation "\fP\fIobjects\fP\fB.h"\fP
+(仅对 C++) 如果 要求 从 头文件 产生 完整的 输出 (并且 全局可见),
+你 应该 在 主输入文件 中 使用 这条 pragma. 头文件 中 应该 依次 使用 `\|\c
+.B #pragma interface\c
+\&\|' 指令. 在 implementation 文件 中 将 产生 全部 内嵌成员函数 的 备份,
+调试信息, 实现 虚函数 的 内部表格等.
+.Sp
+如果 `\|\c
+.B #pragma implementation\c
+\&\|' 不带 参数, 它 指的是 和 源文件 有 相同基本名 的 包含文件; 例如, `\|\c
+.B allclass.cc\c
+\&\|' 中, `\|\c
+.B #pragma implementation\c
+\&\|' 等于 `\|\c
+.B #pragma implementation "allclass.h"\c
+\&\|'. 如果 某个 implementation 文件 需要 从 多个 头文件 引入 代码,
+就应该 使用 这个 字符串参数.
+.Sp
+不可能 把 一个头文件 里面 的 内容 分割到 多个 implementation 文件 中.
+
+.SH "文件 (FILE)"
+.nf
+.ta \w'LIBDIR/g++\-include 'u
+file.c	C 源文件
+file.h	C 头文件 (预处理文件)
+file.i	预处理后 的 C 源文件
+file.C	C++ 源文件
+file.cc	C++ 源文件
+file.cxx	C++ 源文件
+file.m	Objective-C 源文件
+file.s	汇编语言文件
+file.o	目标文件
+a.out	连接的输出文件
+\fITMPDIR\fR/cc\(**	临时文件
+\fILIBDIR\fR/cpp	预处理器
+\fILIBDIR\fR/cc1	C 编译器
+\fILIBDIR\fR/cc1plus	C++ 编译器
+\fILIBDIR\fR/collect	某些机器需要的连接器前端(front end)程序
+\fILIBDIR\fR/libgcc.a	GCC 子例程 (subroutine) 库
+/lib/crt[01n].o	启动例程 (start-up)
+\fILIBDIR\fR/ccrt0	C++ 的附加启动例程
+/lib/libc.a	标准 C 库, 另见 intro (3)
+/usr/include	\fB#include\fP 文件的标准目录
+\fILIBDIR\fR/include	\fB#include\fP 文件的标准 gcc 目录
+\fILIBDIR\fR/g++\-include	\fB#include\fP 文件的附加 g++ 目录
+.Sp
+.fi
+.I LIBDIR
+通常为
+.B /usr/local/lib/\c
+.IR machine / version .
+.br
+.I TMPDIR
+来自 环境变量
+.B TMPDIR
+(如果 存在, 缺省为
+.B /usr/tmp ,
+否则为
+.B /tmp\c
+\&).
+
+.SH "另见 (SEE ALSO)"
+cpp(1), as(1), ld(1), gdb(1), adb(1), dbx(1), sdb(1).
+.br
+.B info\c
+\&中
+.RB "`\|" gcc "\|', `\|" cpp \|',
+.RB "`\|" as "\|', `\|" ld \|',
+和
+.RB `\| gdb \|'
+的 条目.
+.br
+.I
+Using and Porting GNU CC (for version 2.0)\c
+, Richard M. Stallman;
+.I
+The C Preprocessor\c
+, Richard M. Stallman;
+.I
+Debugging with GDB: the GNU Source-Level Debugger\c
+, Richard M. Stallman 和 Roland H. Pesch;
+.I
+Using as: the GNU Assembler\c
+, Dean Elsner, Jay Fenlason & friends;
+.I
+ld: the GNU linker\c
+, Steve Chamberlain 和 Roland Pesch.
+
+.SH BUGS
+关于 报告 差错 的 指导 请 查阅 GCC 手册.
+
+.SH "版权 (COPYING)"
+Copyright
+.if t \(co
+1991, 1992, 1993 Free Software Foundation, Inc.
+.PP
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+.PP
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+.PP
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in
+translations approved by the Free Software Foundation instead of in
+the original English.
+
+.SH "作者 (AUTHORS)"
+关于 GNU CC 的 奉献者 请 查阅 GUN CC 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net
+
+.\".SH "字典"
+.\"archive file: 归档库文件, 库文件
+.\".br
+.\"assemble: 汇编
+.\".br
+.\"assembler: 汇编器
+.\".br
+.\"assembly language: 汇编语言
+.\".br
+.\"compile: 编译
+.\".br
+.\"compiler: 编译器
+.\".br
+.\"context: 执行环境
+.\".br
+.\"data flow information: 数据流信息 (-Wuninitialized)
+.\".br
+.\"extern reference: 外部引用 (-mhalf-pic)
+.\".br
+.\"in-line code sequence: 嵌入代码 (-min-line-mul)
+.\".br
+.\"link: 连接
+.\".br
+.\"linker: 连接器
+.\".br
+.\"memory reference: 内存访问 (-mserialize-volatile)
+.\".br
+.\"object file: 目标文件
+.\".br
+.\"operand: 操作数
+.\".br
+.\"preprocessing: 预处理
+.\".br
+.\"preprocessor: 预处理器
+.\".br
+.\"scratch space: 活动空间 (-mfull-fp-blocks)
+.\".br
+.\"sequential consistency: 结果一致 (-mserialize-volatile)
+.\".br
+.\"

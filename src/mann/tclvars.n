@@ -1,0 +1,422 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: tclvars.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: tclvars.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH tclvars n 8.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+tclvars \- Tcl 使用的变量
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+Tcl 库自动的建立和管理下列全局变量。除了下面专做说明的地方之外，对特定于应用的代码和用户，这些变量通常应当作为只读的来对待。
+.TP
+\fBenv\fR
+Tcl     把这个变量维护为一个数组，它的元素是这个进程的环境变量。读取一个元素将返回相应的环境变量的值。设置这个数组的一个元素将修改相应的环境变量，如果它不存在则建立一个新的。删除     \fBenv\fR 的一个元素将删除相应的环境变量。对 \fBenv\fR     数组的变更将影响通过象 \fBexec \fR这样的命令传递给子进程的环境变量。如果删除了整个     \fBenv\fR 数组，则 Tcl 将停止监视 \fBenv\fR     访问并且将不更新环境变量。
+.RS
+.VS 8.0 
+在 Windows 下，任何大小写形式的环境变量 PATH 和  COMSPEC 都被自动转换成大写的。例如，PATH  环境变量可以被操作系统导出为“path”、“Path”、“PaTh”、等，这导致其他简单  Tcl 代码必须支持许多特殊的写法。Tcl  继承的所有其他环境变量保持不变。
+.VE
+.RE
+.RS
+在 Macintosh 上，Tcl  把环境变量构造为非现存的全局环境变量。为 Tcl  建立的环境变量包括:
+.TP
+\fBLOGIN\fR
+它持有 Macintosh 的 Chooser 名字。
+.TP
+\fBUSER\fR
+它也持有 Macintosh 的 Chooser 名字。
+.TP
+\fBSYS_FOLDER\fR
+到系统目录的路径。
+.TP
+\fBAPPLE_M_FOLDER\fR
+到 Apple 菜单目录的路径。
+.TP
+\fBCP_FOLDER\fR
+到控制面板目录的路径。
+.TP
+\fBDESK_FOLDER\fR
+到桌面目录的路径。
+.TP
+\fBEXT_FOLDER\fR
+到系统扩展目录的路径。
+.TP
+\fBPREF_FOLDER\fR
+到偏好目录的路径。
+.TP
+\fBPRINT_MON_FOLDER\fR
+到打印监控器目录的路径。
+.TP
+\fBSHARED_TRASH_FOLDER\fR
+到网络垃圾箱目录的路径。
+.TP
+\fBTRASH_FOLDER\fR
+到垃圾箱目录的路径。
+.TP
+\fBSTART_UP_FOLDER\fR
+到启动目录的路径。
+.TP
+\fBHOME\fR
+到应用程序的缺省目录的路径。
+.PP
+你还可以为 Macintosh 建立你自己的环境变量。叫做 \fBTcl Environment Variables\fR 的一个文件将被放置到 Mac 系统文件夹中的偏好文件夹中。这个文件中的每行的形式都是 \fIVAR_NAME=var_data\fR。
+.PP
+最后的选择是把环境变量放置到这个应用的叫做 \fBTcl Environment Variables\fR 的一个‘STR#’资源文件中。这被认为是更象“Mac 式”而不是一个 Unix 式样的环境变量文件。‘STR#’资源中每个条目有与上述相同的格式。源代码文件 \fItclMacEnv.c\fR 包含 env 机制的实现。这个文件包含许多 #define，它们允许你定制 env 机制来适合你的应用的需要。
+.RE
+.TP
+\fBerrorCode\fR
+在发生了一个错误之后，设置这个变量为持有关于错误的补充信息，它的形式易于用程序处理。\fBerrorCode\fR 由有一个或多个元素的一个 Tcl 列表组成。这个列表的第一个元素标识错误的一个一般的类别，并决定列表余下部分的格式。Tcl 核心为 \fBerrorCode\fR 使用下列格式；个别应用可以定义补充的格式。
+.RS
+.TP
+\fBARITH\fI code msg\fR
+在发生一个算术错误的时候使用这个格式(例如，在 \fBexpr\fR 命令中尝试除以零)。\fICode\fR 标识准确的错误而 \fImsg\fR 提供一个人可阅读的对错误的描述。\fICode\fR 将是下列之一：DIVZERO (尝试除以零)、DOMAIN (如果函数的一个参数在它的作用域之外，比如 acos(-3))、IOVERFLOW (整数溢出)、 OVERFLOW (浮点数溢出)、或 UNKNOWN (如果不能确定错误的原因)。
+.TP
+\fBCHILDKILLED\fI pid sigName msg\fR
+在子进程被一个信号所终止的时候使用这个格式。\fBerrorCode\fR 的第二个元素是这个进程的标识符(十进制数)。第三个元素标识导致进程终止的信号的符号名字；它将是在文件 signal.h 中包含的名字之一，比如 \fBSIGPIPE\fR。第四个元素是一个描述这个信号的人可阅读的短消息，比如对 \fBSIGPIPE\fR是“write on pipe with no readers”。
+.TP
+\fBCHILDSTATUS\fI pid code\fR
+在子进程以非零状态退出的时候使用这个格式。\fBerrorCode \fR的第二个元素是这个进程的标识符(十进制数)，而第三个元素是这个进程返回的退出代码(也是十进制数)。
+.TP
+\fBCHILDSUSP\fI pid sigName msg\fR
+在子进程被一个信号所挂起的时候使用这个格式。\fBerrorCode\fR 的第二个元素是这个进程的标识符，是一个十进制数。第三个元素识导致进程挂起的信号的符号名字；它将是在文件signal.h 中包含的名字之一，比如 \fBSIGTTIN\fR。 第四个元素是一个描述这个信号的人可阅读的短消息，比如对 \fBSIGTTIN \fR是“background tty read”。
+.TP
+\fBNONE\fR
+对除了返回错误消息之外没有其他可获得的补充信息的错误使用这个格式。在这种情况下 \fBerrorCode\fR 将由只有一个单一元素的一个列表组成，这个元素的内容是 \fBNONE\fR。
+.TP
+\fBPOSIX \fIerrName msg\fR
+如果 \fBerrorCode\fR 的第一个元素是 \fBPOSIX\fR，则错误发生在一个 POSIX 内核调用期间。这个列表的第二个元素将包含发生的错误的符号名字，比如 \fBENOENT\fR；它将是在包含文件 errno.h 中定义的值之一。这个列表的第三个元素是对应于 \fIerrName\fR 的一个人可阅读的消息，比如对 \fBENOENT\fR 是“no such file or directory”。
+.PP
+要设置 \fBerrorCode\fR，应用应当使用库过程比如 \fBTcl_SetErrorCode\fR 和 \fBTcl_PosixError\fR，或者调用  \fBerror\fR 命令。如果使用了这些方法之一，则 Tcl 解释器将在下个错误之后重置这个变量为 \fBNONE\fR。
+.RE
+.TP
+\fBerrorInfo\fR
+在一个错误发生之后，这个字符串将包含标识在最新近的错误发生时正在执行的 Tcl 命令和过程的一行或多行。它的内容使用栈跟踪的形式，展示在错误发生时调用的各个嵌套的 Tcl 命令。
+.TP
+\fBtcl_library\fR
+这个变量持有包含系统 Tcl  脚本库的一个目录的名字，比如用于自动装载的那些目录。\fBinfo library\fR 命令返回这个变量的值。关于 Tcl  脚本库的详情请参见 \fBlibrary\fR 手册条目。 除了 Tcl 脚本库之外，每个应用或包通常都有它自己的特定于应用的脚本库；每个应用都应该设置名字象  \fB$\fR\fIapp\fR\fB_library\fR 这样的一个全局变量(这里的 \fIapp\fR  是这个应用的名字)来持有这个应用的库目录的网络文件名字。在建立解释器的时候，通过查找许多不同目录直到找到包含一个适当的 Tcl 启动脚本的目录，来设置 \fBtcl_library\fR 的最初的值。如果 \fBTCL_LIBRARY\fR 环境变量存在，则首先访问它指名的目录。如果 \fBTCL_LIBRARY\fR 未被设置或不参照一个适当的目录，则 Tcl 检查基于在其中编译(compiled-in)的缺省位置的其他一些目录、包含应用的二进制文件的位置、和当前工作目录。
+.TP
+\fBtcl_patchLevel\fR
+在建立解释器的时候 Tcl 初始化这个变量来持有给出当前的 Tcl   补丁级别的一个字符串，比如 \fB7.3p2 \fR是Tcl 7.3 的第二次官方补丁，而 \fB7.4b4\fR 是 Tcl 7.4 的第四次 beta    发布。\fBinfo patchlevel\fR 命令返回这个值。
+.VS 8.0 br
+.TP
+\fBtcl_pkgPath\fR
+这个变量持有一个目录的列表，它一般指示把包安装到哪里。在 Windows 上不使用它。它典型的包含一个或两个条目；如果它包含两个条目，第一个通常是依赖于平台的包的目录(例如，共享库的二进制文件)而第二个通常是平台无关的包的目录(例如，脚本文件)。典型的把包安装为在  \fB$tcl_pkgPath\fR 中的一个条目的一个子目录。在 \fB$tcl_pkgPath\fR 中的目录缺省的包含在 \fBauto_path\fR 变量中，所以 \fBpackage require\fR 命令期间自动的在它们和它们的直接子目录中查找包。注意: 不希望应用修改 \fBtcl_pkgPath\fR。在启动时它的值被添加到  \fBauto_path\fR；对 \fBtcl_pkgPath\fR 的变动不会反映到 \fBauto_path\fR   中。如果你想让 Tcl 来在额外的目录中查找包，你应该把这些目录的名字添加到 \fBauto_path\fR，而不是 \fBtcl_pkgPath\fR。
+.VE
+.TP
+\fBtcl_platform\fR
+这是一个关联数组，它的元素包含关于应用在其上运行的平台的信息，比如操作系统的名字、它的当前发行号、和机器的指令集。总是定义下列元素，但是如果 Tcl 不能检索到任何有关的信息，则它们的值将是空串。除此之外，扩展和应用可以向这个数组添加补充的值。预先定义的元素是:
+
+.RS
+.VS
+.TP
+\fBbyteOrder\fR
+这个机器的本地字节序: \fBlittleEndian\fR 或 \fBbigEndian\fR。
+.VE
+.TP
+\fBdebug\fR
+如果这个变量存在，则编译解释器时启用了调试符号。只在 Windows 上存在这个变量，扩展作者可以依赖于所装载的 C 运行时库来指定装载哪个包。
+.TP
+\fBmachine\fR
+这个机器执行的指令集，比如 \fBintel\fR、\fBPPC\fR、\fB68k\fR、或\fBsun4m\fR。在 UNIX 机器上，用 \fBuname -m\fR 返回这个值。
+.TP
+\fBos\fR 
+在这个机器上运行的操作系统的名字，比如 \fBWindows 95\fR、\fBWindows NT\fR、\fBMacOS\fR、或 \fBSunOS\fR。 在 UNIX 机器上，用 \fBuname -s\fR 返回这个值。在 Windows 95 和 Windows 98 上，返回的值将是 \fBWindows 95\fR 来提供更好的对 Windows 95 的反向兼容；要区别二者，请检查 \fBosVersion\fR。
+.TP
+\fBosVersion\fR
+在这个机器上运行的操作系统的版本号。在 UNIX 机器上，用 \fBuname -r\fR 返回这个值。在 Windows 95 上，版本将是 4.0；在 Windows 98 上，版本将是 4.10。
+.TP
+\fBplatform\fR
+\fBwindows\fR、\fBmacintosh\fR、或 \fBunix \fR之一。它表示这个机器的一般操作环境。
+.TP
+\fBthreaded\fR
+如果这个变量存在，则编译这个解释器时启用了线程。
+.TP
+\fBuser\fR
+它基于在平台上获得的登录信息标识当前用户。在 Unix 它源自 USER 或 LOGNAME 环境变量，在 Windows 和 Macintosh 上源自 GetUserName。
+.RE
+.TP
+\fBtcl_precision\fR
+.VS
+这个变量在把浮点数转换成字符串时控制生成的数字的数目。它缺省的是 12。对于 IEEE 浮点数 17 位数字是“最佳的”，这样允许双精度值在二进制和字符串之间来回转换而不丢失信息。但是，使用  17 位数字将禁止任何舍入，这将生成更长，而更不直观的值。例如，\fBexpr 1.4\fR 在设置 \fBtcl_precision\fR 为 17 时返回 1.3999999999999999，而在设置 \fBtcl_precision\fR 为 12 时返回 1.4 。
+.RS
+在一个进程中的所有解释器共享一个单一的 \fBtcl_precision\fR  值: 在一个解释器中改变它将同样影响所有其他解释器。但是，不允许安全解释器修改这个变量。
+.RE
+.VE
+.TP
+\fBtcl_rcFileName\fR
+在初始化期间使用这个变量来指示特定于用户的启动文件的名字。如果在特定于应用的初始化中设置了它，则 Tcl 启动代码将检查这个文件是否存在，并且如果它存在的话则 \fBsource\fR (载入)它。例如，对于 \fBwish\fR ，这个变量被设置成给 Unix 的 \fB~/.wishrc\fR 和给 Windows 的 \fB~/wishrc.tcl\fR。
+.TP
+\fBtcl_rcRsrcName\fR
+这个变量只在 Macintosh  系统上使用。在初始化期间使用这个变量来指示位于应用或扩展资源  fork 中的一个特定于应用的 \fBTEXT\fR  资源的名字。如果特定于应用的初始化设置了它，则 Tcl  启动代码将检查资源是否存在，如果存在则 \fBsource\fR   它。例如，Macintosh \fBwish\fR  应用设置这个变量为 \fBtclshrc\fR。
+.TP
+\fBtcl_traceCompile\fR
+设置这个变量的值来控制在字节码编译期间显示多少跟踪信息。缺省的，tcl_traceCompile    是零且不显示信息。设置 tcl_traceCompile 为 1，在编译一个过程或顶层命令的时候在标准输出上生成一行总结。设置它为 2，在标准输出上详细的列出在每次编译期间散发(??? emit)的字节码指令。在跟踪怀疑是 Tcl 编译器的问题时很有用。在把现存代码转换成 Tcl8.0 时也偶尔有用。
+.TP
+\fBtcl_traceExec\fR
+设置这个变量的值来控制在字节码执行期间显示多少跟踪信息。缺省的，tcl_traceExec    是零而不显示信息。设置 tcl_traceExec 为 1，在每次调用一个 Tcl 过程的时候在标准输出上生成一行跟踪。设置它为 2，在用命令的名字和它的参数调用任何Tcl 命令的时候，生成一行输出。设置它为 3，生成一个详细的跟踪，展示每个字节码指令的执行结果。注意在 tcl_traceExec 是 2 或 3 的时候，不展示象 set 和 incr 这样已经被整个替换为一个字节码指令序列的命令。在跟踪怀疑是 Tcl 编译器和解释器的问题时很有用。在把现存代码转换成 Tcl8.0 时也偶尔有用。
+.TP
+\fBtcl_wordchars\fR
+这个变量的值是一个正则表达式，设置它来控制认把什么字符认为是“字”字符。例如在  Tk 的文本框中用双击来选择一个字。它是平台相关的。在  Windows 上，它缺省为 \fB\S\fR，意思是除了 Unicode  空格字符之外的任何字符。其他平台上缺省为 \fB\w\fR，它是任何   Unicode 字字符(数字、字母、下划线)。
+.TP
+\fBtcl_nonwordchars\fR
+这个变量的值是一个正则表达式，设置它来控制认把什么字符认为是“非字”字符。例如在   Tk 的文本框中用双击来选择一个字。它是平台相关的。在 Windows 上，它缺省为 \fB\s\fR，意思是任何 Unicode 空格字符。其他平台上缺省为 \fB\W\fR，它是除了 Unicode 字字符(数字、字母、下划线)之外的任何字符。
+.TP
+\fBtcl_version\fR
+在建立解释器的时候，Tcl 初始化这个变量来持有这个版本的 Tcl 的版本号，形式是 \fIx.y\fR。对  \fIx\fR 的变更表示可能导致不兼容的较大的变化，对 \fIy\fR  的变更表示保持反向兼容的小增强和缺陷修理，\fBinfo tclversion\fR 命令返回这个变量的值。
+
+.SH "参见 SEE ALSO"
+eval(n)
+
+.SH "关键字 KEYWORDS"
+arithmetic, bytecode, compiler, error, environment, POSIX, precision, subprocess, variables
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/12/10
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

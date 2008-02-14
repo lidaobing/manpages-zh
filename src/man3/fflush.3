@@ -1,0 +1,106 @@
+.\" Copyright (c) 1990, 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" This code is derived from software contributed to Berkeley by
+.\" Chris Torek and the American National Standards Committee X3,
+.\" on Information Processing Systems.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)fflush.3	5.4 (Berkeley) 6/29/91
+.\"
+.\" Converted for Linux, Mon Nov 29 15:22:01 1993, faith@cs.unc.edu
+.\"
+.\" Modified 2000-07-22 by Nicol??s Lichtmaier <nick@debian.org>
+.\" Modified 2001-10-16 by John Levon <moz@compsoc.man.ac.uk>
+.\"
+.TH FFLUSH 3  1993-11-29 "BSD MANPAGE" "Linux Programmer's Manual"
+.SH NAME
+fflush \- 刷新一个流
+.SH "SYNOPSIS 总览"
+.B #include <stdio.h>
+.sp
+.BI "int fflush(FILE *" stream );
+.SH "DESCRIPTION 描述"
+函数
+.B fflush
+强制在所给的输出流或更新流
+.I stream
+上，写入在用户空间缓冲的所有数据，使用流的底层写功能函数。流的打开状态不受影响。
+.PP
+如果参数
+.I stream
+是
+.BR NULL ,
+.B fflush
+刷新
+.I 所有
+打开的流。
+.PP
+要使用非锁定的对应版本，参见
+.BR unlocked_stdio (3)
+。
+.SH "RETURN VALUE 返回值"
+成功执行返回 0，否则返回
+.B EOF
+并设置全局变量
+.I errno
+来指示错误发生。
+.SH ERRORS
+.TP
+.B EBADF
+.I Stream
+不是一个打开的流，或者不是用于输出。
+.PP
+函数
+.B fflush
+也可能失败并置
+.I errno
+为
+.BR write (2)
+指定的值。
+.SH "NOTES 要点"
+注意
+.B fflush()
+仅仅刷新用户空间的由 C 库提供的缓冲。要保证数据被物理地存储到磁盘上，必须也刷新内核缓冲。例如，使用
+.BR sync (2)
+或
+.BR fsync (2).
+.SH "CONFORMING TO 标准参考"
+函数
+.BR fflush()
+遵循 ANSI X3.159-1989 (``ANSI C'') 标准。
+.SH "SEE ALSO 参见"
+.BR fsync (2),
+.BR sync (2),
+.BR write (2),
+.BR fclose (3),
+.BR fopen (3),
+.BR setbuf (3),
+.BR unlocked_stdio (3)

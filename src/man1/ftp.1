@@ -1,0 +1,948 @@
+.\" Copyright (c) 1985, 1989, 1990 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"	from: @(#)ftp.1	6.18 (Berkeley) 7/30/91
+.\"
+.\"
+.\"  参考了几个其它版本的 ftp man page, 开头的版权声明、日期都是一样的,
+.\"  只具体内容稍有不同. 为方便起见, 本文英文原稿使用 cmpp cvs 上的 ftp.1.
+.\"  本文的英文原稿写的非常简洁、准确. 本人水平有限, 许多地方看不明白;
+.\"  而且翻译时采用意译, 比起英文原稿来, 译文也显得不够严谨.
+.\"  错误、不足之处实在太多, 还望各位指正.
+.\"     译者 sliant@21cn.com, 2001-11-11,
+.\"     while missing Xie-WenMin ,
+.\"     while missing Xie-WenMin .
+.Dd August 15, 1999
+.Dt FTP 1
+.Os "Linux NetKit  (0.16) "
+.Sh 名称 (NAME)
+.Nm ftp
+.Nd
+.Tn Internet
+文件传输程序 (file transfer program)
+.Sh 概述 (SYNOPSIS)
+.Nm ftp
+.Op Fl pinegvd
+.Op Ar host
+.Nm pftp
+.Op Fl inegvd
+.Op Ar host
+.Sh 说明 (DESCRIPTION)
+用户通过
+.Nm Ftp
+这个程序来使用
+.Tn Internet
+上的标准文件传输协议 (File Transfer  Protocol).
+本程序允许用户向远端网站发送文件, 或从远端网站接收文件.
+.Pp
+参数选项可以在命令行启动ftp时指定, 也可以在ftp命令解释模式下输入.
+.Bl -tag -width flag
+.It Fl p
+使用被动模式进行数据传输. 如果你本地网络有防火墙,
+外部主机不能连接到你这个客户端, 这个选项就派上用场了.
+本选项要求 ftp 服务器支持 PASV 命令.
+如果使用 pftp 从命令行启动 ftp, 本选项是默认打开的.
+.It Fl i
+进行多个文件传输时关掉交互式的确认提示.
+.It Fl n
+一般，在启动 ftp 时, ftp 会试着进行自动登录. 本选项可以关掉这个功能.
+如果 auto-login 功能被启用的话,  ftp 会在用户 home 目录下的 .netrc
+(参阅
+.Xr netrc 5)
+文件中查找远端主机上的用户帐号.
+如果 .netrc 文件中用户帐号这一项不存在,
+ftp 会提示用户输入远端主机上的登录名 (缺省为用户在本地机器上的帐号),
+如果需要, 还会提示你输入密码和用来登录的帐号. ??
+.Pp
+(译者注: 使用本选项, 可以实现所谓的 "非交互式登录".
+你可以试试下面这条命令:
+.Pp
+echo open ftp_server "\\n" user my_name my_password "\\n" dir "\\n" bye | ftp -n
+不能使用 rcp 的时候, 可以用这条 ftp 命令来代替.)
+.It Fl e
+如果被编译成了 ftp 可执行格式, 本选项会关掉命令编辑和历史命令功能;
+否则什么也不做. ??
+.It Fl g
+关掉文件名匹配功能.
+.It Fl v
+显示详细信息. 本选项使得 ftp 显示远端服务器的所有响应,
+并在数据传输完成后显示传输数据的统计信息.
+.It Fl d
+打开 debug 模式.
+.El
+.Pp
+从命令行启动
+.Nm ftp
+时, 可指定欲与之通讯的远端主机. 如果指定了,
+.Nm ftp
+会立即尝试与远端
+.Tn FTP
+服务器建立连接; 否则,
+.Nm ftp
+会进入其命令解释模式, 等待用户进一步的指令.
+.Nm ftp
+在等待用户指令时, 会显示提示符
+.Ql ftp>
+.Pp
+.Nm ftp
+能够识别以下的命令:
+.Bl -tag -width Fl
+.It Ic \&! Op Ar command Op Ar args
+在本地机器上启动一个交互的shell. 如果本命令带有参数,
+第一个参数作为 shell 命令直接执行, 其它的参数成为这个 shell 命令的参数.
+.It Ic \&$ Ar macro-name Op Ar args
+执行宏
+.Ar macro-name
+所指代的命令. 宏使用
+.Ic macdef
+命令来定义. 本命令中的参数不进行文件名匹配, 直接传给这个宏.
+.It Ic account Op Ar passwd
+在你成功登录以后, 本命令可以提供一个附加的密码,
+远端系统会用这个密码来访问某些资源.
+如果不指定参数, 则会提示用户输入密码;
+输入密码时, 回显会被禁止.
+.It Ic append Ar local-file Op Ar remote-file
+添加本地文件到远端机器上. 如果没有指定
+.Ar remote-file,
+则本地文件名在经过
+.Ic ntrans
+或
+.Ic nmap
+转换后, 作为远端文件名使用.
+在文件传输过程中还会使用
+.Ic type,
+.Ic forma,
+.Ic mode
+和
+.Ic structure
+的当前设置.
+.It Ic ascii
+将当前文件传输方式设置为网络
+.Tn ASCII
+方式, 即文本模式.
+这也是缺省的文件传送方式.
+.It Ic bell
+每个文件传送命令完成后响铃提示.
+.It Ic binary
+将当前文件传输方式设置为 binary image, 即二进制模式.
+.It Ic bye
+终止与当前
+.Tn FTP
+服务器的连接, 退出
+.Nm ftp.
+文件结束符 (译者注: ctrl-D) 有同样的功能.
+.It Ic case
+转换 case 状态, 即远端主机文件名大小写转换规则.
+.Ic mget
+命令会中用到本状态.
+.Ic case
+状态若为 on, 远端主机文件传输到本地时,
+文件名中的大写字母会被转换为小写. 缺省的 case 状态为 off.
+(译者注: toggle 这个词我翻译成转换. 意思是说,
+如果当前 case 状态为 on, 你执行 case 这个命令,
+case 状态就转成了 off; 如果当前为 off, 则会变成 on. 下同.)
+.It Ic \&cd Ar remote-directory
+改变远端机器上的当前目录到
+.Ar remote-directory.
+.It Ic cdup
+改变远端机器上的当前目录到其父目录, 即其上级目录.
+.It Ic chmod Ar mode file-name
+将远端系统上文件
+.Ar file-name
+的权限改为
+.Ar mode.
+.It Ic close
+终止与当前远端服务器的
+.Tn FTP
+连接, 回到命令解释模式. 所有定义的宏都会被清除.
+.It Ic \&cr
+转换 cr 状态, 即 ascii 方式下取文件时的回车换行转换规则.
+用 ascii 方式获取文件时, 文件内容被分割为一条条纪录, 以回车换行符为分隔符;
+如果
+.Ic \&cr
+状态为 on, 回车换行符会被转换为
+.Ux
+系统的单个换行符.
+非
+.Ux
+系统的文本文件中可能含有单个换行符; 在进行 ascii 方式的文件传输时,
+只有将
+.Ic \&cr
+状态设置为 off, 这些单个换行符才能与回车换行符区分开来.
+.Ic \&cr
+的缺省状态为 on.
+(译者注: 回车符的 ASCII 码为 0D, 对应的 C 语言转义字符为 \\r;
+换行符的 ASCII 码为 0A , 对应的 C 语言转义字符为 \\n;
+UNIX 下的文本文件, 换行的时候就一个换行符;
+DOS  下的文本文件, 换行的时候是两个字符: 回车 + 换行.
+服务器端 ftpd 在用 ascii 方式发送文件时,
+会先把单个换行转换为回车 + 换行, 再送到网络上传输;
+客户端 ftp 在用 ascii 方式接受文件时, 如果 cr 状态为 on,
+ftp 会把回车 + 换行转换为单个换行; 如果为 off,
+则不进行这种转换. 如果网上传输的数据中同时含有单个换行和回车 + 换行,
+你就一定要把 cr 状态设为 off, 才能把数据原样取回来;
+否则, 取回来的单个换行和回车 + 换行都转换成了单个换行,
+你就分不清这两种了. 还是使用 binary 最好.)
+.It Ic delete Ar remote-file
+删除远端机器上的文件
+.Ar remote-file.
+.It Ic debug Op Ar debug-value
+转换 debugging 状态, 即是否跟踪每条指令.
+.Ar debug-value
+是可选的, 其值用来设置跟踪的级别.
+当 debigging 状态为 on 时,
+.Nm ftp
+会显示每条送往远端机器的指令, 并在显示的指令前加上
+.Ql \-\->
+.It Xo
+.Ic dir
+.Op Ar remote-directory
+.Op Ar local-file
+.Xc
+显示远端机器目录
+.Ar remote-director
+下的文件名.
+.Ar local-file
+这个参数是可选的.
+如果指定了这个参数, 本命令的显示结果会保存在
+.Ar local-file
+这个本地文件中.
+如果 prompt 状态为 on,
+.Nm ftp
+会提示用户确认最后这个参数是用来存放
+.Ic dir
+显示结果的本地文件. 如果不指定
+.Ar remote-director,
+则本命令显示远端机器当前目录下的文件名.
+如果不指定
+.Ar local-file,
+或
+.Ar local-file
+指定为
+.Fl ,
+则输出结果显示在你的终端上.
+.It Ic disconnect
+同
+.Ar close.
+.It Ic form Ar format
+将文件传输格式设置为
+.Ar format.
+缺省格式为 \*(Lqfile\*(Rq. ??
+.It Ic get Ar remote-file Op Ar local-file
+把远端机器上的文件
+.Ar remote-file
+取回到本地.
+如果不指定本地文件名, 则远端文件名在经过
+.Ic case,
+.Ic ntrans
+和
+.Ic nmap
+转换后, 作为本地文件名使用. 文件传输过程中会用到当前的
+.Ic type,
+.Ic form,
+.Ic mode,
+和
+.Ic structure
+状态.
+.It Ic glob
+转换 glob 状态, 即在执行
+.Ic mdelete,
+.Ic mget
+和
+.Ic mput
+命令时, 是否进行文件名匹配. 如果 glob 状态为 off,
+则不进行文件名匹配.
+对
+.Ic mput
+而言, 文件名匹配规则和本地的
+.Xr csh 1
+文件名匹配一样.
+对
+.Ic mdelete
+和
+.Ic mget
+而言, 每个远端机器文件名都分别在远端机器上进行匹配,
+匹配结果中的同名文件不会合并.
+目录名匹配规则和文件名匹配规则不尽相同,
+具体结果要取决于远端系统和 ftp 服务程序.
+你可以使用
+.Ql mls remote-files \-
+预先看看匹配结果是否如你所愿.
+注意:
+.Ic mget
+和
+.Ic mput
+可能不会传送子目录. 想连着子目录一起传送, 你可以使用 binary
+方式传送这个子目录的
+.Xr tar 1
+包.
+(译者注:
+1、
+文件匹配是说, *n 代表所有以 n 结尾的文件.
+例如, 在你本地 linux 机器当前目录下有三个文件 Xie Wen Min ,
+在 shell 下用 echo *n 这条命令, 结果为 Wen Min ,
+可见 *n 被 shell 匹配为 Wen Min.
+在 ftp 中, 如果 glob 为 on ,
+mput *n 这条指令会被匹配为 mput Wen Min ,
+本地的 Wen Min 两个文件被传送到远端.
+如果 glob 为 off ,
+mput *n 这条指令不会被匹配,
+于是 mput 会试图把文件名为 "*n" 的本地文件传到远端,
+如果本地没有这个名为 "*n" 的文件, ftp 就会报错.
+2、
+mput 是把本地文件送到远端机器, 故其匹配规则与本地 shell的文件名匹配一致.
+mget, mdelete 则是把远端机器上的文件送到本地,
+故其匹配规则和最终结果要取决于远端系统.
+3、
+考虑如下情况: 远端机器上有三个文件 Xie, Wen, Min
+如果执行 mget X* W* *n,
+显然, 匹配结果会是 Xie Wen Min Wen.
+虽然 Wen 这个文件出现了两次,
+但 ftp 不会把这两个文件名合为一个,
+所以 Wen 这个文件会被 mget 两次, 第二次覆盖第一次.
+如果 mdel X* W* *n, Wen 这个文件会被删两次, 第二次报错.)
+.It Ic hash
+转换 hash 状态, 即是否显示数据传输进度. 如果 hash 状态为 on,
+每传送完一个 1024 字节的数据块时显示一个 # 号.
+.It Ic help Op Ar command
+显示指定命令
+.Ar command
+的简要说明. 如果不指定参数, 本命令列出所有已知的
+.Nm ftp
+命令.
+.It Ic idle Op Ar seconds
+将远端服务器的最长空闲时间设为
+.Ar seconds
+秒.
+如果不指定参数
+.Ar seconds,
+则本命令显示当前的最长空闲时间值.
+（译者注：如果在最长空闲时间内没执行任何 ftp 命令,
+与远端机器的连接将自动终止. ）
+.It Ic lcd Op Ar directory
+改变本地的当前工作目录. 如果不指定参数
+.Ar directory,
+则切换到用户的 home 目录.
+.It Xo
+.Ic \&ls
+.Op Ar remote-directory
+.Op Ar local-file
+.Xc
+显示远端机器目录下的文件名列表. 具体如何显示与远端系统有关;
+例如, 大多数
+.Ux
+系统显示 shell 命令 ls -l 的输出 (参阅 nlist ).
+如果不指定
+.Ar remote-directory
+则显示远端机器当前目录的内容.
+如果 prompt 状态为 on ,
+.Nm ftp
+会提示用户确认最后一个参数是用来存放
+.Ic \&ls
+显示结果的本地文件. 如果不指定
+.Ar local-file
+, 或者
+.Ar local-file
+指定为
+.Sq Fl ,
+则结果显示到用户终端上. 可以在本命令中用引号指定附加参数.
+例如, 如果远端系统为
+.Ux ,
+则 ls "-rt /usr" 这条命令会显示远端机器 /usr 这个目录下的文件,
+显示结果按创建时间由远到近排序.
+.It Ic macdef Ar macro-name
+定义一个宏. 执行本命令后, 接下来输入的内容会存放到宏
+.Ar macro-name
+里. 空行 (文件中的连续换行, 或终端的回车换行) 表示宏定义结束.
+最多只能定义 16 条宏, 而且所有的宏内容加起来不能超过 4096 字节.
+执行
+.Ic close
+命令后所有的宏定义会被清除.
+在宏中, $ 和 \e 这两个字符为特殊字符.
+$ 字符后跟数字, 将在这个宏在执行时将替换为命令行中的参数.
+$ 字符后跟字符 i , 表示循环执行当前宏.
+在循环的第一次, $i 被替换为命令行中的第一个参数;
+第二次, 替换为第二个参数, 以此类推.
+\e 后面跟一个字符, 表示这个字符本身.
+例如, \e 可以去掉 $ 的特殊意义, 表示 $ 这个字符本身.
+.It Ic mdelete Op Ar remote-files
+删除远端机器文件
+.Ar remote-files.
+.It Ic mdir Ar remote-files local-file
+和
+.Ic dir
+命令相似, 但是允许你指定多个远端文件. 如果 prompt 状态为 on,
+.Nm ftp
+会提示用户确认最后一个参数是用来存放输出结果的本地文件.
+.It Ic mget Ar remote-files
+匹配参数
+.Ar remote-files
+中指定的远端文件名, 对匹配结果里的每个文件都执行一个
+.Ic get
+命令. 关于文件名匹配, 请参阅
+.Ic glob
+命令. 根据当前的
+.Ic case,
+.Ic ntrans,
+和
+.Ic nmap
+状态, 远端文件名在经过适当的转换后, 作为本地文件名使用.
+文件被传输到本地机器的当前目录. 你可以用
+.Ql lcd directory
+命令改变本地机器的当前目录, 也可以用
+.Ql "\&! mkdir directory"
+命令新建本地目录.
+.It Ic mkdir Ar directory-name
+在远端机器上创建目录.
+.It Ic mls Ar remote-files local-file
+和
+.Ic nlist
+命令相似, 但是允许你指定多个远端文件, 而且
+.Ar local-file
+这个参数必须指定. 如果 prompt 状态为 on,
+.Nm ftp
+会提示用户确认最后一个参数是用来存放输出结果的本地文件.
+.It Ic mode Op Ar mode-name
+将文件传输模式设置为
+.Ar mode-name
+所指定的模式. 缺省模式为 \*(Lqstream\*(Rq 模式. ??
+.It Ic modtime Ar file-name
+显示远端机器上文件的最后修改时间.
+.It Ic mput Ar local-files
+匹配参数中指定的本地文件名, 对匹配结果里的每个文件都执行一个
+.Ic put
+命令. 关于文件名匹配, 请参阅
+.Ic glob
+命令. 根据当前的
+.Ic ntrans
+和
+.Ic nmap
+状态, 本地文件名在经过适当的转换后, 作为远端文件名使用.
+.It Ic newer Ar file-name Op Ar local-file
+比较远端文件和本地文件的修改时间, 如果远端文件比本地文件新,
+或本地文件不存在, 则从远端机器上取此文件.
+.It Xo
+.Ic nlist
+.Op Ar remote-directory
+.Op Ar local-file
+.Xc
+显示远端机器上指定目录下的文件列表.
+如果不指定参数
+.Ar remote-directory,
+则显示远端机器当前目录的内容.
+如果 prompt 状态为 on,
+.Nm ftp
+会提示用户确认最后一个参数是用来存放显示结果的本地文件.
+如果不指定本地文件
+.Ar local-file,
+或者本地文件
+.Ar local-file
+指定为
+.Sq Fl,
+显示结果会在用户终端上显示出来.
+.It Ic nmap Op Ar inpattern outpattern
+设置或取消文件名映射机制. 如果不指定参数, 则本命令取消文件名映射机制.
+如果指定了参数, 则在执行
+.Ic mput
+或
+.Ic put
+命令, 且不指定远端文件名时, 远端文件名会被映射;
+在执行
+.Ic mget
+或
+.Ic get
+命令, 且不指定本地文件名时, 本地文件名会被映射.
+非 unix 的远端系统常使用不同于 unix 的文件命名规则,
+当用 ftp 连接到这样的远端系统时, 本命令会很有用处.
+转换规则由参数
+.Ar inpattern
+和
+.Ar outpattern
+决定.
+一个文件名会先经过
+.Ic ntrans
+和
+.Ic case
+的转换, 再按照
+.Ar inpattern
+进行
+.Ic nmap
+映射. 参数
+.Ar inpattern
+指定转换前的文件命名规则. 参数
+.Ar outpattern
+指定转换后的文件命名规则. 在
+.Ar inpattern
+和
+.Ar outpattern
+这两个参数中, 用 $1, $2, ..., $9 来替代变量; 用 \e$ 替代 $ 字符;
+其余的字符则没有特殊含义. 例如, 若
+.Ar inpattern
+为 $1.$2, 则对于文件名 mydata.data, $1 取值 mydata, $2取值 data.
+结果文件名由
+.Ar outpattern
+决定. 在
+.Ar outpattern
+中, $1, $2, ..., $9 被相应的取值代替, 作为最终结果.
+$0 被替换为整个原始文件名. 对方括号括起来的两个变量 [$x,$y] 而言,
+若 $x 非空, 则其相当于 $x; 否则相当于 $y (以上 x,y 为数字).
+举例如下:
+输入命令行 nmap $1.$2.$3 [$1,$2].[$2,file], 则
+原始文件名 myfile.data 会被映射为 myfile.data,
+原始文件名 myfile.data.old 会被映射为 myfile.data,
+原始文件名 myfile 会被映射为 myfile.file,
+原始文件名 .myfile 会被映射为 myfile.myfile,
+Spaces may be included in
+.Ar outpattern,
+as in the example: `nmap $1 sed "s/  *$//" > $1' . ??
+(译者注: 这一段我没看懂, 也没试出来.)
+`$', '[', ']', `,' 这四个字符有特殊含义, 所以若要使用这四个字符,
+需在前面加上 \\ 以去掉其特殊含义.
+.It Ic ntrans Op Ar inchars Op Ar outchars
+设置或取消文件名字符转换机制. 如果不指定参数,
+则本命令取消文件名字符转换机制. 如果指定了参数, 则在执行
+.Ic mput
+和
+.Ic put
+命令, 且不指定远端文件名时, 远端文件名中的字符会被转换;
+在执行
+.Ic mget
+和
+.Ic get
+命令, 且不指定本地文件名时, 本地文件名中的字符会被转换.
+非 unix 的远端系统常使用不同于 unix 的文件命名规则,
+用 ftp 连接到这样的远端系统时, 本命令会很有用处.
+原始文件名中的
+.Ar inchars
+会被替换为对应的
+.Ar outchars.
+如果 inchar 字符串比 outchar 长, 则多出的那一部分字符会从原始文件名中删掉.
+.It Ic open Ar host Op Ar port
+连接到指定的远端主机
+.Ar host
+.Tn FTP
+服务器. 端口号
+.Nm ftp
+是可选的; 如果指定了端口号,
+.Nm ftp
+会尝试使用这个指定的端口号连接远端
+.Tn FTP
+主机. 如果自动登陆选项
+.Ic auto-login
+是打开的话 (缺省为打开),
+.Nm ftp
+还会尝试自动登陆.  (详见下述)
+.It Ic prompt
+转换 prompt 状态, 即是否进行交互提示. 如果 prompt 状态为 on ,
+在传送多个文件时, ftp 会提示用户选择要上传或下载的文件;
+如果 prompt 状态为 off (缺省为 on),
+.Ic mget
+和
+.Ic mput
+这两个命令会不加提示地传送所有指定的文件,
+.Ic mdelete
+会不加提示地删掉所有指定的文件.
+.It Ic proxy Ar ftp-command
+在副连接上执行 ftp 命令. 本命令允许同时连接到两个远端 ftp 服务器,
+并在这两个远端服务器之间传送文件.
+(译者注: 原始的 ftp 所建立的连接为 primary control connection, 主连接;
+使用 proxy open 所建立的连接为 secondary control connection, 副连接.
+在副连接上运行 ftp 命令, 即在 ftp 命令前加上 proxy 前缀, 如
+proxy open, proxy put 等. 以下将这种 ``proxy ftp command'' 译为 "代理命令".)
+第一个执行的代理命令应该是
+.Ic open
+命令, 用来建立副连接.
+运行 "proxy ?" 命令, 可以看到所有能在副连接中运行的 ftp 命令.
+以下的 ftp 命令在副连接中运行时, 效果与在主连接中不同:
+在自动登录过程中,
+.Ic open
+不会定义新的宏;
+.Ic close
+不会清除已有的宏定义;
+.Ic get
+和
+.Ic mget
+将文件从主连接的远端主机传送到副连接的远端主机;
+.Ic put  ,
+.Ic mput ,
+和
+.Ic append
+将文件从副连接的远端主机传至主连接的远端主机.
+第三方文件传输取决于副连接的远端主机是否支持 ftp 协议中的
+.Dv PASV
+命令.
+.It Ic put Ar local-file Op Ar remote-file
+将本地文件传至远端主机. 如果不指定参数
+.Ar remote-file,
+则根据当前的
+.Ic ntrans
+和
+.Ic nmap
+状态, 本地文件名在经过适当的转换后, 作为远端文件名使用.
+在文件传输过程中会用到当前的
+.Ic type,
+.Ic format,
+.Ic mode
+和
+.Ic structure
+状态.
+.It Ic pwd
+显示远端机器的当前路径.
+.It Ic quit
+同
+.Ic bye
+命令.
+.It Ic quote Ar arg1 arg2 ...
+将你指定的参数原样送到远端
+.Tn FTP
+服务器.
+(译者注: 你输入的 ftp 命令, 经由本地 ftp 客户程序解释,
+转换成 ftp 协议命令, 再发送给远端 ftp 服务程序.
+这些转换后的 ftp 协议命令, 叫做 raw ftp command,
+也就是本命令所能使用的参数. 关于这些参数, 请参阅 remotehelp 命令.
+下文中出现的大写字母的命令都是 raw ftp command.)
+.It Ic recv Ar remote-file Op Ar local-file
+同 get 命令.
+.It Ic reget Ar remote-file Op Ar local-file
+和 get 命令相似, 略有差异如下: 如果本地文件
+.Ar local-file
+的长度比远端文件
+.Ar remote-file
+短, ftp 会认为这是由于上一次传送异常中断,
+导致本地文件只是远端文件的开头一部分,
+故 reget 会从本地文件的最后开始续传.
+在连接不稳、经常异常断掉的网络中传送大文件时, 本命令会很有用.
+.It Ic remotehelp Op Ar command-name
+显示远端
+.Tn FTP
+服务程序的帮助信息. 如果指定了参数
+.Ar command-name,
+则此参数也会一并传给远端服务器.
+.It Ic remotestatus Op Ar file-name
+如果不指定参数, 本命令显示远端机器的状态.
+如果指定了参数
+.Ar file-name,
+则显示远端文件
+.Ar file-name
+的状态.
+.It Xo
+.Ic rename
+.Op Ar from
+.Op Ar to
+.Xc
+将远端机器上的文件
+.Ar from
+重命名为
+.Ar to.
+.It Ic reset
+清除应答队列. 本命令使本地 ftp 客户和远端 ftp 服务程序
+重新同步命令/应答序列. 远端 ftp 服务程序可能出错,
+并导致 ftp 协议出现错误, 此时需要使用本命令.
+.It Ic restart Ar marker
+使用本命令后, 接下来应使用一个
+.Ic get
+或
+.Ic put
+命令; 此时的 get 或 put 命令会从参数
+.Ar marker
+指定的
+.Ux
+系统文件偏移处 (一般以字节计算) 重传文件.
+.It Ic rmdir Ar directory-name
+删除远端机器上的目录.
+.It Ic runique
+转换 runique 状态, 即本地同名文件是否自动覆盖.
+如果 runique 状态为 off, 则在使用
+.Ic get
+或
+.Ic mget
+命令取远端文件到本地时, 远端文件会自动覆盖本地的同名文件;
+如果 runique 状态为 on, 则在文件同名时, 会在取回的文件名后加一个 .1;
+如果加了一个 .1 还是与本地文件重名, 则在远端文件名后加 .2;
+若还是重名, 加 .3; 以此类推, 如果直到 .99 还重名, 则会报错.
+新文件名会显示给用户. 注意
+.Ic runique
+状态并不影响本地 shell 命令的文件覆盖.
+缺省的
+.Ic runique
+状态为 off.
+.It Ic send Ar local-file Op Ar remote-file
+同 put 命令.
+.It Ic sendport
+转换 sendport 状态, 即是否使用
+.Dv PORT
+命令. 缺省状态下,
+.Nm ftp
+每建立一个连接进行数据传送时, 都会使用一个
+.Dv PORT
+命令. 使用
+.Dv PORT
+命令可以免掉多文件传输时的延迟时间.
+如果
+.Dv PORT
+命令失败,
+.Nm ftp
+会使用缺省的数据端口. 如果禁止使用
+.Dv PORT
+命令, 则在每次进行数据传送时不会使用
+.Dv PORT
+命令. 有些版本的
+.Tn FTP
+在具体实现中忽略了
+.Dv PORT
+命令, 但却错误地应答说已经接受了
+.Dv PORT
+指令, 此时就需要使用本命令.
+.It Ic site Ar arg1 arg2 ...
+本命令将参数作为
+.Dv SITE
+命令原样传给远端
+.Tn FTP
+服务器.
+.It Ic size Ar file-name
+显示远端机器上文件
+.Ar file-name
+的大小.
+.It Ic status
+显示
+.Nm ftp
+当前的各种状态.
+.It Ic struct Op Ar struct-name
+将文件传输结构
+.Ar structure
+设置为参数
+.Ar struct-name.
+缺省取值为 stream. ??
+.It Ic sunique
+转换 sunique 状态, 即远端同名文件是否自动覆盖.
+要使用本命令, 远端的 ftp 服务程序必须支持 ftp 协议中的
+.Dv STOU
+命令. 新生成的不同的远端文件名会显示给用户.
+缺省的 sunique 状态为 off, 即自动覆盖远端同名文件.
+.It Ic system
+显示远端机器的操作系统类型.
+.It Ic tenex
+设置文件传输方式为与
+.Tn TENEX
+机器通讯所需要的方式. ??
+.It Ic trace
+转换 trace 状态, 即是否跟踪每个数据包.
+.It Ic type Op Ar type-name
+将文件传送类型
+.Ic type
+设置为
+.Ar type-name.
+如果不指定参数, 则本命令显示当前文件传送类型.
+缺省的文件传送类型是网络
+.Tn ASCII
+类型.
+.It Ic umask Op Ar newmask
+设置远端机器上的文件掩码为
+.Ar newmask.
+如果不指定参数
+.Ar newmask,
+则本命令显示当前的文件掩码.
+.It Xo
+.Ic user Ar user-name
+.Op Ar password
+.Op Ar account
+.Xc
+使用
+.Op Ar user-name
+作为用户名登录远端
+.Tn FTP
+服务器. 如果不指定参数
+.Ar password,
+而远端服务器需要提供密码, 则
+.Nm ftp
+会提示用户输入密码 (无回显); 如果不指定参数
+.Ar account,
+而远端
+.Tn FTP
+服务器需要提供账号,
+.Nm ftp
+会提示用户输入账号.
+如果指定了参数
+.Ar account,
+而在登录过程中远端 FTP 服务程序不需要账号,
+则在登录完成以后会使用一个 account 命令将账号发送给服务器.
+一般而言,
+.Nm ftp
+在启动时, 会与远端
+.Tn FTP
+服务器建立连接并自动完成以上的登录过程.
+也可以在启动
+.Nm ftp
+时使用 -n 选项禁止此自动登录功能.
+.It Ic verbose
+转换 verbose 状态, 即是否显示详细信息.
+如果 verbose 状态为 on , 则会显示远端
+.Tn FTP
+服务器的每一个响应,
+并在文件传送结束后显示关于传输效率的统计信息.
+缺省的 verbose 状态为 on .
+.It Ic ? Op Ar command
+同 help 命令.
+.El
+.Pp
+如果参数含有空格, 需用使用一对引号 "" 将其引起来.
+.Sh 放弃当前文件传送 (ABORTING A FILE TRANSFER)
+按中断键 (一般为 Ctrl-C ) 可放弃当前文件传送.
+对发送文件而言, 此时当前发送过程会立刻终止;
+对文件接收, 此时会发送一个 ftp 协议中的
+.Dv ABOR
+命令到远端服务器, 而剩下未接受的数据会被丢弃.
+这个过程有快有慢, 具体取决于远端服务器如何实现
+.Dv ABOR
+命令. 如果远端服务器不支持
+.Dv ABOR
+命令, 则服务器会继续当前文件传送, 直到传送完成, 才再显示出提示符
+.Ql ftp>.
+.Pp
+如果所有的本地操作已经完成,
+.Nm ftp
+在等待远端服务器应答时,
+不会对中断键做出响应. 如果这时候 ftp 协议出了问题,
+或如上所述远端服务器不支持 ABOR 命令而坚持把当前文件发送完,
+用户就会等待很长时间得不到响应. 如果确实是 ftp 协议出了问题,
+用户必需手工杀掉这个
+.Nm ftp
+进程.
+.Sh 文件名转换 (FILE NAMING CONVENTIONS)
+.Nm ftp
+命令中, 若指定文件名作为参数, 则此文件名会经过以下几步的处理:
+.Bl -enum
+.It
+如果指定的文件名为
+.Sq Fl ,
+则在输出时使用标准输出
+.Ar stdin,
+在输入时使用标准输入
+.Ar stdout.
+.It
+如果指定的文件名首字母是
+.Sq \&|,
+则此参数余下的部分被当作是一个 shell 命令.
+.Nm Ftp
+会使用
+.Xr popen 3
+和所提供的参数创建一个 shell 进程,
+并使用标准输入 stdin (标准输出 stdout) 来进行读 (写) 操作.
+如果 shell 命令中包含空格, 则必须用引号将其引起来; 例如: 
+"ls -lt". 一个有用的例子是: "dir | more".
+.It
+如果上述两步处理失败, 而 globbing 状态为 on , 本地文件名会进行匹配,
+匹配规则同
+.Xr csh  1
+(参阅
+.Ic glob
+命令). 如果
+.Nm ftp
+命令只需要单个的本地文件作参数 (如
+.Ic put),
+则仅使用匹配结果里的第一个文件名.
+.It
+对
+.Ic mget
+和
+.Ic get
+命令而言, 如果不指定本地文件名, 则远端文件名在经过
+.Ic case,
+.Ic ntrans,
+或
+.Ic nmap
+转换后, 作为本地文件名使用. 如果
+.Ic runique
+状态为 on,
+本地文件名还可能加上一个后缀以免覆盖.
+.It
+对
+.Ic mput
+和
+.Ic put
+命令而言, 如果不指定远端文件名, 则本地文件名在经过
+.Ic ntrans
+或
+.Ic nmap
+转换后, 作为远端文件名使用. 如果
+.Ic sunique
+状态为 on,
+远端服务器可能还会给远端文件名加上一个后缀以免覆盖.
+.El
+.Sh 文件转换参数 (FILE TRANSFER PARAMETERS)
+FTP 规格说明书中指定了许多可能影响文件传送的参数.
+.Ic type
+可设置为 ascii, image (binary), ebcdic, 或 local byte size (一般用于
+.Tn PDP Ns -10's
+和
+.Tn PDP Ns -20's
+机器).
+.Nm Ftp
+支持 ascii 和 image 类型的文件传输, 对于
+.Ic tenex
+机器, 还支持 local byte size 8 方式的文件传输.
+.Pp
+其它可能影响文件传输的参数有
+.Ic mode,
+.Ic form,
+和
+.Ic struct.
+.Nm Ftp
+只支持这些参数的缺省值.
+.Sh 环境 (ENVIRONMENT)
+.Nm Ftp
+使用了以下的环境变量:
+.Bl -tag -width Fl
+.It Ev HOME
+本环境变量指明了文件
+.Pa .netrc
+的缺省路径, 如果其存在的话.
+.It Ev SHELL
+本环境变量指明了缺省的 shell.
+.El
+.Sh 参阅 (SEE ALSO)
+.Xr ftpd 8,
+RFC 959
+.Sh 历史 (HISTORY)
+.Nm ftp
+命令最初见于
+.Bx 4.2.
+.Sh 错误 (BUGS)
+对许多 ftp 命令而言, 其能否正确执行, 取决于远端服务器如何响应.
+.Pp
+使用
+.Bx 4.2
+的 ascii 方式传送文件时, 对回车换行符的处理有错误.
+本版本中已经修正了此问题, 但同时带来了另一个问题:
+使用 ascii 方式, 与
+.Bx 4.2
+服务器互传二进制文件时可能出错.
+要避免此问题, 请使用 binary image 类型来传送文件.

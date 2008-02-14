@@ -1,0 +1,54 @@
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Thu May 20 20:45:48 MET DST 1993
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" Modified Sat Jul 24 17:11:07 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Sun Nov 21 10:49:38 1993 by Michael Haardt
+.\" Modified Sun Feb 26 15:09:15 1995 by Rik Faith (faith@cs.unc.edu)
+.TH SHELLS 5 "November 21, 1993" "" "Linux Programmer's Manual"
+.SH NAME [命令名]
+shells \- 有效登录 shell 的路径名
+.SH 描述
+.B /etc/shells 
+是一个文本文件，其中包含有效登录 shell 的路径全名。
+.BR chsh(1) 
+需要参考这个文件，并且其他程序也可以查询该文件。
+有些程序从这个文件判断用户是不是标准用户。比如: ftp 守护进程
+一般不会允许那些所用的 shell 没有在该文件中注明用户访问。
+.SH 实例
+.B /etc/shells
+可能包含以下路径: 
+.sp
+.RS
+.BR /bin/sh 
+.br
+.B /bin/csh 
+.RE     
+.SH 相关文件
+.I /etc/shells   
+.SH 又见
+.BR chsh(1), getusershell(3)   
+.SH "[中文版维护人]"
+.B Redcandle <redcandle51@chinaren.com >
+.SH "[中文版最新更新]"
+.B 2000.10.29
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

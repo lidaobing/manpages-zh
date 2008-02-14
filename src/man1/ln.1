@@ -1,0 +1,157 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Chinese version Copyright Surran, BitBIRD of www.linuxforum.net
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH LN 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+ln \-在文件之间建立连接
+.SH 总览
+.BI "ln [options] source [dest]"
+.br
+.BI "ln [options] source...directory"
+.SH POSIX 选项：
+.B "[\-f]"
+.SH GNU 选项（缩写）：
+.B [\-bdfinsvF] 
+.B [\-S backup\-suffix]
+.B [\-V {numbered, existing, simple}]
+.B [\-\-help] [\-\-version] [\-\-]
+.SH 描述
+在Unix世界里有两个'link'（连接）概念，一般称之为硬连接和软连接。
+.BR 一个硬连接仅仅是一个文件名。（一个文件可以有好几个文件名，只有将
+.BR 最后一个文件名从磁盘上删除，才能把这个文件删掉。文件名的个数是由
+.BR ls(1)来确定的。所有的文件名都处于同一个状态，也就没有什么“源名字”
+.BR 之说。通常文件系统里的一个文件的所有名字包含着一样的数据信息，不
+.BR 过这样也不是必需的。）一个软连接（或符号连接）是完全不同的：它是
+.BR 一个包含了路径信息的小小的指定文件。因此，软连接可以指向不同文件
+.BR 系统里的文件（比如由NFS装载的不同机器文件系统上的文件），甚至可以
+.BR 指向一个不一定确实存在的文件。在软连接文件被访问（系统调用open(2)
+.BR 或stat(2)）的时候，操作系统用该文件所包含的路径替换该文件的访问介
+.BR 入点，从而实现对所指文件的访问。（用命令rm(1)和unlink(2)可以删除
+.BR 连接，但不是删除该文件所指向的文件。系统指定调用lstat(2)和readlink(2)
+.BR 来读取连接文件与其所指文件的状态。到底是对软连接文件操作，还是对被
+.BR 指向文件操作，由于不同操作系统件存在不同的系统调用，而存在着差异。）
+
+ln 在文件间产生连接。缺省时，产生硬连接，有\-s选项，则产生符号（软）连接。
+
+如果仅仅只给出一个文件名，那么ln将在当前目录里产生这个文件的连接，
+也就是说，以该文件（的最后一个）名称等同的名字在当前目录里产生一个连接
+（GNU范围内）；
+如果最后一个参数是一个已存在的目录名，
+ln 将在那个目录里给每一个源文件用以与源文件相同的文件名产生连接，
+（不同情况见以下\-\-no\-dereference的描述）；
+如果只给出两个文件名，ln将产生源文件的连接；
+如果最后一个参数不是一个目录名或多于两个文件名，则报错。
+
+缺省时，ln不删除已存在的文件或符号连接。
+（因此，它可以被用来锁定目标文件，即当dest已经不存在时）
+但选项\-f可以强制执行。
+
+在已存在的实现中，只有超级用户才能建立目录的硬连接。
+POSIX 禁止系统调用link(2)和ln建立目录的硬连接
+（但是允许在不同的文件系统间建立硬连接）。
+
+.SH POSIX 选项
+.TP
+.B "\-f "
+删除已存在的目的文件。
+.SH GNU 选项
+.TP
+.B "\-d, \-F, \-\-directory"
+允许超级用户建立目录硬连接。
+.TP
+.B "\-f, \-\-force"
+删除已存在的目的文件。
+.TP
+.B "\-i, \-\-interactive"
+提示是否删除已存在的目的文件。
+.TP
+.B "\-n, \-\-no\-dereference"
+当所给出的目的文件名是一个目录的符号连接时，将其视为一般文件处理。
+
+当目的目录名是一个确实存在的目录（不是一个符号连接）时，
+不进行模糊处理，而在那个目录里建立连接。
+但是当所指定的目的目录名是一个符号连接时，
+有两种方式来对待用户的要求。
+ln 会视目的为一个普通目录，并且在里面建立连接。
+或者如同符号连接本身一样地视其为一个非目录。
+这种情况下，ln 将在建立新连接之前删除或备份这个符号连接。
+缺省地，把符号连接视为普通目录来对待。
+.TP
+.B "\-s, \-\-symbolic"
+建立符号连接以替代硬连接。
+在不支持符号连接的系统上，这个选项仅仅会产生一个错误提示而已。
+.TP
+.B "\-v, \-\-verbose"
+在建立连接前显示所操作的文件名。
+.SH GNU 备份选项
+对于想备份那些有可能被覆盖、改写或者被破坏的文件，
+GNU提供了比如：cp, mv, ln, install和patch等命令。
+可以使用\-b参数生成备份文件。备份文件的名称由\-V参数指定。
+假如备份文件的名称是通过原文件名加后缀而得到，
+那么要用\-S参数来指定这个后缀。
+.TP
+.B "\-b, \-\-backup"
+备份文件。
+.TP
+.B "\-S SUFFIX，\-suffix=SUFFIX"
+在备份文件后添加"SUFFIX"(你的后缀)。如果不使用该参数，则使用环境变量
+SIM_PLE_BACHUP_SUFFIX，如果该环境变量没有设置，则缺省地使用'～'。
+.TP
+.B "\-V METHOD，\-version\-control=METHOD"
+指定备份文件如何命名。
+参数"METHOD"可以是'numbered'(或't')，
+'existing'(或'nil')，或'never'(或'simple')。
+如果不使用该参数，则使用环境变量VERSION_CONTROL，
+如果该环境变量没有设置，则缺省地使用
+'existing'。
+
+正确有效的METHOD参数对应于Emacs变量'version\-control'。(唯一被承认的缩写)：
+
+t, numbered
+产生数字标记形式的备份文件。
+
+nil, existiong
+对已有数字标记备份的文件进行数字备份，而简单备份其他类型文件。
+
+never, simple
+总是进行简单备份。
+
+
+.SH GNU 标准参数
+.TP
+.B "\-help"
+在标准输出上显示使用信息并顺利退出。
+.TP
+.B "\-version"
+在标准输出上显示版本信息并顺利退出
+.TP
+.B "\-\-"
+终端参数列表。
+
+
+.SH 环境变量
+变量LANG, LC_ALL, LC_COLLATE, LC_CTYPE和LC_MESSAGES具有通常意义。
+在GNU版本里，变量
+SIMPLE_BACKUP_SUFFIX和VERSION_CONTROL控制备份文件的命名。
+
+.SH 遵循
+POSIX 1003.2，尽管POSIX 1003.2(1996)没有讨论软连接。
+软连接在BSD中有介绍，在System V release3（或更老版本）系统中不出现。
+
+.SH 另见
+ls(1), rm(1), link(2), lstat(2), open(2), readlink(2), stat(2), unlink(2)
+
+.SH 注意
+本文出自应用文档－4.0，其他版本肯定会有微小差别。
+任何添加或纠错意见请寄：aeb@cwi.nl。
+程序Bugs请告知：fileutils\-bugs@gnu.ai.mit.edu
+
+.SH "[中文版维护人]"
+.B Surran <email>
+.SH "[中文版最新更新]"
+2000/10/19
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

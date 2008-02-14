@@ -1,0 +1,57 @@
+.TH EXPAND "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+expand \- 把 tab 符转换为空格符
+.SH "总览 (SYNOPSIS)"
+.B ../src/expand
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+把 各文件 FILE 中的 tab 符 转换为 空格符, 然后 写到 标准输出.
+如果 没有 指定 FILE, 或者 FILE 是 -, 就从 标准输入 读取 数据.
+.TP
+\fB\-i\fR, \fB\-\-initial\fR
+不要 转换 非空白符 后面 的 TAB 符
+.TP
+\fB\-t\fR, \fB\-\-tabs\fR=\fINUMBER\fR
+设置 tab 的 间隔 为 NUMBER 个 字符, 而 不再是 8
+.TP
+\fB\-t\fR, \fB\-\-tabs\fR=\fILIST\fR
+使用 明确的 tab 位置 列表, 每一项 用 逗号 隔开
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+可以 用 \fB\-NUMBER\fR 或 \fB\-LIST\fR 取代
+\fB\-t\fR NUMBER 或 \fB\-t\fR LIST.
+.SH "作者 (AUTHOR)"
+David MacKenzie.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B expand
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B expand
+程序, 使用 命令
+.IP
+.B info expand
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/14
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

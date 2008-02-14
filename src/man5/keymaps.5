@@ -1,0 +1,422 @@
+.\" @(#)keymaps.5 1.10 940130 aeb
+.TH KEYMAPS 5 "24 April 1998"
+.SH NAME
+keymaps \- 对键盘映射文件的描述
+
+.SH "描述 (DESCRIPTION)
+.IX "keymaps" "" "\fLkeymaps\fR \(em keyboard table descriptions for loadkeys and dumpkeys" ""
+.IX "loadkeys" "keyboard table descriptions" "\fLloadkeys\fR" "keyboard table descriptions"
+.IX "dumpkeys" "keyboard table descriptions" "\fLdumpkeys\fR" "keyboard table descriptions"
+.IX keyboard "table descriptions for loadkeys and dumpkeys" keyboard "table descriptions for \fLloadkeys\fR and \fLdumpkeys\fR"
+.IX "translation tables"
+.LP
+.BR loadkeys (1)
+能够 通过 调入 指定的 文件 修改 键盘翻译表, 键盘翻译表 通常 用于 内核的 
+键盘驱动程序; 另外 
+.BR dumpkeys (1)
+可以 根据 键盘翻译表 产生 这些文件.
+
+.LP
+这些文件 的 结构 大体上 和
+.BR xmodmap (1)
+的 输入文件 类似. 文件 由 字符集(charset), 键定义(key), 和 串定义 组成,
+可以 包含 注释.
+
+.LP
+注释行 以
+.B !
+或
+.B #
+字符 开始, 到 行尾 结束, 忽略 其中 任何 字符.
+注意, 注释行 不需要 从 第一列 开始, 而
+.BR xmodmap (1)
+有 这个 要求.
+
+.LP
+键盘映射(keymap)文件 是 面向行 定义 的; 一个 完整的定义 必须 在 一个 逻辑行
+上 阐明. 不过 逻辑行 可以 分割 在 多个 物理行 上, 只需 在 各个 物理行尾 添加
+一个 反斜杠 (\\) 即可.
+
+.SH "包含文件 (INCLUDE FILES)"
+一个 键盘映射表 可以 包含 其他 键盘映射表, 就象这样:
+.LP
+.RS
+include "pathname"
+.RE
+
+.SH "字符集定义 (CHARSET DEFINITIONS)"
+字符集 定义 的 格式 是:
+.LP
+.RS
+.EX
+charset "iso-8859-x"
+.EE
+.RE
+.LP
+它 指出 如何 解释 后面的 keysym.
+例如, 在 iso-8859-1 中, 符号 mu (或 micro) 的 代码是 0265,
+而 iso-8859-7 中的 mu 是 0354.
+
+.SH "键值的完整定义 (COMPLETE KEYCODE DEFINITIONS)"
+键值(keycode) 的 完整定义 形式 如下:
+.LP
+.RS
+.nf
+.BI keycode " keynumber " = " keysym keysym keysym" \fR...
+.fi
+.RE
+.LP
+.I keynumber
+是 按键的 内部 标识值, 大致 相当于 它的 扫描码(scan code).
+.I keynumber
+可以 用 十进制数, 八进制数, 或 十六进制数 表示. 
+八进制数 以 零 开始, 十六进制数 以
+.B 0x
+开始.
+.LP
+.I keysym
+表示 键盘 动作(action), 单个 按键 可以 编联(bind) 多至 256 个 动作.
+动作 指 输出 Latin1 字符 或 字符序列, 切换 控制台 或 键盘映射, 以及
+重启动 机器 等. (可以 用 dumpkeys(1) 获得 完整的 列表, 如 
+.BI " dumpkeys -l"
+\&.)
+.LP
+在
+.I keysym
+前面 加上 前缀 '+' (加号) 表明 这个 keysym 是 字符, 因而 能够 受到
+CapLock 的 影响, 就象 Shift 的 作用 一样 (CapLock 反转 Shift 的 状态).
+缺省情况下, 配合 CapLock 能够 产生 ASCII 字母 'a'-'z' 和 'A'-'Z'.
+如果 Shift+CapsLock 无法 产生 小写字母, 试在 映射文件 中 加入
+.LP
+.RS
+.nf
+.BI "keycode 30 = +a  A"
+.fi
+.RE
+
+.LP
+当 一个 按键 按下时, 发生 什么 事件 取决于 当时 哪个 修饰键(modifier)
+起作用. 键盘驱动程序 支持 8 个 修饰键, 它们是 (任意顺序)
+Shift, AltGr, Control, Alt, ShiftL, ShiftR, CtrlL 和 CtrlR.
+下面 的 表格 列出 各个 修饰键 对应的 权值, 权值 是 2 的 指数:
+.LP
+.RS
+.TP 24
+.I 修饰键
+.I 权值
+.TP 24
+Shift
+  1
+.PD 0
+.TP 24
+AltGr
+  2
+.TP 24
+Control
+  4
+.TP 24
+Alt
+  8
+.TP 24
+ShiftL
+ 16
+.TP 24
+ShiftR
+ 32
+.TP 24
+CtrlL
+ 64
+.TP 24
+CtrlR
+128
+.PD
+.RE
+.LP
+按键 的 有效动作 通过 加权值 获得, 加权值 是 有效修饰键 的 权值和.
+缺省情况下 没有 使用 修饰键, 对应的 动作代码 是 0, 也就是说, 当一个键
+按下 或 弹起 时, 相应 动作 位于 键定义行 的 第一列. 又如, 如果 Shift 和
+Alt 键 处于 有效状态, 产生的 动作代码 是 9 (对应 第十列).
+
+.\" (译注: 作者 对 修饰键 状态 一直 使用 有效(in effect) 一词, 译者 的 理解 是, 
+.\" 修饰键 不能 简单的 以 按下和弹起 确定 其 状态, 键盘驱动程序 能够 重定义 
+.\" 修饰键 行为, 例如, 按 一下 表示 生效, 再按 一下 表示 解除)
+
+.LP
+通过 编联 适当的 动作, 我们 可以 改变 有效的 修饰键.
+例如, 如果 对 某个键 编联了 名称 Shift, 当 这个键 按下 时, shift 修饰键
+就 生效, 当 这个键 弹起 时, shift 修饰键 状态 就 解除. 
+如果 对 某个键 编联了 名称 AltGr_Lock, 当 按下 这个键 时, AltGr 修饰键 就
+生效, 再次 按下 这个键 就 解除 AltGr 修饰键 状态.
+(缺省情况下, Shift, AltGr, Control 和 Alt 编联到 同名 按键 上;
+AltGr 指 右侧 Alt 键.)
+.LP
+注意, 编联 修饰键 时 应该 非常 小心, 否则 键盘映射 可能 无法 使用.
+例如, 如果 某个键 的 第一列 定义为 Control, 其他列 定义为 VoidSymbol, 你 就
+有麻烦 了. 因为 按下 这个键 使 Control 修饰键 生效, 随后 的 动作 应该 来自
+第五列 (见上表). 因此 当 这个键 弹起 时, 第五列 的 动作 被 采用, 但 这里 是 
+VoidSymbol, 什么 都 不发生. 这意味着 尽管 你 已经 松开了 这个键, 可是 Control
+修饰键 仍然 有效. 反复 敲击 这个键 也 无济于事. 要 避免 这样 的 事情, 你 应该
+把 所有的 列 定义为 相同的 修饰符, 为此 后面 将要 介绍 一个 常用的 缩写.
+
+.LP
+.I keysym
+可以 采用 十进制数, 八进制数, 十六进制数 或者 符号表示法.
+数字表示 的 形式 和
+.IR keynumber 
+一样, 而 符号表示 类似于
+.BR xmodmap (1)
+中 用的. 需要注意 数字符号 的 区别.
+数字符号 '0', ..., '9' 在
+.BR xmodmap (1)
+中 被换成 对应的 单词 'zero', 'one', ... 'nine', 防止 和 数字表示法 混淆.
+
+.LP
+在
+.I keysym
+中 使用 数字表示法 非常 不利于 移植, 这是 因为 不同 的 内核版本 之间, 各键 
+的 动作代码 可能 不一样, 因此 不鼓励 使用 数字表示法, 除非 内核 支持的 某项
+键盘动作 在 当前的 
+.BR loadkeys (1)
+中 没有 对应的 符号名称.
+
+.LP
+下面 介绍 一些 缩写 标记, 它们 能够 增加 可读性, 减少 输入量, 同时
+也能 减少 输入错误.
+.LP
+首先, 你 可以 给出 一个 映射说明行, 如
+.LP
+.RS
+.EX
+keymaps 0-2,4-5,8,12
+.EE
+.RE
+.LP
+表明 键定义行 并不 使用 全部的 256 列, 而 只用 指定的 列. 
+(本例为: 映射 plain, Shift, AltGr, Control, Control+Shift, Alt 和 
+Control+Alt, 只有 7 列, 而非 256 列.)
+如果 没有 定义 这样的 映射说明行, 将 产生 缺省 定义 keymaps 0-M, 
+此处的 M+1 是 所有 键定义行 中 发现 的 最大项数.
+
+.LP
+其次, 键定义行尾 的 VoidSymbol 项 可以 不出现. VoidSymbol 表示 一个
+键盘动作, 它 不产生 输出, 也不出现 其他 效果. 例如, 把 30 号键 定义为
+输出 'a', 按下 Shift 时 输出 'A', 按下 其他 修饰键 如 AltGr 之类 则
+什么都 不做, 你 可以 写成
+.LP
+.RS
+.nf
+keycode  30 = a	A
+.fi
+.RE
+.LP
+来 代替 冗长的
+.LP
+.RS
+.nf
+keycode  30 = a	A	VoidSymbol	VoidSymbol \\
+		VoidSymbol VoidSymbol VoidSymbol ...
+.fi
+.RE
+.LP
+为了方便, 你 可以 用 更简洁 的 定义. 如果 键定义行 中, 等号 后面 只有 一个
+动作码, 它 就可以 拥有 额外的 含义. 如果 这个 动作码 (数字 或 符号 形式)
+不是 一个 ASCII 字符, 这 意味着 该 动作码 在 所有 定义了的 行 上 有效.
+反过来, 如果 动作码 是 ASCII 字符, 位于 'a', ..., 'z' 或 'A', ..., 'Z' 
+之间, 对于 不同的 修饰键组合, 有 如下 定义
+(下表 列出 两种 可能情况: 动作码 是 一个 小写字母, 表示为 'x', 或者是 一个
+大写字母, 表示为 'Y'.)
+.LP
+.RS 4
+.TP 24
+.I modifier
+.I symbol
+.TP 24
+none
+x			Y
+.PD 0
+.TP 24
+Shift
+X			y
+.TP 24
+AltGr
+x			Y
+.TP 24
+Shift+AltGr
+X			y
+.TP 24
+Control
+Control_x		Control_y
+.TP 24
+Shift+Control
+Control_x		Control_y
+.TP 24
+AltGr+Control
+Control_x		Control_y
+.TP 24
+Shift+AltGr+Control
+Control_x		Control_y
+.TP 24
+Alt
+Meta_x		Meta_Y
+.TP 24
+Shift+Alt
+Meta_X		Meta_y
+.TP 24
+AltGr+Alt
+Meta_x		Meta_Y
+.TP 24
+Shift+AltGr+Alt
+Meta_X		Meta_y
+.TP 24
+Control+Alt
+Meta_Control_x	Meta_Control_y
+.TP 24
+Shift+Control+Alt
+Meta_Control_x	Meta_Control_y
+.TP 24
+AltGr+Control+Alt
+Meta_Control_x	Meta_Control_y
+.TP 24
+Shift+AltGr+Control+Alt
+Meta_Control_x	Meta_Control_y
+.PD
+.RE
+.LP
+.SH "单一修饰键定义 (SINGLE MODIFIER DEFINITIONS)"
+上述 键定义行 的 格式 总要 定义 全部 M+1 个 可能的 组合, 无论 该行 是不是
+真的 有 那么多 动作. 然而 还有 另一种 语法定义, 用来说明 只产生 一个 动作
+的 特定键组合. 如果 你的 键盘映射 只有 少数 不符合 需要, 如 AltGr+function
+键, 这个 功能 就特别 有用. 你 可以 制作 一个 小型文件, 在 调入 键盘映射文件
+后 重定义 所需的 映射. 这种 形式 的 语法 是:
+.LP
+.BR "" { " plain " "| <modifier sequence> } " keycode
+.I keynumber
+.B =
+.I keysym
+.LP
+例如:
+.RS
+.EX
+.nf
+plain keycode 14 = BackSpace
+control alt keycode 83 = Boot
+alt keycode 105 = Decr_Console
+alt keycode 106 = Incr_Console
+.fi
+.EE
+.RE
+这里的 "plain" 指 该键的 基本动作 (就是说, 没有 使用 修饰键 时),
+不影响 该键 的 其他 修饰键 组合.
+
+.SH "字符串定义 (STRING DEFINITIONS)"
+除了 注释 和 键定义行, 键盘映射表 还包含 字符串定义. 它们 用于 定义
+各个 功能键(function key) 的 动作码 输出 些 什么. 字符串定义 的 语法 是:
+.LP
+.RS
+.B string
+.I keysym
+.B =
+.BI
+"text"
+.RE
+.LP
+.I text
+包括 文本字符, 八进制字符, 或者 三个 escape 序列: \fB\\n\fP, \fB\\\\\fP, 
+和 \fB\\"\fP, 分别 代表 换行, 反斜杠, 和 引号. 八进制字符 的 格式 是 
+反斜杠 后面 列出的 八进制数字, 最多 三个 八进制数字.
+
+
+.SH "组合定义 (COMPOSE DEFINITIONS)"
+组合(键)定义 的 语法 是:
+.LP
+.RS
+.BI "compose '" char "' '" char "' to '" char "'"
+.RE
+描述 两个 字节 怎样 组合成 第三者 (当 使用 少见的 声调符 或 组合键 时).
+它 常用来 在 标准键盘 上 输入 声调符 之类.
+
+.SH "缩写 (ABBREVIATIONS)
+从 kbd-0.96 开始 可以 使用 多种 缩写.
+.TP
+.B "strings as usual"
+定义 常用 字符串 (而不是 它们 编联的 键).
+.TP
+\fBcompose as usual for "iso-8859-1"\fP
+定义 常用 compose 组合.
+.LP
+如果 想要 知道 哪些
+.I keysym
+能够 用在 键盘映射表 中, 请 使用
+.LP
+.RS
+.nf
+.B dumpkeys --long-info
+.fi
+.RE
+.LP
+遗憾的是, 目前 仍然 没有 对 各个 符号 的 说明. 您 可以 从 符号名称 上
+推测, 或者 参考 内核源程序.
+.LP
+
+.SH "示例 (EXAMPLES)"
+(小心 使用 keymaps 行, 如 `dumpkeys` 显示的 第一行, 或者 "keymaps 0-15" 之类)
+.LP
+下面的 输入项 交换 左侧 Control 键 和 Caps Lock 键 的 功能:
+.LP
+.RS
+.nf
+keycode  58 = Control
+keycode  29 = Caps_Lock
+.fi
+.RE
+.LP
+正常的时候, 键值 58 是 Caps Lock, 键值 29 是 Control 键.
+.LP
+下面的 输入项 使 Shift 键 和 CapsLock 键 更好用 一点, 象 老式 打字机.
+就是说, 按下 Caps Lock 键 (一次 多次 皆可) 使 键盘 进入 CapsLock 状态,
+按 任一 Shift 键 解除 该 状态:
+.LP
+.RS
+.nf
+keycode  42 = Uncaps_Shift
+keycode  54 = Uncaps_Shift
+keycode  58 = Caps_On
+.fi
+.RE
+.LP
+下面的 输入项 设置 增强形键盘 的 编辑键, 使 它 更象是 VT200 系列 终端:
+.LP
+.RS
+.nf
+keycode 102 = Insert
+keycode 104 = Remove
+keycode 107 = Prior
+shift keycode 107 = Scroll_Backward
+keycode 110 = Find
+keycode 111 = Select
+control alt   keycode 111 = Boot
+control altgr keycode 111 = Boot
+.fi
+.RE
+.LP
+下面是 一个 示范, 将 字符串 "du\\ndf\\n" 和 AltGr-D 编联. 我们 使用了
+"空闲的" 动作码 F100, 通常 它 没有被 使用:
+.LP
+.RS
+.nf
+altgr keycode 32 = F100
+string F100 = "du\\ndf\\n"
+.LP
+
+.SH "另见 (SEE ALSO)"
+.BR loadkeys (1),
+.BR dumpkeys (1),
+.BR showkey (1),
+.BR xmodmap (1)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

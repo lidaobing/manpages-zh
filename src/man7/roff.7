@@ -1,0 +1,1206 @@
+.ig
+roff.man
+
+Last update: 22 Apr 2002
+
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+written by Bernd Warken <bwarken@mayn.de>
+maintained by Werner Lemberg <wl@gnu.org>
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this .ig-section and AUTHORS, with no
+Front-Cover Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+..
+.
+.\" --------------------------------------------------------------------
+.\" Setup
+.\" --------------------------------------------------------------------
+.
+.mso www.tmac
+.
+.if n \{\
+.  mso tty-char.tmac
+.  ftr CR R
+.  ftr CI I
+.  ftr CB B
+.\}
+.
+.if '\*[.T]'dvi' \{\
+.  ftr CB CW
+.\}
+.
+.
+.\" --------------------------------------------------------------------
+.\" String definitions
+.
+.\" Final `\""' comments are used to make Emacs happy, sic \""
+.
+.\" The `-' sign for options.
+.ie t \{\
+.  ds @- \-\"
+.  ds @-- \-\-\"
+.\}
+.el \{\
+.  ds @- -\"
+.  ds @-- --\"
+.\}
+.
+.ds Comment \.\[rs]\[dq]\"
+.ds Ellipsis \.\|.\|.\&\"
+.
+.
+.\" --------------------------------------------------------------------
+.\" Begin of macro definitions
+.
+.de c
+.\" this is like a comment request when escape mechanism is off
+..
+.
+.eo
+.
+.c ---------------------------------------------------------------------
+.
+.de Text
+.  nop \)\$*
+..
+.
+.de CodeSkip
+.  ie t \
+.    sp 0.2v
+.  el \
+.    sp
+..
+.
+.de Esc
+.  ds @1 \$1\"
+.  shift
+.  Text \f[B]\[rs]\*[@1]\f[]\$*
+.  rm @1
+..
+.
+.de QuotedChar
+.  ds @1 \$1
+.  shift
+.  nop `\f[B]\*[@1]\f[]'\$*
+.  rm @1
+..
+.
+.c --------------------------------------------------------------------
+.
+.c a shell command line
+.de ShellCommand
+.  br
+.  ad l
+.  nh
+.  Text \f[I]sh#\h'1m'\f[]\f[CR]\$*\f[]\&\"
+.  ft R
+.  ft P
+.  hy
+.  ad
+..
+.
+.c --------------------------------------------------------------------
+.
+.c ShortOpt ([c [punct]])
+.c
+.c `-c' somewhere in the text.
+.c The second argument is some trailing punctuation.
+.c
+.de ShortOpt
+.  ds @1 \$1\"
+.  shift
+.  nh
+.  Text \f[CB]\*[@-]\f[]\f[B]\*[@1]\f[]\/\$*
+.  hy
+.  rm @1
+..
+.
+.de TP+
+.  br
+.  ns
+.  TP \$1
+..
+.
+.c --------------------------------------------------------------------
+.
+.c Topic
+.c
+.de Topic
+.  TP 2m
+.  Text \[bu]
+..
+.
+.ec
+.\" End of macro definitions
+.
+.
+.\" --------------------------------------------------------------------
+.\" Title
+.\" --------------------------------------------------------------------
+.
+.TH ROFF 7 "23 April 2002" "Groff Version 1.18.1"
+.SH NAME
+roff \- roff 排版系统的概念和历史
+.
+.
+.\" --------------------------------------------------------------------
+.SH "描述 DESCRIPTION"
+.\" --------------------------------------------------------------------
+.
+.I roff
+是一系列排版程序，如
+.IR troff ,
+.IR nroff ,
+.IR ditroff ,
+.IR groff ,
+等等的通称。
+.
+一个 roff 排版系统包含一个可扩展的文本格式化语言和一系列程序用以打印和转换为其他文本格式。
+.
+传统的，它是 Unix 的主要文本处理系统；现在，每个 类Unix 操作系统仍然附带一个 roff 系统作为核心软件包。
+.
+.P
+当今最普遍的 roff 系统是自由软件的实现
+.IR "GNU roff",
+.BR groff (1).
+.
+groff 之前的实现被称为传统的
+.I classical
+实现 (从 1973 年开始)。
+.
+.I groff
+实现了它的传统的前辈的用法和功能，并且加入了更多扩展。
+.
+当前，由于
+.I groff
+是唯一可以在 (几乎是) 任何计算机系统上都可用的 roff 系统，因此它是事实上的 roff 标准。
+.
+.P
+在一些古老的 Unix 系统中，有一个叫做
+.B roff
+的可执行文件，实现了甚至更加古老的
+.I Multics
+操作系统中的
+.B runoff 。
+参见
+.BR HISTORY
+段落。
+它的功能非常有限，即使与古老的 troff 相比；它不再被支持了。
+.
+因此，在本文档中，
+.I roff
+总是泛指 roff 系统
+.IR "roff system" 
+，不是古老的 roff 可执行文件
+.
+.P
+尽管历史悠久，roff 当前还在广泛使用中，例如，UNIX 系统的手册页
+.RI ( man\~pages\/ )
+，很多软件书籍，系统文档，标准和团体组织的文档都是用 roff 来写的。
+.
+roff 在文本设备上的输出效果仍然是无可比拟的，
+并且，与其他自由的排版系统相比，它的图形输出也不差，
+甚至强于很多商业的系统
+.
+.P
+最普遍的 roff 的应用是手册页
+.I manual pages
+(简称
+.IR "man pages") ;
+它是很多操作系统中的标准文档系统
+.
+.P
+此文档描述了围绕
+.IR "roff system" 
+开发的一些历史事件；
+所有 roff 版本在用法方面的一些共同点，
+roff 管道的细节－－它经常被掩盖在类似
+.BR groff (1)
+等等的 “前端” 之后；
+对排版语言的一般的概述；
+一些写 roff 文档的技巧；
+还有到更多资料的链接
+.
+.
+.\" --------------------------------------------------------------------
+.SH "历史 HISTORY"
+.\" --------------------------------------------------------------------
+.
+.I roff
+文本处理系统有很长的一段历史，可以回溯到60 年代。
+.
+roff 系统自身与 Unix 操作系统关系密切，
+但是它的起源要从更早的操作系统 CTSS 和 Multics 开始。
+.
+.
+.\" --------------------------------------------------------------------
+.SS "祖先 The Predecessor runoff"
+.\" --------------------------------------------------------------------
+.
+.P
+.I roff
+系统的演变与操作系统的历史紧密联系。
+.
+它的 “先祖”
+.B runoff
+是
+.I Jerry Saltzer
+在
+.I CTSS
+操作系统
+.RI ( "Compatible Time Sharing System" 
+，兼容分时系统 (?)，1961)
+上的作品。
+.
+CTTS 后来发展成为操作系统
+.URL http://\:www.multicians.org "Multics" ,
+Unix 的一个著名的来源，出现于 1963，同时
+.I runoff
+成为文档和文本处理的主要格式。
+.
+当时，这两种操作系统只能运行在非常昂贵的计算机之上，
+因此它们大部分用于研究和官方及军队的任务之中
+.
+.P
+与现代的 roff 相比，
+.I runoff
+语言可以做的事非常有限。
+.
+在 60 年代，只能产生文本的输出。
+.
+这可以用一个长度为\~2 的命令 (request) 的集合实现，
+这些命令的绝大部分都保持不变地被 roff 采用。
+.
+这种语言的模型是根据 “前计算机时代” 的排版习惯而建立的，
+那时，以点 (dot, `.') 开头的行被写在手稿中，
+向之后进行手工排版工作的工人指示格式化的要求
+.
+.P
+开始，runoff 程序是用
+.I PL/1
+语言写成的，后来用
+.IR BCPL 
+来写－－那是
+.IR C \~\c
+编程语言的 “祖母”。
+.
+在 Multics 操作系统中，帮助系统由 runoff 来处理，
+与 roff 管理 Unix 手册页的作用类似。
+.
+仍然有 runoff 语言写成的文档，
+例如可以到 Saltzer 的主页看看。参见
+.BR "SEE ALSO" 
+段
+.
+.
+.\" --------------------------------------------------------------------
+.SS "传统的 nroff/troff 系统 The Classical nroff/troff System"
+.\" --------------------------------------------------------------------
+.
+在 70 年代，Multics 的后裔 (offspring)
+.I Unix
+变得越来越普遍，因为它可以运行在廉价的计算机上，
+并且那时在大学里可以很容易地获得。
+.
+在 MIT (麻省理工，the Massachusetts Institute of Technology), 
+有人想在一台运行 Unix 的 PDP-11 计算机上驱动 Wang (王安公司?) 的
+.I Graphic Systems CAT
+排字机，一种图形化的输出设备。
+.
+由于 runoff 在这种任务上能力有限，它被
+.IR "Josef F. Osanna" ,
+(Multics 操作系统的主要开发者之一，几个 runoff 移植系统的作者)
+继续开发，成为一种更强大的文本排版系统
+.
+.P
+.I runoff
+这个名字被简化为
+.IR roff .
+Ocsanna 所设想的，极大扩展了的语言已经包含了一个完整的
+.IR "roff" 
+系统的所有元素。
+.
+所有现代的 roff 系统都试图实现同这个系统兼容。
+.
+因此 Joe Osanna 是当之无愧的所有 roff 系统之父
+.
+.P
+最早的
+.I roff 
+系统有三个排版程序
+.
+.TP
+.B troff
+.RI ( "typesetter roff\/" )
+为它唯一支持的
+.I CAT
+排字机产生一个图形的输出
+.
+.TP
+.B nroff
+为终端和文本打印机产生合适的文本输出
+.
+.TP
+.B roff
+对最初的 runoff 程序的有限功能进行重新实现；
+这个程序在后来的版本中被抛弃。
+.
+现在，
+.I roff
+这个名字只用来指代一个 troff/\:nroff 系统的整体
+.
+.P
+Osanna 的第一版用 PDP-11 的汇编语言实现，发布于 1973.
+.
+.I Brian Kernighan
+加入到
+.I roff
+的开发中，使用 C\~编程语言将它进行了重写。
+.
+C\~版本发布于 1975.
+.
+.P
+.BR nroff / troff
+程序使用的排版语言的语法记载在著名的
+.IR "Troff User's Manual [CSTR\~#54]"
+中，出版于 1976, Brian Kernighan 对它不断修订，直到 1992 年。
+.
+此文档是对传统的
+.IR "classical troff" 
+的说明. 所有后来的
+.I roff
+系统都试着与这个说明实现兼容
+.
+.P
+1977 年，Osanna 在他\~50 岁时，由于一次突发的心脏病而去世。
+Kernighan 继续开发 troff。
+.
+下一个开发目标是赋予 troff 一个更一般的接口，以支持更多设备，
+中间输出格式和 “后处理” 系统。
+.
+这使得
+.I "roff"
+系统的结构趋于完整，现在仍然被使用。参见
+.BR "USING ROFF" 
+段。
+.
+1979 年，它们被写入论文
+.IR "[CSTR\~#97]" .
+这个新的 troff 版本是所有现存的较新的 troff 系统的基础，包括
+.IR groff .
+.
+在一些系统上，这个设备无关的
+.I troff
+有一个可执行文件叫做
+.BR ditroff (7).
+.
+所有现代的
+.B troff
+程序都已经自动提供了对 distroff 完整的兼容性
+.
+.
+.\" --------------------------------------------------------------------
+.SS "商业化 Commercialization"
+.\" --------------------------------------------------------------------
+.
+免费的 Unix\~7 操作系统商业化之后，出现了严重的退步。
+.
+一大批不同的操作系统浮出水面，为他们所作的扩展间的互不兼容而争斗。
+.
+幸好，这种不兼容没有影响到原始的 troff。
+.
+所有不同的商业版本的 roff 系统都大量使用了 
+Osanna/\:Kernighan 的开放的源代码和文档，但是却将其作为
+.BI "它们的" 
+系统 (\[lq]their\[rq] system) 出售\[em] 只有很少的修改
+.
+.P
+古老的 Unix 和传统的 troff 的源代码在长达 20 年时间里不再可以自由获得。
+.
+.P
+幸运的是，Caldera 收购了 SCO UNIX (2001).
+.
+随后，Caldera 使得源代码可以在网上获得，允许用于非商业用途。参见
+.BR "SEE ALSO" 
+段
+.
+.P
+(译注：谁能想到，现在，2003 年，SCO会成为自由软件和开源软件界共同的敌人呢？
+而Caldera 又在什么地方呢？)
+.
+.
+.\" --------------------------------------------------------------------
+.SS "自由的 Free roff"
+.\" --------------------------------------------------------------------
+.
+任何商业的 roff 系统都无法成为 roff 开发中的后继者。
+.
+商业社会中的每个人都只对他们自己的事情感兴趣。
+.
+这使得曾经如此优秀的 Unix 操作系统在 80 年代一蹶不振
+.
+.P
+作为对如此快速的商业化过程的补救
+(As a counter-measure to the galopping commercialization，还请重新翻译)，
+AT&T Bell Labs 贝尔实验室试图发起一个恢复性的项目 (？，a rescue project) ，使用他们的
+.I Plan\~9
+操作系统。
+.
+它可以免费用于非商业用途，甚至包含了源代码。
+但是它有一个专利许可证，that empedes the free development ( 还请解释词义)。
+.
+这种想法早已过时，因此 Plan\~9 没有被主流开发者接受为自己的平台
+.
+.P
+真正的补救措施 (？， remedy) 是不断出现的自由操作系统
+(386BSD, GNU/\:Linux, 等等.) 和 80 年代到 90 年代的自由软件工程。
+.
+他们实现了传统的 Unix 的特性和很多扩展，因此旧的 “XP体验” 不会丢掉
+(such that the old experience is not lost)。
+.
+进入 21 世纪，类 Unix 系统重新成为计算机工业中的主导因素 \[em] 这要感谢自由软件
+.
+.P
+最重要的自由 roff 计划是 GNU 移植版本的 troff，
+由 James Clark 建立，使用
+.URL http://\:www.gnu.org/\:copyleft "GNU Public License" .
+.
+它叫做
+.I groff
+.RI ( "GNU roff" ).
+参见
+.BR groff (1)
+中的概述
+.
+.P
+groff 系统仍然在继续开发。
+.
+它与传统 troff 兼容，但是还添加了很多扩展。
+.
+它是第一个可以在几乎所有操作系统上运行的 roff 系统并且 \[em] 它是自由开放的。
+.
+这使得 groff 成为现在 roff 的事实标准
+.
+.
+.\" --------------------------------------------------------------------
+.SH "使用 USING ROFF"
+.\" --------------------------------------------------------------------
+.
+很多人不会注意到他们在使用 roff。
+.
+当你阅读一份手册页 (man page) 时，roff 工作在后台。
+.
+roff 文档可以使用
+.BR xditview (1x)
+程序查看，它是一个 X 发行版的标准程序。参见
+.BR X (7x).
+.
+但是显式地使用 roff 也不困难
+.
+.P
+一些 roff 实现提供了包装程序，使得人们可以简单地在命令行使用 roff 系统。
+.
+例如，GNU 的 roff 实现
+.BR groff (1)
+提供了命令行选项来避免传统 troff 中过长的的命令管道；
+.BR grog (1)
+程序试着从文档猜测应当使用什么参数来运行 groff；
+不习惯于指定命令行选项的人应当用
+.BR groffer (1)
+程序来图形化地显示 groff 文件和手册页
+.
+.
+.\" --------------------------------------------------------------------
+.SS "管道 The roff Pipe"
+.\" --------------------------------------------------------------------
+.
+roff 系统由预处理器 (preprocessor)，roff 排版程序和后处理器 (postprocessor) 组成。
+.
+这种结构使用了大量的管道
+.I piping
+机制，意思是，一系列的程序陆续地被调用，
+队列中的每个程序的输出就作为下一个程序的输入
+.
+.CodeSkip
+.
+.ds @1 "cat \f[I]file\f[P] |\""
+.ds @2 "\*[Ellipsis] | \f[I]preproc\f[P] | \*[Ellipsis] |\""
+.ds @3 "troff \f[I]options\f[P] | \f[I]postproc\f[P]\""
+.
+.ShellCommand "\*[@1] \*[@2] \*[@3]"
+.
+.rm @1
+.rm @2
+.rm @3
+.P
+预处理器产生 roff 代码，传给一个 roff 处理器 (例如，troff)，
+然后 roff 处理器接下来产生中间输出，传给一个后处理器程序，
+用来打印或者产生最终输出
+.
+.P
+所有这些组件都使用它们自己的程序语言；
+每种语言是与其他组件完全无关的。
+.
+此外，还可以包括为特殊目标而制作 (tailor) 的 roff 宏包
+.
+.P
+大多数 roff 文档中掺杂着使用一些包中的宏、
+一个或多个预处理器的代码，还会添加 roff 语言中的一些元素。
+.
+用户很少需要用到 roff 排版语言的完整功能；
+只有宏包的作者需要知道底层细节 (gory details)
+.
+.
+.
+.\" --------------------------------------------------------------------
+.SS "预处理器 Preprocessors"
+.\" --------------------------------------------------------------------
+.
+预处理器是任何产生符合 roff 排版语言语法的输出的程序。
+.
+每个预处理器都有它自己的语言，在预处理器运行时被翻译为 roff 代码。
+.
+roff 文档中可以包含以这种语言写成的片段；
+它们可以被特殊的 roff 命令或宏识别
+(they are identified by special roff requests or macros)。
+.
+加入了预处理器代码的文档必须通过所有相应的预处理器处理之后，
+才能传给真正的 roff 排版程序，
+因为真正的 roff 排版程序会忽略所有陌生的代码。
+.
+预处理器只会分析并转换指定由它处理的文档部分
+.
+.P
+有大量的自由/商业 roff 预处理器。
+.
+一些不能在所有系统上使用，
+还有一些预处理器被认为是 roff 系统不可分割的部分。
+.
+传统的预处理器有
+.
+
+.de @TP
+.\" local indent for .TP
+.TP \\w'\\f[B]soelim\\f[P]'u+2n
+..
+.P
+.RS
+.PD 0
+.@TP
+.B tbl
+制表 (table)
+.@TP
+.B eqn
+数学公式 (mathematical formul\[ae])
+.@TP
+.B pic
+绘图 (diagram)
+.@TP
+.B refer
+书目索引 (bibliographic references)
+.@TP
+.B soelim
+包含标准位置的宏文件 (macro)
+.PD
+.RE
+.
+.P
+其他已知预处理器，但不是在所有系统上都可用，包括
+.
+.P
+.RS
+.PD 0
+.@TP
+.B chem
+化学公式 (chemical formul\[ae])
+.@TP
+.B grap
+构造图元 (graphical elements)
+.@TP
+.B grn
+插入
+.BR gremlin (1)
+图片
+.PD
+.RE
+.
+.rm @TP
+.
+.\" --------------------------------------------------------------------
+.SS "排版程序 Formatter Programs"
+.\" --------------------------------------------------------------------
+.
+A
+.I roff formatter
+排版程序是一个解释用 roff 排版语言或 roff 宏包写成的文档的程序。
+.
+它产生中间结果
+.IR "intermediate output" ,
+将送入单一设备后处理器。后处理器必须在排版程序的命令行选项中指定。
+.
+文档必须已经通过了所有需要的预处理器处理
+.
+.P
+roff 排版程序的输出以另外一种语言表示：
+.IR "intermediate output format"
+或
+.IR "troff output" .
+这种语言最初详述在
+.IR "[CSTR\~#97]" 
+中；它的 GNU 扩展记载在
+.BR groff_out (5)
+中。
+.
+中间输出语言与高级的 roff 语言相比像一种汇编指令语言。
+.
+产生的中间输出是为一种特定的设备优化过的，
+但是对于所有设备，这种语言都适用
+.
+.P
+roff 排版程序是整个 roff 系统的核心。
+.
+传统 roff 有两个排版程序：
+对应字符设备的
+.B nroff
+和对应图形设备的
+.B troff
+.
+.P
+通常，
+.I troff
+这个名字泛指这两种排版程序
+(is used as a general term to refer to both formatters)。
+.
+.
+.\" --------------------------------------------------------------------
+.SS "设备 后处理器 Devices and Postprocessors"
+.\" --------------------------------------------------------------------
+.
+设备是类似打印机、字符或图形终端等的硬件接口，
+或者是用于转换为另一种字符或图形设备的软件接口
+.
+.P
+后处理器是将 troff 输出转化为一种适于某种特殊设备的格式的程序。
+.
+对于输出目标来说，roff 后处理器像是它们的设备驱动
+.
+.P
+每种设备都有为其优化的后处理器程序。.
+.
+后处理器解释中间输出，产生设备相关的代码，传送给设备
+.
+.P
+设备名和后处理器程序的名称是不固定的，
+因为它们依赖于计算机的软硬件的能力。
+.
+例如，
+.I [CSTR\~#54]
+中提到的传统的设备名已经有了极大的改变。
+.
+旧的硬件不再存在，旧的图形转换程序与现代同等功能的程序相比太不精确了
+.
+.P
+例如，Postscript 设备
+.I post
+在传统 troff 中分辨率是 720，而 groff 的
+.I ps
+设备是 72000, 提高了 100 倍
+.
+.P
+现在，操作系统为大多数类似打印机的硬件提供了设备驱动，
+因此不必为每个打印机写一个特殊的后处理器
+.
+.
+.\" --------------------------------------------------------------------
+.SH "roff 编程 ROFF PROGRAMMING"
+.\" --------------------------------------------------------------------
+.
+roff 文档是加入了 roff 排版元素的普通文档。
+.
+roff 排版语言非常强大；
+它几乎是一个完整的程序语言，并且提供了扩充自身的元素。
+.
+使用这些元素，就可以开发为特殊程序定制的宏包。
+.
+这样的宏包比普通的 roff 要容易上手得多。
+.
+所以大多数人会选择一中宏包，
+不用去关心 roff 语言的内部实现
+.
+.
+.\" --------------------------------------------------------------------
+.SS "宏包 Macro Packages"
+.\" --------------------------------------------------------------------
+.
+宏包是一些适于以便利的办法格式化某种特殊文档的宏的集合。
+.
+它们简化了 roff 的使用。
+.
+一个包的宏定义保存在一个叫做
+.IB name .tmac
+的文件中 (传统的命名是
+.BI tmac. name\c
+).
+.
+所有 tmac 文件保存在标准位置的一个或多个目录中。
+.
+有关宏包的命名和位置的细节可以看
+.BR groff_tmac (5).
+.
+.P
+文档中用到的宏包可以使用命令行选项
+.ShortOpt m 
+提供给排版程序, 参见
+.BR troff (1),
+它们也可以在文档中指定，使用 roff 语言的 “包含文件” 命令，参见
+.BR groff (7).
+.
+.P
+著名的传统宏包有
+.I man
+用来处理传统手册页
+.I mdoc
+处理 BSD 样式的手册页；此类书籍、文档和信件的宏集合是
+.I me
+(命名也许是根据它的创造者之名
+.I Eric
+Allman 而来),
+.I ms
+(命名来自
+.IR "Manuscript Macros\/" ),
+还有
+.I mm
+(命名来自
+.IR "Memorandum Macros\/" ).
+.
+.
+.\" --------------------------------------------------------------------
+.SS "roff 排版语言 The roff Formatting Language"
+.\" --------------------------------------------------------------------
+.
+传统的 roff 排版语言记述在 troff 用户手册
+.I Troff User's Manual
+.IR "[CSTR\~#54]" 
+中.
+.
+roff 语言是完整的编程语言，提供了命令 (request)，宏定义，转义序列 (escape sequence)，
+字符串变量，数字或数量寄存器 (number or size registers)，还有流程控制语句
+.
+.P
+.I Requests
+“命令” 是预定义的基础的排版命令，与 shell 提示下的命令类似。
+.
+用户可以定义类似 “命令” 的元素，使用 roff 的 “预定义” 元素。
+.
+用户定义的命令就被叫做 “宏”
+.IR macros .
+.
+文档作者不会体会到 命令和宏 之间用法的任何区别；
+它们都写在一行中，并以一个点 (dot, `.') 开始
+.
+.P
+.I Escape sequences
+“转义序列” 是以反斜杠 (backslash, 
+.QuotedChar \[rs] .
+) 开始的 roff 元素。
+它们可以被插入到任何地方，包括文本的一行中间。
+.
+它们用来实现不同的功能，可以使用
+.Esc ( 
+插入非 ASCII 字符，使用
+.Esc f 
+改变字体，使用
+.Esc \[dq] 
+插入行内注释，它们也可以转义特殊的控制字符，像这样
+.Esc \[rs] ,
+还有很多很多其他的功能
+.
+.P
+.I Strings
+“字符串” 是存储一个字符串的变量。
+.
+字符串以
+.B .ds
+命令存储。
+.
+存储的字符串可以用
+.B \[rs]*
+转义序列获得
+.
+.P
+.I Registers
+“寄存器” 存储数字和数量。
+.
+寄存器可以用
+.B .nr
+命令设置，然后用控制序列
+.BR "\[rs]n" 
+来获得它的值
+.
+.
+.\" --------------------------------------------------------------------
+.SH "文件扩展名 FILE NAME EXTENSIONS"
+.\" --------------------------------------------------------------------
+.
+手册页使用章节号作为文件扩展名，例如本文档的文件名是
+.IR roff.7 ,
+也就是说它放在手册页的第 \~7 章
+.
+.P
+传统的宏包使用包名称作为文件扩展名，例如
+.IB file. me
+意思是使用了
+.I me
+宏包的文件，
+.IB file. mm
+使用了宏包
+.IR mm ,
+.IB file. ms
+用的是
+.IR ms ,
+.IB file. pic
+则是
+.I pic
+等等
+.
+.P
+但是没有 roff 文档统一的命名方式，尽管
+.IB file. tr
+用于
+.I troff file
+在现在和当时都是一样的
+.
+也许应当有 roff 文件扩展名的一个标准
+.
+.P
+文件扩展名与
+.BR less (1)
+格式化工具结合，会非常好用。
+.
+它提供了用单一的方式打开各种输入的可能性，
+方法是定义一个 shell 环境变量
+.BR LESSOPEN .
+这种办法没有什么文档，这是一个例子：
+.
+.CodeSkip
+.ShellCommand LESSOPEN='|lesspipe %s'
+.CodeSkip
+.
+.B lesspipe
+可以是一个系统提供的命令或者是你自己的脚本。
+.
+.
+.\" --------------------------------------------------------------------
+.SH "编辑 EDITING ROFF"
+.\" --------------------------------------------------------------------
+.
+最好的 roff 文档编辑器是 Emacs，参见
+.BR emacs (1).
+它提供了
+.I nroff
+模式，适于所有种类的 roff “方言”。
+.
+可以用下面的命令来激活这种模式
+.
+.P
+当用 Emacs 编辑文档时可以输入
+.RI ` "M-x nroff-mode" '
+来改变模式，这里
+.B M-x
+意思是按住
+.B Meta
+键 (或
+.BR Alt )
+同时点一下
+.BR x\~ 
+键
+.
+.P
+也可以在编辑器加载文件的时候，自动改变模式
+.
+.Topic
+最好的办法是将下面三行注释包含在文件末尾
+.
+.CodeSkip
+.nf
+.B \*[Comment] Local Variables:
+.B \*[Comment] mode: nroff
+.B \*[Comment] End:
+.fi
+.
+.Topic
+有一系列的文件扩展名，例如手册页的扩展名，会自动触发 nroff 模式
+.
+.Topic
+理论上，可以将下面的序列
+.CodeSkip
+.B \*[Comment] \%-*-\ nroff\ -*-
+.CodeSkip
+作为文件的第一行，也可以使 emacs 在加载文件时启用 nroff 模式。
+.
+不幸的是，一些程序例如
+.B man
+在这种方法中会出错；因此请不要用它
+.
+.P
+所有的 roff 排版程序都提供了自动的断行以及水平和竖直间距。
+.
+为了不干扰它的功能，应当注意以下几点：
+.
+.Topic
+不要在 roff 文档中包含空行或只包含空格的行，
+.
+而是使用“空行”命令 (一行中只包含一个点)，或者一行注释
+.B \*[Comment]
+(如果需要一个构造元素的话)
+.
+.Topic
+不要在行首用空格，因为这会导致不可预测的行为。
+.
+段落缩进可以以受控的方式，用 roff 命令构造出来
+.
+.Topic
+每句话应当放到自己的一行中，因为句号后面的空格的处理方法是根据它结束的是短语还是句子而不同的。
+.
+要区别这两种情况，在每句话后面加上一个换行
+.
+.Topic
+另外要使用 Emacs 的 auto-fill 模式的话，最好在每句话后面添加一个空的 roff 命令 (一行中只包含一个点)
+.
+.P
+下面的例子显示了最佳的 roff 编辑习惯是怎样的
+.
+.IP
+.nf
+这是一个 roff 文档的例子.
+.Text .
+这是同一段中的下一句.
+.Text .
+这是下一个句子，它比较长，分成了多
+行；类似 `cf.' 这样的短语可以很容易地
+识别，因为其中的“点”后面没有换行.
+.Text .
+(在输出时，它们仍会在同一段中.)
+.Text .
+(译注：如果使用中文的标点“。”就不用考虑这些，
+但是每句话后面换行总是个好主意。少用 `.' 为妙)
+.fi
+.
+.P
+除了 Emacs，其他一些编辑器也提供了 nroff 格式文件的支持，例如
+.BR vim (1),
+它是
+.BR vi (1)
+程序的扩展
+.
+.
+.\" --------------------------------------------------------------------
+.SH BUGS
+.\" --------------------------------------------------------------------
+.
+.I UNIX\[rg]
+是 Open Group 的注册商标。
+.
+但是在 Caldera 在 2001 年收购 SCO UNIX 之后，事情发生了极大的好转
+.
+.P
+(译注：为什么 2003 年 SCO 又会成为 M$ 的走狗呢?)
+.
+.
+.\" --------------------------------------------------------------------
+.SH "参见 SEE ALSO"
+.\" --------------------------------------------------------------------
+.
+有大量的讲述 roff 的文档。
+.
+讲述传统 troff 的原始文档仍可获得，groff 的所有方面也都详细地记录在文档中
+.
+.
+.\" --------------------------------------------------------------------
+.SS "Internet sites"
+.\" --------------------------------------------------------------------
+.
+.TP
+troff.org
+.URL http://\:www.troff.org "“历史上的 troff”"
+提供了 roff 所有历史方面的概述和指引。
+.
+这个网站仍在建设；但是，它将成为 roff 历史的主要来源
+.
+.TP
+Multics
+.URL http://\:www.multicians.org "“Multics 的官方站点”"
+包含很多 MIT 的项目的信息，CTSS，Multics，早期的 Unix，还包括
+.IR  runoff ;
+尤其有用的是一个术语字典，还有很多到古老的文档的链接
+.
+.TP
+Unix Archive
+.URL http://\:www.tuhs.org/\:Archive/ \
+     "“古老的 Unix 的档案馆”"
+.
+提供了古老的 Unix 的源码和一些二进制文件
+(包括 troff 的源码和它的文档)，它们
+是 Caldera 自 2001 年以来公开的，例如著名的 Unix 版本\~7
+的 PDP-11 平台版本位置是
+.URL http://\:www.tuhs.org/\:Archive/\:PDP-11/\:Trees/\:V7 \
+     "Unix V7 site" .
+.
+.TP
+Developers at AT&T Bell Labs
+.URL http://\:cm.bell-labs.com/\:cm/\:index.html \
+     "“贝尔实验室计算和数学科学研究所”"
+.
+提供了搜索早期开发者信息的功能
+.
+.TP
+Plan 9
+.URL http://\:plan9.bell-labs.com "“Plan\~9 操作系统”"
+.
+AT&T Bell Labs 贝尔实验室的作品
+.
+.TP
+runoff
+.URL http://web.mit.edu/\:Saltzer/\:www/\:publications/\:pubs.html \
+"“Jerry Saltzer 的主页”"
+.
+保存了古老的 runoff 排版语言写成的一些文档
+.
+.TP
+CSTR Papers
+.URL http://\:cm.bell-labs.com/\:cm/\:cs/\:cstr.html \
+     "“贝尔实验室 CSTR 网站”"
+.
+保存了原始的 troff 手册 (CSTR #54, #97, #114, #116, #122)
+还有著名的有关编程的历史文档
+.
+.TP
+GNU roff
+.URL http://\:www.gnu.org/\:software/\:groff "“groff 的官方网站”"
+提供了 自由的 roff 实现：groff，并且它是 roff 的事实标准
+.
+.
+.\" --------------------------------------------------------------------
+.SS "历史文档 Historical roff Documentation"
+.\" --------------------------------------------------------------------
+.
+很多
+.troff
+历史文档仍然可以在线获得。
+.
+troff 语言主要的两部手册是
+.
+.TP
+[CSTR\~#54]
+J. F. Osanna,
+.URL http://\:cm.bell-labs.com/\:cm/\:cs/\:54.ps \
+     "\fINroff/\:Troff User's Manual\fP" ;
+.
+(《用户手册》) Bell Labs, 1976; revised by Brian Kernighan, 1992.
+
+.
+.TP
+[CSTR\~#97]
+Brian Kernighan,
+.URL http://\:cm.bell-labs.com/\:cm/\:cs/\:97.ps \
+     "\fIA Typesetter-independent TROFF\fP" ,
+.
+(《设备无关的 troff》) Bell Labs, 1981, revised March 1982.
+.
+.P
+将 roff 作为一种“小语言”("little language") 来讲述的论文有
+.
+.TP
+[CSTR\~#114]
+Jon L. Bentley and Brian W. Kernighan,
+.URL http://\:cm.bell-labs.com/\:cm/\:cs/\:114.ps \
+     "\fIGRAP \(em A Language for Typesetting Graphs\fP" ;
+.
+(《grap: 一种图形排版语言》) Bell Labs, August 1984.
+.
+.TP
+[CSTR\~#116]
+Brian W. Kernighan,
+.URL http://\:cm.bell-labs.com/\:cm/\:cs/\:116.ps \
+     "\fIPIC -- A Graphics Language for Typesetting\fP" ;
+.
+(《pic: 一种排版用的图形控制语言》) Bell Labs, December 1984.
+.
+.TP
+[CSTR\~#122]
+J. L. Bentley, L. W. Jelinski, and B. W. Kernighan,
+.URL http://\:cm.bell-labs.com/\:cm/\:cs/\:122.ps \
+"\fICHEM \(em A Program for Typesetting Chemical Structure Diagrams, \
+Computers and Chemistry\fP" ;
+.
+(《chem: 排版化学结构图的程序，计算机与化学》) Bell Labs, April 1986.
+.
+.
+.\" --------------------------------------------------------------------
+.SS "手册页 Manual Pages"
+.\" --------------------------------------------------------------------
+.
+由于它结构复杂，完整的 roff 系统包含很多很多手册页，
+每一个都描述了 roff 的一个方面。
+.
+不幸的是，不同的 roff 实现之间，它们的手册没有相同的命名格式
+.
+.P
+在
+.IR groff 
+中，手册页
+.BR groff (1)
+包含了 groff 相关的所有文档的索引
+.
+.P
+其他系统中，你需要自己探索，但是
+.BR troff (1)
+是个很好的起点
+.
+.
+.\" --------------------------------------------------------------------
+.SH "作者 AUTHORS"
+.\" --------------------------------------------------------------------
+.
+Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+.
+.P
+This document is distributed under the terms of the FDL (GNU Free
+Documentation License) version 1.1 or later.
+.
+You should have received a copy of the FDL on your system, it is also
+available on-line at the
+.URL http://\:www.gnu.org/\:copyleft/\:fdl.html "GNU copyleft site" .
+.
+.P
+此文档是
+.IR groff ,
+GNU roff 套件的一部分。
+.
+它的作者是
+.MTO bwarken@mayn.de "Bernd Warken" ;
+它的管理者是
+.MTO wl@gnu.org "Werner Lemberg".
+.
+.
+.SH "[中文版维护人]"
+.B bbbush <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 2003.11.28
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 
+.
+.\" --------------------------------------------------------------------
+.\" Emacs setup
+.\" --------------------------------------------------------------------
+.
+.\" Local Variables:
+.\" mode: nroff
+.\" End:

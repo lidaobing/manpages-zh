@@ -1,0 +1,283 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Chinese version Copyright Surran, BitBIRD of www.linuxforum.net
+.\"
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH CP 1 "August 1998" "GNU fileutils 3.16"
+.SH NAME
+cp \- 复制文件和目录
+.SH 总览
+.BI "cp [" "选项" "] " "文件路径"
+.br
+.BI "cp [" "选项" "] " "文件...目录"
+.sp
+POSIX 选项:
+.B [\-fipRr]
+.sp
+GNU 参数(最短形式):
+.B [\-abdfilprsuvxPR]
+.BI "[\-S " SUFFIX ]
+.B "[\-V {numbered,existing,simple}]"
+.BI [\-\-sparse= WHEN ]
+.B "[\-\-help] [\-\-version] [\-\-]"
+.SH 描述
+.B cp
+复制文件(或者目录等).
+可以使用这个命令复制一个文件到一个指定的目的地,
+或者复制任意多个文件到一个目的目录目录.
+.Pp
+如果最后一个命令参数为一个已经存在的目录名，
+.B cp
+会将每一个源
+.I 文件
+复制到那个目录下(维持原文件名).
+如果所给的参数只有两个文件名.它把前一个文件复制到后一个文件上.
+如果最后一个参数不是文件名,目录名,和给出多于两个非选项参数,是
+错误的.
+
+.Pp
+(因而:如果/b已经存在,那么'cp -r /a /b'会复制/a到/b而成为/b/a.
+而复制/a/x到/b而成为/b/a/x.但如果/b事先不存在,它会把/a复制为/b
+而复制/a/x到/b而成为/b/a/x.但如果/b事先不存在,它会把/a复制为/b
+而把/a/x复制为/b/x.)
+.Pp
+所创建的文件和/或目录的模式和原始的文件的模式是一样的，
+然后用用户umask值修改(除非使用了\-p选项),(但在递归方式
+复制目录时,新建目录会临时地获得他们的最终模式Ored,连同
+S_IRWXU(0700),以便进程能够读、写、查找这些新建的目录.
+.Pp
+复制文件到其自身时它什么事情都不做(除了可能会生成一条错误信息以外).
+当复制到一个现存的不同文件时,系统调用函数
+`open(path,O_WRONLY|O_TRUNC)'打开目的文件.当复制到一个新文件时,系
+统调用函数`open(path,O_WRONLY|O_CREAT,mode)'创建该文件.如果这操
+作失败,该文件存在,和给出了\-f选项,
+.B cp
+试图先删除该现存文件,如果删除成功则把它当做一个新文件处理.
+.SH "POSIX 选项"
+POSIX 识别四个半选项：
+.TP
+.B \-f
+如果需要,删除已存在的目的文件.(如前所述.)
+.TP
+.B \-i
+提示是否覆盖现有普通目标文件。
+(在标准出错上显示问题,从标准输入读取答案.只有明确确认了才复制文件.)
+.TP
+.B \-p
+保留原文件的所有者、组、权限（包括 setuid 和 setgid 位），
+上次修改时间和上次访问时间。如果制作所有者或组信息的副本时出错，
+则 setuid 和 setgid 位被清空。
+（要不然源文件和副本的上次访问时间显然是不同的，
+因为复制操作就是对源文件的访问．）
+.TP
+.B \-R
+递归复制目录，如果对象不是普通文件或目录那么做相应正
+确处理，(因此，一个 FIFO或者特殊文件在复制后仍然是一
+个 FIFO型或者相应特殊文件。)
+.TP
+.B \-r
+递归复制目录，如果对象不是普通文件或目录那么做一些未
+声明处理．（因此，我们允许并鼓励用 \-r 选项做 \-R 的
+同义词．不过那些愚蠢的特征，象那些在 GNU 版本的
+.BR cp
+出
+现的（见下文）也可以用．）
+.SH "GNU 细节"
+.Pp
+通常，读写文件的方式都是一样的．例外情况见下面的
+.B "\-\-sparse"
+选项．
+.Pp
+缺省情况下,`cp'并不复制目录(参见下文
+.B "\-r"
+选项说明).
+.Pp
+.B cp
+通常不会复制文件到自身,但有以下例外：
+如果参数
+.B "\-\-force \-\-backup"
+与
+.I 源文件
+一起给出，并且与
+.I 目的文件
+并且指向一个普通文件，
+.B cp
+将生成一个备份文件,不是普通的就是编了号的,就象通
+常的方法那样声明.在你仅仅想对已有的文件进行备份,
+而又不想修改它的时候很有用.
+.SH "GNU 选项"
+.TP
+.B "\-a, \-\-archive"
+复制时,尽可能保持文件的结构和属性.(但不保持目录
+结构)等同于
+.BR "\-dpR" 。
+.TP
+.B "\-d, \-\-no\-dereference"
+复制符号链接作为符号链接而不是复制它指向的文件,
+并且保护在副本中原文件之间的硬链接.
+.TP
+.B "\-f, \-\-force"
+删除存在的目标文件。
+（较：原译文缺下面的部分）
+.TP
+.B "\-i, \-\-interactive"
+无论是否覆盖现存文件都作提示。
+.TP
+.B "\-l, \-\-link"
+制作硬链接代替非目录拷贝。
+.TP
+.B "\-p, \-\-preserve"
+保持原始文件的所有者，组，许可，和时间表属性。
+.TP
+.B "\-P, \-\-parents"
+一个斜杠和指定的源文件名构成目的文件。
+最后送给
+.B cp
+的参数必须是一个已存在的目录的名字。例如, 下面这个命令:
+.br
+.nf
+cp \-\-parents a/b/c existing_dir
+.br
+.fi
+复制文件 `a/b/c' 到 texisting_dir(现有的目录)/a/b/c',建立任
+何缺少的中间目录。
+.TP
+.B "\-r"
+递归地复制目录,复制任何非目录和非符号链接(那是,
+FIFOs和特别文件)好象他们是常规的文件一样看待.这
+意味着尝试读出每个源文件的数据,和把它写到目的地
+上.因而,用这个选项,cp'可能彻底地终止,当不确定地
+读一个FIFO或者/dev/tty时,(这是一个缺陷.它意味着
+如果你不知道在这棵树(目录)中有什么要复制的时候,
+你不得不避开\-r并使用\-R打开一个未知的设备文件,
+比如说一台扫描仪,会有未知的效果发生在硬件上)
+.TP
+.B "\-R, \-\-recursive"
+递归地复制目录,保留非目录(参见上面的
+.B "\-r"
+).
+.TP
+.BI "\-\-sparse=" "WHEN"
+一个稀疏file'包容`holes'-占用0字节,它不占用任何
+物理块;系统把他们作为0调用read'来读.由于许多二进
+制文件包容许多连续的0字节,这样能保存相当的磁盘空
+间并且加快速度.省缺情况下,
+.B cp
+通过自然的启发方式发现在源文件里holes并且使相关
+的输出文件稀疏.
+.RS
+.PP
+.I WHEN
+值能够是下面中的一个：
+.TP
+.B auto
+默认的行为:如果输入文件是稀疏的,输出文件也是稀疏的.
+.TP
+.B always
+总是使输出文件稀疏.当输入文件所在的文件系统不支
+持稀疏文件的时候，这是有用的,但是输出文件所在的
+文件系统需要(支持稀疏文件).
+.TP
+.B never
+从不使输出文件稀疏.如果你找到一个需要此选项的应
+用程序,让我们知道.
+.RE
+.TP
+.B "\-s, \-\-symbolic\-link"
+生成符号链接代替非目录拷贝.所有的源文件名必须是
+绝对的(由`/'开始),除非目的文件是在当前目录.这选
+项仅仅在系统不支持符号链接时引起一个错误消息.
+.TP
+.B "\-u, \-\-update"
+如果存在的目的地有相同的,或者更新的修改时间,不
+复制非目录(文件).
+.TP
+.B "\-v, \-\-verbose"
+在复制前印出文件名.
+.TP
+.B "\-x, \-\-one\-file\-system"
+跳过来自不同文件系统的子目录.
+.SH "GNU 备份选项"
+GNU 版本程序象
+.BR cp ,
+.BR mv ,
+.BR ln ,
+.B install
+和
+.B patch 
+会在覆盖,改变,或者破坏(文件)前生成一个备份文件.
+那个文件由\-b选项给出.他们的由\-V选项命名.一般
+情况下备份文件名是源文件名加上后缀,这个后缀由\-S
+指定.
+.TP
+.B "\-b, \-\-backup"
+生成关于覆盖和删除的备份.
+.TP
+.BI "\-S " SUFFIX ", \-\-suffix=" SUFFIX
+加入
+.I SUFFIX(后缀)
+到每个备份文件.
+如果不指定,使用
+.B SIMPLE_BACKUP_SUFFIX
+环境变量的值.如果连
+.B SIMPLE_BACKUP_SUFFIX
+都没有设置,省缺是`~'.
+.TP
+.BI "\-V " METHOD ", \-\-version\-control=" METHOD
+.RS
+指定如何命名备份文件.
+.I METHOD
+能够是 `numbered' (or `t'), `existing' (or `nil'), or `never' (or
+`simple').
+如果不指定,使用
+.B VERSION_CONTROL
+环境变量的值.如果
+.B VERSION_CONTROL
+也没有设置,省缺备份文件类型是 `existing'.
+.PP
+这选项相应Emacs 变量 `version-control'.
+有效的
+.IR METHOD s
+是(接受唯一的缩写):
+.TP
+.BR t ", " numbered
+总是产生编号的备份。
+.TP
+.BR nil ", " existing
+Make numbered backups of files that already have them, simple
+backups of the others.
+.TP
+.BR never ", " simple
+总作简单的备份.
+.RE
+.SH "GNU 标准选项"
+.TP
+.B "\-\-help"
+印出用法并退出.
+.TP
+.B "\-\-version"
+印出版本信息并退出.
+.TP
+.B "\-\-"
+结束选项列表.
+.SH 环境(参数)
+变量LANG,LC_ALL,LC_COLLATE,LC_CTYPE和LC_MESSAGES有通常意义.
+对于GNU版本,变量SIMPLE_BACKUP_SUFFIX和VERSION_CONTROL控制备份
+文件命名.与上面的描述一样.
+.SH "适用到"
+POSIX 1003.2
+.SH 注意
+这份
+.B cp
+的描述和FILEUTils-4.0中找到的是一样的;另外的版
+本也许有些微的差别.修正和新增邮到aeb@cwi.nl.
+报告缺陷到fileutils-bugs@gnu.ai.mit.edu.
+
+.SH "[中文版维护人]"
+.B Surran <email>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

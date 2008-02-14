@@ -1,0 +1,748 @@
+.\"; Copyright (C) 1994, 1995 by Daniel Quinlan (quinlan@yggdrasil.com)
+.\"; with networking additions from Alan Cox (A.Cox@swansea.ac.uk)
+.\"; and scsi additions from Michael Neuffer (neuffer@mail.uni-mainz.de)
+.\"; and sysctl additions from Andries Brouwer (aeb@cwi.nl)
+.\"; 中文版版权所有 mapping, Laser www.linuxforum.net 2000
+.\";
+.\"; This is free documentation; you can redistribute it and/or
+.\"; modify it under the terms of the GNU General Public License as
+.\"; published by the Free Software Foundation; either version 2 of
+.\"; the License, or (at your option) any later version.
+.\";
+.\"; The GNU General Public License's references to ";object code";
+.\"; and ";executables"; are to be interpreted as the output of any
+.\"; document formatting or typesetting system, including
+.\"; intermediate and printed output.
+.\";
+.\"; This manual is distributed in the hope that it will be useful,
+.\"; but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"; GNU General Public License for more details.
+.\";
+.\"; You should have received a copy of the GNU General Public
+.\"; License along with this manual; if not, write to the Free
+.\"; Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+.\"; USA.
+.\";
+.\"; Wed May 17 15:26:04 1995: faith@cs.unc.edu, updated BUGS section
+.\"; Minor changes by aeb and Marty Leisner (leisner@sdsp.mc.xerox.com).
+.\"; Sat Apr 13 02:32:45 1996: aeb@cwi.nl, added sys, various fixes.
+.\"; Mon Jul 22 17:14:44 1996: aeb@cwi.nl, minor fix.
+.TH PROC 5 ";22 July 1996"; ";"; ";Linux Programmer's Manual";
+.SH NAME
+proc \- 进程信息伪文件系统
+
+.SH 描述
+/proc 是一个伪文件系统, 被用作内核数据结构的接口, 而不仅仅
+是解释说明 /dev/kmem. /proc里的大多数文件都是只读的, 但也可
+以通过写一些文件来改变内核变量. 
+.LP
+下面对整个 /proc 目录作一个大略的介绍.
+.LP
+.na
+.nh
+.PD 1
+.TP
+.I [number]
+在 /proc 目录里, 每个正在运行的进程都有一个以该进程
+ID 命名的子目录, 其下包括如下的目录和伪文件.
+.RS
+.TP
+.I cmdline
+该文件保存了进程的完整命令行. 如果该进程已经
+被交换出内存, 或者该进程已经僵死, 那么就没有
+任何东西在该文件里, 这时候对该文件的读操作将返回零
+个字符. 该文件以空字符 null 而不是换行符作为结
+束标志. 
+.TP
+.I cwd
+一个符号连接, 指向进程当前的工作目录. 例如, 
+要找出进程 20 的 cwd, 你可以: 
+.br
+.nf
+.ft CW
+cd /proc/20/cwd; /bin/pwd
+.fi
+.ft
+.PP
+请注意 pwd 命令通常是 shell 内置的, 在这样的情况下可能
+工作得不是很好. 
+
+.TP
+.I environ
+该文件保存进程的环境变量, 各项之间以空字符分隔, 
+结尾也可能是一个空字符. 因此, 如果要输出进程 1 的环境变量, 
+你应该: 
+.br
+.nf
+.ft CW
+(cat /proc/1/environ; echo) | tr ";\\000"; ";\\n";
+.fi
+.ft P
+.PP
+(至于为什么想要这么做, 请参阅
+.IR lilo (8).)
+.TP
+.I exe
+也是一个符号连接, 指向被执行的二进制代码.
+
+在 Linux 2.0 或者更早的版本下, 对 exe 特殊文件的
+.I readlink(2)
+返回一个如下格式的字符串: 
+
+[设备号]:节点号
+
+举个例子, [0301]:1502 就是某设备的 1502 节点, 
+该设备的主设备号为 03 (如 IDE, MFM 等驱动器),
+从设备号为 01 (第一个驱动器的第一分区).
+
+而在 Linux 2.2 下, 
+.I readlink(2) 
+则给出命令的实际路径名.
+
+另外, 该符号连接也可以正常析引用(试图打开 exe 
+文件实际上将打开一个可执行文件). 你甚至可以键入
+.I /proc/[number]/exe
+来运行 [number] 进程的副本. 
+
+带 -inum 选项的
+.IR find(1)
+命令可以定位该文件. 
+.TP
+.I fd
+进程所打开的每个文件都有一个符号连接在该子目
+录里, 以文件描述符命名, 这个名字实际上是指向
+真正的文件的符号连接，（和 exe 记录一样）．
+例如, 0 是标准输入, 1 是标准输出, 2 是标准错误, 等等.
+
+程序有时可能想要读取一个文件却不想要标准输入，
+或者想写到一个文件却不想将输出送到标准输出去，
+那么就可以很有效地用如下的办法骗过(假定 -i 是输入
+文件的标志, 而 -o 是输出文件的标志): 
+.br
+.nf
+\f(CWfoobar -i /proc/self/fd/0 -o /proc/self/fd/1 ...\fP
+.fi
+.br
+这样就是一个能运转的过滤器. 请注意该方法不能
+用来在文件里搜索, 这是因为 fd 目录里的文件是
+不可搜索的.
+
+在 UNIX 类的系统下, /proc/self/fd/N 基本上就与
+/dev/fd/N 相同. 实际上, 大多数的 Linux MAKEDEV
+脚本都将 /dev/fd 符号连接到 [..]/proc/self/fd 上. 
+.TP
+.I maps
+该文件包含当前的映象内存区及他们的访问许可. 
+
+格式如下:
+.nf
+.ft CW
+.in +3n
+address           perms offset   dev   inode
+00000000-0002f000 r-x-- 00000400 03:03 1401
+0002f000-00032000 rwx-p 0002f400 03:03 1401
+00032000-0005b000 rwx-p 00000000 00:00 0
+60000000-60098000 rwx-p 00000400 03:03 215
+60098000-600c7000 rwx-p 00000000 00:00 0
+bfffa000-c0000000 rwx-p 00000000 00:00 0
+.ft
+.fi
+.in
+.PP
+address 是进程所占据的地址空间, perms 是权限集: 
+.nf
+.in +5
+r = read
+w = write
+x = execute
+s = shared
+p = private (copy on write)
+.fi
+.in
+.PP
+offset 是文件或者别的什么的偏移量, dev 是设备号(主设
+备号:从设备号), 而 inode 则是设备的节点号. 0 表明没有
+节点与内存相对应, 就象 bss 的情形.
+.PP
+在 Linux 2.2 下还增加了一个域给可用的路径名. 
+.TP
+.I mem
+该文件并不是 mem (1:1) 设备, 尽管它们有相同的设备号.
+/dev/mem 设备是做任何地址转换之前的物理内存,
+而这里的 mem 文件是访问它的进程的内存.目前这个 mem 还不能
+.I mmap(2)
+（内存映射）出去，而且可能一直要等到内核中增加了一个通用的
+.I mmap(2)
+以后才能实现．
+(也许在你读本手册页时这一切已经发生了)
+.TP
+.I mmap
+.I mmap(2)
+做的 maps 映射目录，是和 exe, fd/* 等类似的符号连接.
+请注意 maps 包含了比 /proc/*/mmap 更多的信息,
+所以应该废弃 mmap.
+
+";0"; 通常指 libc.so.4.
+
+在 linux 内核 1.1.40 里, 
+.I /proc/*/mmap
+被取消了.
+(现在是
+.B 真的
+废弃不用了!)
+.TP
+.I root
+依靠系统调用
+.I chroot(2), 
+unix 和 linux 可以让
+每个进程有各自的文件系统根目录. 
+由
+.I chroot(2)
+系统调用设置．
+根指向文件系统的根，性质就象 exe, fd/* 等一样．
+.TP
+.I stat
+进程状态信息, 被命令
+.I ps(1)
+使用. 
+
+现将该文件里各域, 以及他们的
+.I scanf(3)
+格式说明符, 按顺序分述如下:
+.RS
+.TP
+\fIpid\fP %d
+进程标识．
+.TP
+\fIcomm\fP %s
+可执行文件的文件名, 包括路径. 该文件是否可
+见取决于该文件是否已被交换出内存. 
+.TP
+\fIstate\fP %c
+";RSDZT"; 中的一个, R 是正在运行, S 是
+在可中断的就绪态中睡眠, D 是在不可中
+断的等待或交换态中睡眠, Z 是僵死, T 
+是被跟踪或被停止(由于收到信号). 
+.TP
+\fIppid\fP %d
+父进程 PID.
+.TP
+\fIpgrp\fP %d
+进程的进程组 ID.
+.TP
+\fIsession\fP %d
+进程的会话 ID.
+.TP
+\fItty\fP %d
+进程所使用终端.
+.TP
+\fItpgid\fP %d
+当前拥有该进程所连接终端的进程所在的进程
+组 ID. 
+.TP
+\fIflags\fP %u  
+进程标志. 目前每个标志都设了数学位, 
+所以输出里就不包括该位. crt0.s 检查数学仿真
+这可能是一个臭虫, 因为不是每个进
+程都是用 c 编译的程序. 数学位应该是十
+进制的 4, 而跟踪位应该是十进制的 10.
+.TP
+\fIminflt\fP %u
+进程所导致的小错误（minor faults）数目, 这样的
+小错误（minor faults）不需要从磁盘重新载入一个
+内存页. 
+.TP
+\fIcminflt\fP %u
+进程及其子进程所导致的小错误（minor faults）数目.
+.TP
+\fImajflt\fP %u
+进程所导致的大错误（major faults）数目, 这样的
+大错误（major faults）需要重新载入内存页. 
+.TP
+\fIcmajflt\fP %u
+进程及其子进程所导致的大错误（major faults）数目.
+.TP
+\fIutime\fP %d
+进程被调度进用户态的时间(以 jiffy 为单
+位, 1 jiffy=1/100 秒，另外不同硬件体系略有不同).
+.TP
+\fIstime\fP %d
+进程被调度进内核态的时间, 以 jiffy 为
+单位. 
+.TP
+\fIcutime\fP %d
+进程及其子进程被调度进用户态的时间, 
+以 jiffy 为单位. 
+.TP
+\fIcstime\fP %d
+进程及其子进程被调度进内核态的时间, 
+以 jiffy 为单位. 
+.TP
+\fIcounter\fP %d
+如果进程不是当前正在运行的进程, 就是
+进程在下个时间片当前可以拥有的最大时
+间, 以 jiffy 为单位. 如果进程是当前正
+在运行的进程, 就是当前时间片中所剩下
+jiffy 数目. 
+.TP
+\fIpriority\fP %d
+标准优先数只再加上 15, 在内核里该值总
+是正的. 
+.TP
+\fItimeout\fP %u
+当前至进程的下一次间歇时间, 以 jiffy
+为单位. 
+.TP
+\fIitrealvalue\fP %u
+由于计时间隔导致的下一个 SIGALRM
+发送进程的时延，以 jiffy 为单位.
+.TP
+\fIstarttime\fP %d 
+进程自系统启动以来的开始时间, 以 jiffy
+为单位.
+.TP
+\fIvsize\fP %u
+虚拟内存大小. 
+.TP
+\fIrss\fP %u
+Resident Set Size（驻留大小）: 进程所占用的真实内
+存大小, 以页为单位, 为便于管理而减去
+了 3. rss 只包括正文, 数据以及堆栈的空间, 
+但不包括尚未要求装入内存的或已被交换出去的.
+.TP
+\fIrlim\fP %u
+当前进程的 rss 限制, 以字节为单位, 通
+常为 2,147,483,647. 
+.TP
+\fIstartcode\fP %u
+正文部分地址下限. 
+.TP
+\fIendcode\fP %u
+正文部分地址上限. 
+.TP
+\fIstartstack\fP %u
+堆栈开始地址.
+.TP
+\fIkstkesp\fP %u
+esp(32 位堆栈指针) 的当前值, 与在进程
+的内核堆栈页得到的一致. 
+.TP
+\fIkstkeip\fP %u
+EIP(32 位指令指针)的当前值.
+.TP
+\fIsignal\fP %d
+待处理信号的 bitmap(通常为 0).
+.TP
+\fIblocked\fP %d
+被阻塞信号的 bitmap(对 shell 通常是 0, 2)．
+.TP
+\fIsigignore\fP %d
+被忽略信号的 bitmap. 
+.TP
+\fIsigcatch\fP %d
+被俘获信号的 bitmap. 
+.TP
+\fIwchan\fP %u
+进程在其中等待的通道, 实际是一个系统
+调用的地址. 如果你需要文本格式的, 也
+可以在名字列表中找到. 
+(如果有最新版本的 /etc/psdatabase, 你
+可以在 \fIps -l\fP 的结果中的 WCHAN 域看到)
+.RE
+.RE
+
+.TP
+.I cpuinfo 
+保存了CPU 以及体系架构依赖条目的列表. 对于不同的系
+统架构有不同的列表, 共有的两项是 \fIcpu\fP 和 \fIBogoMIPS\fP, \fIcpu\fP
+可能是当前在用的 CPU, 而 \fIBogoMIPS\fP 则是内核初始化时计算出
+的一个系统常数. 
+.TP
+.I devices
+主设备号及设备组的列表, 文本格式. MAKEDEV 脚本使用
+该文件来维持内核的一致性. 
+.TP
+.I dma
+一个列表, 指出正在使用的\fIISA\fP DMA (直接内存访问)通道. 
+.TP
+.I filesystems
+以文本格式列出了被编译进内核的文件系统. 当没有给
+.I mount(1)
+指明哪个文件系统的时候, 
+.I mount(1)
+就依靠该文件遍历不同的文件系统.
+.TP
+.I interrupts
+该文件以 ASCII 格式记录了（至少是在 i386 体系上的）每次 IRQ 的中断数目. 
+.TP
+.I ioports
+该文件列出了当前在用的已注册 I/O 端口范围. 
+.TP
+.I kcore
+该伪文件以 core 文件格式给出了系统的物理内存映象, 再
+利用未卸载的内核 (/usr/src/linux/tools/zSystem), 我
+们就可以用 GDB 查探当前内核的任意数据结构. 
+
+该文件的总长度是物理内存 (RAM) 的大小再加上 4KB. 
+.TP
+.I kmsg
+可以用该文件取代系统调用
+.I syslog(2)
+来记录内核信息. 
+但是读该文件需要超级用户权限, 并且一次只能有一个进
+程可以读该文件, 因而如果一个使用了
+.I syslog(2)
+系统调用功能来记录内核信息的系统日志进程正在运行的话,
+别的进程就不能再去读该伪文件了.
+
+该文件的内容可以用
+.I dmesg(8)
+来察看. 
+.TP
+.I ksyms
+该文件保存了内核输出的符号定义, 
+.I modules(X)
+使用该文件
+动态地连接和捆绑可装载的模块. 
+.TP
+.I loadavg
+平均负载数给出了在过去的 1, 5, 15 分钟里在运行队列里
+的任务数, 与
+.I uptime(1)
+等命令的结果相同. 
+.TP
+.I locks
+这个文件显示当前文件锁．
+.TP
+.I malloc
+只有在编译时定义了 CONFIGDEBUGMALLOC 才会有该文件．
+.TP
+.I meminfo
+.I free(1)
+利用该文件来给出系统总的空闲内存和已用内存
+(包括物理内存和交换内存), 以及内核所使用的共享内存
+和缓冲区. 
+
+该文件与
+.I free(1)
+\h'-1' 格式相同, 但是以字节为单位而不是 KB. 
+.TP
+.I modules
+列出了系统已载入的模块, 文本格式. 
+.TP
+.I net
+该子目录包括多个 ASCII 格式的网络伪文件, 描述了网络
+层的部分情况. 可以用 cat 来察看这些文件, 但标准的
+.I netstat(8)
+命令组更清晰地给出了这些文件的信息. 
+.RS
+.TP
+.I arp
+该文件以 ASCII 格式保存了内核 ARP 表, 用于地址解析, 
+包括静态和动态 arp 数据. 文件格式如下: 
+.nf
+.ft CW
+.ie t .in +3n
+.el .in -2n
+IP address       HW type     Flags       HW address
+10.11.100.129    0x1         0x6         00:20:8A:00:0C:5A
+10.11.100.5      0x1         0x2         00:C0:EA:00:00:4E
+44.131.10.6      0x3         0x2         GW4PTS
+.ft
+.fi
+.in
+.PP
+其中 'IP address' 是机器的 IPv4 地址; 'HW type' 是地址的硬
+件类型, 遵循 RFC 826; flags 是 ARP 结构的内部标志, 在
+/usr/include/linux/if_arp.h 中定义; 'HW address' 是该
+IP 地址的物理层映射(如果知道的话). 
+.TP
+.I dev
+该伪文件包含网络设备状态信息, 给出了发送和收
+到的包的数目, 错误和冲突的数目, 以及别的一些
+基本统计数据. 
+.I ifconfig(8)
+利用了该文件来报
+告网络设备状态. 文件格式如下: 
+.nf
+.ft CW
+.if n .in -13n
+Inter-|   Receive                  |   Transmit
+face |packets errs drop fifo frame|packets errs drop fifo colls carrier
+lo:      0    0    0    0    0     2353    0    0    0     0    0
+eth0: 644324    1    0    0    1   563770    0    0    0   581    0
+.if n .in
+.ft
+.fi
+.TP
+.I ipx
+无信息.
+.TP
+.I ipx_route
+无信息.
+.TP
+.I rarp
+该文件具有和
+.I arp
+同样的格式, 包含当前的逆向
+地址映射数据. 
+.I rarp(8)
+利用这些数据来作逆向
+地址查询服务. 只有将 RARP 配置进内核, 该文件才
+存在. 
+.TP
+.I raw
+该文件保存了 RAW 套接字表, 大部分信息除用于调试以外没有什么用.
+'sl' 指出了套接字的内核散列槽号; 'local address'
+包括本地地址和协议号对; "St" 是套接字的内部状态;
+tx_queue 和 rx_queue 是内核存储器使用意义上的输入输
+出数据队列; RAW 没有使用"tr", "tm-&gt;when" 和 "rexmits";
+uid 是套接字创建者的有效 uid.
+.TP
+.I route
+没有信息, 但是看上去类似于
+.I route(8)
+.TP
+.I snmp
+该文件以 ASCII 格式保存了 IP, ICMP, TCP 以及 UDP
+管理所需的数据信息, 基于 snmp 协议. TCP mib
+(TCP 管理数据库)尚未完善, 可能在 1.2.0 内核能够
+完成. 
+.TP
+.I tcp
+该文件保存了 TCP 套接字表, 大部分信息除用于调试以外没有什么用.
+"sl" 指出了套接字的内核散列槽号; "local address"
+包括本地地址和端口号; "remote address" 包括远地
+地址和端口号(如果有连接的话); 'St' 是套接字的内
+部状态; 'tx_queue' 和 'rx_queue' 是内核存储器使用意义上
+的输入输出数据队列; "tr", "tm-&gt;when" 和 "rexmits" 保存
+了内核套接字声明的内部信息, 只用于调试; uid
+是套接字创建者的有效 uid. 
+.TP
+.I udp
+该文件保存了 UDP 套接字表, 大部分信息除用于调试以外没有什么用.
+"sl" 指出了套接字的内核散列槽号; "local address"
+包括本地地址和端口号; "remote address" 包括远地
+地址和端口号(如果有连接的话); "St" 是套接字的内
+部状态; "tx_queue" 和 "rx_queue" 是内核存储器使用意义上
+的输入输出数据队列; UDP 没有使用 "tr","tm-&gt;when" 和
+"rexmits"; uid 是套接字创建者的有效 uid.
+格式如下: 
+.nf
+.ft CW
+.if n .in 0
+sl  local_address rem_address   st tx_queue rx_queue tr rexmits  tm-&gt;when uid
+1: 01642C89:0201 0C642C89:03FF 01 00000000:00000001 01:000071BA 00000000 0
+1: 00000000:0801 00000000:0000 0A 00000000:00000000 00:00000000 6F000100 0
+1: 00000000:0201 00000000:0000 0A 00000000:00000000 00:00000000 00000000 0
+.if n .in
+.ft
+.fi
+.TP
+.I unix
+列出了当前系统的UNIX域套接字以及它们的状态, 
+格式如下: 
+.nf
+.sp .5
+.ft CW
+Num RefCount Protocol Flags    Type St Path
+0: 00000002 00000000 00000000 0001 03
+1: 00000001 00000000 00010000 0001 01 /dev/printer
+.ft
+.sp .5
+.fi
+.PP
+'Num' 是内核散列槽号; 'RefCount' 是用户套接字号; 'Protocol'
+当前总是 0; 'Flags' 是内核标志, 指出了套接字的状态; 'Type'
+当前总是 1(在内核中尚未支持 unix 域数据报套接字); 'St'
+是套接字内部状态; 'Path' 套接字绑捆的路径(如果有的话). 
+.RE
+.TP
+.I pci
+该文件列出了内核初始化时发现的所有 PCI 设备及其配置. 
+.TP
+.I scsi
+该目录包括 scsi 中间层伪文件及各种 SCSI 底层驱动器子目录,
+对系统中每个 SCSI host, 子目录中都存在一个文件与之对应, 
+展示了部分 SCSI IO 子系统的状态. 这些文件是 ASCII 格式
+的, 可用cat阅读. 
+
+你也可以通过写其中某些文件来重新配置该子系统, 开关一些功能.
+.RS
+.TP
+.I scsi
+该文件列出了内核掌握的所有 SCSI 设备, 其内容就
+和系统启动时所看到的类似. 目前 scsi 只支持
+\fIsingledevice\fP命令, 该命令允许 root 添加一个热插
+拔(hotplugged)设备到一个已知设备列表中. 
+
+命令
+.B echo 'scsi singledevice 1 0 5 0' &gt; /proc/scsi/scsi 
+令 host scsi1 扫描 SCSI 通道 0, 
+看在 ID 5 LUN 0 是否存在设备, 如果在该地址
+存在设备, 或者该地址无效, 则返回一个错误. 
+.TP
+.I drivername
+目前 \fIdrivername\fP 可包含: NCR53c7xx, aha152x, aha1542, aha1740, 
+aic7xxx, buslogic, eata_dma, eata_pio, fdomain, in2000, pas16, qlogic, 
+scsi_debug, seagate, t128, u15-24f, ultrastore 或者 wd7000. 
+这些目录展示那些至少注册了一个 SCSI HBA 的驱动. 
+而对每个已注册的 host, 每个目录中都包含一个文件与之对应, 
+而这些对应的 host 文件就以初始化时分配给 host 的数字来命名.
+
+这些文件给出了驱动程序以及设备的配置, 统计数据等.
+
+可以通过写这些文件实现不同的 host 上做不同的工作. 
+例如, root 可以用 \fIlatency\fP 和 \fInolatency\fP 命令打
+开或者关闭 eata_dma 驱动器上测量延时的代码, 
+也可以用 \fIlockup\fP 和 \fIunlock\fP 命令
+控制 scsi_debug 驱动器所模拟的总线锁操作. 
+.RE
+.TP
+.I self
+当某进程访问 /proc 目录时, 该目录就指向 /proc 下以该进
+程 ID 命名的目录. 
+.TP
+.I stat
+内核及系统的统计数据. 
+.RS
+.TP
+\fIcpu  3357 0 4313 1362393\fP
+系统分别消耗在用户模式, 低优先权的用户模式（nice）, 
+系统模式, 以及空闲任务的时间, 以 jiffy 为单位.
+最后一个数值应该是 uptime 伪文件第二个数值的
+100 倍. 
+.TP
+\fIdisk 0 0 0 0\fP
+目前并没有实现这四个磁盘记录, 我甚至认为就不应该实现它，
+这是由于在别的机器上内核统计通常依赖转换率及
+每秒 I/O 数, 而这令每个驱动器只能有一个域. 
+.TP
+\fIpage 5741 1808\fP
+系统（从磁盘）交换进的页数和交换出去的页数．
+.TP
+\fIswap 1 0\fP
+取入的交换页及被取出的交换页的页数.
+.TP
+\fIintr 1462898\fP
+系统自启动以来所收到的中断数. 
+.TP
+\fIctxt 115315\fP
+系统所作的进程环境切换次数. 
+.TP
+\fIbtime 769041601\fP
+系统自 1970 年 1 月 1 号以来总的运行时间, 以秒为单位. 
+.RE
+.TP
+.I sys
+该目录在 1.3.57 的内核里开始出现, 包含一些对应于内
+核变量的文件和子目录. 你可以读这些变量, 有的也可以
+通过\fIproc\fP修改, 或者用系统调用
+.IR sysctl (2)
+修改. 目前该目录下有如下三个子目录:
+.IR kernel ";, "; net ";, "; vm
+每个各自包括一些文件和子目录.
+.RS
+.TP
+.I kernel
+该目录包括如下文件: 
+.IR domainname ";, "; file-max ";, "; file-nr ";, "; hostname ";, ";
+.IR inode-max ";, "; inode-nr ";, "; osrelease ";, "; ostype ";, ";
+.IR panic ";, "; real-root-dev ";, "; securelevel ";, "; version ,
+由文件名就可以清楚地得知各文件功能. 
+.LP
+只读文件 
+.I file-nr
+给出当前打开的文件数. 
+.LP
+文件
+.I file-max
+给出系统所容许的最大可打开文件数.
+如果 1024 不够大的话, 可以
+.br
+.nf
+.ft CW
+echo 4096 &gt; /proc/sys/kernel/file-max
+.fi
+.ft
+.LP
+类似地, 文件
+.I inode-nr
+以及文件
+.I inode-max
+指出了当前 inode 数和最大 inode 数.
+.LP
+文件
+.IR ostype ";, "; osrelease ";, "; version
+实际上是
+.IR /proc/version
+的子字串．
+.LP
+文件
+.I panic
+可以对内核变量
+.IR panic_timeout
+进行读/写访问．
+如果该值为零, 内核在 panic 时进入（死）循环; 
+如果非零, 该值指出内核将自动重起的时间, 以秒为单位. 
+.LP
+文件
+.I securelevel
+目前似乎没什么意义 - root 无所不能. 
+.RE
+.TP
+.I uptime
+该文件包含两个数: 系统正常运行时间和总的空闲时间, 都以秒为单位. 
+.TP
+.I version
+指明了当前正在运行的内核版本, 例如: 
+.nf
+.in -2
+.ft CW
+Linux version 1.0.9 (quinlan@phaze) #1 Sat May 14 01:51:54 EDT 1994
+.ft
+.in +2
+.fi
+
+.RE
+.RE
+.SH 又见
+cat(1), find(1), free(1), mount(1), ps(1), tr(1), uptime(1), readlink(2),
+mmap(2), chroot(2), syslog(2), hier(7), arp(8), dmesg(8), netstat(8),
+route(8), ifconfig(8), procinfo(8)等等. 
+.\"; maybe I should trim that down
+.SH 遵循
+本手册页基本上是针对 Linux 1.3.11 内核, 如有必要请及时更新!
+
+最后更新也是针对 Linux 1.3.11.
+.SH 注意事项
+请注意许多字符串(例如环境变量或者命令行)是以内部格式保存的, 
+以 NUL 作为子域的结束标志, 可以用 \fIod -c\fP
+或者 \fItr ";\\000"; ";\\n";\fP 使之变得更可读.
+
+本手册页还不完善, 可能有不够确切的地方, 需要经常更新. 
+.SH BUGS
+.I /proc
+可能会给那些使用了
+.BR chroot (2)
+的进程带来安全问题. 例如, 如果
+.I /proc
+被 mount 在
+.B chroot
+级别里, 一个
+到
+.I /proc/1/root
+的
+.BR chdir (2)
+操作将返回文件系统的原始根目录.  
+由于 Linux 还不支持
+.BR fchroot (2)
+调用, 该问题可能更应该看作一个特性而不是一个 bug.
+
+.SH "[中文版维护人]"
+.B mapping <mapping@263.net>
+.SH "[中文版最新更新]"
+.B 2000/11/26
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,352 @@
+.\" @(#)mpg123.1 0.01 21-Apr-1997 OF; from mpg123 archive
+.\" Chinese version copyright (c)linuxipy <groove@ustc.edu> , href=http://www.linuxforum.net>www.linuxforum.net 2003.
+.\" Chinese version last update on 29-Dec-2003
+.\"
+.\"
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH mpg123 1 "21 Apr 1997"
+.SH 命令名
+mpg123 \- 播放 MPEG 1.0/2.0 Layer-1, -2, -3 音频文件
+.SH 语法
+.B mpg123
+[
+.B \-tscvqy01m24
+][
+.BI \-b " size"
+][
+.BI \-k " num"
+][
+.BI \-n " num"
+][
+.BI \-f " factor"
+][
+.BI \-r " rate"
+][
+.BI \-g " gain"
+][
+.BI \-a " dev"
+][
+.BR "\-o s" " | " "\-o h" " | " "\-o l"
+][
+.BI \-d " n"
+][
+.BI \-h " n"
+][
+.BI \-p " proxy"
+][
+.BI \-@ " file"
+]
+.IR file " ... | " URL " ... | "
+.B \-
+.SH 描述
+.B mpg123
+从一个或多个
+.I 文件
+或者
+.I URL
+读取MPEG-1/2音频比特流 (如果指定 `\-' 选项, 则从标准输入读取),
+然后使用音频设备进行播放(默认), 或将解码结果送 到标准输出上.
+.SH 选项
+.B mpg123
+接收传统的POSIX风格的单字母选项, 也接收GNU风格的长单词选项. 这两 种选项分别以 `\-' 和
+"\-\^\-" 开头.
+.TP
+.BR \-t ", " \-\-test
+测试模式. 对音频流进行解码, 但不输出.
+.TP
+.BR \-s ", " \-\^\-stdout
+将解码结果送到标准输出上, 而不使用音频设备进行播放. 如果
+.B mpg123
+不支持你的音频硬件, 你就可以试试这一选项, 这时, 
+.B mpg123
+以本机 字节顺序(host byte order)输出16比特的立体声线性PCM(脉冲编码调制)
+音频裸数据(没有数据头).
+.TP
+.BR \-c ", " \-\^\-check
+对每一帧进行滤波器越界检查, 如发生则报告之.
+.TP
+.BR \-v ", " \-\^\-verbose
+播放时显示更多信息, 比如显示当前正在解码的帧号. 
+.TP
+.BR \-q ", " \-\^\-quiet
+安静模式. 不显示诊断信息.
+.TP
+.BR \-y ", " \-\^\-resync
+如果输入文件发生错误, 则重新进行同步并继续解码. 另外, 对那些文件 头损坏的MPEG文件,
+通常
+.B mpg123
+会拒绝播放并显示 ' Illegal header', 但如果指定本选项, 
+.B mpg123
+会试图从损坏的文件头中恢复并进行播放. 小心:
+损坏的MPEG文件在播放到损坏处时可能出现尖利刺耳的噪声, 如果 音量过大, 可能损坏扬声器.
+.TP
+.BR \-0 ", " \-\^\-single0 "; " \-1 ", " \-\^\-single1
+只对0(左) 声道或者1(右) 声道进行解码. 这两个选项只对立体声的MPEG 音频流有效.
+.TP
+.BR \-m ", " \-\^\-singlemix
+将两个声道混音. 此选项只对MPEG Layer-3的立体声音频流有效, 并可比
+完全立体声解码节省一些
+CPU时间.
+.TP
+.BR \-2 ", " \-\^\-2to1 "; " \-4 ", " \-\^\-4to1
+将输出流的采样率将低至标准的1/2 (22kHz) 或者1/4 (11kHz). 使用这
+两个选项可以减少一些CPU的负荷, 但是声音质量会下降(至少使用11kHz 采样率时会很难听).
+.TP
+\fB\-b \fIsize\fR, \fB\-\^\-buffer \fIsize
+用
+.I size
+指定输出缓冲区的大小, 单位为千字节. 使用此选项通常可以避 免由频繁的系统操作造成的
+声音输出时断时续的现象. 
+.I size
+的值小于 300时就没什么意义了, 建议至少取1024(即使用1Mb的缓冲区, 可以缓冲
+相当于6秒钟的音频数据).
+.I size
+的默认值为0, 即不进行输出缓冲.
+.TP
+\fB\-k \fInum\fR, \fB\-\^\-skip \fInum
+跳过前
+.I num
+帧. 不指定此选项时, 默认从第1帧开始解码. 
+.TP
+\fB\-n \fInum\fR, \fB\-\^\-frames \fInum
+只对前
+.I num
+帧进行解码. 不指定此选项时, 默认对整个音频流进行解码.
+.TP
+\fB\-f \fIfactor\fR, \fB\-\^\-scale \fIfactor
+改变缩放因子
+.I factor
+的值(默认值为32768).
+.TP
+\fB\-r \fIrate\fR, \fB\-\^\-rate \fIrate
+设置采样率
+.I rate
+(默认为自动设置). 使用这一选项后,
+.B mpg123
+会自动 将速率转换成不依赖于MPEG流速率的一个恒定比特率.
+此选项应该和 \-\-stereo 或 \-\-mono 联合起来使用.
+.TP
+\fB\-g \fIgain\fR, \fB\-\^\-gain \fIgain
+设置音频硬件输出增益
+.I gain
+(默认为保持不变).
+.TP
+\fB\-a \fIdev\fR, \fB\-\^\-audiodevice \fIdev
+指定音频设备. 默认的音频设备与系统配置有关(通常是 /dev/audio 或 /dev/dsp ),
+如果系统中有多个音频设备而默认的又不是你想用的那个, 就可使用本选项.
+.TP
+.BR "\-o s" ", " \-\^\-speaker
+将声音导出到主板上的扬声器上.
+.TP
+.BR "\-o h" ", " \-\^\-headphones
+将声音导出到耳机连接器上.
+.TP
+.BR "\-o l" ", " \-\^\-lineout
+将声音导出到Line-Out连接器上.
+.TP
+\fB\-d \fIn\fR, \fB\-\^\-doublespeed \fIn
+每
+.IR n
+帧播放一帧. 这会使MPEG流的播放速度提高为正常速度的
+.I n
+倍, 从而可以产生特殊的声音效果. 此选项可以和
+.B \-\^\-halfspeed
+选项组合使 用, 实现类似每4帧播放3帧(译者注: 指定-d 4 -h 3)的效果.
+如果使用 此选项, 不要指望声音质量会很好.
+.TP
+\fB\-h \fIn\fR, \fB\-\^\-halfspeed \fIn
+将每帧都播放
+.I n
+遍. 这会使MPEG流的播放速度降低为正常速度的
+.IR 1 / n ,
+从而可以产生特殊的声音效果. 此选项可以和
+.B \-\^\-doublespeed
+选项组合 使用, 实现类似每3帧播放2帧(译者注: 指定-h 2 -d 3)的效果.
+如果使 用此选项, 不要指望声音质量会很好.
+.TP
+\fB\-p \fIURL \fR| \fBnone\fR, \fB\-\^\-proxy \fIURL \fR| \fBnone
+指定
+.I proxy
+作为HTTP请求的代理. 指定的格式应是一个完整的URL (如"http://host.domain:port/"),
+但是可以省略前缀"http://", 端口 号port(默认的端口为80)和末尾的'/'. 
+如果指定为
+.B none
+,则不使用代 理, 直接向服务器请求文件. 更多细节请看 "HTTP 支持" 小节.
+.TP
+\fB\-u \fIauth\fR, \fB\-\^\-auth \fIauth
+如果通过HTTP下载文件时服务器要求提供认证信息, 则由
+.I auth
+指定, 其 格式为 "用户名:密码" (不包括引号).
+.TP
+\fB\-@ \fIfile\fR, \fB\-\^\-list \fIfile
+从
+.I file
+指定的文件中读取将要播放的MPEG音频流所在的文件和(或)URL, 如果
+命令行中还指定了其它的文件和(或)URL, 也将其包含进播放清单.
+如果指定
+.I file
+为 `\-'而非一个普通的文件名, 
+.B mpg123
+将从标准输入读 取文件名和(或)URL, 或者读取一个指向播放清单文件的URL.
+注意:
+.B \-@
+选项只能使用一次(如果多处指定, 则只有最后一个有效).
+.TP
+.BR \-z ", " \-\^\-shuffle
+随机播放. 按随机的顺序播放命令行和清单文件中指定的音频文件.
+.TP
+.BR \-\-stereo
+强制立体声输出.
+.TP
+.BR \-\-reopen
+强制在播放完一个文件后重新打开音频设备.
+.TP
+.BR \-\-8bit
+强制8比特输出.
+.TP
+.BR \-Z ", " \-\-random
+完全随机播放. (译者注: 与 --shuffle 选项的区别是, 指定本选项有可
+能重复多次播放同一文件)
+.SH 操作数
+.B mpg123
+支持下面的操作数:
+.TP
+.IR file 
+指定输入文件的路径. 这些文件必须包含合法的MPEG-1/2音频 Layer-1,
+Layer-2或Layer-3的比特流.
+如果指定为'-', 将从标准输入读取MPEG数 据. 进一步, 如果以"http://"开头, 则认为指定
+了一个
+.I URL
+(请看下一 节).
+.SH HTTP 支持
+除了能从普通文件和标准输入读取MPEG音频流,  
+.B mpg123
+还支持通过HTTP协 议从万 维网(WWW)上获取由URL(统一资源定位符)指定的文件.
+一个URL是一个以 "http://" 为前缀的字符串, 当
+.B mpg123
+识别到这个前缀, 它会尝试开启一个 到相应服务器的连接, 
+接着获取相应的文件并进行解码播放.
+.P
+很多时候, 从WWW缓存, 或所谓的网络代理比直接从服务器更容易获取文件. 为利 用这种便利,
+.B mpg123
+会依次检查
+.BR MP3_HTTP_PROXY ", "http_proxy "和" HTTP_PROXY,
+这三个环境变量是否被设置, 并将第一个被设置的变量的值作为指定的代理.
+如 果你需要自己指定另外的代理, 可以使用
+.B \-p
+命令行选项 (请看"选项"小节).  使用
+.B "\-p none"
+选项将不使用任何代理而直接连接服务器, 即使前面所述的三个 变量被设置.
+.P
+值得注意的是, 为了能从一个WWW服务器获取并流畅地播放MPEG音频文件, 
+必须有 足够快的网络连接. 例如, 为了能播放速率为128kbit/s的MPEG文件, 所需的
+网络带宽至少应该是128kbit/s加上网络协 议本身的传输开销.
+如果网络常发生 短时中断, 可以试试用
+.B \-b
+选项指定一个缓冲区. 如果你所在的网络根本无 法达到实时传输MPEG音频文件所需的带宽,
+就只好使用
+.BR lynx (1)
+之类的软件先将 文件下载到本地硬盘上再进行播放了.
+.P
+如果服务器要求认证, 可以使用
+.BR "\-u auth"
+选项(请看"选项"小节)指定用户名和密 码.
+.SH 中断
+任何时候按Ctrl-C键都能中断
+.B mpg123
+的运行. 如果有多个文件在播放, Ctrl-C 会终止当前文件的播放并
+开始播放下一个文件, 这种情况下, 如果你想终止整 个程序的运行, 必须连按两次Ctrl-C
+(在约一秒钟之内).
+.P
+注意, 按了Ctrl-C之后声音也许不会马上消失, 这是因为系统的音频设备缓冲了 
+一部分数据. 这种延迟随系统不同而不同, 但通常都不超过1到2秒.
+.SH 相关说明
+.BR lynx (1),
+.BR sox (1),
+.BR intro (1)
+.SH 注意
+MPEG音频解码, 特别是Layer-3的解码, 需要CPU进行大量的运算. 为能达到实时
+解码, 你的计算机至少应该配备Pentium, Alpha, SuperSparc或性能相当的处 理器.
+同时你可以使用
+.B -singlemix
+选项进行单声道解码, 对Layer-3, 这多少 能减少一点CPU负荷. 此外你也可以考虑使用
+.BR \-2 " 和 " \-4
+选项.
+.P
+如果这些方法都不奏效, 试试用
+.B \-s
+选项将解码结果送到标准输出上并将其定向 到一个文件中, 然后再用适当的工具播放这个文件.
+你也许会用到
+.BR sox (1)
+这个 工具, 它能将文件转换成你的音频播放器所用的格式.
+.P
+还有一点就是
+.B mpg123
+总是输出16比特的立体声数据(如果指定
+.BR \-0 "或" \-1
+选项中 的一个, 立体声两个声道的数据是相同的). 如果系统硬件要求其它格式, 比如8
+比特的单声道的数据, 同样可以使用
+.BR sox (1)
+进行转化.
+.P
+如果你的系统本身足够快, 能够进行实时解码, 只是在系统负荷较重时(如定时任
+务, 用户远程登录或启动`大'程序等)出现停顿, 你应该用
+.B \-b
+选项指定一个不小 于1000K字节的缓冲区.
+.SH BUGS
+.TP
+已知的BUG和局限性:
+.br
+MPEG-2, Layer-1和-2未经 测试. 可能不能工作.(Layer-3应该能工作.)
+.br
+不提供对自由格式的音频流的支持.
+.br
+对Layer-1的支持未经 严格测试. 
+.br
+未进行CRC错误校验.
+.br
+没有对DEC Digital Unix, Ultrix 和 IBM AIX平台上的音频硬件提供支 持,
+因此在这些平台上必须使用
+.B \-s
+选项.
+.SH 作者
+.TP
+主要作者:
+.br
+Michael Hipp <hippm@informatik.uni-tuebingen.de>
+.TP
+使用了下面的代码或借鉴了其中的思想:
+.br
+MPEG Software Simulation Group (Base package)
+.br
+Philipp Knirsch <phil@mpik-tueb.mpg.de> (DCT36/manual unroll)
+.br
+Tobias Bading <bading@cs.tu-berlin.de> (subband synthesis)
+.br
+Jeff Tsay <ctsay@pasteur.eecs.berkeley.edu> (DCT36)
+.br
+Thomas Woerner (SGI Audio)
+.br
+Damien Clermonte <clermond@esiee.fr> (HP-UX audio fixes)
+.br
+Oliver Fromme <oliver.fromme@heim3.tu-clausthal.de>
+.P
+网络参考资料:
+http://www.sfs.nphil.uni-tuebingen.de/~hipp/mpg123.html
+.br
+http://www.heim3.tu-clausthal.de/~olli/mpg123/
+.br
+(包含关于mpg123邮件组的信息)
+.P
+在此获取最新版本:
+.br
+http://ftp.tu-clausthal.de/pub/unix/audio/mpg123
+.SH "[中文版维护人]"
+linuxipy <groove@ustc.edu>
+.SH "[中文版最新更新]"
+2004/2/29
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

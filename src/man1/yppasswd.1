@@ -1,0 +1,156 @@
+.\" -*- nroff -*-
+.\" Copyright (C) 1998, 1999 Thorsten Kukuk
+.\" This file is part of the yp-tools.
+.\" Author: Thorsten Kukuk <kukuk@suse.de>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2, or (at your option)
+.\" any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software Foundation,
+.\" Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"
+.TH yppasswd 1 "1998年5月" "YP Tools 2.4"
+.SH NAME(名称）
+yppasswd, ypchfn, ypchsh \- 修改你在NIS数据库中的密码
+.SH SYNOPSIS(总览)
+.B "yppasswd [-f] [-l] [-p] [user]"
+.br
+.B "ypchfn [user]"
+.br
+.B "ypchsh [user]"
+.SH DESCRIPTION(描述)
+在Linux中,标准的
+.BR passwd (1),
+.BR chfn (1)
+和
+.BR chsh (1)
+不能够用来修改用户的NIS密码,shell和GECOS信息,它们只能修改本机上的密码文件.
+要修改NIS信息,可以使用它们的NIS对应命令
+.BR yppasswd ,
+.B ypchfn
+和
+.BR ypchsh
+来替代.
+.P
+这些命令都是同一个程序,只是链接为不同的名字罢了.
+使用命令行选项,你可以选择是否更新你的密码
+.BR \-p ,
+你的登录shell
+.BR \-l ,
+你的GECOS字段
+.BR \-f ,
+还是它们的并集.
+如果没有指定其它选项的话,
+.B yppasswd
+暗含了
+.B \-p
+选项.如果你使用了
+.B \-f
+或者
+.B \-l
+选项,你也需要添加
+.B \-p
+标识。
+.B ypchfn
+暗含了
+.B \-f
+选项,而
+.B ypchsh
+则暗含了
+.BR \-l 
+选项.
+.P
+当不带
+.I user
+参数调用时,正在调用命令的用户的账号信息将被更新,
+否则更新
+.I user
+的信息.该选项只对超级用户有用.如果服务器上的yppasswdd后台守护程序支持,你可以指定服务器的root密码来替换用户[老的]密码.
+.P
+所有工具首先会提示用户当前NIS密码需要使用
+.BR yppasswdd (8)
+后台守护程序认证.随后,程序提示以下更新信息:
+.\"
+.\"
+.IP "\fByppasswd\fP或\fB-l\fP"
+修改用户的NIS密码.提示用户输入新的密码.
+当输入密码时,响应是关闭的,这样密码不会显示在屏幕上.拒绝空的密码,这是因为密码短于6个字符.用户然后会要求重新输入密码以确证第一次没有拼错.
+.\"
+.\"
+.IP "\fBypchsh\fP or \fB-l\fP"
+修改用户的登录shell.提示用户输入新的shell,老的shell作为默认值:
+.IP
+.in +2n
+.ft B
+.nf
+Login shell [/bin/sh]: _
+.fi
+.ft
+.in
+.IP
+要接受默认值,只需按回车.要清除在你的
+.BR passwd (5)
+文件中的shell字段(这样会选定系统的默认shell),
+输入字符串
+.IR none .
+.\"
+.\"
+.IP "\fBypchfn\fP or \fB-f\fP"
+修改用户的全名和相关信息.按照惯例,一些应用程序需求
+.BR passwd (5)
+文件的GECOS字段(字段4)包含用户的真名(与登录名相对应)和一些如办公室电话号码之类的附加信息.这些信息通过
+.BR finger (1)
+和其他一些可能的工具显示.
+.IP
+当设置全名时,
+.B ypchfn
+显示以下提示,默认值使用方括号括起:
+.IP
+.in +2n
+.ft B
+.nf
+Name [Joe Doe]:
+Location [2nd floor, bldg 34]:
+Office Phone [12345]:
+Home Phone []:
+.fi
+.ft
+.in
+.IP
+要接受默认值,只需按回车.要清除一个字段,则输入
+字符串
+.IR none .
+.SH SEE ALSO(另见)
+.BR chfn (1),
+.BR chsh (1),
+.BR finger (1),
+.BR passwd (5),
+.BR passwd (1),
+.BR ypcat (1),
+.BR yppasswdd (8),
+.BR ypserv (8),
+.BR ypwhich (1)
+.LP
+.SH AUTHOR(作者)
+.B yppasswd
+是
+.B yp-tools
+包的一部分,由Thorsten Kukuk <kukuk@suse.de>写成.
+
+
+
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2000/12/14
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

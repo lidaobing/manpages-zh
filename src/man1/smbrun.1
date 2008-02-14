@@ -1,0 +1,51 @@
+
+.TH smbrun 1 Samba  "23 Oct 1998"
+
+.SH NAME
+smbrun - smbd和外部程序间的接口程序。 
+
+.SH 总览 SYNOPSIS
+smbrun shell-command
+
+.SH 描述 DESCRIPTION
+此程序是samba套件的一部分。 
+
+smbrun是个非常小的“粘合”程序，用于为smbd守护程序\fBsmbd\fR(8)运行一些shell命令。
+
+它首先把用户和组身份改成所能达到的最高级别，然后运行\fIsystem()\fR调用中的命令行。这个程序
+可以顺利地允许一些操作系统以非root身份运行外部程序。
+
+.SH 选项 OPTIONS
+\fIshell-command\fR
+要执行的shell命令。这个命令应该带有全路径。 
+
+.SH 环境变量 ENVIRONMENT VARIABLES
+如果没有给出完整的路径信息，smbrun所执行时的PATH 环境变量会影响可执行程序的查找位置及运行。
+
+.SH 诊断
+如果无法定位\fBsmbrun\fR或者不能通过\fBsmbd\fR执行命令，我们可以在\fBsmbd\fR记录文件中找到一些相应的信息。其它一些诊断信息取决于运行的shell命令。最好让你执行的shell命令来提供有用的诊断信息，用来除错。
+
+.SH 版本
+此手册页是针对samba套件版本2.0的。 
+
+.SH 另见
+.PP
+\fBsmb.conf\fR (5), \fBsmbd\fR (8) 
+
+.SH "作者 AUTHOR"
+
+.PP
+samba软件和相关工具最初由Andrew Tridgell创建。samba现在由Samba Team 作为开源软件来发展，类似linux内核的开发方式。
+
+.PP
+最初的samba手册页是 Karl Auer写的。
+手册页源码已经转换为YODL格式(另一种很好的开源软件，可以在ftp://ftp.ice.rug.nl/pub/unix找到)，由Jeremy Sllison 更新到Samba2.0 版本。
+Gerald Carter 在Samba2.2中将它转化为DocBook 格式。
+Alexander Bokovoy 在Samba 3.0中实现了DocBook XML4.2 格式的转换。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

@@ -1,0 +1,44 @@
+.\"  Chinese Version Copyright mhss, www.linuxforum.net, 2000
+.TH ZDUMP 8
+.SH NAME
+zdump \- 时区输出器
+.SH SYNOPSIS 总览
+.B zdump
+[
+.B \-v
+] [
+.B \-c
+cutoffyear ] [ zonename ... ]
+.SH 描述
+.I Zdump
+对命令行中的每一个
+.I zonename
+输出其当前时间。
+.PP
+提供了以下选项:
+.TP
+.B \-v
+对于命令行的每一个
+.I zonename
+,
+输出可能的最早时间值，可能的最早时间一天以后的时间值，
+它们均是能被检测到的精确时刻的1秒前的时间值，
+可能的最晚时间一天以前的时间值, 可能的最晚时间值，
+如果给出的时间是夏令时，每行以
+.B isdst=1
+结束，否则以
+.B isdst=0
+结束。
+.TP
+.BI "\-c " cutoffyear
+在给定的年份开始的前后，剪切掉冗余的输出。
+.SH "又见"
+newctime(3), tzfile(5), zic(8)
+.\" @(#)zdump.8 7.3
+
+.SH [中文版维护人]
+.B mhss <jijingzhisheng@up369.com>
+.SH [中文版最新更新]
+2000/12/05
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

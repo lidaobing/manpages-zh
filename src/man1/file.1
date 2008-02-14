@@ -1,0 +1,364 @@
+.TH FILE 1 "Copyright but distributable"
+.SH NAME
+file
+\- 确定文件类型
+.SH 总览
+.B file
+[
+.B \-bcnsvzL
+]
+[
+.B \-f
+命名文件 ]
+[
+.B \-m 
+幻数文件 ]
+file ...
+.SH 描述
+本手册页说明了3.27版本
+.B file
+命令的使用.
+.B File
+命令试图检查每个参数以判定文件的类型.
+检查共有三组，按如下顺序进行:文件系统检查，幻数检查，以及语言检查.
+.I 文件系统
+检查成功则输出文件类型.
+.PP
+输出的类型一般会包含以下的词中的一个：
+.B text
+(文件中仅有
+.SM ASCII
+字符，可以用
+.SM ASCII
+终端读此文件，以保证内容的可靠性),
+.B executable
+(文件中保存的是程序编译后的结果，一些\s-1UNIX\s0 内核或其它内核能理解这类文件),
+或者
+.B data
+表示所有其它类型文件(data 一般为二进制文件或者不可打印的).
+但是有的常用的文件格式（如core文件、tar包），虽然也包含二进制数据，
+却不属于这一类
+如果要修改
+.I /usr/share/magic
+或者程序本身, 
+.B "preserve these keywords" .
+当文件为``text'' 类型时，认为此文件为可读文件.
+不要象在Berkeley环境中那样做 \- 要把``shell commands text''改为``shell script''.
+.PP
+文件系统检查是建立在对
+.BR stat (2)
+系统调用结果的分析上的.
+程序会分析文件是否为空,或者是否是某种特殊文件.
+对于所有可在现有系统上使用的文件类型 (比如套接
+口文件，动态链接文件，命名管道文件(FIFOs) 等)，
+只要它在系统头文件
+.IR sys/stat.h 
+中已经定义过，就可以被检查到.
+.PP
+幻数检查用来检查文件中是否有特殊的固定格式的数据.
+规范的例子如二进制可执行文件(编译后的程序)
+.I a.out
+,该文件格式在标准include目录下的
+.I a.out.h
+文件中定义，也可能在
+.I exec.h
+中定义.
+这些文件在文件开始部分附近的一个特殊位置保存有一个'幻数' , 
+通过幻数告诉\s-1UNIX\s0 操作系统此文件是二进制可执行文件,
+和其中包含的其它类型.
+幻数的概念已经扩展到数据文件.任何在文件固定位置有与文件类型
+相关的不变标识符的文件都可以这样表示. 这些文件中的信息可以
+从幻数文件
+.I /usr/share/magic
+中读取.
+.PP
+如果文件为
+.SM ASCII 
+文件,
+.B file
+会试图检查它的语言.
+语言检查在文件开始的几个块中(任意位置)查找是否有特殊字符串(参看
+.IR names.h )
+例如，关键字
+.B .br
+指出此文件很可能是
+.BR troff (1)
+输入文件, 而关键字 
+.B struct
+指出此文件是C程序.
+语言检查不如前两组检查可靠，所以放在最后执行.它也用来检查
+一些混合文件(例如 
+.BR tar (1)
+存档文件)并确定文件是`ascii text'类型还是`data'类型. 
+.SH 选项
+.TP 8
+.B \-b
+不输出文件名 (简要模式).
+.TP 8
+.B \-c
+检查时打印输出幻数文件的解析结果.常与
+.B \-m
+一起使用，用来在安装幻数文件之前调试它.
+.TP 8
+.B \-f 命名文件
+从在参数表前的
+.I 命名文件
+中读出将要检查的文件名(每行一个文件).要有
+.I 命名文件
+，或者至少有一个文件名参数;
+如果要检查标准输入, 使用``-''作为文件参数.
+.TP 8
+.B \-m list
+指定包含幻数的文件列表.可以是单个文件，也可以是
+用冒号分开的多个文件.
+.TP 8
+.B \-n
+每检查完一个文件就强制刷新标准输出. 仅在检查一组文件时才有效.
+一般在将文件类型输出到管道时才采用此选项.
+.TP 8
+.B \-v
+打印程序版本并退出.
+.TP 8
+.B \-z
+试图查看压缩文件内部信息.
+.TP 8
+.B \-L
+(在支持符号链接的系统上)选项显示符号链接文件的原文件, 就像
+.BR ls (1)
+命令的like-named 选项.
+.TP 8
+.B \-s
+通常,
+.B file
+只是试图去检查在文件列表中那些
+.BR stat (2)
+报告为正常文件的文件的类型.由于读特殊文件将可能导致
+不可知后果，所以这样可以防止发生问题.使用
+.BR \-s
+选项时
+.B file
+命令也将去读文件列表中的块特殊文件和字符特殊文件.
+一般用于从原始磁盘分区中获得文件系统类型，此文件为块
+特殊文件. 这个选项也导致
+.B file
+命令忽略
+.BR stat (2)
+报告的文件大小，因为在有些系统中原始磁盘分区的大小报告为0.
+.SH 文件
+.I /usr/share/magic
+\- 默认的幻数列表
+.SH ENVIRONMENT
+环境变量
+.B MAGIC
+用于设置默认的幻数文件.
+.SH 参看
+.BR magic (4)
+\- 幻数文件的格式.
+.br
+.BR strings (1), " od" (1), " hexdump(1)"
+\- 检查非textfile的工具.
+.SH 标准的一致性
+本程序比System V 的FILE命令强大, 几乎能分辨出所有的模糊语言.
+与System V 的FILE命令大部分兼容.本版本能识别更多的magic, 
+但是，也将因此在有些情况下会产生不同输出(尽管更加精确). 
+.PP
+本版本与System V的显著区别就是本版本对空格是作为分隔符来
+处理的, 所以不能在格式字符串中包含空格. 例如,现有幻数文
+件中的
+.br
+>10	string	language impress\ 	(imPRESS data)
+.br
+要改为
+.br
+>10	string	language\e impress	(imPRESS data)
+.br
+另外, 格式字符串中的反斜线符号也要避免.例如，现有幻数文件中的
+.br
+0	string		\ebegindata	Andrew Toolkit document
+.br
+要改为
+.br
+0	string		\e\ebegindata	Andrew Toolkit document
+.br
+.PP
+SunOS releases 3.2及以后的版本包括从System V 发展来的
+.BR file (1)
+命令,但有所扩展.本版本与Sun的file命令差别不大.它包括对 `&' 
+操作符的扩展,例如,
+.br
+>16	long&0x7fffffff	>0		not stripped
+.SH MAGIC DIRECTORY
+幻数文件项主要是从USENET收集来的,许多人都为此作出了贡献.
+Christos Zoulas (下边将提到的)将收集附加项信息及修正幻数文件项.
+幻数文件项的合并表将会定时发布.
+.PP
+幻数文件项的顺序非常重要.不同的系统上的幻数项放的顺序可能不同.
+如果老的
+.B file
+命令使用幻数文件，请将旧的幻数文件改名保存，
+(如改为
+.IR /usr/share/magic.orig )
+以便日后做比较用.
+.SH 举例
+.nf
+$ file file.c file /dev/hda
+file.c:   C program text
+file:     ELF 32-bit LSB executable, Intel 80386, version 1,
+dynamically linked, not stripped
+/dev/hda: block special
+
+$ file -s /dev/hda{,1,2,3,4,5,6,7,8,9,10}
+/dev/hda:   x86 boot sector
+/dev/hda1:  Linux/i386 ext2 filesystem
+/dev/hda2:  x86 boot sector
+/dev/hda3:  x86 boot sector, extended partition table
+/dev/hda4:  Linux/i386 ext2 filesystem
+/dev/hda5:  Linux/i386 swap file
+/dev/hda6:  Linux/i386 swap file
+/dev/hda7:  Linux/i386 swap file
+/dev/hda8:  Linux/i386 swap file
+/dev/hda9:  empty
+/dev/hda10: empty
+.fi
+.SH 历史
+There has been a 
+.B file
+命令至少是从研究版本6(手册页时间为1975年1月)开始加入\s-1UNIX\s0中的.
+System V 版本引入了一个重要变化:幻数类型的外部表.程序的运
+行时间有轻微下降, 但是复杂性大大增加了.
+.PP
+本程序是基于System V 版本的,由Ian Darwin独立设计和编写.
+.PP
+John Gilmore对源代码做了较大修改,在第一版基础上有较大提高.
+Geoff Collyer发现了一些不足之处，并提供了一些幻数文件项.
+本程序一直在完善中.
+.SH 作者
+由Ian F. Darwin写源码, UUCP 地址 {utzoo | ihnp4}!darwin!ian,
+电子邮件 ian@sq.com,
+邮寄地址: P.O. Box 603, Station F, Toronto, Ontario, CANADA M4Y 2L8.
+.PP
+由Rob McMahon修改, cudcv@warwick.ac.uk, 1989, 并对`&'操作符进行了扩充
+（不再仅仅是简单的 `x&y != 0'，而是象`x&y op z'这样）.
+.PP
+由Guy Harris修改, guy@netapp.com, 1993,完成:
+.RS
+.PP
+恢复``old-style'' `&'
+操作符为原来的功能,因为 1) Rob McMahon所做的修改打破了原来的使用方式, 
+2) 本版本的
+.B file
+命令支持的SunOS 的``new-style'' `&' 操作符也处理 `x&y op z',
+3) Rob的修改对某些情况没有考虑到;
+.PP
+引入多级`>';
+.PP
+引入``beshort'', ``leshort'', 等关键字使得程序能够按照一定的比特顺序
+查看文件中的比特数，而不是仅按运行
+.BR file
+时的本地比特顺序查看.
+.RE
+.PP
+由Ian Darwin和其他作者（包括Christos Zoulas(christos@astron.com)）修改, 1990-1999.
+.SH 合法性通告
+版权所属 (c) Ian F. Darwin, Toronto, Canada,
+1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993.
+.PP
+本软件独立于美国电话电报公司，Sun微系统公司，Digital设备公司,
+Lotus发展公司 , California大学董事会，X联盟或者MIT,或者自由软件基金会.
+.PP
+本软件独立于美国商业部的任何出口规定,可以自由用于任何国家和行星.
+.PP
+任何人无需授权即可在任何计算机系统上使用此软件用于任何目的，
+可以自由修改和发布，但要遵守以下限制:
+.PP 
+1. 作者对使用此软件造成的任何后果不负任何责任，无论多么严重，
+即使这些后果是由于软件造成的.
+.PP
+2. 禁止不如实说明本软件的来源，无论是明确说错或是忽略. 由于很少有用户读源码,
+所以在文件中一定要说明软件来源.
+.PP
+3. 修改后的版本必须明白的标明，禁止将其作为原始软件.由于很少有用户读源码,
+所以在文件中一定要说明软件来源.
+.PP
+4. 禁止删除或修改本通告.
+.PP
+随同本包发布的几个支持文件(\fIgetopt\fP, \fIstrtok\fP)由
+Henry Spencer完成，同样适用以上条款.
+.PP
+随同本包发布的几个支持文件(\fIstrtol\fP, \fIstrchr\fP)属于公共域的;都做了标记.
+.PP
+文件
+.I tar.h
+和
+.I is_tar.c
+由
+.B tar
+程序组的John Gilmore完成,无需遵从以上条款.
+.SH 臭虫
+必定存在一种更好的方法来根据Magdir中的glop来自动创建Magic
+文件.是什么方法呢?要更好的实现，那么幻数文件应该编译成二进制
+(就是说，
+.BR ndbm (3)
+或者, 在异种网络环境中采用定长的
+.SM ASCII
+字符串)来加快启动速度.这样，程序就能达到Version 7 中的
+file命令那样的运行速度,同时又具有System V 版本的灵活性.
+.PP
+.B File
+使用的一些算法虽然提高了速度，但精确性降低了，因此
+在对
+.SM ASCII
+文件内容操作有时会出错.
+.PP
+对
+.SM ASCII
+文件的支持(基本上是对编程语言)过于简单,效率较低，需要重新编译并更新.
+.PP
+在一系列连续行后应该跟着有一个``else''从句.
+.PP
+幻数文件和关键词应该有正则表达式的支持.
+使用
+.SM "ASCII TAB"
+作为分隔符非常不足取，导致很难编辑文件, 但也因此受到保护.
+.PP
+在关键词中使用大写字母是可取的.
+例如,
+.BR troff (1)
+命令与查看手册页的宏.
+正则表达式支持将使这易于实现.
+.PP
+本程序没有实现对 \s-2FORTRAN\s0 的理解.
+应该能够通过在开始行中出现的关键字识别出\s-2FORTRAN\s0 .
+正则表达式支持将使这易于实现.
+.PP
+文件
+.I ascmagic
+中的关键词表可能应归入Magic文件.
+这能通过使用象`*'这样的关键词来实现偏移量.
+.PP
+另一个优化是要对幻数文件排序，这样，我们就可以
+在取得第一个比特，第一个词，第一个长整型，等等的时候完成
+对它们所有的检查.抱怨在幻数文件项中的冲突.制定一条规则，
+将幻数项在文件偏移量的基础上排序，胜过在幻数文件里指定位置吗？
+.PP
+本程序应提供一种方法来评价一种猜测有"多么好".
+我们去除了一些先前的设想(如，将 ``From '' 作为文件的最初5个字符)
+因为它们不如其它的设想好(如，``Newsgroups:'' 对"Return-Path:").
+如果没有其它的设想提出，就很可能会采纳第一种设想.  
+.PP
+本程序比某些file命令执行速度慢.
+.PP
+本手册，特别是本部分，比较长.
+.SH 可用性
+可以通过匿名FTP登陆到
+.B ftp.astron.com
+在目录下
+.I /pub/file/file-X.YY.tar.gz
+获得作者的命令的最新版本
+
+.SH "[中文版维护人]"
+.B 姓名 <email>
+.SH "[中文版最新更新]"
+.B 2001/07/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

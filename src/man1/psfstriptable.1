@@ -1,0 +1,26 @@
+.TH PSFSTRIPTABLE 1 "28 Oct 1997" "控制台工具" "Linux 用户手册"
+
+.SH NAME
+psfstriptable \- 从控制台字体中移走嵌入的Uniocde字符表
+
+.SH 总览
+.B psfstriptable
+.I 字体文件 [输出文件]
+
+.SH 描述
+.IX "psfstriptable command" "" "\fLpsfstriptable\fR command"  
+
+.B psfstriptable
+命令从
+.IR 字体文件
+或者标准输入(此时的
+.I 字体文件
+是单个破折号(\-))读取一个可能含有嵌入Unicode字体表的.psf格
+式的控制台字体, 并将没有Unicode嵌入字符表的.psf格式的控制
+台字体文件写回到标准输出或所指明的输出文件.
+
+.SH "另见"
+.BR consolechars (8),
+.BR psfaddtable (1),
+.BR psfgettable (1).
+

@@ -1,0 +1,89 @@
+.TH Button "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B Button - 有增强选项的按钮组件
+
+.SH 创建 CREATION
+.B Button pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+Button 组件向 Tk 按钮组件扩展了新选项。增加了动态帮助 (\fIDynamicHelp\fR) 选项，一个新面型(relief)式样，arm/disarm 回调，和 repeatdelay/repeatinterval 选项。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+
+.TP
+-armcommand
+指定当在 Button 上点击鼠标按钮 1 的时候与 Button 相关联的一个 Tcl 命令。在 repeatdelay 或 repeatinterval 选项是正整数的时候，如果鼠标指针在这个按钮之上，则反复的调用这个命令，直到释放鼠标按钮 1。
+
+.TP
+-command  
+指定与 Button 相关联的一个 Tcl 命令。典型的当鼠标按钮 1 在 Button 窗口上释放的时候调用这个命令。
+
+.TP
+-default  
+指定缺省 ring 为三种状态之一: normal、active、或 disabled。在活跃状态下，用这个平台特定的缺省按钮的外观绘制这个按钮。在普通状态下，用这个平台特定的非缺省按钮的外观来绘制这个按钮，留出足够的空间来绘制缺省按钮外观。普通和活跃状态将导致相同大小的按钮。在停用状态下，用非缺省按钮外观来绘制这个按钮，但不为缺省外观留下空间。停用状态将导致比活跃状态更小的按钮。
+
+.TP
+-disarmcommand  
+指定在鼠标按钮 1 释放的时候与 Button 相关联的一个 Tcl 命令。即使鼠标指针不在 Button 上也要调用这个命令，并且总是在用 command 选项指定的命令之前。它典型的与 armcommand、repeatdelay 和 repeatinterval 联合使用。
+
+.TP
+-height  
+为 Button 指定想要的高度。如果在 Button 中显示一个图象或位图，则这个值单位是屏幕单位； 对于文本它以行为单位。如果未指定这个选项，则从在其中显示的图象或位图或文本的大小来计算 Button 的需要的高度。
+
+.TP
+-helptext  
+动态帮助的文本。如果为空，则这个组件不能获得帮助。
+
+.TP
+-helptype  
+动态帮助的类型。使用 balloon 或 variable.
+
+.TP
+-helpvar  
+在 helptype 选项是 variable 的时候使用的变量。
+
+.TP
+-name  
+为这个按钮指定一个标准名字。如果在资源数据库中找到选项 *nameName，则从它的值中提取 text 和 underline 选项。
+
+.TP
+-relief  
+为这个组件指定想要的 3-D 效果。可接受的值是按钮面型(relief)的标准值(raised、sunken、 flat、ridge、solid、和 groove) 和 link，它指定当指针在按钮外面的时候按钮的面型是 flat 而在指针在里面的时候是 raised。
+
+.TP
+-state  
+指定这个 Button 为三种状态之一: normal、active、或 disabled。在普通状态下，使用 foreground 和 background 选项显示这个 Button。典型的在指针在这个 Button 之上的时候使用活跃状态。在活跃状态下，使用 activeforeground 和 activebackground 选项显示这个 Button。停用状态意味着这个按钮应当是没有感觉的(insensitive): 缺省绑定将拒绝激活这个组件并将忽略鼠标按扭按下。在这种状态下，使用 disabledforeground 和 background 选项显示这个 Button。
+
+.TP
+-underline  
+指定在这个按钮的标签中要有下划线的字符的整数索引。0 对应显示的文本的第一个字符，1 对应下一个字符，以此类推。
+
+在这个按钮的顶层窗口上自动把绑定 <Alt-char> 自动的设置为调用 Button::setfocus。
+
+.TP
+-width  
+为 Button 指定想要的宽度。如果在 Button 中显示一个图象或位图，则这个值单位是屏幕单位； 对于文本它以字符为单位。如果未指定这个选项，则从在其中显示的图象或位图或文本的大小来计算 Button 的需要的宽度。 
+
+.SH 组件命令
+
+.TP
+pathName cget  option
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。
+
+.TP
+pathName invoke 
+如果 Button 的 state 不是停用。它调用这个按钮的命令。用活跃颜色和 sunken 面型(relief)重新显示 Button，并调用 armcommand。接着用普通颜色和它定义的面型显示 Button，并调用 disarmcommand 接着 command。
+
+在 Button 获得输入聚焦并且用户按 space bar 的时候调用 invoke。
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/04
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

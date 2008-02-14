@@ -1,0 +1,113 @@
+.\" This man page is Copyright (C) 1999 Andi Kleen .
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.\" 中文版 Copyright (c) 2000 LetBright, BitBIRD 和 www.linuxforum.net
+.TH ICMP 7 "27 Apr 1999" "Linux Man Page" "Linux Programmer's Manual" 
+.SH NAME 名称
+icmp, IPPROTO_ICMP \- Linux IPv4 ICMP 核心模块. 
+.SH DESCRIPTION 描述
+本网络核心协议模块实现了基于 RFC792 协议中定义的《互联网控制报文协议》
+。它针对网络主机间通讯出错的情况作出回应并给出诊断信息。
+用户不能直接使用本模块。相反本模块需与核心中的其他协议进行通讯，而这
+些协议将 ICMP 出错信息返回到网络协议的应用层。ICMP 核心模块也回应 ICMP 请求。
+.PP
+如果用 IPPROTP_ICMP 打开原始套接字（raw socket）时，
+用户协议有可以收到任意本地套接字 ICMP 包。
+.BR IPPROTO_ICMP .
+请参阅
+.BR raw (7)
+传递到套接字的 ICMP 包可以用
+.BR ICMP_FILTER 
+套接字选项进行过滤。核心会处理所有 ICMP 包，包括传递到用户的套接字去的。
+
+Linux 对可以到达每个目标主机出错信息包的比率设立了限制。
+.BR ICMP_REDIRECT
+及
+.BR ICMP_DEST_UNREACH
+也受进入包的目标路由的限制。
+
+.SH SYSCTLS
+ICMP 支持通过 sysctl 接口来设置一些全局 IP 参数。对 Sysctl 的访问可以通过读、写
+.BR /proc/sys/net/ipv4/* 
+下的文件通过 
+.BR sysctl (2)
+接口进行. 大多数这些 sysctls 对特定 ICMP 类型的数据包数量进行了限制。
+Linux 2.2 使用记号单元过滤器对 ICMP 包进行限制。
+.\" XXX better description needed
+此值表示超时错误，以秒计，直到到顶后记号单元过滤器被清除为止。
+.TP
+.BR icmp_destunreach_rate
+发送目的地不可到达 ICMP 消息包的最大数据包比率。这限制了发送到任意一个
+路由或目的地的数据包的比率。
+这个限制不影响发送用来发现数据链路最大传送单位（MTU）的
+.BR ICMP_FRAG_NEEDED 包 
+数据包。
+.TP
+.BR icmp_echo_ignore_all 
+如果该值不为零,Linux将忽略所有的
+.BR ICMP_ECHO 
+请求。
+.TP
+.BR icmp_echo_ignore_broadcasts
+如果该值不为零,Linux将忽略所有发送到广播地址的
+.BR ICMP_ECHO 
+数据包。
+.TP
+.BR icmp_echoreply_rate 
+发送响应
+.BR ICMP_ECHOREQUEST 
+请求的
+.BR ICMP_ECHOREPLY
+数据包比率的最大值。
+.TP
+.BR icmp_paramprob_rate
+发送
+.BR ICMP_PARAMETERPROB
+数据包比率的最大值。当一个具有非法 IP 报头数据包到达时将发送这些包。
+.TP
+.BR icmp_timeexceed_rate
+发送
+.BR ICMP_TIME_EXCEEDED
+包比率的最大值。当一个数据包通过太多网段时，这些包用作防止路由回环。
+.SH NOTES
+由于在许多其他实现中不支持
+.B IPPROTO_ICMP 
+原始套接字（raw socket），可移植程序不能依靠这一特性。
+.\" not really true ATM
+.\" 
+.PP
+.\" Linux ICMP 将遵从RFC1122协议.
+.PP
+.\" XXX: 这已列入修正计划，将加入对Alexey无用网关检测的补丁.
+当Linux不作为路由器时，将不被发送
+.BR ICMP_REDIRECT
+包。内核也只有在路由表中的旧网关和路由重新定向超时时才接受这些包。
+.PP
+.BR ICMP_TIMESTAMP
+返回的 64 位毫秒为单位的时间戳是自1970年1月1日以来的时间．
+.PP
+Linux 的 ICMP 在内部使用原始套接字（raw socket）来发送ICMP包。
+这个原始套接字可能在
+.BR netstat (8)
+消息输出中出现，带着一个“zero inode”信息。
+.PP
+.SH VERSIONS
+在2.2版本中将再不支持
+.BR ICMP_ADDRESS
+请求。
+.PP
+在2.2版本中将不再支持
+.BR ICMP_SOURCE_QUENCH
+.SH 参见
+.BR ip (7)
+.PP
+RFC792 对ICMP协议进行了详细的叙述。
+
+.SH "[中文版维护人]"
+.B LetBright <letbright@netease.com>
+.SH "[中文版最新更新]"
+.B 2000/10/30
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

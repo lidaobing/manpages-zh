@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+while(<>){
+	s/gb2312/utf8/g;
+	s/<DD>//ig;
+	s/<DT>//ig;
+	s/<DL>//ig;
+	s/<\/DL>//ig;
+	print
+}

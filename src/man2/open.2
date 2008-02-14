@@ -1,0 +1,333 @@
+
+.TH OPEN 2 1999-06-03 "Linux" "System calls"
+.SH NAME
+open, creat \- 用来 打开和创建 一个 文件或设备
+.SH SYNOPSIS 总览
+.nf
+.B #includ e <sys/types.h>
+.B #include <sys/stat.h>
+.B #include <fcntl.h>
+.sp
+.BI "int open(const char *" pathname ", int " flags );
+.BI "int open(const char *" pathname ", int " flags ", mode_t " mode )
+.BI "int creat(const char *" pathname ", mode_t " mode );
+.fi
+.SH "描述 (DESCRIPTION)"
+.B open()
+通常 用于 将 路径名 转换为 一个 文件描述符 (一个 非负的 小 整数, 在
+.B read " , "write
+等 I/O操作中 将会被使用). 当
+.B open()
+调用 成功, 它会 返回 一个 新的 文件描述符 (永远取 未用 描述符的 最小值).
+这个调用 创建 一个 新的 打开文件, 即 分配 一个 新的 独一无
+二的 文件描述符, 不会与 运行中的 任何 其他程序 共享 (但 可以 通过
+.B fork (2)
+系统调用 实现 共享).
+这个 新的 文件描述符 在其后 对 打开文件操作 的函数 中 使用.(参考
+.BR fcntl (2)).
+文件的 读写 指针 被 置于 文件头
+
+参数
+.I flags
+是通过
+.BR O_RDONLY ", " O_WRONLY " 或 " O_RDWR
+(指明 文件 是以 只读 , 只写 或 读写 方式 打开的)
+与 下面的 零个 或 多个 可选模式 按位
+.RI - or
+操作 得到的:
+.TP
+.B O_CREAT
+若文件 不存在 将 创建 一个 新 文件.
+新 文件 的 属主 (用户ID) 被 设置 为 此 程序 的 有效 用户 的 ID.
+同样 文件 所属 分组 也 被 设置 为 此 程序 的 有效 分组 的 ID
+或者 上层 目录 的 分组 ID (这 依赖 文件系统 类型 ,装载选项 和 上层目录 的 模式,
+参考,在
+.BR mount (8)
+中 描述 的 ext2 文件系统 的 装载选项
+.I bsdgroups
+和
+.I sysvgroups
+)
+.TP
+.B O_EXCL
+通过
+.BR O_CREAT ,
+生成 文件 , 若 文件 已经 存在 , 则
+.B open
+出错 , 调用 失败 . 若是 存在 符号联接 , 将会 把 它的 联接指针 的 指向 文件 忽略.
+.B O_EXCL
+is broken on NFS file systems, programs which rely on it for performing
+locking tasks will contain a race condition.  The solution for performing
+atomic file locking using a lockfile is to create a unique file on the same
+fs (e.g., incorporating hostname and pid), use
+.BR link (2)
+to make a link to the lockfile. If \fBlink()\fP returns 0, the lock is
+successful.  Otherwise, use
+.BR stat (2)
+on the unique file to check if its link count has increased to 2,
+in which case the lock is also successful.
+.TP
+.B O_NOCTTY
+假如
+.I pathname
+引用 一个 终端设备 \(em 参考
+.BR tty (4)
+\(em 即使 进程 没有 控制终端 ,这个 终端 也 不会 变成 进程 的 控制 终端.
+.TP
+.B O_TRUNC
+假如 文件 已经 存在 , 且是 一个 普通 文件 ,打开 模式 又是 可写(即 文件 是 用
+O_RDWR 或 O_WRONLY 模式 打开 的) , 就把 文件 的 长度 设置 为 零 , 丢弃 其中
+的 现有 内容.若 文件 是 一个 FIFO 或 终端设备 文件 , O_TRUNC 标志 被 忽略.
+其他 O_TRUNC 的 作用 是 不 具体 指定 的 (在 许多 Linux 版本 中 , 通常 会 被 忽略 ,
+其他 的 一些 版本 将 返回 一个 错误)
+.TP
+.B O_APPEND
+文件 以 追加 模式 打开 . 在
+.BR 写
+以前 , 文件 读写 指针 被 置 在 文件 的 末尾 .
+as if with
+.BR lseek .
+.B O_APPEND
+may lead to corrupted files on NFS file systems if more than one process
+appends data to a file at once.  This is because NFS does not support
+appending to a file, so the client kernel has to simulate it, which
+can't be done without a race condition.
+.TP
+.BR O_NONBLOCK " 或 " O_NDELAY
+.B 打开(open)
+文件 可以 以 非块(non-blocking) 模式 打开 . 此时 文件 并 没有 打开 , 也 不能 使用 返回 的
+文件描述符 进行 后续 操作 , 而是 使 调用 程序 等待 . 此 模式 是 为了 FIFO (命名管道) 的 处理
+, 参考
+.BR fifo (4).
+这种 模式 对 除了 FIFO 外 没有 任何 影响 .
+.TP
+.B O_SYNC
+打开 文件 实现 I/O 的 同步 . 任何 通过 文件描述符 对 文件 的
+.BR write
+都会 使 调用 的 进程 中断 , 直到 数据 被 真正 写入 硬件 中 .
+其他 , 参考
+.I RESTRICTIONS.
+.TP
+.B O_NOFOLLOW
+假如 \fIpathname\fR 是 一个 符号 联接 , 则 打开 失败 . 这是 FreeBSD
+的 扩充 , 从 2.1.126 版本 以来 被 引入 到 Linux 中来 .
+从 glibc2.0.100 库 以来 , 头文件 中 包括 了 这个 参数 的 定义;
+ \fI kernel 2.1.126 以前 将 忽略 它的 使用\fR.
+.TP
+.B O_DIRECTORY
+假如 \fIpathname\fR 不是 目录 , 打开 就 失败 . 这个 参数 是 Linux 特有 的 ,
+在 kernel 2.1.126 中 加入 , 为了 避免 在 调用 FIFO 或 磁带设备 时 的 denial-of-service
+问题 , 但是 不应该 在 执行 \fBopendir\fR 以外 使用.
+.TP
+.B O_LARGEFILE
+在 32位 系统 中 支持 大 文件系统 , 允许 打开 那些 用 31位 都 不能 表示 其 长度 的 大 文件 .
+.PP
+在 文件 打开 后 , 这些 可选 参数 可以 通过
+.B fcntl
+来 改变 .
+
+在 新文件 被 创建 时 , 参数
+.I mode
+具体 指明 了 使用 权限 . 他 通常 也 会 被
+.BR umask
+修改 . 所以 一般 新建 文件 的 权限 为
+.BR "(mode & ~umask)" .
+注意 模式 只 被 应用 于 将来 对 这 新文件 的 使用 中;
+.B open
+调用 创建 一个 新的 只读 文件 , 但 仍 将 返回 一个 可 读写 文件 描述符.
+.PP
+后面 是 一些
+.IR mode
+的 具体 参数:
+.TP
+.B S_IRWXU
+00700 允许 文件 的 属主 读 , 写 和 执行 文件
+.TP
+.B S_IRUSR (S_IREAD)
+00400 允许 文件 的 属主 读 文件
+.TP
+.B S_IWUSR (S_IWRITE)
+00200 允许 文件 的 属主 写 文件
+.TP
+.B S_IXUSR (S_IEXEC)
+00100 允许 文件 的 属主 执行 文件
+.TP
+.B S_IRWXG
+00070 允许 文件 所在 的 分组 读 , 写 和 执行 文件
+.TP
+.B S_IRGRP
+00040 允许 文件 所在 的 分组 读 文件
+.TP
+.B S_IWGRP
+00020 允许 文件 所在 的 分组 写 文件
+.TP
+.B S_IXGRP
+00010 允许 文件 所在 的 分组 执行 文件
+.TP
+.B S_IRWXO
+00007 允许 其他 用户 读 , 写 和 执行 文件
+.TP
+.B S_IROTH
+00004 允许 其他 用户 读 文件
+.TP
+.B S_IWOTH
+00002 允许 其他 用户 写 文件
+.TP
+.B S_IXOTH
+00001 允许 其他 用户 执行 文件
+.PP
+.I mode
+只有 当 在
+.IR flags
+中 使用
+.B O_CREAT
+时 才 有效 , 否则 被 忽略.
+
+.B creat
+相当 于
+.B open
+的 参数
+.I flags
+等于
+.BR O_CREAT|O_WRONLY|O_TRUNC .
+.SH RETURN VALUE 返回值
+.BR open " 和 " creat
+都 返回 一个 新的 文件描述符 (若是 有 错误 发生 返回 \-1 ,并在
+.I errno
+设置 错误 信息).
+注意
+.B open
+可以 打开 设备 专用 文件 , 但是
+.B creat
+不能创建,需要用
+.BR mknod (2)
+来代替.
+.LP
+On NFS file systems with UID mapping enabled, \fBopen\fP may return a file
+descriptor but e.g. \fBread\fP(2) requests are denied with \fBEACCES\fP.
+This is because the client performs \fBopen\fP by checking the permissions,
+but UID mapping is performed by the server upon read and write requests.
+
+若 文件 是 新 建立 的 , 他 的 atime(上次访问时间), ctime(创建时间), mtime(修改时间) 都 被 修改 为 当前 时间
+, 上层 目录 的atime , ctime 也 被 同样 修改 . 其他的 , 假如 文件 是 由 O_TRUNC 参数 修改
+的 ,它的 ctime , mtime 域 也 被 设置 为 当前 时间.
+
+.SH ERRORS 错误信息
+.TP
+.B EEXIST
+参数
+.BR O_CREAT " and " O_EXCL
+被
+使用,但是文件(
+.I pathname
+)已经存在.
+.TP
+.B EISDIR
+文件名 (
+.I pathname
+) 是 一个 目录 , 而 又 涉及 到 写 操作.
+.TP
+.B EACCES
+ 访问 请求 不 允许 (权限不够) , 在 文件名 (
+.IR pathname
+)中 有 一 目录 不允许 搜索 (没有 执行权限) , 或者 文件 还 不存在 且 对 上层目录 的 写 操作 又 不允许.
+.TP
+.B ENAMETOOLONG
+文件名 (
+.IR pathname
+) 太 长 了
+.TP
+.B ENOENT
+目录 (
+.I pathname
+) 不存在 或者 是 一个 悬空 的 符号 联接.
+.TP
+.B ENOTDIR
+.I pathname
+不是 一个 子目录
+.TP
+.B ENXIO
+使用
+O_NONBLOCK | O_WRONLY, 命名 的 文件 是 FIFO , 所读 文件 还 没有 打开 的 文件 ,
+或者 , 打开 一个 设备 专用 文件 而 相应 的 设备 不存在
+.TP
+.B ENODEV
+文件 (
+.I pathname
+) 引用 了 一个 设备 专用 文件 , 而 相应 的 设备 又 不存在.
+(这是 linux kernel 的 一个bug - ENXIO 一定 会 被 返回 .)
+.TP
+.B EROFS
+文件 (
+.I pathname
+) 是 一个 只读 文件 , 又有 写 操作 被 请求.
+.TP
+.B ETXTBSY
+文件 (
+.I pathname
+) 是 一个 正在 被 执行 的 可 执行 文件 ,又有 写 操作 被 请求.
+.TP
+.B EFAULT
+.IR pathname
+在一个你不能访问的地址空间.
+.TP
+.B ELOOP
+在 分解
+.IR pathname
+时 , 遇到 太多 符号联接 或者 指明 \fBO_NOFOLLOW\fR 但是
+.I pathname
+是 一个 符号联接
+.TP
+.B ENOSPC
+.I pathname
+将要被创建,但是设备又没有空间储存
+.I pathname
+文件了
+.TP
+.B ENOMEM
+可 获得 的 核心内存(kernel memory) 不够
+.TP
+.B EMFILE
+程序打开的文件数已经达到最大值了
+.TP
+.B ENFILE
+系统打开的总文件数已经达到了极限
+.SH "CONFORMING TO"
+SVr4, SVID, POSIX, X/OPEN, BSD 4.3
+The
+.B O_NOFOLLOW
+and
+.B O_DIRECTORY
+flags are Linux-specific.
+One may have to define the
+.B _GNU_SOURCE
+macro to get their definitions.
+.SH RESTRICTIONS 无限制
+There are many infelicities in the protocol underlying NFS, affecting
+amongst others
+.BR O_SYNC " and " O_NDELAY .
+
+POSIX provides for three different variants of synchronised I/O,
+corresponding to the flags \fBO_SYNC\fR, \fBO_DSYNC\fR and
+\fBO_RSYNC\fR.  Currently (2.1.130) these are all synonymous under Linux.
+.SH SEE ALSO 参见
+.BR read (2),
+.BR write (2),
+.BR fcntl (2),
+.BR close (2),
+.BR link (2),
+.BR mknod (2),
+.BR mount (2),
+.BR stat (2),
+.BR umask (2),
+.BR unlink (2),
+.BR socket (2),
+.BR fopen (3),
+.BR fifo (4)
+
+.SH "[中文版维护人]"
+.B Daniel <badlong@163.com>
+.SH "[中文版最新更新]"
+.BR 2002/01/10
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

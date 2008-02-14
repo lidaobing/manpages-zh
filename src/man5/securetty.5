@@ -1,0 +1,29 @@
+.\" 版权所有(c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" 这是免费的文档;你可以遵照自由软件基金会出版的GNU通用出版许可版本2或者更高版本的条例来重新发布和/或修改它.
+.\"
+.\" GNU通用出版许可中涉及到的"目标代码(object code)"和"可执行程序(executables)"可解释为任意文档格式化的输出或者排版系统,包括中间的和已输出的结果.
+.\"
+.\" 该文档的发布寄望于能够实用,但并不做任何担保;甚至也不提供隐含的商品性的保证或者针对特殊目的适用性.参见GNU通用版权许可以获知更多详情.
+.\"
+.\" 你应该接收到与本文档一同发布的GNU通用版权许可的副本;如果没有,请写信到自由软件基金会(Free Software Foundation), Inc., 59 Temple Place, Suite 330, Boston, MA 02111, 
+.\" USA.
+.\"
+.\" 于1993年1月25日星期日11:06:27由Rik Faith (faith@cs.unc.edu)修改
+.TH SECURETTY 5 "1992 年 12 月 29 日" "Linux" "Linux 程序员手册"
+.SH NAME (名称)
+\fB/etc/securetty\fR 由
+.BR login (1)
+使用，该文件由包含数行 tty 设备名（每行一个设备名,前面不加
+.IR /dev/ )
+在这些设备上可以允许 root 登录.
+.SH FILES(相关文件)
+/etc/securetty
+.SH "SEE ALSO"(另见)
+.BR login (1)
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]" 
+.B 2000/11/2
+.SH "《中国Linux论坛man手册页翻译计划》:"
+.B http://cmpp.linuxforum.net

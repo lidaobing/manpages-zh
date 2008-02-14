@@ -1,0 +1,163 @@
+.\" Copyright (c) 1991 Free Software Foundation
+.\" See section COPYING for conditions for redistribution
+.TH size 1 "5 November 1991" "cygnus support" "GNU Development Tools"
+.de BP
+.sp
+.ti \-.2i
+\(**
+..
+
+.SH NAME
+size \- 列出段节大小和总共大小
+
+.SH "总览 (SYNOPSIS)"
+.hy 0
+.na
+.TP
+.B size
+.RB "[\|" \-A \||\| \-B \||\| \c
+.BI "\-\-format=" compatibility\c
+\&\|]
+.RB "[\|" \-\-help "\|]" 
+.RB "[\|" \-d \||\| \-o \||\| \-x\c
+\||\|\c
+.BI "\-\-radix=" number\c
+\&\|]
+.RB "[\|" \c
+.BI "\-\-target=" bfdname\c
+\&\|]
+.RB "[\|" \-V \||\| \-\-version "\|]"  
+.I objfile\c
+\&.\|.\|.
+.ad b
+.hy 1
+
+.SH "描述 (DESCRIPTION)"
+GNU 的 \c
+.B size\c
+\& 程序 列出 参数列表
+.I objfile
+中, 各 目标文件(object) 或 存档库文件(archive)
+的 段节(section)大小 \(em\& 以及 总共大小.
+默认情况下, 对 每个 目标文件 或 存档库中的 每个模块 产生 一行 输出.
+
+.SH "选项 (OPTIONS)"
+.TP
+.B \-A
+.TP
+.B \-B
+.TP
+.BI "\-\-format " "compatibility"
+使用 这几个 选项, 你 可以 让 GNU
+.B size
+的 输出效果 类似于
+\& System V
+.B size
+\& (使用 `\|\c
+.B \-A\c
+\|',
+或 `\|\c
+.B \-\-format=sysv\c
+\|'), 或 Berkeley 
+.B size\c
+\& (使用 `\|\c
+.B \-B\c
+\|', 或 `\|\c
+.B \-\-format=berkeley\c
+\|'). 默认情况下 是 类似于 Berkeley 的 单行格式.  
+
+.TP
+.B \-\-help
+简述 参数和选项.
+
+.TP
+.B \-d
+.TP
+.B \-o
+.TP
+.B \-x
+.TP
+.BI "\-\-radix " "number"
+使用 这几个 选项, 你 可以 让 各个 段节 的 大小 以 十进制 (`\|\c
+.B \-d\c
+\|', 或 `\|\c
+.B \-\-radix 10\c
+\|'); 八进制
+(`\|\c
+.B \-o\c
+\|', 或 `\|\c
+.B \-\-radix 8\c
+\|'); 或 十六进制 (`\|\c
+.B \-x\c
+\|', 或
+`\|\c
+.B \-\-radix 16\c
+\|') 数字 的 格式 显示. `\|\c
+.B \-\-radix \c
+.I number\c
+\&\c
+\|' 只支持 三个数值参数 (8, 10, 16). 总共大小 以 两种进制 给出; `\|\c
+.B \-d\c
+\|' 或 `\|\c
+.B \-x\c
+\|' 的 十进制 和 十六进制 输出, 或 `\|\c
+.B \-o\c
+\|' 的 八进制 和 十六进制 输出.
+
+.TP
+.BI "\-\-target " "bfdname"
+你 可以 通过 参数
+.I bfdname
+指定
+.I objfile
+的 目标格式. 这个选项 可能 不那么 必要; 因为
+.I size
+能够 自动 识别 许多 格式. 参见 
+.BR objdump(1) 
+列出 的 有效格式.
+
+.TP
+.B \-V
+.TP
+.B \-\-version
+显示 \c
+.B size\c
+\& 的 版本信息.
+
+.SH "另见 (SEE ALSO)"
+.BR info 
+的
+.RB "`\|" binutils "\|'" 
+项; 
+.IR "The GNU Binary Utilities" ,
+ Roland H. Pesch (October 1991); 
+.BR ar "(" 1 "),"
+.BR objdump ( 1 ).
+
+.SH "版权 (COPYING)"
+Copyright (c) 1991 Free Software Foundation, Inc.
+.PP
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+.PP
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+.PP
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in
+translations approved by the Free Software Foundation instead of in
+the original English.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2004/02/22
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net
+
+
+

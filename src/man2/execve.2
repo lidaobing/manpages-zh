@@ -1,0 +1,169 @@
+.\" Copyright (c) 1992 Drew Eckhardt (drew@cs.colorado.edu), March 28, 1992
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified by Michael Haardt <u31b3hs@pool.informatik.rwth-aachen.de>
+.\" Modified Wed Jul 21 22:47:01 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified 21 Aug 1994 by Michael Chastain <mec@shell.portal.com>:
+.\"   Fixed typoes.
+.\" Modified Fri Jan 31 16:24:28 1997 by Eric S. Raymond <esr@thyrsus.com>
+.\"
+.TH EXECVE 2 "3 September 1997" "Linux 2.0.30" "Linux Programmer's Manual"
+.SH NAME
+execve \- 执行程序
+
+.SH "总览 (SYNOPSIS)"
+.B #include <unistd.h>
+.sp
+.BI "int execve (const char *" filename ", char *const " argv
+.BI "[], char *const " envp []);
+
+.SH "描述 (DESCRIPTION)"
+\fBexecve()\fP 执行 \fIfilename\fP 指出的 程序. \fIfilename\fP 必须 是
+二进制可执行文件, 或者 以 "\fB#! \fIinterpreter \fR[arg]" 行 开始的 脚本文件.
+后者的 interpreter 必须是 某个 可执行文件 的 有效 路径, 这个 可执行文件 自身
+不能是 脚本程序, 调用 形式 是 "\fBinterpreter\fR [arg] \fIfilename\fR".
+
+\fBexecve()\fP 调用 成功 后 不会 返回, 其 进程 的 正文(text), 数据(data), 
+bss 和 堆栈(stack) 段 被 调入程序 覆盖. 调入程序 继承了 调用程序 的 PID 和
+所有 打开的 文件描述符, 他们 不会 因为 exec 过程 而 关闭. 父进程 的 未决 信号
+被 清除. 所有 被 调用进程 设置过 的 信号 重置为 缺省行为.
+
+如果 当前程序 正在 被 ptrace 跟踪, 成功的 调用 \fBexecve()\fP 后 将 收到
+一个 \fBSIGTRAP\fP 信号.
+
+如果 可执行文件 是 动态连接 的 a.out 二进制程序, 含有 共享库 的 stub,
+开始 执行 程序 的 时候, Linux 动态 连接器(linker)
+.IR ld.so (8)
+把 所需的 共享库 调入 核心, 并且 和 程序 相连.
+
+如果 可执行文件 是 动态连接 的 ELF 二进制程序, 定义在 PT_INTERP 字段 的
+解释器(interpreter) 调入 所需的 共享库.
+连接 libc5 的 程序 的 典型 解释器 是 \fI/lib/ld-linux.so.1\fR,
+而 连接 GNU libc2 (libc6) 的 程序 则为 \fI/lib/ld-linux.so.2\fR.
+
+.SH "返回值 (RETURN VALUE)"
+调用成功 的 时候 \fBexecve()\fP 不会 返回, 调用失败 时 返回 \-1, 并 设置
+.I errno 
+为 相应的 值.
+
+.SH "错误 (ERRORS)"
+.TP 0.8i
+.B EACCES
+文件 或 脚本解释器 不正确.
+.TP
+.B EACCES
+没有 文件 或 脚本解释器 的 执行 权限.
+.TP
+.B EACCES
+文件系统 挂载(mount) 为
+.IR noexec .
+.TP
+.B EPERM
+文件系统 挂载为
+.IR nosuid ,
+使用者 不是 超级用户, 以及 文件 设置了 SUID 或 SGID 位.
+.TP
+.B EPERM
+进程 正 被跟踪, 使用者 不是 超级用户, 以及 文件 设置了 SUID 或 SGID 位.
+.TP
+.B E2BIG
+参数列表 过长.
+.TP
+.B ENOEXEC
+可执行文件 的 文件格式 无法 识别, 误用在 不同的 体系结构, 或者 其他 格式
+错误 导致 程序 无法 执行.
+.TP
+.B EFAULT
+.I filename
+指针 超出 可访问 的 地址空间.
+.TP
+.B ENAMETOOLONG
+.I filename
+太长.
+.TP
+.B ENOENT
+.I filename ,
+脚本解释器, 或 ELF 解释器 不存在.
+.TP
+.B ENOMEM
+内核 空间 不足.
+.TP
+.B ENOTDIR
+在
+.I filename ,
+脚本解释器 或 ELF 解释器 的 前缀 路径 中, 某些 成员 不是 目录.
+.TP
+.B EACCES
+在
+.I filename
+或 脚本解释器 的 前缀 路径 中, 对 某些 目录 没有 访问许可.
+.TP
+.B ELOOP
+解析
+.I filename ,
+脚本解释器 或 ELF 解释器 时 遇到 过多的 符号连接.
+.TP
+.B ETXTBUSY
+可执行文件 被 一个 或 多个 进程 以 写方式 打开.
+.TP
+.B EIO
+发生 I/O 错误.
+.TP
+.B ENFILE
+达到 系统 定义的 同时打开文件数 限制. 
+.TP
+.B EMFILE
+进程 打开了 最大数量 的 文件.
+.TP
+.B EINVAL
+该 ELF 可执行文件 拥有 多个 PT_INTERP 字段 (就是说, 试图 定义 多个 解释器).
+.TP
+.B EISDIR
+ELF 解释器 是 目录.
+.TP
+.B ELIBBAD
+无法 识别 ELF 解释器 的 格式.
+
+.SH "CONFORMING TO"
+SVr4, SVID, X/OPEN, BSD 4.3.  POSIX 没有 对 #! 行为 的 文档, 但有 其他的
+兼容 形式. SVr4 记录了 额外的 错误情况 EAGAIN, EINTR, ELIBACC, ENOLINK, 
+EMULTIHOP; POSIX 没有 关于 ETXTBSY, EPERM, EFAULT, ELOOP, EIO, ENFILE,
+EMFILE, EINVAL, EISDIR 或 ELIBBAD 错误情况 的 文档.
+
+.SH "注意 (NOTES)"
+SUID and SGID processes can not be \fBptrace()\fPd SUID or SGID.
+
+在 #! 格式的 shell 可执行脚本 中, 第一行 的 长度 不得 超过 127 字节.
+
+Linux 忽略 脚本程序 的 SUID 和 SGID 位.
+
+.SH "另见 (SEE ALSO)"
+.BR ld.so "(8),"
+.BR execl "(3),"
+.BR fork (2)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

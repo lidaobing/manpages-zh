@@ -1,0 +1,81 @@
+.\" Copyright (C) 1996 Free Software Foundation, Inc.
+.\" See section COPYING below.
+.TH zic2xpm 6 "11 Apr 1996" "zic2xpm 2.0" "Games"
+.SH NAME
+zic2xpm \- 将 ZIICS 象棋片段 (chess pieces) 转换为 XBoard (XPM/XIM) 片段的工具。
+.SH "总览 SYNOPSIS"
+zic2xpm
+.B file1 [file2 ...]
+.SH "描述"
+.B zic2xpm
+将一个或多个 ZIICS 片段文件转换为 XBoard 可用的格式。
+如果你给出一个以上的文件名，小心同样大小的多个文件 (? sets) 不能共存于同一目录下。
+不同大小的多个文件可以共存于单一目录下。
+.SH "范例 EXAMPLE"
+如果你想新建一个目录，包含设定 (? sets) SET2.V32, SET2.V40, SET2.V50, 和 SET2.V56, 
+它们都在 ~/ziics 目录中，你可以这样：
+
+.nf
+      mkdir Sets
+      cd Sets
+      zic2xpm ~/ziics/SET2.*
+.fi
+
+然后你可以这样运行 XBoard：
+
+.nf
+     xboard -pixmap Sets
+.fi
+.SH BUGS
+请向
+.B frankm@hiwaay.net
+报告它的任何 bug。
+.SH "参见 SEE ALSO"
+.BR
+.BR xboard ( 6 ).
+.SH "作者 AUTHOR"
+Frank McIngvale (frankm@hiwaay.net)
+.SH "版权所有 COPYING"
+Copyright (C) 1996 Free Software Foundation, Inc.
+.PP
+NOTICE: The piece images distributed with ZIICS are
+copyrighted works of their original creators.  Images 
+converted with zic2xpm may not be redistributed without
+the permission of the copyright holders.  Do not contact
+the authors of zic2xpm or of ZIICS itself to request
+permission. 
+.PP
+NOTICE:  The format of the ZIICS piece file was gleaned from
+SHOWSETS.PAS, a part of ZIICS.  Thanks to Andy McFarland
+(Zek on ICC) for making this source available!  ZIICS is a 
+completely separate and copyrighted work of Andy
+McFarland.  Use and distribution of ZIICS falls under the
+ZIICS license, NOT the GNU General Public License.
+.PP
+NOTICE: The format of the VGA imageblocks was determined
+by experimentation, and without access to any
+of Borland Inc.'s BGI library source code.
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.  However, the above notices
+MUST BE RETAINED in any copy that you redistribute or modify.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+.SH "[中文版维护人]"
+.B bbbush <bbbush@163.com>
+.br
+我怀疑还有没有人会看这篇文档
+.SH "[中文版最新更新]"
+.B 2003.11.22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

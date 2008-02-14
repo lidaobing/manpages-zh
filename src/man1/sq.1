@@ -1,0 +1,85 @@
+.\"
+.\" Copyright 1992, 1993, Geoff Kuenning, Granada Hills, CA
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\"
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All modifications to the source code must be clearly marked as
+.\"    such.  Binary redistributions based on modified source code
+.\"    must be clearly marked as modified versions in the documentation
+.\"    and/or other materials provided with the distribution.
+.\" 4. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgment:
+.\"      This product includes software developed by Geoff Kuenning and
+.\"      other unpaid contributors.
+.\" 5. The name of Geoff Kuenning may not be used to endorse or promote
+.\"    products derived from this software without specific prior
+.\"    written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY GEOFF KUENNING AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL GEOFF KUENNING OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.TH SQ 1 LOCAL
+.SH NAME
+sq \- 压缩一个排过序的单词列表
+unsq \- 解压一个排过序的单词列表
+
+.SH "总览 (SYNOPSIS)"
+.B sq
+< infile > outfile
+.PP
+.B unsq
+< infile > outfile
+
+.SH "描述 (DESCRIPTION)"
+.I sq
+压缩 一个 排过序的 单词 列表 (一个 字典). 比如:
+.RS
+sort /usr/dict/words | sq | compress > words.sq.Z
+.RE
+会 大概 以 4 为 因数 压缩 字典.
+.PP
+.I unsq
+解压
+.I sq
+的 输出. 比如:
+.RS
+compress -d < words.sq.Z | unsq | sort -f -o words
+.RE
+会 解压 
+.I sq
+压缩 的 字典.
+.P
+根据 文档 描述, 它 通过 省略 相同 的 词头 来 压缩, 用 一个 单独 的 字符 取代
+这个 词头, 这个 字符 对 与 前一个词 相同的 字符数 进行 编码.
+词头 的 大小 用 一个 编了码 的 可打印 的 字符 表示:
+0-9 代表 0-9, A-Z 代表 10-35, a-z 代表 36-61.
+
+.SH "作者 (AUTHOR)"
+Mike Wexler
+
+.SH "参见 (SEE ALSO)"
+compress(1), sort(1).
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/9/20
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,63 @@
+.TH KBD_MODE 1 "28 Oct 1997" "Console tools" "Linux User's Manual"
+.SH NAME
+kbd_mode \- 显示或者设置键盘模式
+.SH "总览 (SYNOPSIS)"
+.BI "kbd_mode [ " -auks " ]"
+.IX "kbd_mode 命令" "" "\fLkbd_mode\fR 命令"  
+.SH "描述 (DESCRIPTION)"
+.PP
+如果 没有 参数
+.B kbd_mode
+会 显示 当前 键盘 的 模式， 如果 有 参数， 它会把 键盘 设置成 相应的 模式。
+.RS
+.IR \-s ：
+键盘 扫描码 模式 （原始），
+.PP
+.IR \-k ：
+键值 （keycode） 模式 （半原始），
+.PP
+.IR \-a :
+ASCII 模式 (XLATE)，
+.PP
+.IR \-u :
+UTF-8 模式 (UNICODE)。
+.RE
+
+.I XLATE
+模式 是 传统 模式， 所用的 代码 可以 是 任何
+.B 8\-bit (8位)
+的 字符集. 一般 这个 字符集 同 后面 用到 的 字符集 是 匹配 的, 在 它们 被
+传给 屏幕 后， 它们 会 根据
+.B consolechars
+.IR -m
+选择的 字符集 在 内部 转换 为 Unicode， 
+
+在
+.I UNICODE
+模式， 键盘 会 产生
+.B 16位
+的 字符， 这些 字符 会 以1， 2 或者 3 字节 的 形式 （UTF\-8 编码） 传给 内核。
+.B UTF\-8
+在这 后两种 模式中 要 用到
+.BR loadkeys (1)
+定义的 键盘 映射 表。
+.B 警告：
+如果 不是 把 键盘 模式 改为 ASCII 或者 Unicode， 很可能 会使 键盘 不可用。
+这个 命令 也 可以 在 有些 程序 使你的 键盘 处于 错误 状态时 用来 把 键盘 改回
+.I XLATE
+或者
+.I UNICODE
+模式 （比如 通过 远程 登录）。 在 有些 过时的 版本的 程序 中
+.I \-u
+和
+.IR \-s
+是 一样的。
+.SH "参见 (SEE ALSO)"
+.BR loadkeys (1),
+.BR consolechars (8).
+.SH "[中文版维护人]"
+.B 唐友 <tony_ty@263.net>
+.SH "[中文版最新更新]"
+.BR 2001/9/13
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

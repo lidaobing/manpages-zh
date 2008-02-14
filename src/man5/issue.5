@@ -1,0 +1,33 @@
+.\"
+.\" 版权所有(c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" 这是免费的文档;你可以遵照自由软件基金会出版的GNU通用出版许可版本2或者更高版本的条例来重新发布和/或修改它.
+.\"
+.\" GNU通用出版许可中涉及到的"目标代码(object code)"和"可执行程序(executables)"可解释为任意文档格式化的输出或者排版系统,包括中间的和已输出的结果.
+.\"
+.\" 该文档的发布寄望于能够实用,但并不做任何担保;甚至也不提供隐含的商品性的保证或者针对特殊目的的适用性.参见GNU通用版权许可以获知详情.
+.\"
+.\" 你应该接收到与本文档一同发布的GNU通用版权许可的副本;如果没有,请写信到自由软件基金会(Free Software Foundation), Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" 于1993年1月25日星期日11:06:22由Rik Faith <faith@cs.unc.edu>修改
+.\" 于1996年10月21日星期一17:47:19 EDT由Eric S. Raymond <esr@thyrsus.com>修改
+.TH ISSUE 5 "1993年7月24日" "Linux" "Linux Programmer's Manual(Linux程序员手册)"
+.SH NAME (名称)
+issue \- 登录前的信息和标识文件
+.SH DESCRIPTION (描述)
+\fB/etc/issue\fP 是一个文本文件,它包含了在登录提示符出现之前显示的信息
+或者系统标识.如果
+.BR getty (1)
+支持的话,它可能包括多个 \fB\@\fIchar\fP 和 \fB\e\fP\fIchar\fP 序列.
+.SH FILES (相关文件)
+/etc/issue
+.SH "SEE ALSO"(另见)
+.BR getty (1),
+.BR motd (5)
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/07/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

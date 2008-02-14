@@ -1,0 +1,86 @@
+.\" Copyright (c) 1998 Sendmail, Inc.  All rights reserved.
+.\" Copyright (c) 1983, 1997 Eric P. Allman.  All rights reserved.
+.\" Copyright (c) 1985, 1991, 1993
+.\"	The Regents of the University of California.  All rights reserved.
+.\"
+.\" By using this file, you agree to the terms and conditions set
+.\" forth in the LICENSE file which can be found at the top level of
+.\" the sendmail distribution.
+.\"
+.\"
+.\"     @(#)aliases.5	8.8 (Berkeley) 5/19/1998
+.\"
+.TH aliases 5
+.DD May 19, 1998
+.DT ALIASES 5
+.OS BSD 4
+.SH NAME
+.br
+aliases - sendmail使用的别名文件
+.SH 总览
+aliases
+.SH 描述
+此文件描述了
+.B /usr/sbin/sendmai
+使用的用户账号别名。它位于
+.B /etc
+并格式化
+成如下形式的一连串的行：
+.BD -filled -offset indent
+name: name_1, name2, name_3, . . .
+.ED
+.PP
+其中的
+.B name
+是含别名的原名，而
+.B name_n
+就是那个原名的一组别名。以空格起
+首的行是上一行的延续。以`#'起首的行是注释。
+.LP
+别名化只发生在本地账号上。不能发生循环现象，因为邮件不会对任何人进行于一
+多次的投递。
+在完成别名化后，本地的和合法的收信人会有一个``.forward''文件存于他们的宿
+主目录，此文件用于把邮件按文件中定义好的用户列表进行转发。
+.LP
+此别名文件只包含原始数据；实际的别名化信息存于用程序
+.I newaliases(1)
+建立的
+.I  /etc/aliases.db
+这个二进制格式的文件中。每次别名文件更改后都要执行
+.I newaliases
+命令来使更改有效。
+.SH 另见
+.BR newaliases(1),
+.BR dbopen(3),
+.BR dbm(3),
+.BR sendmail(8)
+.RS
+.%T "SENDMAIL 安装和操作指南。"
+.RE
+.RS
+.%T "SENDMAIL 互联网络邮件路由器。"
+.RE
+.SH 错误
+如果你已经在编译
+.B sendmail
+时用
+.B DBM
+支持替换了
+.B NEWDB
+的话，可能会遇到
+.B dbm(3)
+限制
+单条别名容量在
+.I 1000
+字节信息量左右的问题。你可以用``链''的方法来获得更长的别名；
+那就是，把一个作为延续的虚设名来作为别名串中的最后一个名称。
+.SH 历史记录
+别名文件格式出现于BSD 4.0
+.BX 4.0
+。
+.SH "[中文版维护人]"
+.B mhss
+.SH "[中文版最新更新]"
+.B 2001.10.01
+.SH "《中国linux论坛man手册页翻译计划》:"
+.B http://cmpp.linuxforum.net 

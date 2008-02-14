@@ -1,0 +1,120 @@
+.TH MAILADDR 7 1995-06-24 linux "Linux User's Manual" \" -*- nroff -*-
+.\"
+.\" Copyright (c) 1983, 1987 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms are permitted
+.\" provided that the above copyright notice and this paragraph are
+.\" duplicated in all such forms and that any documentation,
+.\" advertising materials, and other materials related to such
+.\" distribution and use acknowledge that the software was developed
+.\" by the University of California, Berkeley.  The name of the
+.\" University may not be used to endorse or promote products derived
+.\" from this software without specific prior written permission.
+.\" THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+.\"
+.\"	@(#)mailaddr.7	6.5 (Berkeley) 2/14/89
+.\"
+.\" Extensively rewritten by Arnt Gulbrandsen <agulbra@troll.no>.  My
+.\" changes are placed under the same copyright as the original BSD page.
+.\"
+.\" fool hilith19: "
+.UC 5
+.SH NAME
+mailaddr \- mail addressing description
+.SH DESCRIPTION
+This manual page gives a brief introduction to SMTP mail addresses, as
+used on the Internet.  These addresses are in the general format
+.PP
+	user@domain
+.PP
+where a domain is a hierarchical dot separated list of subdomains.  For
+example, the addresses
+.PP
+	eric@monet.berkeley.edu
+.br
+	Eric Allman <eric@monet.berkeley.edu>
+.br
+	eric@monet.berkeley.edu (Eric Allman)
+.PP
+are valid forms of the same address.
+.PP
+The domain part (``monet.berkeley.edu'') may be the name of an internet
+host, or it may be a logical mail address.  The domain part is not
+case sensitive.
+.PP
+The local part (``eric'') is often a user name, but its meaning is
+defined by the local software.  It can be case sensitive, but usually
+isn't.  If you see a local-part that looks like garbage, it is usually
+because of a gateway between an internal e-mail system and the net,
+here are some examples:
+.PP
+	"surname/admd=telemail/c=us/o=hp/prmd=hp"@some.where
+	USER%SOMETHING@some.where
+	machine!machine!name@some.where
+	I2461572@some.where
+.PP
+(These are, respectively, an X.400 gateway, a gateway to an arbitrary
+inernal mail system that lacks proper internet support, an UUCP
+gateway, and the last one is just boring username policy.)
+.PP
+The real-name part (``Eric Allman'') can either be placed first, outside
+<>, or last, inside ().  (Strictly speaking the two aren't the same,
+but the difference is outside the scope of this page.)  The name may
+have to be quoted using "" if it contains certain characters, most
+commonly ``.'':
+.PP
+	"Eric P. Allman" <eric@monet.berkeley.edu>
+.SS Abbreviation.
+.PP
+Many mail systems let users abbreviate the domain name.  For instance,
+users at berkeley.edu may get away with ``eric@monet'' to send mail to
+Eric Allman. \fIThis behavior is deprecated.\fP
+.SS Route-addrs.
+.PP
+Under some circumstances it may be necessary to route a message
+through several hosts to get it to the final destination.  Normally
+this happens automatically and invisibly, but sometimes not,
+particularly with old and broken software.  Addresses which show these
+relays are termed ``route-addrs.''  These use the syntax:
+.PP
+	<@hosta,@hostb:user@hostc>
+.PP
+This specifies that the message should be sent to hosta, from there to
+hostb, and finally to hostc.  Some hosts disregard route-addrs and
+send directly to hostc.
+.PP
+Route-addrs occur frequently on return addresses, since these are generally
+augmented by the software at each host.  It is generally possible to ignore
+all but the ``user@hostc'' part of the address to determine the actual
+sender.
+.SS Postmaster.
+.PP
+Every site is required to have a user or user alias designated
+``postmaster'' to which problems with the mail system may be
+addressed.  The ``postmaster'' address is not case sensitive.
+.SS "FREQUENTLY ASKED QUESTIONS"
+rtfm.mit.edu and many mirrors store a collection of FAQs.  Please find
+and use a nearby FAQ archive; there are dozens or hundreds around the
+world.
+.I mail/inter-network-guide
+explains how to send mail between many different networks.
+.I mail/country-codes
+lists the top level domains (e.g. ``no'' is Norway and ``ea'' is Eritrea).
+.I mail/college-email/part*
+gives some useful tips on how to locate e-mail addresses.
+.SH FILES
+.I /etc/aliases
+.br
+.I ~/.forward
+.SH "SEE ALSO"
+.BR binmail (1),
+.BR mail (1),
+.BR mconnect (1),
+.BR forward (5),
+.BR aliases (5),
+.BR sendmail (8),
+.BR vrfy (8),
+RFC822 (Standard for the Format of Arpa Internet Text Messages).

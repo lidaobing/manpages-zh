@@ -1,0 +1,139 @@
+.\" 本man页版权所有(C)1999 Andi Kleen<ak@muc.de>.
+.\" 可能已作修改的该页拷贝版本要获得授权许可,需一字不捺地包括本header(头标识),而
+.\" 且在作了较大修改的情况下,修改作者和日期需添加到header中.
+.\" 中文版版权所有 riser,BitBIRD www.linuxforum.net 2000
+.TH UDP  7 "1998年10月2日" "Linux 手册页" "Linux 程序员手册"
+.SH NAME (名字)
+udp \- IPv4 上面的 UDP 协议.
+.SH SYNOPSIS (总览)
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/in.h>
+.br
+.B udp_socket = socket(PF_INET, SOCK_DGRAM, 0);
+
+.SH DESCRIPTION(描述)
+这是一个 RFC768 中的用户数据报协议的实现.
+它实现无连接的, 不可靠的数据报信息包服务.
+信息包可能在它们传输到达之前重新排序或者重复.
+UDP 通过生成和检查校验和来俘获传输错误.
+
+当创建一个 UDP 套接字时, 它的本地和远程地址是不确定的.
+可以使用带一个有效目的地址作为参数的
+.BR sendto (2)
+或者
+.BR sendmsg (2)
+立即发送数据报.如果套接字上调用了
+.BR connect (2)
+时, 则设置默认的目的地址, 数据报可以使用
+.BR send (2)
+或者
+.BR write (2)
+发送而不需要指定目的地址.
+也可以通过传递一个地址给
+.BR sendto (2)
+或者
+.BR sendmsg (2)
+来发送到其它目的地址.
+为了接收信息包,套接字必须首先用
+.BR bind (2)
+绑定一个本地地址,
+如果没有这么做, 
+套接字层在第一个用户接收请求时将自动分配一个本地端口.
+
+所有接收操作只返回一个信息包.
+当信息包小于所传递的缓冲区时, 则只返回那些数据, 
+当信息包大于所传递的缓冲区时,则截断信息包并设置
+.B MSG_TRUNC
+标志.
+
+IP 选项可以使用描述于
+.BR ip "(7)"
+中的套接字选项发送或接收.
+只有打开了合适的 sysctl 时,
+内核才处理它们(不过即使关闭了它们, 仍然会传递给用户).
+参见
+.BR ip "(7)" .
+
+如果设置了
+.B MSG_DONTROUTE
+标志,则发送时目的地址必须指向一个本地接口地址,
+而且信息包只发到该接口.
+
+当 UDP 的总长超过接口 MTU(Maximum Transmission Unit 最大传输单元)时,
+UDP 会对信息包进行分段.
+一个更为网络友好的可选方法是使用 path MTU discovery(路径MTU发现),
+它描述于
+.BR ip (7)
+中的
+.B IP_PMTU_DISCOVER
+部分.
+
+.SH ADDRESS FORMAT (地址格式)
+UDP 使用 IPv4 的
+.B sockaddr_in
+地址格式,其描述于
+.BR ip (7)
+中.
+
+.SH ERROR HANDLING (错误处理)
+所有重大错误都会以错误返回值的方式传递给用户,
+即使套接字没有连接亦如此.这种处理方式有别于许多其它的
+BSD 套接字实现方法, 除非套接字连接上, 否则那些方法不会传递任何错误,
+Linux 的处理方式遵循
+.B RFC1122
+的要求.
+
+为了与以前的代码兼容,可以设置
+.B SO_BSDCOMPAT
+SOL_SOCKET 选项令只在套接字已连接的情况下接收远程错误(
+.B EPROTO
+和
+.BR EMSGSIZE )
+除外.
+最好是修复代码并适当地处理错误, 而不要打开该选项.
+本地产生的错误总是传递.
+
+当打开了
+.B IP_RECVERR
+选项时, 所有错误可以存储在套接字错误队列中,
+并可以通过带
+.B MSG_ERRQUEUE
+标识设置的
+.BR recvmsg (2)
+来接收.
+
+.SH ERRORS (错误)
+所有列在
+.BR socket (7)
+或
+.BR ip (7)
+中的错误都可以在一个 UDP 套接字上收发时收到.
+
+.B ECONNREFUSED
+没有与目的地址相关联的接收者.
+这可能由于在前面一个通过该套接字发送的信息包而引发.
+
+.SH VERSIONS(版本)
+IP_RECVERR 是 Linux 2.2 中的新功能.
+
+.SH CREDITS(尾注)
+本手册页的作者为 Andi Kleen.
+
+.SH SEE ALSO(另见)
+.BR ip (7),
+.BR socket (7),
+.BR raw (7).
+
+RFC768: 用户数据报协议.
+.br
+RFC1122: 主机需求
+.br
+RFC1191: 描述 path MTU discovery (路径MTU查找).
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/07/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

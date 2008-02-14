@@ -1,0 +1,124 @@
+.\" -*- nroff -*-
+.\" Copyright (c) 1999, 2000 SuSE GambH Nuernberg, Germany
+.\" Author: Thorsten Kukuk <kukuk@suse.de>
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of the
+.\" License, or (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this program; see the file COPYING.  If not,
+.\" write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+.\" Boston, MA 02111-1307, USA.
+.\"
+.TH nscd.conf 5 1999-10 "GNU C Library"
+.SH NAME
+/etc/nscd.conf - 域名服务缓存守护进程配置文件
+.SH "描述 DESCRIPTION"
+该文件
+.B /etc/nscd.conf
+在启动
+.BR nscd (8)
+时读入。每一行或者指定一个属性和值，或者指定一个属性、服务和一个值。域之间通过
+空格或者TAB分开。‘#’表示注释的开始；在该字符之后到行的末尾将不会被nscd解释。
+
+有效服务为passwd，group或者hosts。
+
+.B logfile
+.I debug-file-name
+.RS
+指定调试信息写入的文件名。
+.RE
+
+.B debug-level
+.I value
+.RS
+设置希望的调试级别。
+.RE
+
+.B threads
+.I number
+.RS
+这是启动的等待请求的线程数。最少将创建5个线程。
+.RE
+
+.B server-user
+.I user
+.RS
+如果设置了该选项，nscd将作为该用户运行，而不是作为root。如果每个用户都使用一个
+单独的缓存（-S参数），将忽略该选项。
+.RE
+
+.B enable-cache
+.I service
+.I <yes|no>
+.RS
+启用或禁用制定的
+.I 服务
+缓存。
+.RE
+
+.B positive-time-to-live
+.I service
+.I value
+.RS
+设置
+.IR service
+在指定缓存中正的项目（成功的请求）的TTL（存活时间）。
+.I Value
+以秒为单位。较大的值将增加缓存命中率从而减低平均响应时间，但是将增加缓存的一致
+性问题。
+.RE
+
+.B negative-time-to-live
+.I service
+.I value
+.RS
+设置
+.IR service
+在指定缓存中负的项目（失败的请求）的TTL（存活时间）。
+.I Value
+以秒为单位。如果存在由不在系统数据库中的uid（用户ID）（例如在以root身份解包linux
+内核源代码时）所拥有的文件将明显改善性能；应该维持较小的值以降低缓存一致性问题。
+.RE
+
+.B suggested-size
+.I service
+.I value
+.RS
+这是内部散列表的大小，
+.I value
+应该保持一个素数以达到优化效果。
+.RE
+
+.B check-files
+.I service
+.I <yes|no>
+.RS
+启用或禁用检查属于指定
+.I 服务
+的文件的改变。这些文件是
+.IR /etc/passwd，
+.IR /etc/group，
+以及
+.IR /etc/hosts。
+.RE
+
+.SH "参见"
+.BR nscd (8)
+.SH "作者"
+.B nscd
+由Thorsten Kukuk和Ulrich Drepper完成。
+
+.SH "[中文版维护人]"
+.B 梁萌 <mengliang99@sohu.com>
+.SH "[中文版最新更新]"
+.BR 2002/5/18
+.SH "[中国linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

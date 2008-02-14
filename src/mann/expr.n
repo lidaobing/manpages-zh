@@ -1,0 +1,481 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-2000 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: expr.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: expr.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH expr n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+expr \- 求一个表达式的值     
+.SH "总览 SYNOPSIS"
+\fBexpr \fIarg \fR?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+连接(concatenate)所有 \fIarg\fR (在它们中间添加分隔符空格)，把结果作为一个Tcl 表示式来求值(evaluate)并返回结果。在 Tcl 表达式中允许的操作符式在 C  表达式中允许的操作符的一个子集，并且它们与相应的 C 操作符有相同意义和优先级。表达式几乎总是产生一个数值结果(整数或浮点数的值)。例如，表达式     
+.CS
+\fBexpr 8.2 + 6\fR
+.CE
+求值出 14.2.
+Tcl 表达式与 C 表达式在操作数指定的方式上有区别。还有，Tcl 表达式支持非数值操作符和字符串比较。       
+.SH "操作数 OPERANDS"
+.PP
+一个 Tcl 表达式由操作符、操作数和括号的组合构成。在操作符、操作数和括号之间可使用白空格；它被表达式的指令所忽略。指定整数值可以使用十进制(通常的情况)、八进制(如果操作数的第一个字符是 \fB0\fR)、或十六进制(如果操作数的前两个字符是 \fB0x\fR)。如果一个操作数没有上述的整数格式，则如果可能的话把它作为浮点数对待。指定浮点数可以使用任何遵从 ANSI 的 C 编译器可接受方式(除了在多数安装(installation)中不允许 \fBf\fR、\fBF\fR、\fBl\fR\fB \fR和 \fBL\fR  后缀)。例如，下列的数都是有效的浮点数: 2.1、3.、6e4、7.91e+16。如果没有可能的数值解释，则一个操作数被作为字符串来保留(并且对它只提供一组有限的操作符)。
+.PP
+可以用下列方式指定操作数: 
+.IP [1]
+为一个数值值，要么是整数要么是浮点数。        
+.IP [2]
+作为一个 Tcl 变量，使用标准的 \fB$\fR 记号。变量的值将被用作操作数。        
+.IP [3]
+作为用双引号包围起来的一个字符串。表达式分析器将在引号之间的信息上完成反斜杠、变量和命令替换，并把结果值用作操作数。
+.IP [4]
+作为用花括号包围起来的一个字符串。在左花括号和相匹配的右花括号之间的字符将被用作操作数而不做任何替换。
+.IP [5]
+作为一个用方括号包围起来的 Tcl 命令。命令将被执行并且它的结果将被用作操作数。   
+.IP [6]
+作为一个数学函数，它的参数可以是操作数的任何上述形式，比如 \fBsin($x)\fR。参见下面的已定义的函数的一个列表。       
+.LP
+在上述替换发生的地方(例如在被引用起来的字符串当中)，他们由表达式的指令来完成。但是，在调用表达式处理器之前命令分析器可能已经完成了一个额外的替换层。如下面讨论的那样，通常最好把表达式包围在花括号中来防止命令分析器在这些内容上进行替换。
+.PP
+举一些简单的表达式的例子，假设变量\fBa\fR  的值是 3 并且变量 \fBb\fR  的值是 6。则下面的每行左边的命令将生成右边的值。
+.CS
+.ta 6c
+\fBexpr 3.1 + $a	6.1
+expr 2 + "$a.$b"	5.6
+expr 4*[llength "6 2"]	8
+expr {{word one} < "word $a"}	0\fR
+.CE
+.SH "操作符 OPERATORS"
+.PP
+下面列出了有效的操作符，用优先级的降序分组:       
+.TP 20
+\fB\-\0\0+\0\0~\0\0!\fR
+一元(Unary，也译为单目)减，一元加，位(bit-wise) NOT，逻辑 NOT。这些操作符不能提供给字符串操作数，并且位 NOT 只能提供给整数。 
+.TP 20
+\fB*\0\0/\0\0%\fR
+乘，除，求余。这些操作符不能提供给字符串操作数，并且求余只能提供给整数。余数将总是与除数有相同的符号并且绝对值小于除数。        
+.TP 20
+\fB+\0\0\-\fR
+加和减。对任何数值操作数均有效。        
+.TP 20
+\fB<<\0\0>>\fR
+左移和右移。只对整数操作数有效。一右移总是传播(propagate)符号位。  
+.TP 20
+\fB<\0\0>\0\0<=\0\0>=\fR
+Boolean 小于，大于，小于等于，大于等于。如果条件是真则每个操作符产生 1，否则 0。这些操作符可以象提供给数值操作数一样提供给字符串，在这种情况下使用字符串比较。        
+.TP 20
+\fB==\0\0!=\fR
+Boolean 等于和不等于。每个操作符产生一个零/一结果。对所有操作数类型有效。        
+.TP 20
+\fB&\fR
+位与。只对整数操作数有效。       
+.TP 20
+\fB^\fR
+位异或。只对整数操作数有效。       
+.TP 20
+\fB|\fR
+位或。只对整数操作数有效。       
+.TP 20
+\fB&&\fR
+逻辑与。如果两个操作数都是非零则生成一个 1，否则生成 0。只对 boolean 和数值(整数或浮点数)操作数有效。       
+.TP 20
+\fB||\fR
+逻辑或。如果两个操作数都是零则生成一个 0，否则生成 1。只对 boolean 和数值(整数或浮点数)操作数有效。       
+.TP 20
+\fIx\fB?\fIy\fB:\fIz\fR
+If-then-else，如同 C 语言那样。如果 \fIx\fR 求值为非零，则结果是 \fIy\fR\fI \fR的值。否则结果是 \fIz \fR的值。\fIx\fR操作数必须是一个数值值。    
+.LP
+参见 C 手册来得到对每个操作符的生成结果的更详细的描述。所有相同的优先级的二元操作符从左至右的组合(group)。例如，命令       
+.CS
+\fBexpr 4*2 < 7\fR
+.CE
+返回 0.
+.PP
+\fB&&\fR, \fB||\fR, 和 \fB?:\fR 操作符“惰性求值”，如同 C 语言那样，这意味着如果操作数对确定结果不是必须的则不被求值。例如，命令
+.CS
+\fBexpr {$v ? [a] : [b]}\fR
+.CE
+中实际上只有 \fB[a]\fR 或 \fB[b]\fR中的一个将被求值，依赖于 \fB$v \fR的值。注意，这只在整个表达式被包围在花括号中时是真的；否则 Tcl 分析器将在调用 \fBexpr\fR  命令之前求值 \fB[a]\fR 和 \fB[b]\fR 二者。
+.SH "数学函数 MATH FUNCTIONS"
+.PP
+Tcl 支持在表达式中的下列数学函数:      
+.DS
+.ta 3c 6c 9c
+\fBabs\fR	\fBcosh\fR	\fBlog\fR	\fBsqrt\fR
+\fBacos\fR	\fBdouble\fR	\fBlog10\fR	\fBsrand\fR
+\fBasin\fR	\fBexp\fR	\fBpow\fR	\fBtan\fR
+\fBatan\fR	\fBfloor\fR	\fBrand\fR	\fBtanh\fR
+\fBatan2\fR	\fBfmod\fR	\fBround\fR
+\fBceil\fR	\fBhypot\fR	\fBsin\fR
+\fBcos\fR	\fBint\fR	\fBsinh\fR
+.DE
+.PP
+.TP
+\fBabs(\fIarg\fB)\fR
+返回 \fIarg\fR 的绝对值。\fIArg\fR可以要么式整数要么是浮点数，并且结果以同样的形式返回。    
+.TP
+\fBacos(\fIarg\fB)\fR
+返回 \fIarg \fR的反余弦，值域是 [0,pi] 弧度。\fIArg\fR的定义域是 [-1,1]。 .TP
+\fBasin(\fIarg\fB)\fR
+返回 \fIarg \fR的反正弦，值域是 [-pi/2,pi/2] 弧度。\fIArg\fR  的定义域是 [-1,1]。     
+.TP
+\fBatan(\fIarg\fB)\fR
+返回 \fIarg \fR的反正切，值域是 [-pi/2,pi/2] 弧度。   
+.TP
+\fBatan2(\fIx, y\fB)\fR
+返回 \fIy\fR/\fIx\fR\fI \fR的反正切，值域是 [-pi,pi] 和，\fIx\fR 和 \fIy\fR  不能都是 0。        
+.TP
+\fBceil(\fIarg\fB)\fR
+返回不小于 \fIarg \fR的最小的整数值。     
+.TP
+\fBcos(\fIarg\fB)\fR
+返回 \fIarg \fR的余弦，单位是弧度。      
+.TP
+\fBcosh(\fIarg\fB)\fR
+返回 \fIarg\fR 的双曲余弦，如果结果导致溢出，返回一个错误。       
+.TP
+\fBdouble(\fIarg\fB)\fR
+如果 \fIarg\fR  是一个浮点值，返回 \fIarg\fR；否则把 \fIarg\fR 转换成浮点数并返回转换后的值。      
+.TP
+\fBexp(\fIarg\fB)\fR
+返回 \fIarg\fR 的指数，定义为 e**\fIarg\fR。如果结果导致溢出，返回一个错误。        
+.TP
+\fBfloor(\fIarg\fB)\fR
+返回不大于 \fIarg \fR的最大整数值。        
+.TP
+\fBfmod(\fIx, y\fB)\fR
+返回 \fIx\fR 除以 \fIy\fR 得到的浮点余数。如果 \fIy\fR 是 0，返回一个错误。      
+.TP
+\fBhypot(\fIx, y\fB)\fR
+计算一个直角三角形的斜边的长度(\fIx\fR*\fIx\fR+\fIy\fR*\fIy\fR)。
+.TP
+\fBint(\fIarg\fB)\fR
+如果 \fIarg\fR  是一个整数值，返回 \fIarg\fR，否则通过截取\fIarg\fR  (的整数部分)来把它转换成整数并返回转换后的值。        
+.TP
+\fBlog(\fIarg\fB)\fR
+返回 \fIarg \fR的自然对数。\fIArg\fR  必须是正数值。        
+.TP
+\fBlog10(\fIarg\fB)\fR
+返回 \fIarg \fR的以10 为底的对数(常用对数)。\fIArg\fR必须是正数值。   
+.TP
+\fBpow(\fIx, y\fB)\fR
+计算 \fIx\fR  的 \fIy\fR 次幂。如果 \fIx\fR 是负数，\fIy\fR  必须是一个整数值。     
+.TP
+\fBrand()\fR
+返回一个大于等于零且小于 1 的一个(随机)浮点数，这个范围用数学术语是区间[0,1)。种子来自机器的内部时钟或用 srand 函数人为设定。        
+.TP
+\fBround(\fIarg\fB)\fR
+如果 \fIarg\fR  是一个整数，返回 \fIarg\fR，否则通过四舍五入把 \fIarg\fR  转换成整数并返回转换后的值。   
+.TP
+\fBsin(\fIarg\fB)\fR
+返回 \fIarg \fR的正弦，单位是弧度。    
+.TP
+\fBsinh(\fIarg\fB)\fR
+返回 \fIarg\fR 的双曲正弦。如果结果导致溢出，返回一个错误。        
+.TP
+\fBsqrt(\fIarg\fB)\fR
+返回 \fIarg\fR 的开方。\fIArg\fR  必须是非负数。        
+.TP
+\fBsrand(\fIarg\fB)\fR
+ \fIarg\fR 必须是一个整数，它被用于重置随机数生成器的种子。返回用这个种子生成的第一个随机数。每个解释器都有它自己的种子。  
+.TP
+\fBtan(\fIarg\fB)\fR
+返回 \fIarg\fR 的正切。单位是弧度。
+.TP
+\fBtanh(\fIarg\fB)\fR
+返回 \fIarg\fR 的双曲正切。  
+.PP
+除了这些预定义的函数之外，应用可以使用 \fBTcl_CreateMathFunc \fR()  定义增补的函数。       
+.SH "类型 TYPES, 溢出 OVERFLOW, 和 精度 PRECISION"
+.PP
+所有涉及整数的内部运算用 C 类型 \fIlong\fR\fI \fR处置。并且所有涉及浮点数的内部运算用 C 类型 \fIdouble\fR 处置。当把一个字符串转换成一个浮点数的时候，若检测到指数溢出则导致一个 Tcl 错误。对于从字符串转换成整数，溢出检测依赖于在本地 C  库中的一些例程的行为，所以它应被作为不可靠的来看待。在任何情况下，对中间结果通常不能可靠的检测整数的上溢和下溢。浮点数上溢和下溢的检测通常达到由硬件支持的程度，普遍非常可靠。
+.PP
+整数，浮点数、和字符串的内部表示之间的转换按需要自动完成。对于算术计算，在浮点数介入之前使用整数，此后使用浮点数。例如， 
+.CS
+\fBexpr 5 / 4\fR
+.CE
+返回 1，而
+.CS
+\fBexpr 5 / 4.0\fR
+\fBexpr 5 / ( [string length "abcd"] + 0.0 )\fR
+.CE
+都返回 1.25。 返回的浮点值总是带着一个“\fB.\fR”或一个 \fBe\fR 所以它们看起来不象整数值。例如，
+.CS
+\fBexpr 20.0/5.0\fR
+.CE
+返回 \fB4.0\fR, 而不是 \fB4\fR.
+
+.SH "字符串操作 STRING OPERATIONS"
+.PP
+字符串可被用做比较操作符的操作数，尽管表达式求值器尽可能的尝试着作为整数或浮点数来做比较。如果一个比较的操作数中的一个是字符串而其他是数值值，数值操作数被转换回字符串，对整数值使用 C \fIsprintf\fR  格式指定符 \fB%d\fR ，对浮点数值使用 \fB%g\fR。例如，命令        
+.CS
+\fBexpr {"0x03" > "2"}\fR
+\fBexpr {"0y" < "0x12"}\fR
+.CE
+都返回 1。做第一个比较使用了整数比较，而做第二个比较在把第二个操作数转换成字符串 \fB18\fR之后使用了字符串比较。因为 Tcl 趋向于尽可能的把值作为数值对待，在你事实上想进行字符串比较并且操作符的值可以是任意的的时候使用象 \fB==\fR  这样的操作符通常不是个好主意；在这种情况下最好使用 \fBstring\fR命令。        
+
+.SH "性能的考虑 PERFORMANCE CONSIDERATIONS"
+.PP
+要得到最快的速度和最小的存储需求，就要把表达式包围在花括号中。这允许 Tcl 字节码编译器生成最好的代码。
+.PP
+象上面所提及的那样，表达式被替换两次: 一次由 Tcl 解释器，一次由 \fBexpr\fR  命令。例如，命令
+.CS
+\fBset a 3\fR
+\fBset b {$a + 2}\fR
+\fBexpr $b*4\fR
+.CE
+返回 11，而不是 4 的倍数。这是因为 Tcl 分析器将首先把变量 \fBb\fR替换成 \fB$a + 2\fR，接着 \fBexpr\fR  命令将求值表达式 \fB$a + 2*4\fR。
+.PP
+多数表达式不需要两轮替换。要它们被包围在花括号中，要么它们的变量和命令替换生成数值或本身不需要替换的字符串。但是，因为一些未用化括号包围起来的表达式需要两轮替换，字节码编译器必须散布(emit)额外的指令来处理这些情况。对于未用化括号包围起来的表达式，代价最高昂的代码是包含命令替换的代码。必须通过在每次执行这个表达式时生成新的代码来实现这些表达式。       
+
+.SH "关键字 KEYWORDS"
+arithmetic, boolean, compare, expression, fuzzy comparison
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/07/22 
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

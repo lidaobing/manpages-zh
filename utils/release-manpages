@@ -1,0 +1,16 @@
+#!/bin/sh
+manpages=man-pages-zh_CN
+release=$manpages-1.5
+rm -rf $manpages*
+rm -rf finally
+cvs -d:pserver:anonymous@sf.linuxforum.net:/cvsroot/cmpp export -r HEAD $manpages
+mv $manpages $release
+count=`wc -l $release/DOCS/00TRANSLATED`
+tar zcf $release.tar.gz $release
+rpmbuild -ta $release.tar.gz
+mkdir finally
+mv /usr/src/redhat/SRPMS/$manpages*.src.rpm finally/
+mv /usr/src/redhat/RPMS/noarch/$manpages*.rpm finally/
+mv $release.tar.gz finally/
+rm -rf $manpages*
+echo $count

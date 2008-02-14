@@ -1,0 +1,78 @@
+.TH ECHO 1 "1999年8月" "GNU sh-utils 2.0" 
+.SH NAME(名称)
+echo \- 显示一行文本
+.SH SYNOPSIS(总览)
+.B echo[\fIOPTION\fR]... [\fISTRING\fR]...
+.SH DESCRIPTION(描述)
+.PP
+.\" 在这儿添加任何附加的描述信息
+.PP
+允许在标准输出上显示STRING(s).
+.TP
+\fB\-n\fR 不输出行尾的换行符.
+.TP
+\fB\-e\fR 允许对下面列出的加反斜线转义的字符进行解释.
+.TP
+\fB\-E\fR 禁止对在STRINGs中的那些序列进行解释.
+.TP
+\fB\-\-help\fR 显示帮助并退出(须单独运行)
+.TP
+\fB\-\-version\fR 输出版本信息并退出(须单独运行)
+.PP
+在没有 \fB\-E\fR 的情况下,可承认并可以内置替换以下序列:
+.TP
+ \\NNN
+字符的ASCII代码为NNN(八进制)
+.TP
+ \e\e
+反斜线
+.TP
+ \ea
+报警符(BEL)
+.TP
+ \eb
+退格符
+.TP
+ \ec
+禁止尾随的换行符
+.TP
+ \ef
+换页符
+.TP
+ \en
+换行符
+.TP
+ \er
+回车符
+.TP
+ \et
+水平制表符
+.TP
+ \ev
+纵向制表符
+.SH "REPORTING BUGS"(报告BUGS)
+报告bugs,请发邮件到<bug-sh-utils@gnu.org>.
+.SH "SEE ALSO"(另见)
+以Texinfo手册形式维护的
+.B echo
+完全文档.如果你正确地安装了
+.B info
+和
+.B echo
+命令
+.IP
+.B info echo
+.PP
+应该可以使你访问到整个手册.
+.SH COPYRIGHT(版权)
+版权所有 \(co 1999 Free Software Foundation, 
+Inc.
+.br
+这是自由软件;参看复制条件的源文件.不作任何担保,
+更不用说商品性或者基于特殊目的的适用性.
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.B 2000/11/11
+.SH 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net

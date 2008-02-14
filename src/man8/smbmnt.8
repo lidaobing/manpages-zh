@@ -1,0 +1,43 @@
+.TH SMBMNT 8 "26 Apr 2000" "smbmnt 2.0.7"
+.PP 
+.SH "NAME 名字" 
+smbmnt \- 装载 SMB 文件系统的协助工具。
+.PP 
+.SH "总览" 
+\fBsmbmnt\fP mount-point [ -s share ] [ -r ] [ -u uid ] [ -g gid ] [ -f mask ] [ -d mask ] 
+.PP 
+.SH "描述" 
+.PP 
+smbmnt 用于协助 smbmount 程序完成实际装载 SMB 共享资源。
+smbmnt 必须以 root 用 setuid 来安装，这样普通用户才能
+装载他们的 SMB 共享资源。它在装载点和装载目录上检查
+用户是否有写权限。
+.PP 
+smbmnt 通常由 smbmount 来调用。用户不能直接调用它。
+.PP 
+.IP "\fB-r\fP" 
+以只读方式装载文件系统
+.PP 
+.IP "\fB-u uid\fP" 
+指定要装载文件者的用户标识符。
+.PP 
+.IP "\fB-g gid\fP" 
+指定要装载文件者的组标识符。
+.PP 
+.IP "\fB-f mask\fP" 
+声明用八进制数表示的文件掩码。
+.PP 
+.IP "\fB-d mask\fP" 
+声明用八进制数表示的文件掩码。
+.PP 
+.SH "作者" 
+smbfs、smbmnt 和 smbmount 的维护人是 Andrew Tridgell tridge@samba.org
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2001/04/14
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net
+
+

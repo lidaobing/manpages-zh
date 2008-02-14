@@ -1,0 +1,193 @@
+.\" Don't change the first line, it tells man that we need tbl.
+.\" This man page is Copyright (C) 1999 Andi Kleen .
+.\" 中文版版权所有 redcandle, Laser www.linuxforum.net 2000
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.\" Please send bug reports, corrections and suggestions for improvements to 
+.\" 
+
+.TH RAW 7 "2 Oct 1998" "Linux 手册页" "Linux 程序员手册" 
+.SH NAME
+raw, SOCK_RAW \- Linux IPv4 raw socket.
+
+.SH 总 览
+#include <sys/socket.h>
+.br
+#include <netinet/in.h>
+.br
+raw_socket = socket(PF_INET, SOCK_RAW, int protocol ); 
+
+.SH 描 述
+Raw sockets 使得用户端可以实现新的 IPv4 协议。
+raw socket 设备接收或发送不含链接层报头的原始数据包。
+只有激活接口选项 IP_HDRINCL 时 IPv4 层才会在传输包中
+添加 IP 报头。而且当激活时，包中必须含有 IP 报头。包中含
+有 IP 报头才能被接收。
+
+只有 user id 为 0 或具有 CAP_NET_RAW 能力才能打开 
+raw sockets.
+
+所有匹配为此 raw socket 声明的协议号的包或错误都将被传
+送到该 socket.要察看许可的协议列表，
+请参考 RFC1700 给出的代号和 getprotobyname (3).
+
+IPPROTO_RAW 意味着 IP_HDRINCL 处于激活状态，也意味着接收
+所有 IP 协议. 但是不允许传送。
+
+.TS
+tab(:) allbox;
+c s
+l l.
+IP_HDRINCL 会在传送时修改 IP 报头。
+IP Checksum: 总是写入。
+Source Address:为 0 时写入。
+Packet Id:为 0 时写入。
+Total Length:总是写入。
+.TE
+
+.PP
+如果指定了 IP_HDRINCL 且 IP 报头含有的目的地址不是 0，那么
+该 socket 的目的地址用于路由该包。
+如果指定了 MSG_DONTROUTE 则目的地址
+应指向某个本地接口。否则会进行路有表查找，但是网关路由会被
+忽略。如果未设定 IP_HDRINCL 则可通过 setsockopt (2) 在
+raw socket 中设定 IP header 选项。参考 ip (7) 了解更多信
+息。
+
+在 Linux 2.2 下可以用 IP socket 选项设置所有的 
+IP 报头域和选项. 这意味着通常只有新的协议
+或没有用户界面的协议需要 raw socket (就象 ICMP).
+当收到一个包时，它首先被传给绑定到包协议的任何 raw socket
+然后才传给其他协议句柄(handler)。
+(比如．内核协议模块). 
+
+.SH 地址格式
+raw socket 使用在 ip (7) 中定义的标准 sockaddr_in 地址结构。
+sin_port 域用于指定 IP 协议号，但是在 Linux 2.2 下传送时应将
+其忽略，而且应该一直设为0 (参见 BUGS).
+
+对于接收的包，sin_port 被设置为该包的协议号。
+参考 其中包括介绍有效的 IP 协议的文件. 
+
+.SH SOCKET选项
+raw socket 选项可使用 setsockopt (2) 进行设置，用
+getsockopt (2)进行读取（通过传递 SOL_RAW 族标志）. 
+
+.TP
+.B ICMP_FILTER
+激活绑定到 IPPROTO_ICMP 协议的一个用于 raw socket 特殊的过滤器。
+该值对每种 ICMP 消息都有一个位（掩码），
+可以把那种 ICMP 消息过滤掉．缺省时是不过滤 ICMP 消息．
+
+另外，还支持所有对数据报 socket 有效的 ip(7) SOL_IP 
+socket 选项．
+
+.SH 注 意
+raw socket 包长超过接口 MTU 时会把包分成碎片。(另见 BUGS).
+另一个更友好和快速的选择是使用路径 MTU 查找。 
+在 ip (7) IP_PMTU_DISCOVER 一段有详细描述。
+
+使用 bind (2) 可将 raw socket 绑定到指定的本地地址。
+如果没有绑定，则接收所有符合指定的 IP 协议的包。
+另外用 SO_BINDTODEVICE 可以将 RAW socket 绑定到指定的网络
+设备。 详见： socket (7).
+
+IPPROTO_RAW 只能传送。如果你确实想接收所有的 IP 包
+用 packet (7) socket 和 ETH_P_IP 协议.
+请注意 packet socket不象 raw socket 那样对 IP 碎片进行重组。
+
+如果想要为一个 datagram socket 接收的所有 ICMP 包，那么最好
+在那个 socket 上使用 IP_RECVERR。详见： ip (7).
+
+raw socket 能窃听所有的 IP 协议, 即使象 ICMP 或 
+TCP 这样在内核中有协议模块的也不例外。这时候包会同时传送到
+核心模块和raw socket. 一个可移植的程序不能依赖这个特性，
+许多其他 BSD socket 实现在这方面有局限．
+
+Linux 从不改变用户传输的包 (除了前
+面提到的 IP_HDRINCL ，填入一些0字段).这与其他 raw socket
+实现方式是不同的．
+
+RAW socket 通常很难移植. socket 传输时使用 sin_port 中设置的
+协议，但 Linux2.2 下不行了，解决办法是使用 IP_HDRINCL.
+
+.SH 错误处理
+只有连接了 socket 或 IP_RECVERR 设置为有效时，网络错误才会
+传送给用户。因为兼容性的原因只有 EMSGSIZE 和 EPROTO 被传送
+给 socket.
+
+.SH 错 误
+.TP
+.B IP_RECVERR
+使得所有的错误存储到 error queue（错误队列）. 
+
+.TP
+.B EMSGSIZE 
+包太大。或者因为路径 MTU 查找 （IP_PMTU_DISCOVER）
+设置为有效，或者因为包的尺寸超过 IPv4 规定的包
+最大尺寸 64KB. 
+
+.TP
+.B EACCES
+用户试图传送到某广播地址但是并未事先在socket中设置广播
+标志。
+
+.TP
+.B EPROTO
+ICMP 错误报告有参数问题。
+
+.TP
+.B EFAULT
+无效内存地址。
+
+.TP
+.B EOPNOTSUPP
+传送给 socket 的标志无效(比如：MSG_OOB ).
+
+.TP
+.B EINVAL
+无效参数.
+
+.TP
+.B EPERM
+用户无权打开 raw socket. 只有用户 id 为 0 或具有
+CAP_NET_RAW 属性方可。
+
+.SH 版 本
+IP_RECVERR 和 ICMP_FILTER 是 Linux 2.2 的新实现.
+不能用于可移植程序。
+
+如果设置了 SO_BSDCOMPAT 标志，
+Linux 2.0 里面有和 BSD 里兼容的 raw socket 代码错误，
+在 2.2 里已经修补了．
+
+.SH BUGS
+没有描述透明代理扩展.
+
+当设置 IP_HDRINCL 选项后datagrams（自寻址数据包）不会被分段
+并受 MTU 限制. 这是 Linux 2.2 的限制.
+
+在 Linux 2.2 sin_port 中设置的 IP 协议会丢失。使用的是绑定了
+socket 的协议，或在 socket (2)初始化调用中指定的协议。
+
+.SH 作 者
+Andi Kleen. 
+.SH 另 见
+.BR ip (7), 
+.BR socket (7), 
+.BR recvmsg (2), 
+.BR sendmsg (2).
+.PP
+RFC1191 for path MTU discovery.
+.br
+RFC791 and the include file for the IP protocol.
+.br
+
+.SH "[中文版维护人]"
+.B RedCandle <redcandle51@chinaren.com>
+.SH "[中文版最新更新]"
+.B 2000/10/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

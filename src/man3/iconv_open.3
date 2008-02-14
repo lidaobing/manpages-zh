@@ -1,0 +1,123 @@
+.\" Copyright (c) Bruno Haible <haible@clisp.cons.org>
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" References consulted:
+.\"   GNU glibc-2 source code and manual
+.\"   OpenGroup's Single Unix specification http://www.UNIX-systems.org/online.html
+.\"
+.TH ICONV_OPEN 3  "May 6, 2001" "GNU" "Linux Programmer's Manual"
+
+.SH NAME
+iconv_open \- 分配一个字符集转换的描述符
+
+.SH "总览 (SYNOPSIS)"
+.nf
+.B #include <iconv.h>
+.sp
+.BI "iconv_t iconv_open (const char* " tocode ", const char* " fromcode );
+.fi
+
+.SH "描述 (DESCRIPTION)"
+\fBiconv_open\fP 函数 分配 一个 用于 把 \fIfromcode\fP 编码的 字符串
+转换成 \fItocode\fP 编码 的 转换 描述符.
+.PP
+\fIfromcode\fP 和 \fItocode\fP 所允许的值 以及 支持的 组合方式 都是 与
+系统 相关的. 对于 这个 libiconv 库, 它 支持 下面 的 编码, 也 支持 其
+所有 的 组合.
+.TP
+欧洲语言
+ASCII, ISO-8859-{1,2,3,4,5,7,9,10,13,14,15,16},
+KOI8-R, KOI8-U, KOI8-RU,
+CP{1250,1251,1252,1253,1254,1257}, CP{850,866},
+Mac{Roman,CentralEurope,Iceland,Croatian,Romania},
+Mac{Cyrillic,Ukraine,Greek,Turkish},
+Macintosh
+.TP
+闪米特语言
+ISO-8859-{6,8}, CP{1255,1256}, CP862, Mac{Hebrew,Arabic}
+.TP
+日文
+EUC-JP, SHIFT-JIS, CP932, ISO-2022-JP, ISO-2022-JP-2, ISO-2022-JP-1
+.TP
+中文
+EUC-CN, HZ, GBK, GB18030, EUC-TW, BIG5, CP950, BIG5-HKSCS,
+ISO-2022-CN, ISO-2022-CN-EXT
+.TP
+韩文
+EUC-KR, CP949, ISO-2022-KR, JOHAB
+.TP
+Armenian
+ARMSCII-8
+.TP
+Georgian
+Georgian-Academy, Georgian-PS
+.TP
+泰语
+TIS-620, CP874, MacThai
+.TP
+捞挝语
+MuleLao-1, CP1133
+.TP
+越南语
+VISCII, TCVN, CP1258
+.TP
+特定平台
+HP-ROMAN8, NEXTSTEP
+.TP
+Full Unicode
+.nf
+UTF-8
+UCS-2, UCS-2BE, UCS-2LE
+UCS-4, UCS-4BE, UCS-4LE
+UTF-16, UTF-16BE, UTF-16LE
+UTF-32, UTF-32BE, UTF-32LE
+UTF-7
+JAVA
+.fi
+.TP
+用 \fBuint16_t\fP 或 \fBuint32_t\fP 表示的 Unicode
+(其 字节顺序 和 对齐方式 与 具体 机器 有关)
+UCS-2-INTERNAL, UCS-4-INTERNAL
+.TP
+用 \fBchar\fP 或 \fBwchar_t\fP 表示的 与 区域设置 相关的 编码
+(其 字节顺序 和 对齐方式 与 具体 机器 有关, 其 语意 与
+操作系统 和 当前 区域设置 中的 LC_CTYPE 有关)
+char, wchar_t
+.PP
+在 \fItocode\fP 后面 加上 "//TRANSLIT" 表示, 当 在目标 字符集
+中 不能 表示 一个 字符 时, 就用 同其 相似 的 一个 字符 来 代替.
+.PP
+其 返回的 转换 描述符 可以 被 \fBiconv\fP 多次 使用. 只要 没有 用
+\fBiconv_close\fP 将其 释放, 它 就是 有效的.
+.PP
+转换 描述符 包含了 转换的 状态. 在用 \fBiconv_open\fP 建立 一个 描述符
+时 状态为 初始态. \fBiconv\fP 会 改变 它的 状态. (这说明 一个 描述符
+不能在 多线程中 同时 使用.) 可以 把 NULL 作为 \fIinbuf\fP 传给
+\fBiconv\fP 来 使其 回到 初始态.
+
+.SH "返回值 (RETURN VALUE)"
+\fBiconv_open\fP 函数 返回 一个 新的 转换 描述符. 如果 发生 错误 则
+设置 \fBerrno\fP 变量 同时 返回 (iconv_t)(-1).
+
+.SH "错误 (ERRORS)"
+除了 一般的 错误, 还可能 有 下面的 错误:
+.TP
+.B EINVAL
+此系统 不支持 从 \fIfromcode\fP 到 \fItocode\fP 的 转换.
+
+.SH "遵循 (CONFORMING TO)"
+UNIX98
+
+.SH "参见 (SEE ALSO)"
+.BR iconv "(3), " iconv_close (3)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2002/3/21
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

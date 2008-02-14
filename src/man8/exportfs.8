@@ -1,0 +1,226 @@
+.\"
+.\" exportfs(8)
+.\" 
+.\" Copyright (C) 1995 Olaf Kirch <okir@monad.swb.de>
+.\" Modifications 1999-2003 Neil Brown <neilb@cse.unsw.edu.au>
+.TH exportfs 8 "18 July 2003"
+.SH NAME
+exportfs \- 管理NFS共享文件系统列表
+.SH "概述 (SYNOPSIS)"
+.BI "/usr/sbin/exportfs [-avi] [-o " "options,.." "] [" "client:/path" " ..]
+.br
+.BI "/usr/sbin/exportfs -r [-v]"
+.br
+.BI "/usr/sbin/exportfs [-av] -u [" "client:/path" " ..]
+.br
+.BI "/usr/sbin/exportfs [-v]
+.br
+.BI "/usr/sbin/exportfs -f"
+.br
+.SH "描述 (DESCRIPTION)"
+.B exportfs
+命令用来管理当前NFS共享的文件系统列表。
+这个列表保存在一个单独的文件
+.BR /var/lib/nfs/xtab
+中，当远端主机要求对一个文件系统树加载并访问时由
+.B mountd
+读取，列表中活动的一部分也保存在在内核共享表中。
+.P
+通常
+.B xtab
+在执行
+.BR "exportfs -a" .
+.P
+的时候，根据
+.B /etc/exports 
+中定义的共享列表来初始化。
+但是，管理员可以选择添加或删除独立的文件系统，不必修改
+.B /etc/exports
+，只要执行
+.BR exportfs 
+就可以了。
+.P
+.B exportfs
+和它的合作者
+.B mountd
+工作在两种模式之一，一种是2.4以及早期的内核采用的传统模式，
+另一种是2.6以后内核采用的模式。
+2.6之后的内核提供了
+.B nfsd
+虚拟文件系统，挂载点是
+.BR /proc/fs/nfs 。
+在2.6内核中如果没有挂载这个系统，将使用传统模式。
+.P
+在新模式中，
+.B exportfs
+不为内核提供任何信息，只通过
+.B /var/lib/nfs/xtab
+文件将信息提供给
+.B mountd 
+。
+.B mountd
+将等待内核请求，提供需要的信息。
+.P
+在传统模式中，任何标识了一台特定主机(而不是一个子网或是一个工作组)的
+共享请求会直接进入内核共享表，同时写入
+.BR /var/lib/nfs/xtab .
+甚至于，任何列在
+.B /var/lib/nfs/rmtab
+中的挂载点，只要它符合一个不指定主机的共享请求，将使得
+.B rmtab
+给出的主机的一个适当的共享条目进入内核的共享表中。
+.SH "选项 (OPTIONS)"
+.TP 
+.B -a
+打开或取消所有目录共享。
+.TP
+.BI "-o " options,...
+指定一列共享选项，与
+.BR exports(5) 
+中讲到的类似。
+.TP
+.B -i
+忽略
+.B /etc/exports
+文件，从而只使用默认的和命令行指定的选项。
+.TP
+.B -r
+重新共享所有目录。它使
+/var/lib/nfs/xtab
+和 
+/etc/exports
+同步。
+它将
+/etc/exports
+中已删除的条目从
+/var/lib/nfs/xtab
+中删除，将内核共享表中任何不再有效的条目移除。
+.TP
+.B -u
+取消一个或多个目录的共享。
+.TP
+.B -f
+在“新”模式下，刷新内核共享表之外的任何东西。
+任何活动的客户程序将在它们的下次请求中得到
+.B mountd
+添加的新的共享条目。
+.TP
+.B -v
+输出详细信息。当共享或者取消共享时，显示在做什么。
+显示当前共享列表的时候，同时显示共享的选项。
+.SH "讨论 (DISCUSSION)"
+.\" -------------------- Exporting Directories --------------------
+.SS "共享目录 (Exporting Directories)"
+第一条概述中显示出如何执行命令来添加新的共享。
+当执行
+.BR "exportfs -a" 时,
+所有
+.B exports(5)
+中的目录将添加到
+.B xtab
+并且将结果列表送进内核。
+.P
+.I host:/path
+参数指定了要共享的目录和可以访问它的主机。
+所有
+.B exports(5)
+中定义的格式都可以支持。
+想要将一个目录共享给所有其他机器，只要用
+.IR :/path 
+就可以了。
+.P
+这种指定一个特定主机/目录的共享选项来自于多种来源。
+有一系列的默认选项，可以在
+.B /etc/exports
+中指定它们(除非指定了
+.B -i
+选项)。
+另外，管理员可以使用
+.B -o
+参数和一系列以逗号分隔的选项来覆盖所有默认选项。
+做法就像在
+.BR exports(5) 
+中一样。
+因此，
+.B exportfs
+可以用来修改已经共享的目录的共享选项。
+.P
+.B nfsd(8)
+对内核共享表的修改会在命令行解析和
+.B xtab
+文件修改之后马上进行。
+.P
+默认的共享选项是
+.BR sync,ro,root_squash,no_delay 。
+.\" -------------------- Unexporting Directories ------------------
+.SS "取消共享 (Unexporting Directories)"
+第三种语法显示了怎样取消一个当前的共享目录。
+当执行
+.BR "exportfs -ua" ,
+的时候，
+.B xtab
+中的所有条目被从内核共享表中移除，
+这个文件会被清空。这样可以迅速停止所有NFS服务。
+.P
+要取消单独的共享条目，可以指定一个
+.I host:/path
+参数。这样删除了
+.B xtab
+中的条目并且移除了对应的内核条目(如果有的话)。
+.P
+.\" -------------------- Dumping the Export Table -----------------
+.SS "获取共享表 (Dumping the Export Table)"
+执行不带选项的
+.B exportfs
+将列出当前的共享列表。当给出
+.B -v
+选项时，会列出各自的标志。
+.\" -------------------- EXAMPLES ---------------------------------
+.SH "范例 (EXAMPLES)"
+这条命令将所有
+.B /etc/exports
+中列出的目录加入到
+/var/lib/nfs/xtab
+中，将结果送入内核：
+.P
+.nf
+.B "# exportfs -a
+.fi
+.P
+如果要将
+.B /usr/tmp
+目录共享给
+.BR djando 主机,
+允许匿名写入，应当这样：
+.P
+.nf
+.B "# exportfs -o async django:/usr/tmp
+.fi
+.\" -------------------- DEPENDENCIES -----------------------------
+.SH "依赖性 (DEPENDENCIES)"
+提供给IP子网，DNS和NIS域的共享不会使这些工作组中的客户程序马上就能读取NFS；
+这种类型的共享其实是向
+.B mountd(8)
+提供的信息，为来自这些客户的挂载请求授权。
+这通常不是一个大问题，因为重启过程中，任何存在的加载都保存在
+.B rmtab
+中。
+.P
+当取消一个子网或域的共享时，当前任何提供给这个工作组中的成员的共享
+将被检查。如果它们不再有效，它们将被移除。
+.P
+.\" -------------------- SEE ALSO --------------------------------
+.SH "参见 (SEE ALSO)"
+.BR exports(5) ", " mountd(8)
+.\" -------------------- AUTHOR ----------------------------------
+.SH "作者 (AUTHORS)"
+Olaf Kirch, <okir@monad.swb.de>
+.br
+Neil Brown, <neilb@cse.unsw.edu.au>
+.SH "[中文版维护人]"
+.B 袁乙钧 <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 2003.10.26
+.SH "《中国linux论坛man手册页翻译计划》:"
+.B http://cmpp.linuxforum.net 
+

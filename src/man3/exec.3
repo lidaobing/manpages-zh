@@ -1,0 +1,204 @@
+.\" Copyright (c) 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)exec.3	6.4 (Berkeley) 4/19/91
+.\"
+.\" Converted for Linux, Mon Nov 29 11:12:48 1993, faith@cs.unc.edu
+.\" Updated more for Linux, Tue Jul 15 11:54:18 1997, pacman@cqc.com
+.\"
+.TH EXEC 3  1993-11-29 "BSD MANPAGE" "Linux Programmer's Manual"
+.SH NAME
+execl, execlp, execle, execv, execvp \- 执行某个文件
+
+.SH "总览 (SYNOPSIS)"
+.B #include <unistd.h>
+.sp
+.B extern char **environ;
+.sp
+.BI "int execl( const char *" path ", const char *" arg ", ...);
+.br
+.BI "int execlp( const char *" file ", const char *" arg ", ...);
+.br
+.BI "int execle( const char *" path ", const char *" arg
+.BI ", ..., char * const " envp "[]);"
+.br
+.BI "int execv( const char *" path ", char *const " argv "[]);"
+.br
+.BI "int execvp( const char *" file ", char *const " argv "[]);"
+
+.SH "描述 (DESCRIPTION)"
+.B exec
+系列 函数 用 新的 进程 映象 置换 当前的 进程 映象. 
+本 手册页 描述的 这些 函数 实际上 是 对
+.BR execve (2)
+函数 的 前端(front-end) 包装. (关于 当前进程 的 置换 详见 
+.B execve
+的 手册页.)
+.PP
+这些 函数 的 第一个 参数 是 待执行 程序 的 路径名(文件名).
+.PP
+在 函数
+.BR execl ,
+.BR execlp ,
+和
+.B execle
+中, 
+.I "const char *arg"
+以及 省略号 代表 的 参数 可被 视为
+.IR arg0 ,
+.IR arg1 ,
+\&...,
+.IR argn .
+他们 合起来 描述了 指向 null 结尾的 字符串 的 指针 列表, 即 执行程序 的
+参数列表. 作为 约定, 第一个 arg 参数 应该 指向 执行程序名 自身. 参数列表
+.I 必须
+用
+.B NULL
+指针 结束!
+.PP
+.B execv
+和
+.B execvp
+函数 提供 指向 null 结尾的 字符串 的 指针数组 作为 新程序 的 参数列表.
+作为 约定, 指针数组 中 第一个 元素 应该 指向 执行程序名 自身. 指针数组
+.I 必须
+用
+.B NULL
+指针 结束!
+.PP
+.B execle
+函数 同时 说明了 执行进程 的 环境(environment), 他 在
+.B NULL
+指针 后面 要求 一个 附加参数, NULL 指针 用于 结束 参数列表, 或者说,
+argv 数组. 这个 附加参数 是 指向 null 结尾的 字符串 的 指针数组, 他
+.I 必须
+用
+.B NULL
+指针 结束! 其他 函数 从 当前进程 的
+.I environ
+外部变量 中 获取 新进程 的 环境.
+.PP
+某些 函数 有 特殊的 语义.
+.PP
+如果 提供的 文件名 中 不包含 斜杠符(/), 函数
+.B execlp
+和
+.B execvp
+将 同 shell 一样 搜索 执行文件. 搜索路径 由 环境变量
+.B PATH
+指定. 如果 该 变量 不存在, 则 使用 缺省路径 ``:/bin:/usr/bin''.
+另外, 某些 错误 要 特殊处理.
+.PP
+如果 对 某个 文件 的 访问 遭到 拒绝 (
+.B execve
+返回
+.BR EACCES ),
+这些 函数 将 在 搜索路径 中 继续 寻找. 如果 没有 找到 符合的 文件,
+他们 返回时 把
+.I errno
+置为
+.BR EACCES .
+.PP
+如果 无法 识别 文件首部 (
+.B execve
+返回
+.BR ENOEXEC ),
+这些 函数 将 以 文件名 作为 第一个 参数 调用 shell.
+(如果 这个 尝试 失败 就 不再 进行 搜索 了.)
+
+.SH "返回值 (RETURN VALUE)"
+任何
+.B exec
+函数 返回 均 表明 发生了 错误. 返回值 是 \-1, 全局变量
+.I errno
+指出 错误类型.
+
+.SH "文件 (FILE)"
+.I /bin/sh
+
+.SH "错误 (ERROR)"
+这些 函数 均可能 失败, 
+.I errno
+被 置为 库函数
+.BR execve (2)
+设置的 各种 错误类型.
+
+.SH "另见 (SEE ALSO)"
+.BR sh (1),
+.BR execve (2),
+.BR fork (2),
+.BR environ (5),
+.BR ptrace (2)
+
+.SH "兼容性 (COMPATIBILITY)"
+在 某些 其他系统 中, 缺省路径 (当 环境变量 \fBPATH\fR 不存在)
+把 当前目录 列在
+.I /bin
+和
+.IR /usr/bin 
+后面, 这是 为了 防止 特洛伊木马. Linux 在这儿 采取了 传统的 
+"当前目录优先" 缺省路径.
+.PP
+当 试图 执行 程序 并且 发生 错误 的 时候,  
+.B execlp
+和
+.B execvp
+的 行为 是 历史 习惯, 但是 没有 进入 正式文档, 也没有 被
+POSIX 标准 说明. BSD (可能 还有 其他 系统) 中 进程 自动 进入 睡眠, 如果
+发生 ETXTBSY, 他们 就 重试. 而 Linux 视此为 严重错误, 并且 立即 返回.
+.PP
+传统的 做法中, 函数
+.B execlp
+和
+.B execvp
+忽略 所有 错误, 除了 上述的 错误, 
+.B ENOMEM
+和
+.BR E2BIG .
+如果 发生 这三类 错误, 他们 就 返回. 而 现在的 做法是, 不仅仅 上述的 错误,
+任何 错误 均导致 函数 返回.
+
+.SH "遵循 (CONFORMING TO)"
+.BR execl ,
+.BR execv ,
+.BR execle ,
+.B execlp
+和
+.B execvp
+遵循
+IEEE Std1003.1-88 (``POSIX.1'').
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,45 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH MESG 1 "May 27, 1997" "" "Linux User's Manual"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+mesg \- 调节用户终端的写访问权
+.\"}}}
+.\"{{{  Synopsis
+.SH "总览 (SYNOPSIS)"
+.B mesg
+.RB [ y | n ]
+.\"}}}
+.\"{{{  Description
+.SH "描述 (DESCRIPTION)"
+.B Mesg
+控制 其他用户 对 你的终端 的 访问能力. 典型用途 是 允许 或 禁止 其他用户
+向 你的终端 输出 数据. (另见 \fBwrite\fP(1)).
+.\"}}}
+.\"{{{  Options
+.SH "选项 (OPTIONS)"
+.IP \fBy\fP
+允许 对 用户终端 作 写访问.
+.IP \fBn\fP
+禁止 对 用户终端 作 写访问.
+.PP
+如果 没有 指定 选项, \fBmesg\fP 就 显示 目前 用户终端 的 访问状态.
+.\"}}}
+.\"{{{  Author
+.SH "作者 (AUTHOR)"
+Miquel van Smoorenburg (miquels@cistron.nl)
+.\"}}}
+.\"{{{  See also
+.SH "另见 (SEE ALSO)"
+.BR talk (1),
+.BR write (1),
+.BR wall (1)
+.\"}}}
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

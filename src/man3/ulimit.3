@@ -1,0 +1,62 @@
+.\" Hey Emacs! This file is -*- nroff -*- source.
+.\"
+.\" Copyright (C) 1996 Andries Brouwer (aeb@cwi.nl)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Moved to man3, aeb, 980612
+.\"
+.TH ULIMIT 3 "12 June 1998" "Linux 2.0" "Linux Programmer's Manual"
+.SH NAME
+ulimit \- 获取和改变用户的限制设定
+.SH 大纲
+.B #include <ulimit.h>
+.sp
+.BI "long ulimit(int " cmd ", long " newlimit );
+.SH 描述
+警告: 这个函数已经被废弃. glibc 不再提供这个包含文件. 使用 getrlimit(2), 
+setrlimit(2) 和 sysconf(3) 代替这个函数. 相关shell命令
+.BR ulimit ,
+参见
+.BR bash (1).
+
+使用
+.B ulimit
+可以获得或改变当前进程的限制设定.
+.I cmd
+参数可以是下列值中的一个:
+.TP
+.B UL_GETFSIZE 
+返回文件大小的限制 (以512字节为单位).
+.TP
+.B UL_SETFSIZE
+设定文件大小的限制.
+.TP
+.B 3
+(Linux不支持)
+返回数据段可以使用的最大地址.
+.TP
+.B 4
+(支持,但没有定义符号常量) 
+返回调用本函数的进程可以打开的最大文件数.
+
+.SH "返回值"
+如果执行成功

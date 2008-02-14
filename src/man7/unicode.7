@@ -1,0 +1,193 @@
+.\" Copyright (C) Markus Kuhn, 1995
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+.\" USA.
+.\"
+.\" 1995-11-26 Markus Kuhn <mskuhn@cip.informatik.uni-erlangen.de>
+.\" First version written
+.\" 中文版版权所有 mapping, Laser www.linuxforum.net 2000
+.TH UNICODE 7 "1995-12-27" "Linux" "Linux Programmer's Manual"
+.SH NAME
+Unicode \- 16 位统一超级字符集
+.SH 描述 (DESCRIPTION)
+国际标准
+.B ISO 10646
+定义了
+.BR "通用字符集 (Universal Character Set, UCS)".
+.B UCS
+包含所有别的字符集标准里的字符,并且保证了
+.BR "互换兼容性 (round-trip compatibility)",
+也就是说，当一个字符串在
+.B UCS
+和任何别的字符集之间转换时, 转换表可以保证不会有信息丢失现象发生．
+
+.B UCS
+包含了表示几乎所有已知的语言所必需的字符．该字符集既包
+括那些使用扩展拉丁语的语言,也包括下面的这些语言: Greek, 
+Cyrillic, Hebrew,Arabic, Armenian, Gregorian, Japanese, 
+Chinese, Hiragana, Katakana, Korean, Hangul, Devangari, 
+Bengali, Gurmukhi, Gujarati, Oriya, Tamil, Telugu, 
+Kannada, alayam, Thai, Lao, Bopomofo,等等.而另外的语言,例如
+Tibetian, Khmer, Runic, Ethiopian, Hieroglyphics, 
+各种 Indo-European 语言, 还有许多其他的语言, 正在被加入其
+中.1993 年发布该标准的时候, 还不清楚怎样才能对后面加入的这些
+语言中的大部分作更好的编码. 另外, 这些语言所需的字符, 以及由
+TeX, PostScript, MS-DOS, Macintosh, Videotext, OCR, 还有很
+多字处理系统所提供的大量的图形, 印刷体, 数学和科学符号, 都已
+被包括进来, 还包括了一些特别编码以保证和所有其它已存在字符集
+标准的可逆转换兼容性.
+
+
+.B UCS
+标准 (ISO 10646) 描述了一个 31 位字符集的体系, 不过, 目前
+只使用了前面 65534 个编码位置 (0x0000-0xfffd, 它们被称为
+.BR "基本多语言块  (Basic Multilingual Plane,BMP))",
+分配给了字符, 而且我们
+估计只有那些很古怪的字符(比如． Hieroglyphics)为了专门
+的科学目的, 才会在将来的某个时候, 需要 16 位的 BMP 之外的部分.
+
+从 0x0000 到 0x007f 之间的
+.B UCS
+字符和经典
+.B US-ASCII
+字符集是一样的,
+而从 0x0000 到 0x00ff 之间的字符等于
+.B ISO 8859-1 Latin-1
+字符集．
+.SH 组合字符 (COMBINING CHARACTERS)
+一些
+.B UCS
+编码被分配给了
+.BR "组合字符(combining characters)".
+这样的情形有点类似于打字机上的重音键. 一个组合字符只是
+给前面的字符添加一个重音. 在
+.BR UCS
+里最重要的重音字符都有他们自己的编码,
+不过, 组合字符机制允许给任一字符添加重音和其他的可识别记号.
+组合字符总是跟在那些他们所修饰的字符后面. 例如,德语符号 Umlaut-A 
+(带分音符的大写拉丁字母 A)既可以表示为
+.B UCS
+编码 0x00c4, 也可以
+用一个正常的"大写拉丁字母 A"后面跟一个"组合分音符号":
+0x0041 0x0308 来表示．
+.SH 实现级别 (IMPLEMENTATION LEVELS)
+由于不是所有系统都支持象组合字符这样的高级机制, ISO 10646
+指明了
+.BR UCS
+的三种实现级别:
+.TP 0.9i
+级别 1 (Level 1)
+不支持组合字符和 Hangul Jamo 字符(朝鲜语的一种更复
+杂的专用的编码, Hangul 音节编码成两或三个亚字符).
+.TP
+级别 2 (Level 2)
+类似于级别1, 却在一些语言里面也支持一些组合字符.
+(比如． Hebrew, Arabic, Devangari, Bengali, Gurmukhi,
+Gujarati, Oriya, Tamil, Telugo, Kannada, Malayalam, Thai 和 Lao).
+.TP
+级别 3 (Level 3)
+支持所有
+.B UCS
+字符.
+.PP
+Unicode 协会发布的 Unicode 1.1 标准和 ISO 10646 所描述的
+那样, 在第 3 执行级别只包括了
+.B UCS (基本多语言块 Basic Multilingual Plane).
+Unicode 1.1 还为一些 ISO 10646 的字符定义加
+入了一些语义定义.
+.SH LINUX 下的 UNICODE (UNICODE UNDER LINUX)
+在 Linux 下, 为了降低组合字符的实现复杂性, 目前只包括了执
+行级别 1 下的
+.B BMP.
+更高的执行级别更适合于专门的字处理格式,
+而不是一个普通的系统字符集. 在 linux 下 C 的类型
+.B wchar_t
+是一个
+有符号位的 32 位整型并且其值解释为
+.B UCS4
+编码．
+
+本地化设置指明系统字符编码是使用诸如
+.B UTF-8
+还是
+.BR "ISO 8859-1" 这样的编码．
+象库函数
+.BR wctomb,
+.BR mbtowc,
+或者
+.B wprintf
+就可以用于内部
+.B wchar_t
+字符及字符串与系统字符编码之间做转换.
+.SH 私有区 (PRIVATE AREA)
+在
+.BR BMP
+里, 0xe000 到 0xf8ff 的范围被标准保留做私用因而永远不会
+被分配给任何字符. 对于 Linux 社区, 该私有区被再细分为可以被任何终端用户
+独立使用的 0xe000 到 0xefff 的范围, 以及从 0xf000 到 0xf8ff 给所有 linux
+用户所共用的 linux 区.H. Peter Anvin(<Peter.Anvin@linux.org>,
+Yggdrasil Computing,Inc) 现在维护登记分配到 linux 区的字符.
+该区包括一些 Unicode 中缺少的 DEC VT100 的图形字符, 这使控制台
+的字体缓冲区可以直接获得这些字符, 该区还包括一些象 Klingon
+这样的古老语言所使用的字符.
+.SH 文献 (LITERATURE)
+.TP 0.2i
+*
+Information technology \- Universal Multiple-Octet Coded Character
+Set (UCS) \- Part 1: Architecture and Basic Multilingual Plane.
+International Standard ISO 10646-1, International Organization
+for Standardization, Geneva, 1993.
+
+这是
+.BR UCS
+的正式规范, 非常正式, 也很厚, 还非常贵. 如果要定
+购信息, 去看看 www.iso.ch.
+.TP
+*
+The Unicode Standard \- Worldwide Character Encoding Version 1.0.
+The Unicode Consortium, Addison-Wesley,
+Reading, MA, 1991.
+
+Unicode 已经有 1.1.4 版可用,与 1.0 版的差别可以在 ftp.unicode.org 找到. 
+Unicode 2.0 也将在 1996 年出版一本书.
+.TP
+*
+S. Harbison, G. Steele. C \- A Reference Manual. Fourth edition,
+Prentice Hall, Englewood Cliffs, 1995, ISBN 0-13-326224-3.
+
+一本很好的 C 语言编程参考书. 现在的第四版包含了 1994 年对标准
+ISO C 的第一次修正 (ISO/IEC 9899:1990), 添加了大量
+处理多种字符集的新的 C 库函数.
+.SH 缺憾 (BUGS)
+在写这个手册页的时候,linux 对
+.B UCS
+的 C 语言库支持远未完成.
+.SH 作者 (AUTHOR)
+Markus Kuhn <mskuhn@cip.informatik.uni-erlangen.de>
+.SH 又见(SEE ALSO)
+.B utf-8(7)，
+.B http://www.linuxforum.net/books/UTF-8-Unicode.html
+
+.SH "[中文版维护人]"
+.B mapping <mapping@263.net>
+.SH "[中文版最新更新]"
+.BR 2000/11/06
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

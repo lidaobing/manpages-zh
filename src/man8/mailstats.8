@@ -1,0 +1,73 @@
+.TH MAILSTATS 1 "UNIX Reference Manual" "3rd Berkeley Distribution" "April 25, 1996"
+.SH NAME
+.B   mailstats - 显示邮件状态信息
+.SH 总览
+.B   mailstats [-o] [-C cffile] [-f stfile]
+.SH 描述
+mailstats工具显示当前的邮件状态信息。
+.PP
+首先，先显示统计启动时所记录的时间，当然是以ctime(3)所指定的格式。然后每行显
+示一个邮件程序的统计，而每行都以空格把下面这些字段分隔开：
+.sp
+.RS
+.PD 0.2v
+.TP 1.2i
+M
+邮件程序号码
+.TP
+msgsfr
+该邮件程序接收的信件数
+.TP
+bytes_from   
+该邮件程序接收的信件容量
+.TP
+msgsto       
+该邮件程序发出的信件数
+.TP
+bytes_to     
+该邮件程序发出的信件容量
+.TP
+msgsrej      
+退回的信件数
+.TP
+msgsdis      
+丢弃的信件数
+.TP
+Mailer       
+该邮件程序名
+.PD
+.RE
+.PP
+显示完这些后，用一行对所有邮件程序的所有值进行合计，中间用一行等号把它和上面的
+内容隔开。
+.PP
+该程序有以下选项：
+.TP
+-C
+读取指定的文件来替换缺省的sendmail的"cf"文件。
+.TP
+-f
+读取指定的统计文件来替换在sendmail的"cf"文件中所指定的那个统计文件。
+.TP
+-o
+在输出中不显示邮件程序名。
+.PP
+该程序运行正常返回0，出错返回大于0的任何值。
+
+.SH 文件
+.TP 2.5i
+/etc/sendmail.cf
+缺省的sendmail的"cf"文件。
+.TP
+/var/log/sendmail.st
+缺省的sendmail的统计文件。
+
+.SH 另见
+mailq(1),sendmail(8)
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2001/02/24
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

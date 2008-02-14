@@ -1,0 +1,357 @@
+'\"
+'\" Copyright (c) 1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\"
+'\" RCS: @(#) $Id: registry.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: registry.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH registry n 8.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+registry \- 操纵 Windows 注册表
+.SH "总览 SYNOPSIS"
+.sp
+\fBpackage require registry 1.0\fR
+.sp
+\fBregistry \fIoption\fR \fIkeyName\fR ?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+\fBregistry\fR 包为操纵 Windows 注册表提供了一个通用的操作集。这个包实现了 Tcl 命令 \fBregistry\fR。只在 Windows 平台上支持这个命令。警告: 使用这个命令必须谨慎，因为一个被破坏了的注册表将导致你的系统进入不可用状态。
+.PP
+\fIKeyName\fR 是一个注册表键的名字。注册表键必须是下列一种形式之一:
+.IP
+\fB\e\e\fIhostname\fB\e\fIrootname\fB\e\fIkeypath\fR
+.IP
+\fIrootname\fB\e\fIkeypath\fR
+.IP
+\fIrootname\fR
+.PP
+\fIHostname\fR 指定任何有效的 Windows 主机名字，它导出了自己的注册表。\fIrootname\fR 组成部分必须是下列之一：
+\fBHKEY_LOCAL_MACHINE\fR, \fBHKEY_USERS\fR,
+.VS
+\fBHKEY_CLASSES_ROOT\fR, \fBHKEY_CURRENT_USER\fR,
+\fBHKEY_CURRENT_CONFIG\fR, \fBHKEY_PERFORMANCE_DATA\fR, or
+\fBHKEY_DYN_DATA\fR.  
+\fIkeypath\fR 可以是一个或更多
+.VE
+注册表键的名字, 用反斜杠字符(\fB\\fR)分隔。
+.PP
+\fIOption\fR 指示对注册表键名要做什么。可接受一个唯一的 \fIoption\fR 的缩写。有效的选项有:
+.TP
+\fBregistry delete \fIkeyName\fR ?\fIvalueName\fR?
+.
+如果提供了可选的 \fIvalueName\fR     参数，则从注册表中删除 \fIkeyName\fR     下的这个指定的值。如果省略了可选的 \fIvalueName\fR，则删除这个指定的键和在注册表层次中位于其下的子键或值。如果不能删除这个键则生成一个错误。如果这个键不存在，这个命令没有作用。
+.TP
+\fBregistry get \fIkeyName valueName\fR
+.
+返回在键 \fIkeyName \fR下面的值 \fIvalueName\fR     所关联的数据。如果这个键或值不存在，则生成一个错误。     返回数据的格式的详情请参见下面的 SUPPORTED TYPES 支持的类型。
+.TP
+\fBregistry keys \fIkeyName\fR ?\fIpattern\fR?
+.
+如果未指定 \fIpattern\fR，返回 \fIkeyName \fR的所有子键的名字的一个列表。如果指定了 \fIpattern\fR，只返回匹配 \fIpattern\fR 的那些名字。使用与 \fBstring\fR 相同的匹配规则确定匹配。如果指定的 \fIkeyName\fR  不存在，则生成一个错误。
+.TP
+\fBregistry set \fIkeyName\fR ?\fIvalueName data \fR?\fItype\fR??
+.
+如果未指定 \fIvalueName\fR，若键 \fIkeyName\fR 不存在则建立之。如果指定了 \fIvalueName\fR，如果需要的话，建立键  \fIkeyName\fR 和值 \fIvalueName\fR。\fIvalueName\fR 的内容被设置成 \fIdata\fR，用 \fItype \fR指示其类型。如果未指定 \fItype\fR，假定为类型 \fBsz\fR。数据和类型参数的详情请参见下面的 SUPPORTED TYPES 支持的类型。
+.TP
+\fBregistry type \fIkeyName valueName\fR
+.
+返回在键 \fIkeyName \fR中的值 \fIvalueName\fR     的类型。可能的类型的更多信息请参见下面的SUPPORTED TYPES 支持的类型。
+.TP
+\fBregistry values \fIkeyName\fR ?\fIpattern\fR?
+.
+如果未指定 \fIpattern\fR，返回 \fIkeyName \fR的所有值的名字的一个列表。如果指定了     \fIpattern\fR ，只返回匹配 \fIpattern\fR 的那些名字。使用与     \fBstring\fR 相同的匹配规则确定匹配。
+
+.SH "支持的类型 SUPPORTED TYPES"
+在注册表中一个键之下的每个值包含特定类型的一些数据，这些数据存储为特定于类型的表示。\fBregistry\fR 命令在这种内部表示和可以被 Tcl 脚本操作的表示之间进行转换。在多数情况下，数据被简单的返回为一个 Tcl 字符串。类型为数据指示目的用途，但不实际改变表示。对于一些类型，\fBregistry\fR 命令以不同的形式返回数据以易于操纵。注册命令识别下列类型:
+.TP 17
+\fBbinary\fR
+.
+注册值包含任意二进制数据。数据在 Tcl     中被精确表示，包括所有嵌入的 null。
+.TP
+\fBnone\fR
+.
+注册值包含未定义类型的任意二进制数据。数据在 Tcl     中被精确表示，包括所有嵌入的 null。
+.TP
+\fBsz\fR
+.
+注册值包含一个 null 终结的字符串。数据在 Tcl     中被表示为一个字符串。
+.TP
+\fBexpand_sz\fR
+.
+注册值包含一个 null     终结的字符串，其中包含到环境变量的未展开的引用(unexpanded reference)，引用是通常的 Windows 式样(例如，"%PATH%")。数据在 Tcl 中被表示为一个字符串。
+.TP
+\fBdword\fR
+.
+注册值包含一个小端(little-endian) 32 位数。数据在 Tcl     中被表示为一个十进制串。
+.TP
+\fBdword_big_endian\fR
+.
+注册值包含一个大端(big-endian) 32 位数。数据在 Tcl     中被表示为一个十进制串。
+.TP
+\fBlink\fR
+.
+注册值包含一个符号连接。数据在 Tcl     中被精确表示，包括所有嵌入的 null。
+.TP
+\fBmulti_sz\fR
+.
+注册值包含 null 终结的字符串的一个数组。数据在 Tcl     中被表示为字符串的一个列表。
+.TP
+\fBresource_list\fR
+.
+注册值包含一个设备-驱动器资源列表。数据在 Tcl     中被精确表示，包括所有嵌入的 null。
+.PP
+除了上面列出的用符号命名的类型之外，用对应于系统接口返回的类型代码的一个32位整数标识未知类型 。在这种情况下，数据在 Tcl 中被精确表示，包括所有嵌入的 null。
+
+.SH "移植要点 PORTABILITY ISSUES"
+只能在 Windows 中使用注册表命令。
+
+.SH "关键字 KEYWORDS"
+registry
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/10/29
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

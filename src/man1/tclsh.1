@@ -1,0 +1,310 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH tclsh 1 "" Tcl "Tcl Applications"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+tclsh \- 包含 Tcl 解释器的简单的 shell    
+.SH "总览 SYNOPSIS"
+\fBtclsh\fR ?\fIfileName arg arg ...\fR?
+.BE
+
+.SH "描述"
+.PP
+\fBTclsh\fR 是一个 shell     类应用程序，从它的标准输入或一个文件读 Tcl 命令并对其求值(evaluate)。     如果你不加参数的调用，则它交互式的执行，从标准输入读      Tcl     命令并向标准输出打印命令结果和出错信息。它一直运行直到调用 \fBexit\fR    命令或在它的标准输入上读到文件结束。如果在用户的主(home)目录里存在一个文件        \fB.tclshrc\fR  (或在 Windows 平台上的 \fBtclshrc.tcl\fR)，在从标准输入读第一条命令之前，\fBtclsh\fR 把这个文件作为一个 Tcl 脚本来求值。
+
+.SH "脚本文件 SCRIPT FILES"
+.PP
+如果加参数调用 \fBtclsh \fR则第一个参数是脚本文件的名字而任何额外的参数作为给脚本使用的变量(见后)。 \fBtclsh\fR        将从指名的文件中读 Tcl      命令而不是从标准输入读取；当到达文件结束时       \fBtclsh\fR  将退出。在这种情况下不自动的对 \fB.tclshrc\fR        求值，如果需要的话，脚本文件总是可以 \fBsource\fR(包含)它。
+.PP
+如果你建立的 Tcl       脚本文件的第一行是 
+.CS
+\fB#!/usr/local/bin/tclsh\fR
+.CE
+则如果你把它标记为可执行的，接着就可以直接在你的 shell   中调用这个脚本文件。这里假定了\fB tclsh\fR  被安装在缺省的位置 /usr/local/bin；如果它被安装在其他地方，那么你需要修改上述行来匹配之。许多 UNIX       系统不允许 \fB#!\fR  行超出     30 个字符的长度，所以要确定 \fBtclsh\fR           可执行文件能被用短文件名访问。
+.PP
+一个更好的途径是用下面三行来开始你的脚本文件:         
+.CS
+\fB#!/bin/sh
+# the next line restarts using tclsh \e
+exec tclsh "$0" "$@"\fR
+.CE
+这种方法比起前面的段落有三个好处。首先，\fBtclsh\fR    二进制文件的位置不需要填入(hard-wired into) 脚本中:      它可以在你的 shell 查找路径中的任何地方。其次，他超越了(get around)了上种方法的      30 字符的文件名的限制。第三，这种方法在 \fBtclsh\fR  自身也是 shell 脚本时仍可运行(一些系统要处理多体系或操作系统:      \fBtclsh\fR          脚本选择某个二进制文件来运行)。第三行导致 \fBsh\fR 和 \fBtclsh\fR      两者来处理脚本，但          \fBexec\fR 只被 \fBsh \fR执行。   \fBsh\fR      首先处理脚本文件；它把第二行作为脚本文件对待并执行第三行。\fBexec\fR      语句导致 shell 停止处理而启动 \fBtclsh\fR      来重新处理整个脚本。当 \fBtclsh\fR      启动时，因为第二行的反斜线导致第三行被作为第二行注释的一部分，它把所有三行都作为注释对待。         
+.PP
+.VS
+You should note that it is also common practise to install tclsh with
+its version number as part of the name.  This has the advantage of
+allowing multiple versions of Tcl to exist on the same system at once,
+but also the disadvantage of making it harder to write scripts that
+start up uniformly across different versions of Tcl.
+.VE
+
+.SH "变量 VARIABLES"
+.PP
+\fBTclsh\fR 设置了下列 Tcl 变量:         
+.TP 15
+\fBargc\fR
+包含 \fIarg\fR  参数的个数(没有则为 0)，不包括脚本文件的名字。    
+.TP 15
+\fBargv\fR
+包含一个 Tcl 列表，其元素依次是 \fIarg\fR  参数，如果没有 \fIarg\fR    参数则是一个空串。
+.TP 15
+\fBargv0\fR
+如果指定了 \fIfileName\fR  则在此包含。否则。包含调用 \fBtclsh\fR    使用的名字。    
+.TP 15
+\fBtcl_interactive\fR
+如果交互式运行 \fBtclsh\fR  则包含 1(不指定\fIfileName\fR 并且标准输入是一个终端类设备)，否则是 0。      
+
+.SH "提示符 PROMPTS"
+.PP
+当交互式的调用 \fBtclsh\fR  时，它通常为每条命令提示“\fB%\fR”。你可以通过设置变量 \fBtcl_prompt1\fR     和 \fBtcl_prompt2\fR 来改变提示符。如果存在变量    \fBtcl_prompt1\fR  则它必须由一个输出一个提示符的 Tcl     脚本组成；\fBtclsh\fR 对 \fBtcl_prompt1\fR     中的脚本求值而不是输出一个提示符。变量 \fBtcl_prompt2\fR      以类似的方式用在键入了换行而当前命令却不完整的时候；如果没设置     \fBtcl_prompt2\fR   则对不完整的命令不给以提示符。        
+
+.SH "关键字 KEYWORDS"
+argument, interpreter, prompt, script file, shell
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/20
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

@@ -1,0 +1,123 @@
+.\" Chinese Version Copyright riser, checker :meaculpa
+.\" Copyright (c) 1998 Sendmail, Inc.  All rights reserved.
+.\" Copyright (c) 1988, 1991, 1993
+.\"	The Regents of the University of California.  All rights reserved.
+.\"
+.\" By using this file, you agree to the terms and conditions set
+.\" forth in the LICENSE file which can be found at the top level of
+.\" the sendmail distribution.
+.\"
+.\"
+.\"     @(#)makemap.8	8.12 (Berkeley) 11/13/1998
+.\"
+.TH makemap 8 "BSD 4.4" "11/16/1992"
+.Dd 1992年11月16日
+.Dt MAKEMAP 8
+.Os BSD 4.4
+.Sh NAME(名称)
+.Nm makemap
+.Nd 为sendmail创建数据库映像表
+.Sh SYNOPSIS(总览)
+.Nm
+.Op Fl N
+.if \nP .Op Fl c Ar cachesize
+.Op Fl d
+.Op Fl f
+.if \nP .Op Fl l
+.Op Fl o
+.Op Fl r
+.Op Fl s
+.Op Fl v
+.Ar maptype
+.Ar mapname
+.Sh DESCRIPTION(描述)
+.Nm
+创建
+.Xr sendmail 8
+中关键字式映像查询所使用的数据库映像表.
+它从标准输入设备读取输入并输出到指定的
+.Ar mapname .
+.Pp
+根据其编译的方式不同,
+.Nm
+可以处理多达三种不同的数据库格式,
+这些格式由
+.Ar maptype
+参数确定.
+它们可能为:
+.Bl -tag -width Fl
+.It Li btree
+B-Tree格式映像表.
+这需要新的Berkeley DB库.
+.It Li hash
+Hash格式映像表.
+这也需要Berkeley DB库.
+.El
+.Pp
+普遍而言,
+.Nm
+从标准输入设备读取行，这些行由以空格分隔的两个单词组成.
+第一个为数据库关键字,
+第二个为数值.
+数值可能包含
+``%\fIn\fP''
+字符串用来标明参数替换.
+如果包含文本式的百分符号，则应该重复写
+(``%%'').
+忽略空行和以``#''开头的行.
+.Ss Flags(标识)
+.Bl -tag -width Fl
+.It Fl N
+包含null字节用来结束映像表中的字符串.
+这必须与sendmail.cf中``K''行的\-N标识匹配.
+.if \nP \
+\{\
+.It Fl c
+使用指定的hash和B-Tree缓冲大小.
+.\}
+.It Fl d
+允许映像表中的关键字重复.
+这只能在B-Tree格式的映像表中允许.
+如果读入两个相同的关键字,
+那么它们都会插入到映像表中.
+.It Fl f
+通常所有关键字中的大写字母都会转换成小写字母.
+这个标识可以屏蔽这种功能.
+这是为了配合sendmail.cf中
+\fBK\fP
+行的\-f标识的使用.
+数值永远不作字母大小写的转换.
+.if \nP \
+\{\
+.It Fl l
+列出支持的映像类型.
+.\}
+.It Fl o
+添加到一个旧的文件中.
+允许你增大一个已存在的文件.
+.It Fl r
+允许替换已存在的关键字.
+如果你重复一个关键字,
+通常
+.Nm
+会抱怨，而且不进行插入.
+.It Fl s
+忽略正在创建的映像表的安全性检查.
+这包括对完全可写目录中硬链接或者符号链接的检查.
+.It Fl v
+详尽地打印出正在执行什么.
+.El
+.Sh SEE ALSO(另见)
+.Xr sendmail 8
+.Sh HISTORY(历史)
+.Nm
+该命令出现于
+.Bx 4.4 .
+
+
+.Sh "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.Sh "[中文版最新更新]" 
+.B 2001/2/25
+.Sh 《中国 Linux 论坛 man 手册页翻译计划》: 
+.B http://cmpp.linuxforum.net

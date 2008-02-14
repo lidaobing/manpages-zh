@@ -1,0 +1,100 @@
+.\" Copyright (c) 1980, 1990 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     from: @(#)biff.1	6.5 (Berkeley) 3/14/91
+.\"
+.Dd July 31, 1999
+.Dt BIFF 1
+.Os "Linux NetKit (0.16)"
+.Sh "名称 (NAME)"
+.Nm biff
+.Nd "新到邮件提醒"
+.Sh "总览 (SYNOPSIS)"
+.Nm biff
+.Op Cm ny
+.Sh "描述 (DESCRIPTION)"
+.Nm Biff
+通知系统在当前终端会话期间有新邮件是否提醒你。
+.Pp
+支持的选项有
+.Nm biff :
+.Bl -tag -width 4n
+.It Cm n
+禁止新邮件提醒。
+.It Cm y
+开启新邮件提醒。
+.El
+.Pp
+当新邮件提醒开启后， 如果有邮件到达， 邮件头和邮件正文的头几行将在你的屏幕上打印出来。
+通常会在
+.Pa \&.login
+或者
+.Pa \&.profile
+文件中加上一个
+.Dq Li biff y
+命令， 好让每次登录时自动执行。 
+.Pp
+.Nm Biff
+通过
+.Xr comsat 8
+服务异步执行。 如果此服务没有开启，
+.Nm biff
+就不做任何事情。 在这种情况下， 或者需要同步提醒， 用
+.Xr sh 1
+的
+.Ar MAIL
+变量， 或者
+.Xr csh 1
+的
+.Ar mail
+变量。
+.Sh "参见 (SEE ALSO)"
+.Xr csh 1 ,
+.Xr mail 1 ,
+.Xr sh 1 ,
+.Xr comsat 8
+.Sh "历史 (HISTORY)"
+.Nm
+此命令出现于
+.Bx 4.0
+。
+.Sh "错误 (BUGS)"
+.Xr su 1
+,和 biff 看来并不能一起工作。 这个问题是由于 tty 任然是执行 su 命令的人所有， 这可能导致在改变你的会话的 biff 状态时出现
+.Dq Li 拒绝访问错误。
+.Pp
+请把错误报告给 netbug@ftp.uk.linux.org。 并且附上diffs/patches， 或者编译错误日志等，尽可能完整。
+.Sh "[中文版维护人]"
+.B 唐友 <tony_ty@263.net>
+.Sh "[中文版最新更新]"
+.B 2001/8/28
+.Sh "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

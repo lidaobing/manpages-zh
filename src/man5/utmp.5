@@ -1,0 +1,192 @@
+.TH UTMP 5 " July 2, 1997 
+.PP
+
+.SH "NAME[名称]
+.PP
+utmp, wtmp - 登 录 记 录（login records） 
+.SH "SYNOPSIS[总览]
+.PP
+#include 
+.SH "DESCRIPTION[描述]
+.PP
+\fButmp\fP 文 件 用 于 记 录 当 前 系 统 用 户 是 哪 些 人。 
+但 是 实 际 的 人 数 可 能 比 这 个 数 目 要 多 ， 因 为 并 非 所 有 用 户 都 用 utmp 登 录。 
+
+
+.PP
+\fB警告:\fP \fButmp\fP 
+必 须 置 为 不 可 写 ， 因 为 很 多 系 统 程 序 （ 有 点 傻 的 那 种 ） 依 赖 于 它。 
+如 果 你 将 它 置 为 可 写 ， 其 他 用 户 可 能 会 修 改 它 （//* 
+导 致 程 序 运 行 出 错 ） 。 （//* （//* ）中 为 译 者 注） 
+
+文 件 中 是 一 些 条 目 的 列 表 ， 条 目 的 结 构 （ 在 utmp.h 中 进 行 了 声 明 ） 见 下 ( 注 意 这 里 只 列 出
+了 一 部 分 ； 细 节 依 libc 的 版 本 有 所 不 同 ）：
+.nf
+
+
+#define UT_UNKNOWN 0
+#define RUN_LVL 1
+#define BOOT_TIME 2
+#define NEW_TIME 3
+#define OLD_TIME 4
+#define INIT_PROCESS 5
+#define LOGIN_PROCESS 6
+#define USER_PROCESS 7
+#define DEAD_PROCESS 8
+#define ACCOUNTING 9
+
+#define UT_LINESIZE 12
+#define UT_NAMESIZE 32
+#define UT_HOSTSIZE 256
+
+struct exit_status {
+short int e_termination; /* process termination status. */
+short int e_exit; /* process exit status. */
+};
+
+struct utmp {
+short ut_type; /* type of login */
+pid_t ut_pid; /* pid of login process */
+char ut_line[UT_LINESIZE]; /* device name of tty - "/dev/" */
+char ut_id[4]; /* init id or abbrev. ttyname */
+char ut_user[UT_NAMESIZE]; /* user name */
+char ut_host[UT_HOSTSIZE]; /* hostname for remote login */
+struct exit_status ut_exit; /* The exit status of a process
+marked as DEAD_PROCESS. */
+long ut_session; /* session ID, used for windowing*/
+struct timeval ut_tv; /* time entry was made. */
+int32_t ut_addr_v6[4]; /* IP address of remote host. */
+char pad[20]; /* Reserved for future use. */
+};
+
+/* Backwards compatibility hacks. */
+#define ut_name ut_user
+#ifndef _NO_UT_TIME
+#define ut_time ut_tv.tv_sec
+#endif
+#define ut_xtime ut_tv.tv_sec
+#define ut_addr ut_addr_v6[0]
+
+
+.fi
+.PP
+
+.PP
+这 个 结 构 给 出 了 与 用 户 终 端 联 系 的 文 件 ， 用 户 的 登 录 名 ， 记 录 于 \fItime\fP(2) 
+表 中 的 登 录 时 间 。 字 符 串 如 果 比 给 定 的 大 小 小 的 话 ， 则 以 \fB'\\0'\fP 
+结 束 之。 
+
+.PP
+第一个条目由 \fIinit\fP(8) 
+执行 \fIinittab\fP(5)而产生。然而，在产生条目以前， 
+\fIinit\fP(8) 先将 utmp 
+清空（通过设定 \fBut_type\fP 为 \fBDEAD_PROCESS\fP来实现. 当\fBut_type\fP 
+不是 \fBDEAD_PROCESS\fP 或 \fBRUN_LVL\fP 并且不存在进程号为 \fBut_pid\fP 
+的进程时,通过用空串清空 \fBut_user\fP, \fBut_host\fP 和 \fBut_time\fP 
+来实现。如果不存在 \fBut_id\fP 的空记录, init（初始化时） 
+会创建一个。它将会依据 inittab 来设置 \fBut_id\fP , 设置\fB ut_pid\fP 
+和 \fBut_time\fP 为当前值，设置 \fBut_type\fP 到 \fBINIT_PROCESS\fP. 
+
+.PP
+\fIgetty\fP(8) 
+依据进程号定位条目, 将 \fBut_type\fP 改为 \fBLOGIN_PROCESS\fP, 改变 \fBut_time\fP, 
+设定 \fBut_line\fP ，然后等待连接建立。 \fIlogin\fP(8), 
+在鉴别完用户后, 将 \fBut_type\fP 改为 \fBUSER_PROCESS\fP, 改变 \fBut_time\fP 
+并设定 \fBut_host\fP 和 \fBut_addr\fP. 根据 \fIgetty\fP(8) 和 \fIlogin\fP(8)完成的功能, 
+可以用 \fBut_line\fP 来定位记录，虽然用 \fBut_pid\fP 可能更好些。 
+
+.PP
+当 \fIinit\fP(8) 
+发现有进程存在时, 它通过 \fBut_pid\fP 来定位它的 utmp 条目, 设定 \fBut_type\fP 
+为 \fBDEAD_PROCESS\fP ，然后用零字节清空 \fBut_user\fP, \fBut_host\fP 和 \fBut_time\fP 
+。
+
+.PP
+\fIxterm\fP(1) 
+和其他终端仿真器直接创建 \fBUSER_PROCESS\fP 记录并通过使用\fB 
+/dev/ttyp\fP\fI%c\fP 的最后两个字母或用\fB p\fP\fI%d\fP \fB（/dev/pts/\fP\fI%d\fP）来产生\fB 
+ut_id\fP 。 如果它们找到这个 id 的 \fBDEAD_PROCESS\fP , 
+它们就使用它，否则就创建一个新的条目. 
+如果可能，它们将它标记为 \fBDEAD_PROCESS\fP 并将 \fBut_line\fP, \fBut_time\fP, 
+\fBut_user\fP 和 \fBut_host\fP 置为 null。
+
+.PP
+\fIxdm\fP(8) 不会创建 
+utmp 记录, 因为没有终端与它相连. 试图用它产生 utmp 
+记录会引起如下错误：finger: can not stat /dev/machine.dom. 它应该用于创建 
+wtmp 条目, 和 \fIftpd\fP(8) 
+相似. 
+
+.PP
+\fItelnetd\fP(8) 设定 \fBLOGIN_PROCESS\fP 
+条目并把其他的的留给 \fIlogin\fP(8) 
+去做。telnet 任务结束后, \fItelnetd\fP(8) cleans up utmp 
+in the described way.（？？） 
+
+.PP
+\fBwtmp\fP 文件记录了所有的登录和退出。它的格式与 \fButmp\fP 
+几乎完全一样（例外是：用空用户名来表示在相关终端上的退出）。除此以外， 
+用终端名 \fB"~"\fP 和用户名 \fB"shutdown"\fP 或 \fB"reboot"\fP 
+表示系统关机或重启， the pair of terminal names \fB"|"\fP/\fB"}"\fP 
+logs the old/new system time when \fIdate\fP(1) changes it. \fBwtmp\fP 
+由 \fIlogin\fP(1), 和 \fIinit\fP(1) 以及某些版本的 \fIgetty\fP(1) 使用. 
+但是这些程序并不创建它,所以如果将它删除的话您就得不到记录了。
+
+.SH "FILES[相关文件]
+
+.PP
+/var/run/utmp 
+.br
+/var/log/wtmp 
+
+.SH "CONFORMING TO[遵循] 
+
+.PP
+Linux utmp 既不遵循 v7/BSD 也不遵循 SYSV: 它实际是两者的混合. v7/BSD 
+中域比较少; 最重要的是它没有 \fBut_type\fP (\fBut_type\fP 
+可以使本地的 v7/BSD-类的程序显示(以次为例) dead 或 login 条目.而且,没有为任务分配通道的文件. 
+BSD 则相反(BSD does so), 因为它缺少的是 \fBut_id\fP 域. 在 Linux 中(SYSV 
+中也一样), 记录的 \fBut_id\fP 域一旦设定就不再改变,它保留通道而不需要什么配置文件. 
+清除 \fBut_id\fP 可能会引起 race conditions 从而导致安全漏洞. 就 SYSV 
+的要求来讲,用空字节填充的方式来清空上面提到的各个域不是必须的,但是这样做使得运行采用 
+BSD 语法而又不改变 utmp 的程序成为可能. 正如上面所写的,Linux 
+在句子中使用 BSD 的惯例.
+
+.PP
+SYSV 在句子中仅使用类型域去标识它们或是登录信息(例如:. \fB"new 
+time"\fP). \fBUT_UNKNOWN\fP 只在 Linux 中有. SYSV 没有 \fBut_host\fP 和 \fBut_addr_v6\fP 
+域. 
+
+.PP
+不象其它各种系统, 您可以通过删除文件来禁止 utmp , 在 Linux 中 
+utmp 必须一直存在. 如果你要禁止 \fIwho\fP(1) 命令,您需要使整个 
+utmp 不可读. 
+
+.PP
+需要注意的是在 libc5 和 libc6 中 utmp 的结构是不同的.因此使用旧结构的程序会破坏 
+\fI/var/run/utmp\fP 和/or \fI/var/log/wtmp\fP. Debian 系统包含一个修补过的 
+libc5 它可以使用新的格式. 但对 wtmp, 问题依然存在因为它直接对 
+libc5 进行存取.
+
+.SH "RESTRICTIONS[限制]
+
+.PP
+文件格式依机器而不同, 因此推荐的做法是:在创建它的机器上使用它.
+
+.SH "BUGS[缺憾]
+
+.PP
+本手册页基于 libc5 , 现在可能情况已有不同了. 
+
+.SH "SEE ALSO[另见]
+.PP
+\fBac\fP(1), \fBdate\fP(1), 
+\fBgetutent\fP(3), 
+\fBinit\fP(8), \fBlast\fP(1), \fBlogin\fP(1), \fBupdwtmp\fP(3), \fBwho\fP(1) 
+
+.SH "[中文版维护人]"
+.B Redcandle <redcandle51@chinaren.com>
+.SH "[中文版最新更新]"
+.B 2001.11.08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,75 @@
+.\" Copyright 1995-1996 David Engel (david@ods.com)
+.\" Copyright 1995 Rickard E. Faith (faith@cs.unc.edu)
+.\" Most of this was copied from the README file.  Do not restrict distribution.
+.\" May be distributed under the GNU General Public License
+.TH LDD 1 "30 March 1995"
+.SH NAME
+ldd \- 显示共享库的依赖情况
+.SH "总览 (SYNOPSIS)"
+.B ldd
+.RB [ \-vVdr ]
+program ...
+.SH "描述 (DESCRIPTION)"
+.B ldd
+显示 每个 程序 需要 的 共享库 (shared library), 程序名 在 命令行 上 给出.
+.PP
+对于 a.out 程序,
+.B ldd
+简单的 进行 fork 和 exec 各个 程序, 执行 程序 时 argc 参数 等于零,
+a.out 的 动态连接器 (dynamic linker)
+.BR ld.so ,
+正常情况下 能够 调入 共享库, 注意到 这个 特殊情况, 从而 显示出 依赖关系.
+.PP
+对于 ELF 程序,
+.B ldd
+设置 适当的 环境变量集, 然后 fork 和 exec 各个 程序.
+ELF 的 动态连接器,
+.BR ld-linux.so ,
+正常情况下 能够 调入 共享库, 注意到 这个 特殊情况, 从而 显示出 依赖关系.
+
+.SH "选项 (OPTIONS)"
+.TP
+.B \-v
+显示
+.BR ldd 
+的 版本号.
+.TP
+.B \-V
+显示 动态连接器
+.BR ld.so 
+的 版本号.
+.TP
+.B \-d
+进行 重定位(relocation), 而且 报告 缺少的 函数 (仅限于 ELF).
+.TP
+.B \-r
+对 数据目标 (data object) 和 函数 进行 重定位, 而且 报告 缺少的 
+数据目标 (仅限于 ELF).
+
+.SH BUGS
+对于 非常 陈旧 的 程序,
+.B ldd
+可能
+.I 无法
+工作, 这些 程序 在 
+.B ldd
+加入 编译器工具 之前 就 连接 好了. 如果 对 这样的 某个 程序 执行
+.B ldd ,
+该 程序 的 argc = 0, 其 运行结果 无法 预测. 
+
+.SH "作者 (AUTHOR)"
+David Engel.
+
+.SH "另见 (SEE ALSO)"
+.BR ldconfig (8),
+.BR ld.so (8),
+.BR ld.so.info .
+
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

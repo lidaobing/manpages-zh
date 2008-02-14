@@ -1,0 +1,430 @@
+'\"
+'\" Copyright (c) 1998 Mark Harrison.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" SCCS: @(#) msgcat.n
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: msgcat.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH "msgcat" n 8.1 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+msgcat \- Tcl 消息目录
+.SH "总览 SYNOPSIS"
+\fBpackage require Tcl 8.2\fR
+.sp
+\fBpackage require msgcat 1.1\fR
+.sp
+\fB::msgcat::mc \fIsrc-string\fR
+.sp
+\fB::msgcat::mclocale \fR?\fInewLocale\fR?
+.sp
+\fB::msgcat::mcpreferences\fR
+.sp
+\fB::msgcat::mcload \fIdirname\fR
+.sp
+\fB::msgcat::mcset \fIlocale src-string \fR?\fItranslate-string\fR?
+.sp
+\fB::msgcat::mcunknown \fIlocale src-string\fR
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+\fBmsgcat\fR 包提供用来管理多语言的用户界面的一系列函数。在独立于应用的一个“消息目录”中定义文本串，可以编辑和修改这些文本串而不用修改应用的源代码。通过向这个消息目录增加一个新文件来提供一个新语言或地域(locale)。
+.PP
+对任何应用和包使用消息目录都是可选的，但是鼓励你使用它，以便应用或包在多语言环境中被采用。                 
+
+.SH "命令 COMMANDS
+.TP
+\fB::msgcat::mc \fIsrc-string\fR ?\fIarg arg ...\fR?
+依照用户的当前地区，返回 \fIsrc-string\fR   的翻译(translation)。如果在 \fIsrc-string\fR 之后给出了附加的参数，使用 \fBformat\fR  命令把 \fIsrc-string\fR\fI \fR的翻译中的转换指定符替换成补充参数。
+
+为了翻译 \fIsrc-string \fR\fB::msgcat::mc\fR  将在当前名字空间中查找定义的消息；如果未找到，它将在当前的名字空间的父空间中查找，以此类推直到到达全局名字空间。如果不存在转换字符串，调用 \fB::msgcat::mcunknown\fR 并返回 \fB::msgcat::mcunknown\fR  的返回。
+.PP
+\fB::msgcat::mc\fR  是用来本地化一个应用的主要函数。不再直接的使用英文字符串，一个应用可以把英文字符串传递给 \fB::msgcat::mc\fR 并使用它的结果。如果以这种方式用一种语言写了一个应用，通过简单的定义新的消息目录条目，以后增加附加的语言支持是很容易的。
+.TP
+\fB::msgcat::mclocale \fR?\fInewLocale\fR? 
+这个函数把地域设置成 \fInewLocale\fR。如果省略了 \fInewLocale\fR，返回当前的地域，否则当前的地域被设置成 \fInewLocale\fR。初始的地域缺省为在用户的环境变量中指定的地域。关于地域字符串的格式的详细描述参见下面的 \fBLOCALE AND SUBLOCALE SPECIFICATION\fR 地域和子地域指定章节。   
+.TP
+\fB::msgcat::mcpreferences\fR
+返回一个有序的地域列表，它们是基于用户指定的语言，以用户喜好程度为次序。次序是从最偏好到最不喜好的。如果用户已经指定了LANG=en_US_funky，这个过程将返回{en_US_funky en_US en}。
+.TP
+\fB::msgcat::mcload \fIdirname\fR
+在指定的目录中查找一个文件，这个文件匹配用 \fB::msgcat::mcpreferences \fR返回的语言指定。每个文件的根文件名是地域字符串，扩展名是“.msg”。返回匹配的指定和装载了消息的数目。 
+.TP
+\fB::msgcat::mcset \fIlocale src-string \fR?\fItranslate-string\fR?
+在指定的 \fIlocale \fR中设置从 \fIsrc-string\fR  到 \fItranslate-string\fR  的翻译。如果未指定 \fItranslate-string\fR，对二者都使用 \fIsrc-string\fR 。函数返回 \fItranslate-string\fR。  
+.TP
+\fB::msgcat::mcunknown \fIlocale src-string\fR
+在当前的地域中没有给 \fIsrc-string\fR 定义的翻译的情况下，这个例程被 \fB::msgcat::mc\fR  调用。缺省的动作是返回  \fIsrc-string\fR。这个过程可以被这个应用重新定义，比如对每个未知字符串记录错误消息日志。在与 \fB::msgcat::mc \fR相同的栈层次上调用 \fB::msgcat::mcunknown\fR 过程。 \fB::msgcat::mcunknown\fR  的返回值被用做 \fB::msgcat::mc \fR的返回值。 
+
+.SH "地域和子地域规定 LOCALE AND SUBLOCALE SPECIFICATION"
+.PP
+用地域字符串指定地域。地域字符串的组成是一个语言代码，一个可选的国家(地区)代码，一个可选的特定于系统代码，它们用“_”分割。国家和语言代码在标准ISO-639 和 ISO-3166 中。例如，地域“en”指定 English 而“en_US”指定  U.S.  English。
+.PP
+区域定义缺省为装载 \fBmsgcat \fR包时在 \fBenv(LANG) \fR中的值。如果未定义 \fBenv(LANG)\fR，则地域缺省为“C”。
+.PP
+在用户指定一个地域的时候，在字符串翻译期间进行“最佳匹配”查找。例如，如果用户指定了 en_UK_Funky，按“en_UK_Funky”、“en_UK”、和“en” 的次序查找地域，直到找到一个匹配的字符串翻译。如果没有找到这个字符串的翻译，则调用 \fB::msgcat::unknown\fR。
+.PP
+译注：常用地域字符串的一部分
+.CS
+语言	国家(地区)	地域 ID
+Arabic	Saudi Arabia	ar_SA
+Chinese (Simplified)	China	zh_CN
+Chinese (Traditional)	Taiwan	zh_TW
+English	United States	en_US
+French	France	fr_FR
+German	Germany	de_DE
+Hebrew	Israel	iw_IL
+Italian	Italy	it_IT
+Japanese	Japan	ja_JP
+Korean	South Koreako_KR
+Spanish	Spain	es_ES
+Swedish	Sweden	sv_SE
+.CE
+
+.SH NAME
+.PP
+在消息目录中存储的字符串被存储为相对于在其中增加它们的那个名字空间。这允许多个包使用相同的字符串而不用害怕与其他包冲突。它还允许源字符串被缩写而减少(less prone to)排字错误。    
+.PP
+例如，执行代码 
+.CS
+mcset en hello "hello from ::"
+namespace eval foo {mcset en hello "hello from ::foo"}
+puts [mc hello]
+namespace eval foo {puts [mc hello]}
+.CE
+将输出   
+.CS
+hello from ::
+hello from ::foo
+.CE
+.PP
+在查找一个消息的翻译的时候，消息目录将首先查找当前名字空间，接着是当前名字空间的父名字空间，以次类推知道到达全局名字空间。这允许子名字空间从它的父名字空间“继承”消息。
+.PP
+例如，执行代码        
+.CS
+mcset en m1 ":: message1"
+mcset en m2 ":: message2"
+mcset en m3 ":: message3"
+namespace eval ::foo {
+    mcset en m2 "::foo message2"
+    mcset en m3 "::foo message3"
+}
+namespace eval ::foo::bar {
+    mcset en m3 "::foo::bar message3"
+}
+puts "[mc m1]; [mc m2]; [mc m3]"
+namespace eval ::foo {puts "[mc m1]; [mc m2]; [mc m3]"}
+namespace eval ::foo::bar {puts "[mc m1]; [mc m2]; [mc m3]"}
+.CE
+将输出
+.CS
+:: message1; :: message2; :: message3
+:: message1; ::foo message2; ::foo message3
+:: message1; ::foo message2; ::foo::bar message3
+.CE
+
+.SH "消息文件的定位和格式 LOCATION AND FORMAT OF MESSAGE FILES"
+.PP
+消息文件可以位于任何目录中，取决于下列条件:
+.IP [1]
+给一个包的所有消息文件都在相同的目录中。  
+.IP [2]
+消息文件名跟一个地域指定符并跟随着“.msg”。例如:        
+.CS
+es.msg    -- spanish
+en_UK.msg -- UK English
+.CE
+.IP [3]
+这个文件包含一系列对 mcset 的调用，它们为这个语言设置需要的翻译字符串。例如:   
+.CS
+::msgcat::mcset es "Free Beer!" "Cerveza Gracias!"
+.CE
+
+.SH "推荐的对包的消息设置 RECOMMENDED MESSAGE SETUP FOR PACKAGES"
+.PP
+如果一个包被安装到\fBtcl_pkgPath\fR  的一个子目录中并通过 \fBpackage require\fR 装载，推荐下列过程。
+.IP [1]
+在包安装期间，在你的包目录下建立一个子目录\fBmsgs\fR。     
+.IP [2]
+复制你的 *.msg 文件到这个目录中。    
+.IP [3]
+在你的包初始化脚本中增加下列命令:          
+.CS
+# load language files, stored in msgs subdirectory
+::msgcat::mcload [file join [file dirname [info script]] msgs]
+.CE
+
+.SH "给 FORMAT 和 SCAN 命令的定位代码 POSTITIONAL CODES FOR FORMAT AND SCAN COMMANDS"
+.PP
+用做给 \fBformat\fR 的参数的一个消息字符串中的转换指定符可以包含一个 XPG3 位置指定符。例如，它可以按句法的需要在翻译的时候重新安排句子结构。  
+.CS
+format "We produced %d units in location %s" $num $city
+format "In location %s we produced %d units" $city $num
+.CE
+.PP
+可使用定位参数来处理:   
+.CS
+format "We produced %1\\$d units in location %2\\$s" $num $city
+format "In location %2\\$s we produced %1\\$d units" $num $city
+.CE
+.PP
+类似的，可以在 \fBscan\fR 中使用定位参数来提取国际化字符串中的值。
+
+.SH "感谢 CREDITS"
+.PP
+消息目录代码由 Mark Harrison 开发。  
+
+.SH "参见 SEE ALSO"
+format(n), scan(n), namespace(n), package(n)
+
+.SH "关键字 KEYWORDS"
+internationalization, i18n, localization, l10n, message, text, translation
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.CS
+译注：部分句子写的莫名其妙，余加以意译。
+.CE
+.SH "[中文版最新更新]"
+.B 2001/10/12
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

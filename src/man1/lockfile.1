@@ -1,0 +1,196 @@
+.TH LOCKFILE 1 \*(Dt BuGless
+.SH NAME(名称)
+lockfile \- 条件标志文件创建命令
+.SH SYNOPSIS(总览)
+.B lockfile
+.I "\fB\-\fPsleeptime"
+|
+.I "\fB\-r \fPretries"
+|
+.if n .ti +0.5i
+.I "\fB\-l \fPlocktimeout"
+|
+.I "\fB\-s \fPsuspend"
+|
+.B "\-!"
+|
+.B "\-ml"
+|
+.B "\-mu"
+|
+.I filename
+\&.\|.\|.
+.SH DESCRIPTION(描述)
+
+.B lockfile可以用来创建一个或多个
+.I 信号量(semaphore)
+.IR 文件.如果lockfile不能创建所有指定的文件(按照指定的顺序),那么它会等待一段
+.I 休眠期(sleeptime) 
+(默认为8秒)并从不成功的最后一个文件开始重试.你可以指定失败返回之前
+.I 重试(retries)
+的次数.
+如果
+.I retries
+的次数设为\-1(默认地,也即
+.BR \-r\-1 )
+lockfile会永远重试下去.
+.PP
+如果在所有文件创建之前
+.I retries
+的次数已经满了,lockfile会返回失败的信息并删除所有已经创建的文件.
+.PP
+在shell脚本中使用lockfile作为循环的条件可以很容易地通过使用
+.B \-!
+标识反向退出的状态来实现.为了防止无限循环,除了lockfile已经存在以外的任何原因的失败都不会反向为成功状态,而是仍然以失败状态返回.
+.PP
+所有标识可以在命令行中的任何地方指定,碰到它们就进行处理.命令行简单地由左至右进行解析.
+.PP
+所有通过lockfile创建的文件都是只读的,因此必须使用
+.B rm
+.BR \-f
+来删除.
+.PP
+如果你指定了一个
+.I locktimeout
+那么lockfile会在lockfile最后一次修改/创建之后locktimeout秒过后强制性地删除(很可能是一些其它程序意外死掉很长一段时间后造成不能清除残余的lockfiles).Lockfile不受时钟偏差的影响.在lockfile强制被清除之后,延迟的
+.I suspend
+秒(默认为16)开始计数,这是为了防止无意的直接删除了任何由另一程序新创建的lockfile(与
+.BR procmail (1))
+中的
+.BR SUSPEND
+比较).
+.SS "Mailbox locks"(邮箱锁定)
+如果系统邮件spool目录有权限允许它,或者如果lockfile正好被setgid了,那么它可以通过
+使用相应的选项
+.B "\-ml"
+和
+.B "\-mu"
+lock和unlock你的系统邮箱.
+.SH EXAMPLES(示例)
+假设你想确定访问文件"important"是串行的,也即,没有其它程序或shell脚本允许访问它.为了简省起见,让我们假定它是一个shell脚本.在这个例子中,你应该像这样解决:
+.RS
+\&.\|.\|.
+lockfile important.lock
+\&.\|.\|.
+access_"important"_to_your_hearts_content
+\&.\|.\|.
+rm \-f important.lock
+\&.\|.\|.
+.RE
+现在如果所有访问"important"的脚本按照这条规则,你就可以确保在`lockfile'和`rm'命令之间至多只有一个脚本在执行.
+.SH ENVIRONMENT(环境变量)
+.TP 2.3i
+.B LOGNAME
+用作隐含变量以确定调用者的登录名
+.SH FILES(相关文件)
+.TP 2.3i
+.B /etc/passwd
+为了验证和/或纠正调用者的登录名(如果需要的话,同时也是为了找出HOME目录)
+.TP
+.B /var/spool/mail/$LOGNAME.lock
+系统邮箱的lockfile,出现在其中的环境变量不由系统的环境变量决定,而是会通过在/etc/passwd中查找确定.
+.SH "SEE ALSO"(另见)
+.na
+.nh
+.BR rm (1),
+.BR mail (1),
+.BR binmail (1),
+.BR sendmail (8),
+.BR procmail (1)
+.hy
+.ad
+.SH DIAGNOSTICS(诊断)
+.TP 2.3i
+Filename too long,.\|.\|.
+使用更短的文件名.
+.TP
+Forced unlock denied on "x"
+没有对lockfile "x"所存放的目录的写的权限,或者超过一个lockfile几乎同时正在试图强制lock.
+.TP
+Forcing lock on "x"
+lockfile "x"因为超时的缘故将要强制删除
+(与
+.BR procmail (1))
+中的
+.BR LOCKTIMEOUT
+作比较).
+.TP
+Out of memory,.\|.\|.
+系统交换空间溢出.
+.TP
+Signal received,.\|.\|.
+Lockfile将删除到此为止创建的所有文件并终止.
+.TP
+Sorry,.\|.\|.
+.I retries
+限制已经到达.
+.TP
+Truncating "x" and retrying lock
+"x"看上去不是有效的文件名.
+.TP
+Try praying,.\|.\|.
+缺失子目录或者权限不够.
+.SH BUGS
+确实少于一个.
+.SH WARNINGS(警告)
+.B \-!
+标识的操作行为,尽管有用,但是并不很直接或一致.当测试lockfile的返回值时,shell脚本编写者应该仔细考虑是使用
+.B \-!
+标识简单地作反向测试,还是对原来的退出代码执行一次转换.
+通常,
+.B \-!
+标识应该只用在lockfile是循环的条件之时.
+.SH MISCELLANEOUS(杂项)
+Lockfile不兼容NFS,而且八位还原.
+.SH NOTES(备注)
+使用\-h或\-?选项调用lockfile会使得它显示命令行方式的帮助页.使用\-v选项调用会使得它显示版本信息.
+.PP
+多个
+.B \-!
+标识会切换返回状态.
+.PP
+因为标识可以出现在命令行的任何位置,所以任何一个以'-'开头的文件名必须加'./"在前面.
+.PP
+当任何接在后面的文件正在创建(也即,它们正在使用)时,
+.I retries
+的次数不能重新设置.不过,它可以通过在命令行上指定
+.RI \-r newretries
+于每个文件之后来重新设置.
+.PP
+尽管任何名字的文件都可用作lockfiles,通常习惯还是使用扩展名为'.lock'的文件来lock邮件文件夹(它添加于邮件夹名之后).如果不想担心文件名太长了,也不必遵从任何其它的lockfilename的习惯,那么一个最好的方法就是通过添加前缀`lock.'来生成一个与已经存在的文件相应的lockfilename,并且在其后添加锁定文件的i-node数.
+.Sh SOURCE(源自)
+该程序为 http://www.procmail.org/或者
+ftp.procmail.org的
+.BR pub/procmail/
+中
+.I procmail mail-processing-package
+(v3.14)的一部分.
+.Sh MAILINGLIST(邮件列表)
+有一个针对procmail包中任何程序相关问题的邮件列表:
+.RS
+<procmail-users@procmail.org>
+.RS
+用来提交问题/答案.
+.RE
+<procmail-users-request@procmail.org>
+.RS
+用来请求订阅.
+.RE
+.PP
+.RE
+如果你想即时获得新版本和公开补丁的通告,请发订阅请求到
+.RS
+procmail-announce-request@procmail.org
+.RE
+(这是一个只读列表).
+.SH AUTHOR
+Stephen R. van den Berg
+.RS
+<srb@cuci.nl>
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

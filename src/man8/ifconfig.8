@@ -1,0 +1,223 @@
+.\" 中文版 Copyright (c) 2000 meaculpa, Laser 和 www.linuxforum.net
+.TH IFCONFIG 8 "4 August 1997" "net-tools" "Linux Programmer's Manual"
+.SH NAME
+ifconfig \- 配置网络接口
+.SH 总览
+.B "ifconfig [接口]"
+.br
+.B "ifconfig 接口 [aftype] options | address ..."
+.SH 描述
+.B  ifconfig
+用于配置常驻内核的网络接口。它用于在引导成功时设定网络接口。
+此后，只在需要调试及系统调整时才使用。
+.LP
+如没有给出参数，
+.B ifconfig
+显示当前有效接口的状态。如给定单个
+.B 接口
+作为参数，它只显示给出的那个接口的状态；
+如果给出一个
+.B -a
+参数，它会显示所有接口的状态，包括那些停用的接口。
+否则就对一个接口进行配置。
+
+.SH 地址族
+如果跟在接口名称后的第一个参数是它支持地址族的名称，
+那么这个地址族被用于翻译和显示所有的协议地址。
+当前支持的地址族包括
+.B inet
+(
+.I TCP/IP
+，缺省)，
+.B inet6
+(
+.I IPv6
+)
+，
+.B ax25
+(
+.I AMPR
+无线分组 )，
+.B ddp
+(
+.I Appletalk
+2 代)，
+.B ipx
+(
+.I Novell IPX
+) 和
+.B netrom 
+(
+.I AMPR
+无线分组)。
+.SH 选项
+.B 接口
+接口名称。通常是一个后跟单元号的驱动设备名，
+例如第一个以太接口
+.I eth0 。
+.TP
+.B up
+此选项激活接口。如果给接口声明了地址，等于隐含声明了这个选项。
+.TP
+.B down   
+此选项使接口驱动设备关闭。
+.TP
+.B  "[\-]arp"
+允许或禁止在接口上使用
+.B ARP
+协议。
+.TP
+.B "[\-]promisc"
+允许或禁止接口置于混杂模式。
+如果选用，则接口可以接收网络上的所有分组。
+.TP
+.B "[\-]allmulti"
+允许或禁止
+.B "组播模式（all-multicast）" 。
+如果选用，则接口可以接收网络上的所有组播分组。
+.TP
+.B "metric N"
+将接口度量值设置为整数 N。
+(译注：度量值表示在这个路径上发送一个分组的成本,就是通过多少个路由）
+.TP     
+.B "mtu N"
+此选项设定接口的最大传输单元
+.I MTU。
+.TP
+.B "dstaddr addr"
+为点到点链路(如
+.I PPP
+)设定一个远程 IP 地址。此选项现已废弃；用
+.I pointopoint
+选项替换。
+.TP
+.B  "netmask addr"
+为接口设定 IP 网络掩码。缺省值通常是 A，B 或 C 类的网络掩码
+(由接口的 IP 地址推出)，但也可设为其它值。
+.TP
+.B  "add addr/prefixlen"
+为接口加入一个
+.I IPv6
+地址。
+.TP 
+.B  "del addr/prefixlen"
+为接口删除一个
+.I IPv6
+地址。
+.TP
+.B "tunnel aa.bb.cc.dd"
+建立一个新的
+.B SIT
+(在
+.I IPv4
+中的
+.I IPv6
+)设备，为给定的目的地址建立通道。
+.TP
+.B "irq addr"
+为接口设定所用的中断值。
+并不是所有的设备都能动态更改自己的中断值。
+.TP
+.B "io_addr addr"
+为接口设定起始输入/输出地址。
+.TP
+.B "mem_start addr"
+设定接口所用的共享内存起始地址。只有少数设备需要。
+.TP
+.B "media type"
+设定接口所用的物理端口或介质类型。并不是所有设备都会
+更改这项值，而且它们支持的类型可能并相同。典型的
+.B type
+是
+.I 10base2
+(细缆以太网)，
+.I 10baseT
+(双绞线 10Mbps 以太网)，
+.I AUI
+(外部收发单元接口)等等。介质类型为
+.B auto
+则用于让设备自动判断介质。
+同样，并非所有设备都可以这样工作。
+.TP
+.B  "[\-]broadcast [addr]"
+如果给出了地址参数，
+则可以为接口设定该协议的广播地址。
+否则，为接口设置(或清除)
+.I IFF_BROADCAST
+标志。
+.TP
+.B "[\-]pointopoint [addr]"
+此选项允许接口置为
+.B 点到点
+模式，这种模式在两台主机间建立一条无人可以监听的直接链路。
+.br
+如果还给出了地址参数，则设定链路另一方的协议地址，正如废弃的
+.I dstaddr
+选项的功能。否则，为接口设置(或清除)
+.I IFF_POINTOPOINT
+标志。
+.TP
+.B "hw class address"
+如接口驱动程序支持，则设定接口的硬件地址。
+此选项必须后跟硬件的类型名称和硬件地址等价的可打印
+.I ASCII
+字符。当前支持的硬件类型包括
+.I ether
+(以太网)，
+.I ax25
+(AMPR AX.25)，
+.I ARCnet
+和
+.I  netrom
+(AMPR NET/ROM)。
+.TP
+.B multicast
+为接口设定组播标志。
+通常无须用此选项因为接口本身会正确设定此标志。
+.TP
+.B address
+为接口分配的
+.B IP
+地址。
+.TP
+.B "txqueuelen length"
+为接口设定传输队列的长度。可以为具有高时延的低速接口设定
+较小值以避免在象
+.I telnet
+这样烦人的交互通信时大量高速的传输。
+.SH 注意
+从内核版本 2.2 起不再有别名接口的显式接口统计信息了。
+打印出的源地址统计信息被同一接口的所有别名地址共享。
+打印出的源地址统计信息被同一接口的所有别名地址共享。
+如果你需要每个地址的统计信息，就应该用
+.BR ipchains(8)
+命令为地址加入显式的记帐规则。
+.SH 相关文件
+.I  /proc/net/socket
+.br
+.I  /proc/net/dev
+.br
+.I  /proc/net/if_inet6
+.SH BUGS
+当显示
+.I appletalk DDP
+和
+.I  IPX
+地址时不能用此命令进行更改，但可以用这条命令显示。
+.SH 又见
+route(8), netstat(8), arp(8), rarp(8), ipchains(8)
+.SH 作者
+Fred N. van Kempen, <waltje@uwalt.nl.mugnet.org>
+Alan Cox, <Alan.Cox@linux.org>
+Phil Blundell, <Philip.Blundell@pobox.com>
+Andi Kleen, <ak@muc.de>
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.TP
+.BI http://cmpp.linuxforum.net
+

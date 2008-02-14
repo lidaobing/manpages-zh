@@ -1,0 +1,73 @@
+.TH findsmb1 Samba2 May2000
+
+
+.SH NAME
+findsmb - 列出在子网上响应SMB名称查询的主机信息
+
+.SH SYNOPSIS 总览
+findsmb [子网广播地址]
+
+.SH 描述
+此perl脚本是Samba组件的一部分。
+
+findsmb是个用于打印出关于子网中响应SMB名字查询请求的主机信息的perl脚本。实际上它是通
+过使用nmblookup和smbclient来获得这些信息的。
+
+
+.SH 选项
+
+  如果不使用子网广播地址这个选项的话，findsmb将自行探测运行命令本身的主机所在的子网。
+  该值将会传递给nmblookup作为它的-B选项的一部分。
+
+.SH 示例
+
+findsmb的输出可以列出响应任何初始nmblookup名字查询的所有主机的以下信息：IP地址、NetBIOS
+名、工作组名、操作系统和SMB服务器版本。
+
+在列表中，如果某台主机为其所在工作组的本地主浏览器的话，该主机后跟的工作组名前会被
+标上“+”号。而如果某台主机为其所在工作组的主域浏览器的话，那么该主机后跟的工作组名
+前会被标上“*”号。那些运行Windows、Windows 95 或 Windows 98的主机将不显示任何操作
+系统或服务器版本的信息。
+
+该命令必须运行在没有nmbd正在运行的系统上。否则，你将只得到主机的IP地址和DNS名。要得
+到Windows 95 和 Windows 98主机的正确响应，必须以root身份运行该命令。
+
+例如运行：
+
+findsmb 
+在一台当前没有nmbd运行的主机上就会产生如下的信息：
+.nf
+IP ADDR         NETBIOS NAME   WORKGROUP/OS/VERSION 
+--------------------------------------------------------------------- 
+192.168.35.10   MINESET-TEST1  [DMVENGR]
+192.168.35.55   LINUXBOX      *[MYGROUP] [Unix] [Samba 2.0.6]
+192.168.35.56   HERBNT2        [HERB-NT]
+192.168.35.63   GANDALF        [MVENGR] [Unix] [Samba 2.0.5a for IRIX]
+192.168.35.65   SAUNA          [WORKGROUP] [Unix] [Samba 1.9.18p10]
+192.168.35.71   FROGSTAR       [ENGR] [Unix] [Samba 2.0.0 for IRIX]
+192.168.35.78   HERBDHCP1     +[HERB]
+192.168.35.88   SCNT2         +[MVENGR] [Windows NT 4.0] [NT LAN Manager 4.0]
+192.168.35.93   FROGSTAR-PC    [MVENGR] [Windows 5.0] [Windows 2000 LAN Manager]
+192.168.35.97   HERBNT1       *[HERB-NT] [Windows NT 4.0] [NT LAN Manager 4.0]
+.fi
+.SH 版本
+
+此手册页是针对samba套件版本2.0的。
+
+.SH 另见
+nmblookup (1), smbclient (1) 
+
+.SH 作者
+该perl脚本是由SGI的Herb Lewis所开发。
+
+samba软件和相关工具最初由Andrew Tridgell samba-bugs@samba.org创建。samba现在
+由开发组作为类似Linux内核开发采用的开放源代码计划方式来发展。
+
+请参见samba (7)查找如何获得一份完整的维护者列表以及如何提交错误报告及注解等等。
+
+.SH [中文版维护人] 
+meaculpa <meaculpa@21cn.com>
+.SH [中文版最新更新] 
+2001/02/24
+.SH 《中文MAN-PAGE计划》:
+http://cmpp.linuxforum.net

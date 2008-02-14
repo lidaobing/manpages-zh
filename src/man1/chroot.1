@@ -1,0 +1,50 @@
+.TH CHROOT "1" "August 1999" "GNU sh-utils 2.0" FSF
+.SH NAME
+chroot \- 以 特定 根 目录 运行 命令 或者 交互式 shell
+
+.SH "总览 (SYNOPSIS)"
+.B chroot
+[\fIOPTION\fR]\fI NEWROOT \fR[\fICOMMAND\fR...]
+.br
+.B chroot
+\fIOPTION\fR
+
+.SH "描述 (DESCRIPTION)"
+.PP
+以 NEWROOT 为 根 目录 运行 COMMAND.
+.TP
+\fB\-\-help\fR
+显示 帮助 并且 退出
+.TP
+\fB\-\-version\fR
+显示 版本 信息 并且 退出
+.PP
+如果 没有 指定 命令, 运行 ``${SHELL} \fB\-i\fR'' (默认: /bin/sh).
+
+.SH "报告错误 (REPORTING BUGS)"
+把 错误 报告 给 <bug-sh-utils@gnu.org>.
+
+.SH "参见 (SEE ALSO)"
+.B chroot
+的 完整 的 文档 是 以 Texinfo 手册页 维护 的. 如果
+.B info
+和
+.B chroot
+程序 被 正确 的 安装 在 你的 机子 上, 用
+.IP
+.B info chroot
+.PP
+命令 查看 完整 的 手册页.
+
+.SH "版权 (COPYRIGHT)"
+版权所有 \(co 1999 自由软件基金会
+.br
+这一程序是自由软件; 拷贝条件见源文件.
+没有任何担保; 甚至没有适合特定目的的隐含的担保.
+
+.SH "[中文版维护人]"
+.B 唐友 <tony_ty@263.net>
+.SH "[中文版最新更新]"
+.BR 2001/9/20
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

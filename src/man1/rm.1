@@ -1,0 +1,106 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Chinese version Copyright riser,SCORPIONS, www.linuxforum.net	2000
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH RM 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+rm \- 移除文件或者目录
+
+.SH 总览
+.BI "rm [" options"] "file...
+
+.SH POSIX(Portable Operating System Interface 可移植的操作系统接口) 选项:
+.BI [-fiRr]
+
+.SH GNU 选项 (最短格式):
+.BI  [-dfirvR] [--help] [--version] [--]
+
+.SH 描述
+rm移除每个给定的文件。默认情况下，它不能移除目录。
+但是当给定了-r或者-R选项时，在指定目录之下的整个目录树都会被移除
+（而且对通过‘rm -r’能够移除的目录树深度是没有限制的）。
+当文件路径末端部分只有.和..时会出错
+（因此可用‘rm -r .*’之类来避免这些不愉快的诧异）。
+
+如果给定了-i选项，或者如果一个文件不可写，
+而且标准输入是终端，又没有给定-f选项，那么rm会提
+示用户是否要删除该文件，它写一个问题到stderr并且从stdin读入一个应答。
+如果应答是否定的，该文件将被跳过。
+
+.SH POSIX选项
+.TP
+.BI \-f 
+不作确认提示。不会写出诊断信息。
+如果错误只是文件不存在，那么不会生成一个状态返回的错误。
+.TP
+.BI -i 进行确认提示。（在同时给定了-f和-i选项时，列在最后的生效。）
+.TP
+.BI -r
+或者
+.BI -R
+递归地移除目录树。
+
+.SH SVID(System V Interface Definition)细节
+System V接口定义(SVID)禁止移除正在执行的可执行二进制文件的最后一个链接。
+
+.SHGNU细节
+GNU的实现（在fileutils-3.16中）会因为可移除的层次深度的上限而招致损坏。
+（如果确实必要，可使用‘deltree’工具来移除非常深的目录树。）
+
+.SH GNU选项
+.TP
+.BI "\-d，\-\-directory"
+用unlink（2）来替代rmdir（2）移除目录，而且不要求目录为空
+移除目录使用的方式是unlink（2），而非rmdir（2），
+且在试图unlink目录之前不要求其为空。
+这仅在你有合适权限时才能生效。
+因为unlink一个目录会导致在删除目录下的文件非关联化，
+因此聪明的方法是在执行此之后fsck（8）文件系统。
+.TP
+.BI "\-f，\-\-force"
+忽略不存在的文件，并且从不向用户提示。
+.TP
+.BI "\-i，\-\-interactive"
+提示是否移除每个文件。如果回答是否定的，文件将被跳过。
+.TP
+.BI "\-r，\-R，\-\-recursive"
+递归地移除目录中的内容。
+.TP
+.BI "\-v，\-\-verbose"
+在移除每个文件之前打印其名称。
+
+.SH GNU 标准选项
+.TP
+.BI "\-\-help"
+在标准输出上打印用法信息，并且以成功状态退出。
+.TP
+.BI "\-\-version"
+在标准输出上打印版本信息，然后以成功状态退出。
+.TP
+.BI "\-\-"
+终止选项列表
+
+.SH 环境变量
+变量LANG，LC_ALL，LC_COLLATE，LC_CTYPE和LC_MESSAGES取其通常的含义。
+
+.SH 适应规则
+POSIX 1003.2，关于文件层次深度的限制除外。
+
+.SH 备注
+本页介绍了包括在fileutils-3.16包中的rm；其他版本的可能会有细微的差别。
+请把您的修正和增补建议发邮件到aeb@cwi.nl，
+aw@mail1.bet1.puv.fi和ragnar@lightside.ddns.org。
+报告程序中的bug请发到
+fileutils-bugs@gnu.ai.mit.edu。
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.TP 
+校对：
+Scorpions <rawk@chinese.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

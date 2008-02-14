@@ -1,0 +1,162 @@
+.\" Copyright (c) 1983, 1990 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"	from: @(#)rlogin.1	6.19 (Berkeley) 7/27/91
+.\"
+.Dd August 15, 1999
+.Dt RLOGIN 1
+.Os "Linux NetKit (0.17)"
+.Sh NAME
+.Nm rlogin
+.Nd 远程注册
+.Sh SYNOPSIS(总览)
+.Ar rlogin
+.Op Fl 8EKLdx
+.Op Fl e Ar char
+.Op Fl l Ar username
+.Ar host
+.Sh DESCRIPTION(描述)
+.Nm Rlogin
+在远程主机
+.Ar host  
+上开始 一个 终端会话.
+.Pp
+本程序 和文档 接受 标准的 伯克利
+.Pa rhosts
+授权.
+选项 如下:
+.Bl -tag -width flag
+.It Fl 8
+.Fl 8
+选项 允许 进行 8 位的 输入 数据 传送; 否则在 远程主机 未使用
+与 ^S/^Q 不同的 控制 字符 之前, 所有的 奇偶 校验位 都会 被清除.
+.It Fl E
+.Fl E
+选项 阻塞(stops) 一些 被识别 为转意 字符 的字符.
+当 使用了
+.Fl 8
+选项时, 这样 可以 提供 完全 透明的 连接.
+.It Fl K
+.Fl K
+选项 关闭 所有的 Kerberos 安全 鉴别.
+.It Fl L
+.Fl L
+选项 允许 rlogin 会话 以 ``litout'' 
+模式 运行(参见
+.Xr tty 4 )
+.It Fl d
+.Fl d
+选项 启动 套接字 调试(参见
+.Xr setsockopt 2 )
+, 在 TCP 类型 的连接中, 套接字 用于 提供 与远程 主机的 通讯.
+.It Fl e
+.Fl e
+选项 允许 用户 指定 转意 字符, 缺省是
+``~''.
+可以 直接 使用 字符, 也可以 使用 八进制值 进行 指定, 八进制 格式为:
+\ennn.
+.It Fl k
+.FL k
+选项 要求 rlogin 在从 远程 接受 许可证时, 使用
+.Ar realm
+中定义的 realm, 而不是 
+.Xr krb_realmofhost  3  
+中定义的 realm.
+.It Fl x
+.Fl x
+选项 使通过 rlogin 会话 进行的 数据
+传送 都要 采用
+.Tn DES
+加密.
+这可能 会影响 响应 时间和
+.Tn CPU
+的利用, 但 提高了 安全性.
+.El
+.Pp
+使用 格式为 ``<escape char>.'' 的一行 可以 断开 与远程 主机 的连接.
+类似的, ``<escape char>^Z'' 这样 的行 可以 延迟
+.Nm rlogin
+会话, ``<escape char><delayed-suspend char(延时字符)>'' 会延迟 rlogin 发送 
+部分, 但允许 远程 主机 输出.
+缺省 情况下, (``~'') 是 转意字符, control-Y (``^Y'') 是 延时字符.
+.Pp
+由于 所有的 回应 都在 远方 发生, 所以
+.Nm rlogin
+是 透明的 (除了延时外).
+通过 使用 ^S/^Q 进行 流量 控制, 即使 满负载的 输入/输出
+也可以 被 正确的 解释 处理.
+.Sh KERBEROS AUTHENTICATION(Kerberos鉴别)
+每个 用户 都应该 在他的 主目录 下的
+.Pa .klogin
+文件中 存放 私人的 授权 列表,
+文件中的 每一行 包含 一个 如下 格式的 Kerberos principal 负责人名:
+.Ar principal.instance@realm  .
+如果 用户 被鉴别 是
+.Pa .klogin 
+中的 principal 之一, 就允许 此帐号 进行 存取 访问.
+如果 没有
+.Pa .klogin
+文件, 就采用
+.Ar accountname.@localrealm
+进行 存取 控制.
+否则 就好像 远程的
+.Xr login  1 
+一样, 需要 用户 提供 用户名 和口令 进行 身份 识别.
+为避免 某些 安全 问题,
+.Pa .klogin
+文件 必须为 远程 用户 拥有.
+.Pp
+如果 Kerberos 鉴别 失败, 在给出 一个 警告 消息 之后, 
+就使用 标准的 Berkeley(伯克利)
+.Nm rlogin .
+.Sh ENVIRONMENT(环境)
+.Nm rlogin 
+使用 如下的 环境变量:
+.Bl -tag -width TERM
+.It Ev TERM
+: 定义 用户的 终端类型.
+.El
+.Sh SEE ALSO(参考)
+.Xr rsh 1 ,
+.Xr kerberos 3 ,
+.Xr krb_sendauth 3 ,
+.Xr krb_realmofhost 3
+.Sh HISTORY(历史)
+.Nm rlogin
+最先 出现在
+.Bx 4.2 中.
+.Sh BUGS(补丁)
+.Nm Rlogin
+在 不远的 将来 会被
+.Xr telnet  1
+代替, 这样 可以 使用 更多的 环境控制.
+.Pp
+

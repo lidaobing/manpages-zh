@@ -1,0 +1,164 @@
+.\" Copyright (c) 1989, 1990 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"	from: @(#)finger.1	6.14 (Berkeley) 7/27/91
+.\"
+.Dd August 15, 1999
+.Dt FINGER 1
+.Os "Linux NetKit (0.16)"
+.Sh NAME
+.Nm finger
+.Nd 用户信息查找程序
+.Sh 总览
+.Nm finger
+.Op Fl lmsp
+.Op Ar user ...
+.Op Ar user@host ...
+.Sh 描述
+The
+.Nm finger
+显示关于系统用户的信息
+.Pp
+参数:
+.Bl -tag -width flag
+.It Fl s
+.Nm Finger
+显示用户的登录名, 真名, 终端名 以及写
+状态(如果写被禁止，在终端名后显示一个``*''),
+空闲时间,登录时间,办公地点和电话等。
+.Pp
+登录时间显示为月,天,小时和分钟，如果是超过6个月以前，则
+显示年份，而不是小时和分钟。
+.Pp
+不明设备以及不存在的空闲时间和登录时间显示为一个星号。
+.Pp
+.It Fl l
+产生一个多行显示来描述信息
+.Fl s
+关于用户家目录，家庭电话，登录脚本，邮件状态和文件的内容
+.Dq Pa .plan
+和
+.Dq Pa .project
+和
+.Dq Pa .forward
+从用户的家目录.
+.Pp
+11位数字电话号码显示为 ``+N-NNN-NNN-NNNN''.
+十位或七位数字可以显示为它的子集。
+五位数字电话号码显示为 ``xN-NNNN''.
+四位数字电话号码显示为 ``xNNNN''.
+.Pp
+如果对设备写被禁止, 短语 ``(messages off)''
+被附加在有此设备的行后边.
+每一个用户有一个条目，用
+.Fl l
+选项; 如果一个用户多次登录, 终端信息
+按每次登录重复显示。.
+.Pp
+如果什么邮件都没有，邮件信息显示为``No Mail.'', 如果当新邮件来后，
+已经查看过信箱，为``Mail last read DDD MMM ## HH:MM YYYY (TZ)'' 
+如果有新邮件，则为 ``New mail received ...'',``  Unread since ...''
+.Pp
+.It Fl p
+防止
+.Nm finger
+.Fl l
+选项
+显示
+.Dq Pa .plan
+ 和
+.Dq Pa .project
+文件的内容。
+.It Fl m
+防止
+.Ar user
+名字的匹配.
+.Ar User
+通常是一个登录名; 可是, 也会对用户的真实名字
+进行匹配, 除非提供
+.Fl m
+选项.
+所有由
+.Nm finger
+进行的名字匹配是区分大小写的
+.El
+.Pp
+不指定
+.Nm finger
+的选项
+如果提供操作者的话，
+缺省设为
+.Fl l
+输出风格，否则为
+.Fl s
+风格.
+注意在两种格式中，如果信息不足，
+都有一些域可能丢失,
+.Pp
+如果没有指定参数
+.Nm finger
+会为当前登录的每个用户打印一个条目.
+.Pp
+.Nm Finger
+可以用来查看远地机器上的用户信息
+格式是指定
+.Ar user
+为
+.Dq Li user@host ,
+或
+.Dq Li @host ,
+前者的缺省输出为
+.Fl l
+风格, 后者的缺省输出为
+.Fl s
+风格.
+.Fl l
+是唯一的向远地机器传递的选项.
+.Pp
+如果标准输出是一个socket 
+.Nm finger
+会在每个换行符前插入回车符。这是为了处理由以下调用的远程finger请求
+.Xr fingerd 8 .
+.Sh 参见 
+.Xr chfn 1 ,
+.Xr passwd 1 ,
+.Xr w 1 ,
+.Xr who 1
+.Sh 历史 
+.Nm finger
+命令出现在
+.Bx 3.0 
+.Sh "[中文版维护人]"
+hunter77 <tzb@kali.com.cn>
+.Sh "[中文版最新更新]"
+2001/04/01
+.Sh "《中国linux论坛man手册页翻译计划》:"
+http://cmpp.linuxforum.net

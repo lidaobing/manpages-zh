@@ -1,0 +1,299 @@
+.\"  Copyright (c) 1990-2002 Info-ZIP.  All rights reserved.
+.\"
+.\"  See the accompanying file LICENSE, version 2000-Apr-09 or later
+.\"  (the contents of which are also included in unzip.h) for terms of use.
+.\"  If, for some reason, all these files are missing, the Info-ZIP license
+.\"  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
+.\"
+.\" zipinfo.1 by Greg Roelofs and others.
+.\"
+.\" =========================================================================
+.\" define .X macro (for long-line ZipInfo output examples; small Courier):
+.de X
+.nf
+.ft CW
+.ie n .ti -5
+.el \{ .ti +2m
+.ps -1 \}
+\&\\$1
+.ie n .ti +5
+.el \{ .ti -2m
+.ps +1 \}
+.ft
+.fi
+..
+.\" define .EX/.EE (for multiline user-command examples; normal Courier font)
+.de EX
+.in +4n
+.nf
+.ft CW
+..
+.de EE
+.ft
+.fi
+.in -4n
+..
+.\" =========================================================================
+.TH ZIPINFO 1L "17 February 2002 (v2.4)" "Info-ZIP"
+.SH NAME
+zipinfo \- 列出关于某个ZIP压缩包的详细信息
+.PD
+.SH "总览 SYNOPSIS"
+\fBzipinfo\fP [\fB\-12smlvhMtTz\fP] \fIfile\fP[\fI.zip\fP]
+[\fIfile(s)\fP\ .\|.\|.] [\fB\-x\fP\ \fIxfile(s)\fP\ .\|.\|.]
+.PP
+\fBunzip\fP \fB\-Z\fP [\fB\-12smlvhMtTz\fP] \fIfile\fP[\fI.zip\fP]
+[\fIfile(s)\fP\ .\|.\|.] [\fB\-x\fP\ \fIxfile(s)\fP\ .\|.\|.]
+.PD
+.\" =========================================================================
+.SH "描述 DESCRIPTION"
+\fIzipinfo\fP 列出某个ZIP档案中的所包含文件的技术信息,
+它们绝大多数和MS-DOS系统中的相同.信息包括文件权限设置,加密状态,压缩类型,
+以及压缩程序的版本和所在的操作系统或者文件系统等.缺省时将为档案中的每一个
+文件列出一行,并在首行和末行给出整个档案的概括信息.其输出的格式介于Unix中
+``\fCls \-l\fR''和 ``\fCunzip \-v\fR''的输出结果.参看下面的
+.B "详细描述 DEATILED DESCRIPTION" .
+请注意 \fIzipinfo\fP与\fIunzip\fP 是同一个程序 (在Unix中,是一个对它的连接);
+然而在有些系统上, \fIzipinfo\fP 的支持在\fIunzip\fP 集成后已被忽略.
+.PD
+.\" =========================================================================
+.SH "参数 ARGUMENTS"
+.TP
+.IR file [ .zip ]
+ZIP 压缩包的路径.如果指定的文件是一个通配符,那么将按照某种操作系统或者
+文件系统所决定的顺序处理每一个匹配的文件.只有文件名可以是通配符.路径本
+身不可以.通配符表达式和 Unix 中的 \fIegrep\fP(1) 正则表达式相似,可能包括:
+.RS
+.IP *
+匹配一个0或者任意多个字符组成的序列
+.IP ?
+精确匹配一个字符
+.IP [.\|.\|.]
+匹配中括号中的任何单个字符;也可以通过首字符,连字符和末字符指定一个匹配范围.如果一个惊叹号或者插入符(`!'或者`^')紧跟左括号;那么将对括号中的内容取补集(也就是说, 任何不属于括号中的字符将被匹配).
+.RE
+.IP
+(如果有任何字符会被操作系统所改变,请使用引号,特别是在 Unix 或者 VMS 中)如果没有匹配项出现,那么指定的内容将被认为是原始的文件名;如果这样做也失败,那么将尝试追加 \fC.zip\fR 后缀.注意自解压的ZIP文件是支持的;只要明确指定 \fC.exe\fR 后缀即可.
+.IP [\fIfile(s)\fP]
+指定一个可选的待处理的档案列表.正则表达式(通配符)可以用来匹配多个成员;如上所述.再次提醒如果表达式会被操作系统所扩展或者修改要使用引号.
+.IP [\fB\-x\fP\ \fIxfile(s)\fP]
+指定一个可选的将被忽略的档案列表.
+.\" =========================================================================
+.SH "选项 OPTIONS"
+.TP
+.B \-1
+只列出文件名,一行一个.这个选项具有完全的排它性;首末行信息以及压缩文件的描述信息将不会被输出.它可以在Unix的Shell脚本中使用.
+.TP
+.B \-2
+只列出文件名,一行一个,但是允许输出首行信息 (\fB\-h\fP), 末行信息(\fB\-t\fP) 和压缩文件描述信息 (\fB\-z\fP). 这个选项在文件名特别长的情况下或许有用.
+.TP
+.B \-s
+以Unix的 ``\fCls \-l\fR'' 的短格式列出压缩文件的信息.这是缺省的,详情见下.
+.TP
+.B \-m
+以 Unix的 ``\fCls \-l\fR'' 的中长格式列出压缩文件的信息.和\fB\-s\fP 的输出结果相同,但是它会列出以百分数表示的压缩比率.
+.TP
+.B \-l
+以 Unix的 ``\fCls \-l\fR'' 的长格式列出压缩文件的信息.和 \fB\-m\fP 输出结果相同,除了压缩比率被压缩后的文件大小(以字节为单位)所取代外.
+.TP
+.B \-v
+详细地以多页方式列出压缩文件的信息.
+.TP
+.B \-h
+列出首行信息.并输出档案名字,实际大小(以字节为单位)以及文件数目.
+.TP
+.B \-M
+将所有的输出以和 Unix 中 \fImore\fP(1) 命令相似的内部页的方式输出.在屏幕输出的末尾,\fIzipinfo\fP 将会暂停,并给出``\-\-More\-\-'' 提示;可以按Enter(Return)或者空格键查看下一屏内容.按``q'' 键(在某些系统上可能是Enter/Return键)可以结束\fIzipinfo\fP .与Unix中的more命令所不同,\fIzipinfo\fP 没有向前搜索和编辑功能.同时,\fIzipinfo\fP 对于屏幕末的长行,不能有效地将它按两行或者多行显示出来,导致\fIzipinfo\fP 屏幕上方的一些文本在被浏览之前就卷过.在有些系统上屏幕上的可显示行的数目是不能被取得的,在这种情况下,\fIzipinfo\fP 假定为24行.
+.TP
+.B \-t
+列出所有或者要求被列出文件的总体信息.输出文件的数目,压缩前后的总大小,以及总的压缩系数;或者如果只有总体信息被打印出,则给出整个档案的信息.请注意总的压缩数据的大小总是不同于实际的压缩文件的大小,这是因为后者包括了作为压缩数据附属物的所有的压缩文件内部的头信息.
+.TP
+.B \-T
+以按点分十进制的格式(yymmdd.hhmmss)排序输出文件的日期和时间.默认的日期格式是一个更加标准的,用户易读的,使用月份名缩写(参看下文)的版本.
+.TP
+.B \-z
+包含档案中的描述信息(如果有的话).
+.PD
+.\" =========================================================================
+.SH "详细描述 DETAILED DESCRIPTION"
+.I zipinfo
+有很多种工作方式,如果不太熟悉 Unix 中的 \fIls\fP(1) (或者即使熟悉)的话,要掌握好它的使用也是比较困难的.默认的方式是以如下的格式列出文件:
+.PP
+.X "-rw-rws---  1.9 unx    2802 t- defX 11-Aug-91 13:48 perms.2660"
+.PP
+最后的三个字段分别是文件的修改日期和时间,还有文件名.文件名的大小写是区分的,这样来自MS-DOS PKZIP的压缩文件总是被大写.如果被压缩的文件存储了路径名,也将被看作是文件名的一部分而被显示.
+.PP
+第二,三个字段表示了文件是在 Unix 下以 1.9 版的 \fIzip\fP 压缩的.由于它来自 Unix ,行开头的文件的存取权限以Unix 格式输出.压缩前的文件大小(本例中为2802)在第四个字段中给出.
+.PP
+第五个字段包含了两个字符,它们中的每个都能取若干个值.第一个字符可能是`t'或者`b',相应地表示文件是文本的或者是二进制的;但是如果文件被加密,\fIzipinfo\fP 通过大写字符(`T'或者`B')来表示.第二个字符可以取四个值,它依赖于是否存在一个本地的头信息并且/或者一个和那个文件相关的 "额外" 字段(详细解释参看 PKWare's APPNOTE.TXT,它基本上类似于ANSI C中的pragmas,它们提供了一种包含非标准信息的标准方法).如果两者都不存在,该字段为连字符(`\-');如果有一个扩展的本地头信息但是没有额外字段,则为`l';反之为`x';如果都存在,则为`X'.这样上面示例中的文件(很可能)是一个未被加密的文本文件,并且没有额外字段和本地头信息与之相关联.下面的例子则是一个有额外信息的二进制文件.
+.PP
+.X "RWD,R,R     0.9 vms     168 Bx shrk  9-Aug-91 19:15 perms.0644"
+.PP
+额外的字段的使用是为了满足不同的需要(参看下面选项 \fB\-v\fP 的讨论)包括这里讨论所假设的情况:VMS 文件的存储特性. 一些其他的可能是为了处理操作系统(这是一个误解,实际应该是文件系统更恰当些)包括 OS/2 或者使用高性能文件系统 (HPFS) 的 NT ,MS_DOS, OS/2 或者使用文件获取表 (FAT) 作为文件系统的 NT, Macintosh.它们被如下所标示:
+.PP
+.X "-rw-a--     1.0 hpf    5358 Tl i4:3  4-Dec-91 11:33 longfilename.hpfs"
+.X "-r--ahs     1.1 fat    4096 b- i4:2 14-Jul-91 12:58 EA DATA. SF"
+.X "--w-------  1.0 mac   17357 bx i8:2  4-May-92 04:02 unzip.macr"
+.PP
+前两个例子的文件的属性以类Unix的格式表示,其中七个子域分别表示该文件是否(1)是一个目录,(2)是可读的(总是)(3)是可写的,(4)是可执行的(猜测建立在假定它们的扩展名为\fI.exe\fP, \fI.com\fP, \fI.bat\fP, \fI.cmd\fP和\fI.btm\fP 的基础上)(5)有它的归档位设置,(6)是隐藏的和(7)是一个系统文件.由于一些 Macintosh 归档工具不存储任何档案信息, Macintosh 文件的解释是不可信的.
+.PP
+最后,第六个字段表示了压缩使用的方法和子方法.
+现在已知有六种方法:存储法(storing)(无压缩),缩减法(reducing),收缩法(shrinking),
+内爆法(impoding),标志法(tokenizing)(从来没有公开发布)和紧缩法(deflating).
+更进一步,缩减法有4种级别(从1到4);内爆法有4种类型(4K或者8K的滑动字典,和2或者3个Shannon-Fano树);紧缩法也有4个层次(超快,快,正常,最大压缩).\fIzipinfo\fP 用如下的方式代表了这些方法和子方法:
+\fIstor\fP;\fIre:1\fP, \fIre:2\fP, etc.; \fIshrk\fP; \fIi4:2\fP, \fIi8:3\fP, etc.;
+\fItokn\fP; and \fIdefS\fP, \fIdefF\fP, \fIdefN\fP, and \fIdefX\fP.
+.PP
+中长和长列表格式显示几乎和短列表相同,除去它们附加了文件压缩方面的信息.中长格式以百分数列出了文件压缩率,它代表了被节省的空间:
+.PP
+.X "-rw-rws---  1.5 unx    2802 t- 81% defX 11-Aug-91 13:48 perms.2660"
+.PP
+在这个例子中,文件以超过5倍的比例被压缩;压缩后的数据大小仅为原是大小的19%.长格式则以以字节大小为单位的压缩后文件大小表示该信息:
+.PP
+.X "-rw-rws---  1.5 unx    2802 t-     538 defX 11-Aug-91 13:48 perms.2660"
+.PP
+增加 \fB\-T\fP  选项则将文件的日期和时间以点分格式输出:
+.PP
+.X "-rw-rws---  1.5 unx    2802 t-     538 defX 910811.134804 perms.2660"
+.PP
+注意到因为 MS-DOS 格式中用来存储文件时间的限制,第二个域总是取值为最近的偶数秒.对于 Unix 文件 \fIzip\fP(1L)  和 \fIunzip\fP 很可能在它们的下一个版本中改变.
+.PP
+作为单独文件信息的补充,默认的输出还包括头和末信息行:
+.PP
+.X "Archive:  OS2.zip   5453 bytes   5 files"
+.X ",,rw,       1.0 hpf     730 b- i4:3 26-Jun-92 23:40 Contents"
+.X ",,rw,       1.0 hpf    3710 b- i4:3 26-Jun-92 23:33 makefile.os2"
+.X ",,rw,       1.0 hpf    8753 b- i8:3 26-Jun-92 15:29 os2unzip.c"
+.X ",,rw,       1.0 hpf      98 b- stor 21-Aug-91 15:34 unzip.def"
+.X ",,rw,       1.0 hpf      95 b- stor 21-Aug-91 17:51 zipinfo.def"
+.X "5 files, 13386 bytes uncompressed, 4951 bytes compressed:  63.0%"
+.PP
+头行给出了档案的名字,它的总大小,总的文件数;末行给出了所列出的文件数,它们总的解压后的大小和它们总的解压前的大小(不包含任何的 \fIzip\fP 内部的部分).但是,如果指定一个或者若干的文件,则头信息和末信息将不会列出.这种行为与Unix中的 ``\fCls \-l\fR'' 类似;可以通过明确指定 \fB\-h\fP h或者 \fB\-t\fP 选项强制显示.
+.PP
+在这种情况下,由于 \fB\-h\fP 或 \fB\-t\fP (或同时)而没有其他选项意味着只有头信息或者末信息(或同时)被列出,列表的格式同样需要明确地指定.对此可参看下面\fB "示例 EXAMPLES" \fP 部分获得这个无意义的半智能化的转化.
+.PP
+冗余的列表显示内容大多数都是自解释的.它还列出了文件和档案文件的描述,如果有的话,还列出所有存储在额外域中的类型和字节数.当前已知的额外域的类型包括 PKWARE 的认证(``AV'')信息;OS/2 扩展属性;VMS 文件系统信息,PLWARE 和 Info-ZIP 的版本; Macintosh 的resource forks;Acorn/Archimedes SparkFS 信息等等.(对于OS/2的扩展属性(压缩文件额外域中最常用的部分) \fIzipinfo\fP 报告的 EAs 的存储大小可能与 OS/2 使用 \fIdir\fP 命令给出得结果不一致:OS/2 总是以16位格式输出字节数,而 \fIzipinfo\fP 总是以32位存储输出.)
+.PD
+.\" =========================================================================
+.SH "环境选项 ENVIRONMENT OPTIONS"
+通过设置在环境变量中的选项可以改变 \fIzipinfo\fP 的默认的工作方式，但是解释起来稍微有点复杂, 这是因为 \fIzipinfo\fP 试图以一种直观,类 Unix 的方式进行默认工作.(不要笑)然而这里有一些内在的逻辑.简言之,选项有三个优先等级:默认选项;环境选项,它是优先于默认选项的,并作为其的补充;用户传递的明确的选项,它是优先于上述两类并作为其补充的.
+.PP
+默认的输出列表格式,正如上述描述的,粗略地对应于 "\fCzipinfo \-hst\fR" 命令(除非指定一个单独的压缩文件).
+一个偏爱长输出格式 (\fB\-l\fP) 的用户能够使用\fIzipinfo\fP的环境变量来改变默认的运作:
+.TP
+Unix Bourne shell:
+\f(CW\&ZIPINFO=\-l; export ZIPINFO\fP
+.TP
+Unix C shell:
+\f(CW\&setenv ZIPINFO \-l\fP
+.TP
+OS/2 or MS-DOS:
+\f(CW\&set ZIPINFO=\-l\fP
+.TP
+VMS (quotes for \fIlowercase\fP):
+\f(CW\&define ZIPINFO_OPTS "\-l"\fP
+.EE
+.PP
+另外,如果用户不喜欢末行信息,\fIzipinfo\fP 的"反选项"的概念可以用来覆盖默认的总结行信息.这可以通过在不想使用的选项前加上减号实现:例如,,在这个例子中可以使用``\fC\-l\-t\fR'' 或者 ``\fC\-\-tl\fR'' .第一个连字符是规则开关符,而`t'之前的那个是减号.连续使用两个连字符看起来有些笨拙.但是从直觉出发并非无意义:只用忽略第一个连字符并从此开始.它同样和Unix命令中的 \fInice\fP(1) 相一致.
+.PP
+正如上面所提到的,对于VMS默认的环境变量是ZIPINFO_OPTS(否则将作为一个安装 \fIzipinfo\fP 的外来命令和环境变量相混淆),而对于其它的操作系统则是ZIPINFO.为了与\fIzip\fP(1L) 兼容,ZIPINFOOPT也被接受(不要问为什么).如果ZIPINFO和ZIPINFOOPT均被定义,则ZIPINFO优先. \fIunzip\fP 的诊断选项(\fB\-v\fP 且没有压缩文件名)能够用来检查所有的四个可能的 \fIunzip\fP 和 \fIzipinfo\fP 环境变量.
+.PD
+.\" =========================================================================
+.SH "示例 EXAMPLES"
+要获得一个压缩档案 \fIstorage.zip\fP 的基本的,短格式输出的完整的内容,并包含头末行信息,使用档案名作为zipinfo 的参数即可:
+.PP
+.EX
+zipinfo storage
+.EE
+.PP
+要获得一个基本的,长格式(非冗余)的,包含头末行信息的列表,用 \fB\-l\fP:
+.PP
+.EX
+zipinfo \-l storage
+.EE
+.PP
+要获得一个档案的完整内容,并且不包含头末行信息,可以使用 \fB\-h\fP 和 \fB\-t\fP 的反选项,也可以明确指定显示内容:
+.PP
+.EX
+zipinfo \-\-h\-t storage
+zipinfo storage \e*
+.EE
+.PP
+(这里的反斜杠 (backslash `\') 只是在 shell 会将 `*' 通配符扩展时才必要,正如在 Unix 中双引号扩起来的星号将会全局有效).如果要默认关闭所有的行显示,可以使用环境变量(这里假设是C shell):
+.PP
+.EX
+setenv ZIPINFO \-\-t
+zipinfo storage
+.EE
+.PP
+要获得第一个例子的完整的,短格式的列表输出,如果环境变量已经象前面的那样设置好了,就需要明确指定\fB\-s\fP 选项,因为 \fB\-t\fP 选项本身只表示输出末行信息:
+.PP
+.EX
+setenv ZIPINFO \-\-t
+zipinfo \-t storage            \fR[only totals line]\fP
+zipinfo \-st storage           \fR[full listing]\fP
+.EE
+.PP
+\fB\-s\fP 选项和 \fB\-m\fP 和 \fB\-l\fP, 选项一样,默认情况下包含了头末行信息,除非另外指定,因为规定不显示末行信息的环境变量较之于默认的 \fB\-s\fP 选项的优先权更高,因此为了得到完整的列表输出,就需要明确指定 \fB\-t\fP 选项.没有什么(环境变量)与头信息相关连,因此 \fB\-s\fP 选项就足够了.请注意当使用 \fB\-h\fP 和 \fB\-t\fP 选项的时候,将不显示任何默认的文件列表;只显示头和/或末信息.在使用一个通配符作为 \fIzipinfo\fP 的参数的时候,这种模式是有用的;所有文件的内容只用一个命令就归纳出了.
+.PP
+要以中长格式列出档案中的一个单独文件的信息,只用明确指定文件名就可以了:
+.PP
+.EX
+zipinfo \-m storage unshrink.c
+.EE
+.PP
+指定任何一个档案成员的文件名,就象在本例一样,将不再显示默认的头末信息;只有显示特定文件信息的那行将被输出.当要获得某个单独的文件的信息的时候这种模式符合直觉.对于多个文件的情形,知道总共的压缩前后的文件的大小常是有用的;在这种情况下 \fB\-t\fP 选项常需要明确指定:
+.PP
+.EX
+zipinfo \-mt storage "*.[ch]" Mak\e*
+.EE
+.PP
+为了获得一个ZIP档案的完全信息,可使用冗余选项.如果操作系统允许的话把输出重定向至一个过滤器例如Unix中的\fImore\fP(1)  通常是明智之举:
+.PP
+.EX
+zipinfo \-v storage | more
+.EE
+.PP
+最后,为了查看档案中最近修改的文件,可使用 \fB\-T\fP 选项配合外部的排序程序比如 Unix 中的 \fIsort\fP(1) (还有这个例子中的 \fItail\fP(1) ):
+.PP
+.EX
+zipinfo \-T storage | sort -n +6 | tail -15
+.EE
+.PP
+\fB\-n\fP 选项告诉 \fIsort\fP(1) 以数字大小排序而不是 ASCII 顺序, \fB\+6\fP 选项意为以第一个后面的第六个字段排序(也就是说是第七个字段).这里假定是默认的短格式输出;如果使用了 \fB\-m\fP 或者 \fB\-l\fP 选项,则正确的 \fIsort\fP(1) 选项将是 \fB\+7\fP.\fItail\fP(1) 命令除去最后15行以外的所有内容.以后的版本的 \fIzipinfo\fP 可能会集成日期/时间和文件名的排序于内建的选项.
+.PD
+.\" =========================================================================
+.SH "技巧 TIPS"
+作者发现如果在可以使用别名的系统(或者允许在系统上拷贝/重命名可执行程序,建立链接或者可以以\fIii\fP 为名建立一个命令文件)上定义 \fIzipinfo\fP 的别名为 \fIii\fP 将会带来很大的方便. \fIii\fP 的用法和通常的作为Unix中长格式输出的别名的 \fIll\fP 相平行,而且两个命令的输出的相似性是有意义的.
+.PD
+.\" =========================================================================
+.SH BUGS
+相对于 \fIunzip\fP,\fIzipinfo\fP 的 \fB\-M\fP (``more'') 选项总体上来说在处理屏幕输出时是过于简单了;正如上面指出的,它不能正确地发现过长的行,因此很可能引起屏幕上端的行在被读取之前就被滚动略过.如果附加一个额外的行,\fIzipinfo\fP 应该能发现并且处理这种情况.这需要获得屏幕的宽和高.并且,\fIzipinfo\fP 还要获得所有系统中的屏幕的真实尺寸.
+.PP
+\fIzipinfo\fP的按列输出的模式是没有必要那么复杂的,应进行简化(这里并不是说将会的到简化).
+.PP
+.\" =========================================================================
+.SH "参见 SEE ALSO"
+\fIls\fP(1), \fIfunzip\fP(1L), \fIunzip\fP(1L), \fIunzipsfx\fP(1L),
+\fIzip\fP(1L), \fIzipcloak\fP(1L), \fIzipnote\fP(1L), \fIzipsplit\fP(1L)
+.PD
+.\" =========================================================================
+.SH URL
+The Info-ZIP home page is currently at
+.EX
+\fChttp://www.info-zip.org/pub/infozip/\fR
+.EE
+或
+.EX
+\fCftp://ftp.info-zip.org/pub/infozip/\fR .
+.EE
+.PD
+.\" =========================================================================
+.SH "作者 AUTHOR"
+Greg ``Cave Newt'' Roelofs.  ZipInfo 包含了Mark Adler的模式匹配的代码以及其他很多人的修正/改进.请参考UnZip源程序发布中的CONTRIBS文件获得更加完整的列表.
+
+.SH "[中文版维护人]"
+.B 严亚勤 <tinyfat@263.net>
+.SH "[中文版最新更新]"
+.B 2003.11.22
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

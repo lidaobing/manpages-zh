@@ -1,0 +1,84 @@
+.TH CUT "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+cut \- 在文件的每一行中提取片断
+.SH "总览 (SYNOPSIS)"
+.B ../src/cut
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+在 每个文件 FILE 的 各行 中, 把 提取的 片断 显示在 标准输出.
+.TP
+\fB\-b\fR, \fB\-\-bytes\fR=\fILIST\fR
+输出 这些 字节
+.TP
+\fB\-c\fR, \fB\-\-characters\fR=\fILIST\fR
+输出 这些 字符
+.TP
+\fB\-d\fR, \fB\-\-delimiter\fR=\fIDELIM\fR
+使用 DELIM 取代 TAB 做 字段(field) 分隔符
+.TP
+\fB\-f\fR, \fB\-\-fields\fR=\fILIST\fR
+输出 这些 字段
+.TP
+\fB\-n\fR
+(忽略)
+.TP
+\fB\-s\fR, \fB\-\-only\-delimited\fR
+不显示 没有 分隔符 的 行
+.TP
+\fB\-\-output\-delimiter\fR=\fISTRING\fR
+使用 STRING 作为 输出分隔符, 缺省 (的 输出分隔符) 为 输入分隔符
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+使用 且 只使用 \fB\-b\fR, \fB\-c\fR 或 \fB\-f\fR 中的 一个 选项.
+LIST 由 一个 范围 (range) 或 逗号 隔开的 多个 范围 组成.
+范围 是 下列 形式 之一:
+.TP
+N
+第 N 个 字节, 字符 或 字段, 从 1 计数 起
+.TP
+N-
+从 第 N 个 字节, 字符 或 字段 直至 行尾
+.TP
+N-M
+从 第 N 到 第 M (并包括 第M) 个 字节, 字符 或 字段
+.TP
+\fB\-M\fR
+从 第 1 到 第 M (并包括 第M) 个 字节, 字符 或 字段
+.PP
+如果 没有 指定 文件 FILE, 或 FILE 是 -, 就从 标准输入 读取 数据.
+
+.SH "作者 (AUTHOR)"
+David Ihnat, David MacKenzie, 和 Jim Meyering.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B cut
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B cut
+程序, 使用 命令
+.IP
+.B info cut
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/11
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

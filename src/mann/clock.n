@@ -1,0 +1,392 @@
+'\"
+'\" Copyright (c) 1992-1995 Karl Lehenbauer and Mark Diekhans.
+'\" Copyright (c) 1995-1997 Sun Microsystems, Inc.
+'\" Copyright (c) 1998-1999 Scriptics Corporation
+'\"
+'\" This documentation is derived from the time and date facilities of
+'\" TclX, by Mark Diekhans and Karl Lehenbauer.
+'\" 
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: clock.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: clock.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH clock n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+clock \- 获取和操纵时间    
+.SH "总览 SYNOPSIS"
+\fBclock \fIoption\fR ?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令进行多种操作中的某一个，可以获取或操纵表示一些时间概念(notion)的字符串或值。\fIoption\fR 参数确定这个命令完成什么操作。合法的 \fIoptions\fR  (可以使用缩写) 有:           
+.TP
+.VS 8.3
+\fBclock clicks\fR ?\fB\-milliseconds\fR?
+返回一个高解析度(high-resolution)的时间值，是一个依赖于系统的整数。值的单位是依赖于系统的但应该是系统上可获得的最高解析度的时钟，比如一个 CPU 周期记数(counter)。如果指定了 \fB-milliseconds\fR ，则保证这个值是微秒的粒度。这个值只应用于流逝了的时间的相对测量。     
+.VE 8.3
+.TP
+\fBclock format \fIclockValue\fR ?\fB\-format \fIstring\fR? ?\fB\-gmt \fIboolean\fR?
+把一个整数时间值转换成人可阅读的形式，典型的，这个时间值是从 \fBclock seconds\fR、\fBclock scan\fR、或 \fBfile\fR 命令的 \fBatime\fR、 \fBmtime\fR、或 \fBctime\fR  选项返回的。如果 \fB-format\fR  参数存在，下一个参数是描述如何格式化日期和时间的一个字符串。字段描述符由一个 \fB%\fR 和随后的字段描述符字符组成。所有的其他字符都复制到结果中。有效的字段描述符有: 
+.RS
+.IP \fB%%\fR
+插入一个 %。
+.IP \fB%a\fR
+星期名的缩写 (Mon, Tue, etc.)。         
+.IP \fB%A\fR
+完整的星期名 (Monday, Tuesday, etc.)。          
+.IP \fB%b\fR
+月名的缩写 (Jan, Feb, etc.)。         
+.IP \fB%B\fR
+完整的月名。     
+.IP \fB%c\fR
+特定于本地的日期和时间。     
+.IP \fB%d\fR
+月中的第几天 (01 - 31)。
+.IP \fB%H\fR
+24小时格式的小时(00 - 23)。  
+.IP \fB%I\fR
+12小时格式的小时 (00 - 12)。 
+.IP \fB%j\fR
+年中的第几天 (001 - 366)。      
+.IP \fB%m\fR
+第几月 (01 - 12)。      
+.IP \fB%M\fR
+分 (00 - 59)。         
+.IP \fB%p\fR
+AM/PM 指示符。        
+.IP \fB%S\fR
+秒 (00 - 59)。   
+.IP \fB%U\fR
+年中的第几星期 (00 - 52)，星期天是一个星期中的第一天。         
+.IP \fB%w\fR
+星期几 (Sunday = 0)。      
+.IP \fB%W\fR
+年中的第几星期 (00 - 52)，星期一是一个星期中的第一天。       
+.IP \fB%x\fR
+特定于本地的日期格式。   
+.IP \fB%X\fR
+特定于本地的时间格式。     
+.IP \fB%y\fR
+世纪中的第几年 (00 - 99)。   
+.IP \fB%Y\fR
+带世纪的年 (例如 1990)。   
+.IP \fB%Z\fR
+时区名。    
+.RE
+.sp
+.RS
+在一些系统上支持下列补充的字段描述符(例如在 Unix 上而不在 Windows):     
+.IP \fB%D\fR
+形如 %m/%d/%y 的日期。  
+.IP \fB%e\fR
+月中的第几天 (1 - 31)，没有前导的零。     
+.IP \fB%h\fR
+月名的缩写。
+.IP \fB%n\fR
+插入一个换行。  
+.IP \fB%r\fR
+形如 %I:%M:%S %p 的时间。       
+.IP \fB%R\fR
+形如 %H:%M 的时间。
+.IP \fB%t\fR
+插入一个 tab。
+.IP \fB%T\fR
+形如 %H:%M:%S 的时间。 
+.RE
+.sp
+.RS
+如果未指定 \fB-format\fR  参数，使用格式串 “\fB%a %b %d %H:%M:%S %Z %Y\fR”。如果 \fB-gmt\fR 参数存在，下一个参数必须是一个 boolean (值)。如果是真则指定时间作为 Greenwich 标准时来格式化，如果是假则使用操作环境定义的本地时区。        
+.RE
+.TP
+\fBclock scan \fIdateString\fR ?\fB\-base \fIclockVal\fR? ?\fB\-gmt \fIboolean\fR?
+把 \fIdateString\fR  转换成一个整数时钟值(参见 \fBclock seconds\fR)。这个命令可分析并转换几乎所有的标准的日期和/或时间串，其中可以包含标准的时区助记码(mnemonic)。如果只指定了一个时间，假定为当前的日期。如果串中不包括一个时区助记码，除非 \fB-gmt \fR参数是真之外假定为本地时区，在 \fB-gmt \fR 参数是真的情况下，假定指定的时间是相对于 Greenwich 标准时来计算时钟值。如果指定了 \fB-gmt\fR，它只影响计算出的时间值，不影响对 \fB-base \fR的解释。
+.sp
+如果指定了 \fB-base\fR   标记，下一个参数将包括一个整数的时钟值。只使用这个值中的日期而不管时间。这对确定特定的某天的时间或做其他的相对于日期的转换有用。
+.sp
+\fIdateString\fR 包含零个或多个下列形式的指定(specification):     
+.RS
+.TP
+\fItime\fR
+一天中的时间，样式是: \fIhh\fR?\fI:mm\fR?\fI:ss\fR?? 
+?\fImeridian\fR? ?\fIzone\fR? or \fIhhmm \fR?\fImeridian\fR? 
+?\fIzone\fR?. 如果为指定上下午(meridian), \fIhh\fR 被解释为一个24小时钟点。    
+.TP
+\fIdate\fR
+一个特定的月和日，年是可选的。可接受的格式是 \fImm/dd\fR?\fI/yy\fR?, \fImonthname dd\fR
+?, \fIyy\fR?, \fIdd monthname \fR?\fIyy\fR?, \fIday, dd monthname
+yy\fR, \fI?CC?yymmdd\fR, \fI?CC?yy-mm-dd\fR, \fIdd-monthname-?CC?yy\fR. 缺省的年是当前年。如果年小于  
+.VS
+100，我们把 00-68 年作为 2000-2068 年而 69-99 年作为 1969-1999  年。注意所有平台都可以表示 38-70 年,  所以如果使用这些年就可能出错。           
+.VE
+.TP
+\fIISO 8601 point-in-time\fR
+一个 ISO 8601 point-in-time 指定，如 \fICCyymmddThhmmss\fR, 这里 T 是字面的 T，\fICCyymmdd hhmmss\fR, 或者 \fICCyymmddThh:mm:ss\fR.
+.TP
+\fIrelative time\fR
+相对当前时间的一个指定。格式是 \fInumber unit\fR，可接受的单位是 \fByear\fR、 \fBfortnight\fR、 \fBmonth\fR、 \fBweek\fR、 \fBday\fR、\fBhour\fR、 \fBminute\fR  (或 \fBmin\fR)、和 \fBsecond\fR  (或 \fBsec\fR)。单位可以被指定为单数或复数，比如 \fB3 weeks\fR。还可以指定这些修饰符: \fBtomorrow\fR、 \fByesterday\fR、\fBtoday\fR、 \fBnow\fR、\fBlast\fR、\fBthis\fR、 \fBnext\fR、\fBago\fR。        
+.RE
+.sp
+.RS
+实际的日期计算依照下列的步骤。首先，处理和转换所有绝对日期和/或时间。使用这个时间作为基准(base),添加上星期几(day-of-week)指定。其次，使用相对指定。如果指定了一个日期或某天，并且没有给出绝对或相对的时间，则使用午夜。最后，进行一次校正，这样就在估计了夏令时不同之后产生正确的一天中的小时，并且在从一个大月结束到一个小月时给出正确的日期。       
+.sp
+只在用如下单位指定相对时间的时候进行夏令时校正，日或更多，例如  days、 weeks、 fortnights、months 或 years。这意味着跨越夏令时边界的时候，对 \fBclock scan “1 day”\fR 和 \fBclock scan “24 hours” \fR将给出不同的结果:    
+.CS
+.ta 6c
+\fB% clock scan "1 day" -base [clock scan 1999-10-31]
+941443200
+% clock scan "24 hours" -base [clock scan 1999-10-31]
+941439600\fR
+.CE
+.RE
+.TP
+\fBclock seconds\fR
+把当前的日期和时间作为依赖于系统的整数值返回。值的单位是秒，允许它被用于相对时间的计算。值通常被定义成从“epoch”开始(至今)总共流逝的时间。你不应该假定 epoch 的值。  
+
+.SH "关键字 KEYWORDS"
+clock, date, time
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/21
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

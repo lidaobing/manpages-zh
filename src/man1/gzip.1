@@ -1,0 +1,437 @@
+.\" 中文版版权所有 Liu JingSong, www.linuxforum.net 2000
+.\" 本文档可在遵照LDP GENERAL PUBLIC LICENSE，Version 1, September 1998
+.\" 中描述的条件下进行复制,且该文件发布时必须包含该文档．
+.TH GZIP 1 local
+.SH NAME
+gzip, gunzip, zcat \-  压缩或展开文件
+.SH  总揽
+.ll +8
+.B gzip
+.RB [ " \-acdfhlLnNrtvV19 " ]
+.RB [ \-S\ 后缀 ]
+[
+.I "文件名 \&..."
+]
+.ll -8
+.br
+.B gunzip
+.RB [ " \-acfhlLnNrtvV " ]
+.RB [ \-S\ 后缀 ]
+[
+.I "文件名 \&..."
+]
+.br
+.B zcat
+.RB [ " \-fhLV " ]
+[
+.I "文件名 \&..."
+]
+.SH 描述
+.I Gzip
+采用Lempel-Ziv 编码算法(LZ77)压缩给定文件的大小。
+在可能的情况下, 每个文件被具有扩展名
+.B "\&.gz,"
+的文件所替换, 同时保留原属主状态，存取和修改时间
+(在VMS系统下缺省扩展名为
+.B "\-gz"
+在MSDOS、OS/2 FAT, Windows NT FAT 和Atari系统下，缺省扩展名为
+.B "z"
+)
+如果未指定文件名，或者指定了一个名为"-"的文件名，则从标准输入读取数据，压缩的
+结果输出到标准输出。
+.I Gzip
+只尝试压缩常规文件，特别地，它将忽略符号连接。
+.PP
+如果压缩后的文件名对于所在的文件系统来说太长，
+.I gzip
+会将其截断。
+.I Gzip
+只尝试截断文件名中大于3个字符的段（每个段由点分隔）。如果文件名只由较小的段
+组成，最长的段将被截断。例如，如果文件名的长度限制是14个字符，文件gzip.msdos.exe
+将被压缩为gzi.msd.exe.gz。在没有文件名长度限制的系统中，文件名将不会被截断。
+.PP
+缺省情况下，
+.I gzip
+将原始文件名和时间信息保存在压缩后的文件中。
+当采用
+.B \-N
+选项解压缩文件时，这些信息将被利用。在经过文件传输后文件名被截断及时间信息
+未被保留的情况下，这些信息将将用于恢复文件名及时间信息。
+.PP
+用
+.I gzip -d
+或者
+.I gunzip
+以及
+.I zcat.
+可以将压缩后的文件恢复到原始的形式。如果保留在压缩文件中的原始文件名不适合
+于当前的文件系统，将根据原文件名新建一个合法的文件名。
+.PP
+.I gunzip
+将命令行中以.gz, -gz, .z, -z, _z 或 .Z结尾并具有正确标志头的文件
+解压缩，并以去掉扩展名的解压缩文件替换原文件。
+.I gunzip
+也能识别扩展名为
+.B "\&.tgz"
+和
+.B "\&.taz"
+的文件，并将其分别当作
+.B "\&.tar.gz"
+和
+.B "\&.tar.Z"
+的缩写。
+在压缩时，如果采用
+.B "\&.tar"
+扩展名则需要对文件名进行截断处理时，
+.I gzip
+将采用
+.B "\&.tgz"
+作为扩展名。
+.PP
+.I gunzip
+目前能够解压由
+.I gzip, zip, compress, compress -H
+以及
+.I pack
+产生的文件。
+对输入格式的检测是自动的。当采用前两种格式时，
+.I gunzip
+检查一个32位的CRC校验码。对于
+.I pack, gunzip
+则检查压缩前的数据长度。标准的
+.I compress
+格式的设计无法实现一致性检查。但有时
+.I gunzip
+仍然能检测到坏的.Z文件。如果你在解压一个.Z文件时出现错误，不要简单地因为标准的
+.I uncompress
+没有报错就认定.Z文件是正确的。
+这通常意味着标准的
+.I uncompress
+没有检查它的输入数据，而盲目地产生了错误的输出。SCO的compress -H格式(lzh压缩方
+法）不包含CRC校验码，但也允许一些一致性检查。
+.PP
+由
+.I zip
+生成的文件, 如果其内容只有一个文件并且是以'deflation'方式压缩的，则可
+由gzip解压。这一特性只是为了方便将tar.zip 格式的文件转换为tar.gz格式而加入的。
+要解压含有多个文件的zip文件，请用
+.I unzip.
+.PP
+.I zcat
+的功能与
+.I gunzip
+.B \-c.
+相同。
+(在一些系统中,
+.I zcat
+可能被安装成
+.I gzcat
+以保留
+.I compress
+与zcat的原有连接。)
+.I zcat
+将命令行中列出的文件或由标准输入输入的数据解压，解压后的数据写到标准输出。
+.I zcat
+解压具有正确标志头的文件，而不管其是否带有
+.B "\&.gz"
+后缀。
+.PP
+.I Gzip
+采用
+.I zip
+和 PKZIP 中所采用的Lempel-Ziv算法。得到的压缩比依赖于输入数据的大小以及公用
+子串的分布。例如源程序和英文文档能够压缩60\-70%。
+压缩比通常比LZW(
+.IR compress
+采用的算法)、Huffman编码(
+.IR pack
+所采用的算法）、以及自适应Huffman编码(
+.RI compact )
+等方法要好得多。
+.PP
+即使压缩后的文件略大于原文件，压缩也照样进行。最坏的情况下，多出的数据包括
+gzip文件头中的若干个字节，加上每块32K的5个字节，或者，对于大文件来说0.015%
+的放大率。注意实际占用的硬盘块数目几乎从不增加。
+.I gzip
+在压缩和解压缩时保留原文件的属主和时间信息。
+
+.SH 选项
+.TP
+.B \-a --ascii
+Ascii文本模式：按本地习惯转换行结束符。该选项仅在一些非Unix 系统上有效。
+对于MSDOS，在压缩时CR LF(译注：即回车和换行符)被转换为LF，在解压时LF被
+转换为CR LF。
+.TP
+.B \-c --stdout --to-stdout
+将结果写到标准输出；原文件保持不变。如果有多个输入文件，输出将由一系列
+独立的压缩文件组成。如果想得到较好的压缩率，在压缩前应将多个文件连在一起。
+.TP
+.B \-d --decompress --uncompress
+解压缩。
+.TP
+.B \-f --force
+强制压缩和解压缩，即使指定文件具有多重连接，或相应文件已经存在，或压缩数据
+来自或写往一个终端。
+如果输入数据是
+.I gzip
+无法识别的格式，同时在命令行中也给出了--stdout选项，gzip将把输入数据拷贝至标准
+输出而不做任何改动，就象cat所做的一样。
+如果未给出
+.B \-f
+选项，并且未在后台运行，
+.I gzip
+会提示用户以确认是否覆盖一个已存在的文件。
+.TP
+.B \-h --help
+显示帮助信息然后退出。
+.TP
+.B \-l --list
+列出每个压缩文件的如下项目：
+
+    compressed size:  压缩文件的长度
+    uncompressed size:  压缩前文件的长度
+    ratio: 压缩率(如果未知则为0.0%)
+    uncompressed_name: 压缩前的文件名
+
+对于非gzip格式的文件，压缩前文件长度显示为-1，例如由compress压缩的.Z文件。
+可用下列命令得到这种文件压缩前的长度：
+
+    zcat file.Z | wc -c
+
+如果同时指定了--verbose选项，下列项目也被列出:
+
+    method: 压缩方式
+    crc: 未压缩数据的32位CRC校验码
+    date & time: 压缩前文件的时间信息
+
+目前支持的压缩方式有deflate、compress、lzh(SCO下的compress -H)以及pack等方式。
+对于非gzip格式的文件，crc校验码显示为ffffffff。
+
+若指定了--name选项，如果有的话，压缩前文件名，日期以及时间是保存在压缩文件中
+的内容。
+
+若指定了--verbose选项，还将列出所有文件的长度总和，除非某些文件的长度未知。
+若指定--quiet选项，将不显示标题和合计两行内容。
+.TP
+.B \-L --license
+显示
+.I gzip
+的许可证信息然后退出。
+.TP
+.B \-n --no-name
+在压缩时，缺省不保留原始文件名和时间信息。(如果必须对文件名作截断处理，
+则原始文件名总是被保存。) 在解压缩时，即使有也不恢复原始文件名（仅将压
+缩文件名中的
+.I gzip
+后缀去掉）和时间信息（拷贝压缩文件中相应信息）。该选项是压缩时的缺省选项。
+.TP
+.B \-N --name
+在压缩时总是保存原始文件名和时间信息；该选项为缺省选项。在解压缩时，如果
+存在原始文件名和时间信息则恢复之。该选项可用于对文件名长度有限制的系统，
+以及经过文件传输后丢失时间信息的情况。
+.TP
+.B \-q --quiet
+压制所有警告信息。
+.TP
+.B \-r --recursive
+递归地访问目录结构。如果命令行中有目录名，
+.I gzip
+将进入目录并压缩所有找到的文件（如果执行的命令是
+.I gunzip
+则对其解压缩）。
+.TP
+.B \-S .suf   --suffix .suf
+采用.suf后缀取代.gz后缀。可以指定任何后缀，但应避免使用除了.z和.gz以外
+的其它后缀，以免文件传输到其它系统时发生混淆。一个空后缀将迫使gunzip
+解压缩所有文件而不管它具有什么样的后缀，例如：
+
+    gunzip -S "" *       (在MSDOS下用*.*替换*)
+
+以前版本的gzip采用.z后缀。为了避免与
+.IR pack "(1)".
+冲突，后来作了改动。
+.TP
+.B \-t --test
+测试。检查压缩文件的完整性。
+.TP
+.B \-v --verbose
+详尽模式。显示每个压缩或解压缩文件的名字和压缩率。
+.TP
+.B \-V --version
+版本。显示版本号和编译选项后退出。
+Version. Display the version number and compilation options then quit.
+.TP
+.B \-# --fast --best
+用指定的数字
+.IR #
+调整压缩速度，
+其中
+.B \-1
+及
+.B \-\-fast
+对应最快压缩方式（压缩率较低），
+.B \-9
+及
+.B \-\-best
+对应最慢压缩方式（压缩率最佳）。缺省的压缩级别为
+.BR \-6
+（也就是说，以速度为代价偏向于高压缩率）。
+.SH "高级用法"
+多个被压缩的文件可以连在一起。在这种情况下，
+.I gunzip
+能一次解压所有文件。例如：
+
+      gzip -c file1  > foo.gz
+      gzip -c file2 >> foo.gz
+
+然后
+      gunzip -c foo
+
+上面的命令等价于
+
+      cat file1 file2
+
+如果.gz文件中的某一个文件损坏，其他文件仍可以恢复（如果损坏的文件被删除的话）。
+而且一次压缩所有文件能得到较好的压缩率：
+
+      cat file1 file2 | gzip > foo.gz
+
+上面用法的压缩率比下面用法的高:
+
+      gzip -c file1 file2 > foo.gz
+
+如果想重新压缩连接起来的文件以得到较高的压缩率，可以用下面的命令:
+
+      gzip -cd old.gz | gzip > new.gz
+
+如果一个压缩文件由多个文件组成，--list选项只能列出最后一个成员的
+解压后文件长度和CRC校验码。如果需要所有成员的解压后文件长度，可用如下命令：
+
+      gzip -cd file.gz | wc -c
+
+如果想要产生一个具有多个成员的存档文件，以便将来能够独立地取出其中的成员，
+可以用tar或zip这样的归档软件。GNU tar支持-z选项，可直接调用gzip。gzip设计为
+tar的补充，而非它的取代物。
+.SH "环境变量"
+环境变量
+.B GZIP
+能够控制一系列
+.I gzip
+的缺省选项。
+这些选项被首先解释，并且能被命令行参数中的直接定义覆盖。例如:
+      在sh下:    GZIP="-8v --name"; export GZIP
+      在csh下:   setenv GZIP "-8v --name"
+      在MSDOS下: set GZIP=-8v --name
+
+在Vax/VMS系统中，为了避免与调用该程序的符号设置冲突，该环境变量名为GZIP_OPT。
+.SH "另见"
+znew(1), zcmp(1), zmore(1), zforce(1), gzexe(1), zip(1), unzip(1), compress(1),
+pack(1), compact(1)
+.SH "诊断"
+正常的退出状态为0；如果出现错误，退出状态为1。如果出现警告信息，退出状态为2。
+.PP
+Usage: gzip [-cdfhlLnNrtvV19] [-S suffix] [file ...]
+.in +8
+在命令行中出现非法的选项。
+.in -8
+.IR file :
+not in gzip format
+.in +8
+指定给
+.I gunzip
+的文件没有被压缩。
+.in -8
+.IR file:
+Corrupt input. Use zcat to recover some data.
+.in +8
+压缩文件已损坏。在损坏点以前的数据可以用下列命令恢复。
+.in +8
+zcat file > recover
+.in -16
+.IR file :
+compressed with 
+.I xx
+bits, can only handle 
+.I yy
+bits
+.in +8
+文件
+.I File
+是由一个比在当前机器上能处理更多
+.I 位
+的程序压缩的（采用LZW算法）。用gzip重新压缩该文件，将得到较好的压缩率，并且
+占用的内存较少。
+.in -8
+.IR file :
+already has .gz suffix -- no change
+.in +8
+gzip认为该程序已经压缩。改变文件名再试。
+.in -8
+.I file
+already exists; do you wish to overwrite (y or n)?
+.in +8
+如果你想覆盖该文件回答"y"，如果不是回答"n"。
+
+.in -8
+gunzip: corrupt input
+.in +8
+探测到一个SIGSEGV非法操作，这通常意味着输入文件已经损坏。
+.in -8
+.I "xx.x%"
+.in +8
+由于压缩而减少的数据量相对于输入数据的百分比。（仅对应于
+.BR \-v
+和
+.BR \-l
+选项。）
+.in -8
+-- not a regular file or directory: ignored
+.in +8
+如果输入文件不是常规文件或目录，（例如符号连接，socket文件，FIFO文件，
+设备文件），该文件将保持不变。
+.in -8
+-- has 
+.I xx 
+other links: unchanged
+.in +8
+该文件有连接，将保持不变。更多信息参见
+.IR ln "(1)".
+采用
+.B \-f
+强制压缩多重连接文件。
+.in -8
+.SH 警告
+在向磁带写压缩数据时，通常需要在数据尾部充零以使数据总长度为磁带数据块
+长度的整数倍。当用
+.I gunzip
+对这样的数据解压缩时，
+.I gunzip
+能检测到尾部的无用数据，在缺省情况下将发出一个警告信息。必须采用--quiet
+选项才能压制这一警告信息。该选项可以设在
+.B GZIP
+环境变量中，例如：
+  在sh下:  GZIP="-q"  tar -xfz --block-compress /dev/rst0
+  在csh下: (setenv GZIP -q; tar -xfz --block-compr /dev/rst0
+
+在上面的例子中，gzip被采用了-z选项的GNU tar调用。在磁带上读写压缩数据时，
+应确保采用同样的数据块长度（tar的
+.B -b
+选项）。（本例假定使用的是GNU版本的tar。）
+.SH 缺陷
+如果数据长度超过2GB, 采用--list选项时报告的文件长度不正确。
+如果压缩文件位于不能定位的存储介质上，采用--list选项时报告的文件长度为-1，crc
+校验码为ffffffff。
+
+在极少数情况下，--best选项得到的压缩率比缺省情况(-6)还差。对于一些高度冗余
+的文件，
+.I compress
+比
+.I gzip
+压缩得更好。
+
+.SH "[中文版维护人]"
+.B Liu JingSong <js-liu@263.net>
+.SH "[中文版最新更新]"
+2000/12/28
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

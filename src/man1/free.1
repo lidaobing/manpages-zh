@@ -1,0 +1,58 @@
+.\"             -*-Nroff-*-
+.\"  This page Copyright (C) 1993 Matt Welsh, mdw@sunsite.unc.edu.
+.\"  Freely distributable under the terms of the GPL
+.TH FREE 1 "20 Mar 1993 " "Cohesive Systems" "Linux User's Manual"
+.SH NAME
+free \- 显示系统中已用和未用的内存空间总和.
+
+.SH 总览 (SYNOPSIS)
+.BR "free " [ "\-b" " | " "\-k" " | " "\-m" "] [" "\-o" "] [" "\-s"
+.I delay
+.RB "] [" "\-t" "] [" "\-V" ]
+
+.SH 描述 (DESCRIPTION)
+\fBfree\fP 显示 系统中 已用和未用的 物理内存和交换内存, 共享内存和
+内核使用的 缓冲区的 总和.
+
+.SH 选项 (Options)
+\fB-b\fP 选项 以字节为单位 显示 内存总和; \fB-k\fP 选项 (缺省的) 
+以 KB 为单位 显示; \fB-m\fP 选项 以 MB 为单位.
+
+.PP
+\fB-t\fP 选项 显示 一个 总计行.
+
+.PP
+\fB-o\fP 选项 禁止 "buffer adjusted" 行的显示. 除非 指定 \fBfree\fP 从
+(相应的) 已用/未用的 内存 减去/加上 缓冲区内存.
+
+.PP
+\fB-s\fP 使 \fBfree\fP 以 \fIdelay\fP 秒为间隔, 连续抽样显示. \fIdelay\fP 
+可以设置成浮点数, 它用
+.BR usleep (3)
+做 微秒级 延迟.
+
+.PP
+\fB\-V\fP 显示版本信息.
+
+.SH 文件 (FILES)
+.ta
+.IR /proc/meminfo "\-\- 内存信息"
+.fi
+
+.SH 另见
+.BR ps (1),
+.BR top(1)
+
+.SH 作者
+由 Brian Edmonds 编写
+
+Bug 报告寄给 <procps-bugs@redhat.com>
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/17
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net
+

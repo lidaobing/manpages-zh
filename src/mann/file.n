@@ -1,0 +1,441 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: file.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: file.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH file n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+file \- 操纵文件名和属性
+.SH "总览 SYNOPSIS"
+\fBfile \fIoption\fR \fIname\fR ?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令提供在一个文件名或属性上的一些操作。\fIName\fR 是一个文件的名字；如果它以波浪线(~)开始，则在执行命令之前进行波浪线替换(详情参见\fBfilename\fR  命令的手册条目)。\fIOption\fR 指示对文件名做什么处理。接受 \fIoption\fR 的任何唯一的缩写。有效的选项是: 
+.TP
+\fBfile atime \fIname\fR ?\fBtime\fR?
+.
+返回一个十进制字符串，给出文件 \fIname \fR上次被访问的时间。如果指定了\fItime\fR，它是这个文件要设置成的访问时间。这个时间是用标准的 POSIX 方式(fashion)度量的，即从一个固定的开始时间至今的秒数(通常是1970年1月1日)。如果文件不存在或它的访问时间不可查询或设置则生成一个错误。在 Windows 上，FAT 文件系统不支持访问时间。
+.TP
+\fBfile attributes \fIname\fR
+.br
+\fBfile attributes \fIname\fR ?\fBoption\fR?
+.br
+\fBfile attributes \fIname\fR ?\fBoption value option value...\fR?
+.RS
+这个子命令返回或设置与一个文件相关联的特定于平台的值。第一种形式返回特定于平台的标志(flag)和它们的值的一个列表。第二种形式返回指定选项的值。第三种形式设置一个或多个值。这些值是:
+.PP
+在Unix 上，\fB-group\fR  得到或设置这个文件的组名字。给这个命令一个组ID，而它返回一个组名字。\fB-owner\fR 得到或设置这个文件的属主的名字。这个命令返回属主的名字，而在设置属主的时候要传递给它数值的 ID。\fB-permissions\fR  设置或查询 chmod(1) 所使用的八进制代码。这个命令还有限的支持使用 chmod(1)的符号属性来做设置，形式是 [ugo]?[[+\-=][rwxst],[...]]，这里使用逗号来分隔多个符号属性(例如: \fBu+s，go\-rw\fR  为用户添加粘住位(sticky)，为组和其他删除读和写的许可权)。还支持一个简化的 \fBls\fR式样的字符串，形式是 rwxrwxrwx (必须是 9 个字符)(例如: \fBrwxr\-xr\-t\fR 等价于01755)。
+.PP
+在 Windows 上，\fB-archive\fR 给出值或设置或清除这个文件的归档属性。\fB-hidden\fR  给出值或设置或清除这个文件的隐藏属性。\fB-longname\fR将把每个路径元素扩展成长版本。不能设置这个属性。\fB-readonly\fR 给出值或设置或清除这个文件的只读属性。\fB-shortname\fR    给出一个字符串，在这里每个路径元素被替换成它的短(8.3)版本的文件名。不能设置这个属性。\fB-system\fR 给出值或设置或清除这个文件的系统属性。
+.PP
+在 Macintosh 上，\fB-creator\fR给出或设置这个文件的寻找器(Finder)建立者类型。\fB-hidden\fR给出值或设置或清除这个文件的隐藏属性。\fB-readonly\fR 给出值或设置或清除这个文件的只读属性。注意如果打开了文件共享则目录只能被锁定。\fB-type\fR 给出或设置这个文件的寻找器文件类型。    
+.RE
+.VS
+.TP
+\fBfile channels ?\fIpattern\fR?
+.
+如果没有指定 \fIpattern\fR，则返回所有在这个解释器中注册的打开通道的一个列表。如果指定了 \fIpattern\fR，则只返回匹配\fIpattern\fR  的名字。确定匹配使用与 \fBstring match\fR 相同的规则。              
+.VE
+.TP
+\fBfile copy \fR?\fB\-force\fR? ?\fB\-\|\-\fR? \fIsource\fR \fItarget\fR
+.br
+\fBfile copy \fR?\fB\-force\fR? ?\fB\-\|\-\fR? \fIsource\fR ?\fIsource\fR ...? \fItargetDir\fR
+.RS
+第一中形式在路径名 \fItarget \fR底下做文件或路径 \fIsource\fR的一个复件。如果 \fItarget\fR   是一个现存的目录，则使用第二种形式。第二种形式在\fItargetDir \fR中做列出的每个 \fIsource\fR 文件的一个复件。如果指定一个目录作为一个 \fIsource\fR，则这个目录的内容将被递归的复制进 \fItargetDir\fR   中。除非指定 \fB\-force\fR  选项否则现存文件将不被覆写。即使指定了 \fI\-force\fR  ，尝试覆写一个非空目录，用一个文件覆写一个目录，或者用一个目录覆写一个文件将导致错误。参数按指定的次序被处理，如果有错误的话，在第一个错误处停止(halt)。一个 \fB\-\|\-\fR   标记选项的结束；在 \fB\-\|\-\fR 之后的参数即使以 \fB\- \fR开始将仍被作为一个 \fIsource\fR  来对待。         
+.RE
+.TP
+\fBfile delete \fR?\fB\-force\fR? ?\fB\-\|\-\fR? \fIpathname\fR ?\fIpathname\fR ... ?
+.
+删除由每个 \fIpathname\fR 参数所指定的文件或目录。只有指定 \fB-force\fR选项才删除非空目录。尝试删除一个不存在文件将导致不作为一个错误来考虑。即使没有指定 \fB-force\fR 
+项，尝试删除一个只读文件将导致文件被删除。参数按指定的次序被处理，如果有错误的话，在第一个错误处停止(halt)。一个 \fB\-\|\-\fR  标记选项的结束；在 \fB\-\|\-\fR 之后的参数即使以 \fB\- \fR开始将仍被作为一个 \fIpathname\fR来对待。                
+.TP
+\fBfile dirname \fIname\fR
+返回一个名字，由在 \fIname\fR  中除了最后一个之外的所有路径组成部分(component)组成。如果 \fIname\fR 是一个相对的文件名并且只包含一个路径元素(element)，则返回“\fB.\fR” (在 Macintosh 上为“\fB:\fR”)。如果 \fIname\fR 参照一个根目录，则返回根目录。例如，
+.RS
+.CS
+\fBfile dirname c:/\fR
+.CE
+返回 \fBc:/\fR. 
+.PP
+注意波浪线替换只在必要的时候进行用以补全(complete)命令。例如，                
+.CS
+\fBfile dirname ~/src/foo.c\fR
+.CE
+返回 \fB~/src\fR，而  
+.CS
+\fBfile dirname ~\fR
+.CE
+返回 \fB/home\fR (or something similar).
+.RE
+.TP
+\fBfile executable \fIname\fR
+.
+如果文件对当前用户是可执行的则返回 \fB1\fR，否则返回\fB0\fR。                  
+.TP
+\fBfile exists \fIname\fR
+.
+如果文件 \fIname\fR  存在并且当前的用户对找到(lead to)它(所途径)的目录有查找的权利(privilege)则返回\fB1\fR，否则返回 \fB0\fR。            
+.TP
+\fBfile extension \fIname\fR
+.
+返回在 \fIname \fR最后那个元素的最后一个点号之后并包括点号的所有在 \fIname\fR中字符。如果在 \fIname\fR 的最后的那个元素中没有点号则返回空串。 
+.TP
+\fBfile isdirectory \fIname\fR
+.
+如果文件 \fIname\fR  是一个目录则返回 \fB1\fR，否则返回 \fB0\fR。
+.TP
+\fBfile isfile \fIname\fR
+.
+如果文件 \fIname\fR  是一个普通文件则返回 \fB1\fR，否则返回 \fB0\fR。
+.TP
+\fBfile join \fIname\fR ?\fIname ...\fR?
+.
+接受一个或多个文件名并使用对当前平台正确的路径分隔符来组合它们。如果特定的 \fIname\fR是相对的，则它会被连接到前面的文件名参数上。否则，丢弃所有以前的参数，从当前的参数开始进行连接。例如
+.RS
+.CS
+\fBfile join a b /foo bar\fR
+.CE
+返回 \fB/foo/bar\fR.
+.PP
+注意任何名字都可以包含分隔符，并且结果总是依从当前平台的规矩:  对 Unix 和 Windows 是 \fB/\fR，对 Macintosh 是 \fB:\fR。
+.RE
+.TP
+\fBfile lstat \fIname varName\fR
+.
+除了使用 \fIlstat\fR 调用而不使用 \fIstat \fR之外，与 \fBstat\fR  选项(见后)相同。这意味着如果 \fIname\fR 参照一个符号连接，在 \fIvarName\fR 中返回的信息是针对这个连接而不是它所引用的那个文件。在不支持符号连接的系统上这个选项的行为与 \fBstat\fR选项完全一致。               
+.TP
+\fBfile mkdir \fIdir\fR ?\fIdir\fR ...?
+.
+建立每个指定的目录。对于每个指定的路径名 \fIdir\fR  ，象 \fIdir\fR 自身一样，这个命令将建立所有不存在的父目录。如果指定了一个现存的目录，不做动作并不返回错误。尝试用一个目录覆写一个现存的文件将导致一个错误。参数按指定的次序被处理，如果有错误的话，在第一个错误处停止(halt)。
+.TP
+\fBfile mtime \fIname\fR ?\fItime\fR?
+.
+返回一个十进制字符串，给出文件 \fIname\fR上次被修改的时间。如果指定了\fItime\fR    
+，它是这个文件要设置成的修改时间。(等价与 Unix 的 \fBtouch\fR)。这个时间是用标准的 POSIX 方式(fashion)度量的，即从一个固定的开始时间至今的秒数(通常是1970年1月1日)。如果文件不存在或它的修改时间不可查询或设置则生成一个错误。
+.TP
+\fBfile nativename \fIname\fR
+.
+返回文件的特定于平台的名字。如果这个文件名需要传递给特定于系统的调用，比如对在 Windows 下的 exec 或在 Macintosh 上的 AppleScript 将会有用。
+.TP
+\fBfile owned \fIname\fR 
+.
+如果文件 \fIname\fR  由当前用户所有则返回 \fB1\fR，否则返回 \fB0\fR。
+.TP
+\fBfile pathtype \fIname\fR
+.
+返回 \fBabsolute\fR、\fBrelative\fR、\fBvolumerelative \fR中的一个。如果 \fIname\fR  参照一个在指定卷上的指定文件，路径类型将是 \fBabsolute\fR。如果 \fIname\fR 参照一个相对当前工作目录的一个文件，则路径类型将是 \fBrelative\fR。如果 \fIname\fR 参照在指定卷上的相对于当前工作目录的一个文件，或者在当前工作卷上的指定文件，则路径类型是 \fBvolumerelative\fR。
+.TP
+\fBfile readable \fIname\fR
+.
+如果文件 \fIname\fR  对当前用户是可读的则返回 \fB1\fR，否则返回\fB0\fR。
+.TP
+\fBfile readlink \fIname\fR
+.
+返回由 \fIname\fR  给出的符号连接的值(比如，它指向的文件的名字)。如果 \fIname\fR 不是符号连接或它的值不可读，则返回一个错误。在不支持符号连接的系统上这个选项未定义。               
+.TP
+\fBfile rename \fR?\fB\-force\fR? ?\fB\-\|\-\fR? \fIsource\fR \fItarget\fR
+.TP
+\fBfile rename \fR?\fB\-force\fR? ?\fB\-\|\-\fR? \fIsource\fR ?\fIsource\fR ...? \fItargetDir\fR
+.RS
+第一种形式接受由路径名\fIsource\fR 指定的文件或目录并且把它重命名成 \fItarget\fR，如果路径名 \fItarget\fR指定了在不同目录下的一个名字，则移动这个文件。如果 \fItarget\fR 是一个现存的目录，则使用第二种形式。第二中形式移动每个 \fIsource\fR 文件或目录到目录 \fItargetDir \fR中。除非指定了\fB-force\fR选项否则不覆写现存的文件。尝试覆写一个非空目录，用一个文件覆写一个目录，或者用一个目录覆写一个文件将导致错误。参数按指定的次序被处理，如果有错误的话，在第一个错误处停止(halt)。一个 \fB\-\|\-\fR 标记选项的结束；在 \fB\-\|\-\fR  之后的参数即使以 \fB\- \fR开始将仍被作为一个 \fIsource\fR 来对待。         
+.RE
+.TP
+\fBfile rootname \fIname\fR
+.
+返回 \fIname\fR  的最后一个组成部分的最后一个“.”之前但不包括这个“.”的 \fIname\fR中的所有字符。如果 \fIname\fR 的最后的组成部分不包含点号，则返回 \fIname\fR。
+.TP
+\fBfile size \fIname\fR
+.
+返回给出文件 \fIname\fR 的大小的以字节为单位的一个十进制字符串。如果文件不存在或它的大小不可查询则生成一个错误。      
+.TP
+\fBfile split \fIname\fR
+.
+返回一个列表，它的元素是在 \fIname \fR中的路径的组成部分。列表的第一个元素将与  \fIname \fR有相同的路径类型。所有其他元素将是相对的。除了需要确保一个元素是相对的而无歧义之外，丢弃路径分隔符。例如，在 Unix 下                
+.RS
+.CS
+\fBfile split /foo/~bar/baz\fR
+.CE
+返回 \fB/  foo  ./~bar  baz\fR   来确保以后的命令在第三个组成部分上不进行波浪线替换。
+.RE
+.TP
+\fBfile stat  \fIname varName\fR
+.
+在 \fIname \fR上调用 \fBstat\fR  内核调用，并且使用由 \fIvarName\fR 给出的变量来持有从内核调用返回的信息。\fIVarName\fR 被作为一个数组变量来对待，并且给这个变量设置下列元素: \fBatime\fR、\fBctime\fR、\fBdev\fR、\fBgid\fR、\fBino\fR、\fBmode\fR、\fBmtime\fR、\fBnlink\fR、\fBsize\fR、\fBtype\fR、\fBuid\fR。除了 \fBtype\fR之外的每个元素都是一个十进制字符串，它们的值来自从 \fBstat\fR 返回的结构中相应的字段。这些值的意义详见 \fBstat\fR 的手册条目。\fBtype\fR  元素给出的文件类型与命令 \fBfile type  \fR返回的有相同的形式。这个命令返回一个空串。
+.TP
+\fBfile tail \fIname\fR
+.
+返回在最后一个目录分隔符之后的在 \fIname\fR中的所有字符。如果 \fIname\fR  不包含分隔符则返回\fIname\fR。
+.TP
+\fBfile type \fIname\fR
+.
+返回给出文件 \fIname \fR的类型的一个字符串，它将是\fBfile\fR、\fBdirectory\fR、\fBcharacterSpecial\fR、 \fBblockSpecial\fR、\fBfifo\fR、\fBlink\fR、或 \fBsocket\fR 中的一个。   
+.TP
+\fBfile volume\fR
+. 
+返回一个适当的 Tcl 列表，给出到挂装在系统上的卷的绝对路径。在Macintosh上，将是挂装驱动器的一个列表，包括本地的和网络的二者。N.B.(?)如果两个驱动器有相同的名字，它们都将出现在卷列表上，但当前没有办法从Tcl 来访问除了第一个之外的任何驱动器。在 UNIX 上，命令将总是返回 "/"，因为所有文件系统都是本地挂装的。在 Windows 上，它将返回可获得的本地驱动器的一个列表(比如，{a:/ c:/})。                
+.TP
+\fBfile writable \fIname\fR
+.
+如果文件 \fIname\fR  对当前用户是可写的则返回 \fB1\fR，否则返回 \fB0\fR。   
+.SH "移植要点 PORTABILITY ISSUES"
+.TP
+\fBUnix\fR\0\0\0\0\0\0\0
+.
+这些命令总是使用真实用户和组标识而不使用有效用户和组标识。
+
+.SH "参见 SEE ALSO"
+filename
+
+.SH "关键字 KEYWORDS"
+attributes, copy files, delete files, directory, file, move files, name, rename files, stat
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/21
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

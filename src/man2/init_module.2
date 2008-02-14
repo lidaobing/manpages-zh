@@ -1,0 +1,53 @@
+.TH	init_module ""
+.SH NAME
+init_module - 初始化一条可加载模块的记录.
+.SH 总览
+.B #include <linux/module.h>
+.sp
+int init_module(const char *name, struct module *image);
+.SH 描述
+init_module加载已被重定位的模块映象到内核空间,并运行模块的初始化函数.
+模块映象以module结构开始,紧跟着代码和数据,module定义如下:
+       struct module                                              
+       {
+         unsigned long size_of_struct; /* module结构的大小 */
+         struct module *next; /*指向下一个module结构 */
+         const char *name; /* 模块名字 */
+         unsigned long size;
+         long usecount; /* 使用计数 */
+         unsigned long flags; /* 模块当前状态标志 */
+         unsigned int nsyms;
+         unsigned int ndeps; /* 正使用模块的模块个数 */
+         struct module_symbol *syms;
+         struct module_ref *deps;
+         struct module_ref *refs;
+         int (*init)(void); /* 模块的初始化函数指针 */
+         void (*cleanup)(void); /*模块的清除函数指针 */
+         const struct exception_table_entry *ex_table_start;
+         const struct exception_table_entry *ex_table_end;
+       #ifdef __alpha__
+         unsigned long gp;
+       #endif
+       };
+除了next和refs外,所有的指针被期望指在模块体内, 
+该系统调用只对超级用户开放.
+.SH 返回值
+成功时返回0,错误时返回 -1,errno被相应设置.
+.SH 错误
+.TP
+EPERM
+    用户不是超级用户.
+.TP
+ENOENT
+    name指定的模块不存在.
+.TP
+EINVAL
+.TP
+EBUSY
+    模块的初始化函数失败.
+.TP
+EFAULT
+    name或image越出了程序可访问的地址空间.
+
+.SH  
+      "雷勇" <nsinit@263.net>

@@ -1,0 +1,362 @@
+'\"
+'\" Copyright (c) 1995-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: filename.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: filename.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH filename n 7.5 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+filename \- Tcl 命令支持的文件名转换
+.BE
+.SH INTRODUCTION
+.PP
+所有接受文件名作为参数的 Tcl 命令和 C 过程希望文件名是依赖于当前平台的三种形式之一。在每种平台上，Tcl 都支持这种平台上的标准形式的文件名。额外的，在所有平台上，Tcl 支持一种 Unix 式的语法，提供了一种方便的方式来构造简单的文件名。但是，打算被移植的脚本不要假定特定形式的文件名。可移植的脚本必须使用 \fBfile split\fR 和 \fBfile join\fR 命令来操纵文件名(详见\fBfile\fR 的手册条目)。
+
+
+.SH "路径类型 PATH TYPES"
+.PP
+基于用来指定文件的路径的起点，文件名被组织成三种一般类型: 绝对，相对，相对-卷。绝对名字是完全限定的(qualified)，给出的到文件的路径相对于一个特定的卷和在这个卷上的根目录。相对名字是未限定的，给出的到文件的路径相对于当前的工作目录。相对-卷名字是部分限定的，给出的路径要么相对在当前卷上的根目录，要么相对于在指定卷上的当前目录。使用 \fBfile pathtype\fR 命令来确定一个给定路径的类型。
+
+.SH "路径语法 PATH SYNTAX"
+.PP
+本地名字的规则依赖于在 Tcl 数组元素 \fBtcl_platform(platform) \fR中报告的值:
+.TP 10
+\fBmac\fR
+在 Apple Macintosh 系统上，Tcl  支持两种形式的路径名。常规 Mac 式样的名字使用分号作为路径分隔符。路径可以是相对的或绝对的，并且文件名中可以包含除了分号之外的任何字符。一个前导的分号导致路径的剩余部分被解释成相对当前目录。如果一个路径包含一个不在开始处的分号，则路径被解释成一个绝对路径。在路径中任何地方的两个或多个分号的序列被用做构造相对路径，这里的 \fB::\fR 参照当前目录的父目录，\fB:::\fR 参照父目录的父目录，以此类推。
+.RS
+.PP
+除了 Macintosh 式样的名字，Tcl 还支持 Unix 式名字的一个子集。如果一个路径不包含分号，则把它按一个  Unix 路径来解释。使用斜杠作为路径分隔符。文件名 \fB\&.\fR 参照当前目录，而 \fB\&..\fR 参照当前目录的父目录。但是，象 \fB/\fR 或 \fB/..\fR的一些名字没有映射，并被作为 Macintosh 名字解释。一般的，生成文件名的命令返回 Macintosh 式样的名字，而接收文件名的命令接受 Macintosh 和 Unix 式样的两种名字。
+.PP
+下列例子展示不同形式的路径名:
+.TP 15
+\fB:\fR
+到当前文件夹(folder)的相对路径。
+.TP 15
+\fBMyFile\fR
+到在当前文件夹中的叫 \fBMyFile\fR的一个文件的相对路径。
+.TP 15
+\fBMyDisk:MyFile\fR
+到在叫 \fBMyDisk \fR的设备上的一个叫 \fBMyFile\fR 的文件的绝对路径。.
+.TP 15
+\fB:MyDir:MyFile\fR
+到在当前文件夹中的一个叫 \fBMyDir\fR的文件夹中的一个叫 \fBMyFile\fR 的文件的相对路径。
+.TP 15
+\fB::MyFile\fR
+到在当前文件夹的上层文件夹中的一个叫 \fBMyFile\fR 的文件的相对路径。
+.TP 15
+\fB:::MyFile\fR
+到在当前文件夹的上两层文件夹中的一个叫 \fBMyFile\fR 的文件的相对路径。
+.TP 15
+\fB/MyDisk/MyFile\fR
+在叫 \fBMyDisk \fR的设备上的一个叫 \fBMyFile\fR 的文件的绝对路径。
+.TP 15
+\fB\&../MyFile\fR
+到在当前文件夹的上层文件夹中的一个叫 \fBMyFile\fR 的文件的相对路径。
+.RE
+.TP
+\fBunix\fR
+在 Unix 平台上，Tcl 使用的路径名的组成部分由斜杠来分隔。路径名可以是相对的或绝对的，并且文件名可以包含除斜杠之外的任何字符。文件名 \fB\&.\fR 和 \fB\&..\fR  是特殊的并且分别参照当前目录和当前目录的父目录。多个毗接的(adjacent)的斜杠被解释为一个单一的分隔符。下列例子展示不同形式的路径名:
+.RS
+.TP 15
+\fB/\fR
+到根目录的绝对路径。
+.TP 15
+\fB/etc/passwd\fR
+到在根目录中的 \fBetc\fR 目录中的一个叫 \fBpasswd\fR 的文件的绝对路径。
+.TP 15
+\fB\&.\fR
+到当前目录的相对路径。
+.TP 15
+\fBfoo\fR
+Relative path to the file \fBfoo\fR in the current directory.
+.TP 15
+\fBfoo/bar\fR
+到在当前目录中的一个叫 \fBfoo\fR 的文件的相对路径。
+.TP 15
+\fB\&../foo\fR
+到在当前目录中的目录 \fBfoo\fR 目录中的一个叫 \fBbar\fR 的文件的相对路径。
+.RE
+.TP
+\fBwindows\fR
+在 Microsoft Windows 平台上，Tcl 支持相对驱动器和 UNC 式样的名字两者。\fB/\fR 和 \fB\e\fR 二者都可用在两种类型的名字中做分隔符。相对驱动器的名字由可选的驱动器指定符(specifier)和随后的绝对或相对的路径组成。UNC 路径依从 \fB\e\eservername\esharename\epath\efile\fR 的一般形式。在两种形式中，文件名 \fB.\fR 和 \fB..\fR 是特殊的并且分别参照当前目录和当前目录的父目录。下列例子展示不同形式的路径名:
+.RS
+.TP 15
+\fB\&\e\eHost\eshare/file\fR
+到在主机 \fBHost \fR上的导出点 \fBshare\fR 的根目录中的一个叫 \fBfile\fR 的文件的绝对 UNC 路径。
+.TP 15
+\fBc:foo\fR
+到在驱动器 \fBc \fR上的当前目录中的一个叫 \fBfoo\fR 的文件的相对卷的路径。
+.TP 15
+\fBc:/foo\fR
+到在当前卷上的当前目录中 \fBfoo\fR 目录中一个叫 \fBbar\fR 的文件的绝对路径。
+.TP 15
+\fBfoo\ebar\fR
+到在当前卷上的当前目录中 \fBfoo\fR 目录中一个叫 \fBbar\fR 的文件的相对路径。
+.TP 15
+\fB\&\efoo\fR
+到在当前卷的根目录中的一个叫 \fBfoo\fR 的文件的相对卷的路径。
+.RE
+
+.SH "波浪线替换 TILDE SUBSTITUTION"
+.PP
+除了上述文件名规则之外，Tcl 还支持 csh 式样的波浪线替换。如果一个文件名以一个波浪线开始，则按文件名的第一个元素被给定用户的主目录的位置所替换来解释。如果波浪线之后立即跟随着一个分隔符，则用 \fB$HOME\fR 环境变量来替换。否则在波浪线和下一个分隔符之间的的字符被接受为一个用户名，它被用来检索用于替换的用户的主目录。
+.PP
+Macintosh 和 Windows 不支持对波浪线跟随一个用户名的波浪线替换。在这些平台上，使用波浪线并跟随一个用户名的尝试将生成一个错误。有一个波浪线而没有用户名的文件名将象 Unix 一样使用 \fB$HOME\fR 环境变量来替换。
+
+.SH "移植要点 PORTABILITY ISSUES"
+.PP
+注意所有的文件系统都是大小写敏感的，所以脚本应避免依赖于在文件名中的字符大小写的代码。额外的，在不同设备上允许的字符集可能不同，所以脚本脚本应选择不包含特殊字符如 \fB<>:"/\e|\fR 的文件名。最安全的方式是只使用由字母组成的用户名。还有 Windows 3.1 只支持有不多于8个字符的根和不多于3个字符的扩展的文件名。
+
+.SH "关键字 KEYWORDS"
+current directory, absolute file name, relative file name,
+volume-relative file name, portability
+
+.SH "参见 SEE ALSO"
+file(n), glob(n)
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/08/28
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

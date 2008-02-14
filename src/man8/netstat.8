@@ -1,0 +1,435 @@
+.\"
+.\" netstat.8 
+.\"
+.\" Original: (mdw@tc.cornell.edu & dc6iq@insu1.etec.uni-karlsruhe.de)
+.\"
+.\" Modified: Bernd.Eckenfels@inka.de
+.\" Modified: Andi Kleen ak@muc.de 
+.\" Modified: Tuan Hoang tqhoang@bigfoot.com 
+.\"
+.\"
+.TH NETSTAT 8 "19 December 2000" "net-tools" "Linux Programmer's Manual"
+
+.SH NAME
+netstat \- 显示网络连接，路由表，接口状态，伪装连接，网络链路信息和组播成员组。
+.SH 总览 SYNOPSIS
+
+.B netstat 
+.RI [ address_family_options ]
+.RB [ \-\-tcp | \-t ]
+.RB [ \-\-udp | \-u ]
+.RB [ \-\-raw | \-w ]
+.RB [ \-\-listening | \-l ]
+.RB [ \-\-all | \-a ]
+.RB [ \-\-numeric | \-n ]
+.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
+.RB [ \-\-symbolic | \-N ]
+.RB [ \-\-extend | \-e  [ \-\-extend | \-e] ]
+.RB [ \-\-timers | \-o ]
+.RB [ \-\-program | \-p ]
+.RB [ \-\-verbose | \-v ]
+.RB [ \-\-continuous | \-c]
+.RB [delay]
+.P
+.B netstat 
+.RB { \-\-route | \-r }
+.RI [ address_family_options ]
+.RB [ \-\-extend | \-e  [ \-\-extend | \-e] ]
+.RB [ \-\-verbose | \-v ]
+.RB [ \-\-numeric | \-n ]
+.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
+.RB [ \-\-continuous | \-c]
+.RB [delay]
+.P
+.B netstat
+.RB { \-\-interfaces | \-i }
+.RI [ iface ]
+.RB [ \-\-all | \-a ]
+.RB [ \-\-extend | \-e  [ \-\-extend | \-e] ]
+.RB [ \-\-verbose | \-v ]
+.RB [ \-\-program | \-p ]
+.RB [ \-\-numeric | \-n ]
+.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
+.RB [ \-\-continuous | \-c]
+.RB [delay]
+.P
+.B netstat
+.RB { \-\-groups | \-g }
+.RB [ \-\-numeric | \-n ]
+.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
+.RB [ \-\-continuous | \-c]
+.RB [delay]
+.P
+.B netstat
+.RB { \-\-masquerade | \-M }
+.RB [ \-\-extend | \-e ]
+.RB [ \-\-numeric | \-n ]
+.RB [ \-\-numeric-hosts ] [ \-\-numeric-ports ] [ \-\-numeric-ports ]
+.RB [ \-\-continuous | \-c]
+.RB [delay]
+.P
+.B netstat
+.RB { \-\-statistics | -s }
+.RB [ \-\-tcp | \-t ]
+.RB [ \-\-udp | \-u ]
+.RB [ \-\-raw | \-w ]
+.RB [delay]
+.P
+.B netstat 
+.RB { \-\-version | \-V }
+.P
+.B netstat 
+.RB { \-\-help | \-h }
+.P
+.IR address_family_options :
+.PP
+.RB [ \-\-protocol= { inet , unix , ipx , ax25 , netrom , ddp }[, ...] ]
+.RB [ \-\-unix | \-x ] 
+.RB [ \-\-inet | \-\-ip ]
+.RB [ \-\-ax25 ]
+.RB [ \-\-ipx ] 
+.RB [ \-\-netrom ]
+.RB [ \-\-ddp ]
+
+.SH 描述 DESCRIPTION
+.B Netstat
+程序显示Linux网络子系统的信息。 输出信息的类型是由第一个参数控制的，就像这样：
+.SS (none)
+无选项时,
+.B netstat 
+显示打开的套接字.  如果不指定任何地址族，那么打印出所有已配置地址族的有效套接字。
+.SS "\-\-route , \-r"
+显示内核路由表。
+.SS "\-\-groups , \-g"
+显示IPv4 和 IPv6的IGMP组播组成员关系信息。
+.SS "\-\-interface=\fIiface \fR, \fB\-i"
+显示所有网络接口列表或者是指定的
+.IR iface 
+。
+.SS "\-\-masquerade , \-M"
+显示一份所有经伪装的会话列表。
+.SS "\-\-statistics , \-s"
+显示每种协议的统计信息。
+.SH 选项 OPTIONS
+.SS "\-\-verbose , \-v"
+详细模式运行。特别是打印一些关于未配置地址族的有用信息。
+.SS "\-\-numeric , \-n"
+显示数字形式地址而不是去解析主机、端口或用户名。
+.SS "\-\-numeric-hosts"
+显示数字形式的主机但是不影响端口或用户名的解析。
+.SS "\-\-numeric-ports"
+显示数字端口号，但是不影响主机或用户名的解析。
+.SS "\-\-numeric-users"
+显示数字的用户ID，但是不影响主机和端口名的解析。
+.SS "\-\-protocol=\fIfamily \fR, \fB\-A"
+指定要显示哪些连接的地址族(也许在底层协议中可以更好地描述)。
+.I family 
+以逗号分隔的地址族列表，比如
+.BR inet , 
+.BR unix , 
+.BR ipx , 
+.BR ax25 , 
+.BR netrom ,
+和
+.BR ddp 。
+这样和使用
+.BR \-\-inet ,
+.BR \-\-unix " (" \-x ),
+.BR \-\-ipx ,
+.BR \-\-ax25 ,
+.BR \-\-netrom ,
+和
+.B \-\-ddp 
+选项效果相同。
+.P
+地址族
+.B inet
+包括raw, udp 和tcp 协议套接字。
+.SS "\-c, \-\-continuous"
+将使
+.B netstat
+不断地每秒输出所选的信息。
+.SS "\-e, \-\-extend"
+显示附加信息。使用这个选项两次来获得所有细节。
+.SS "\-o, \-\-timers"
+包含与网络定时器有关的信息。
+.SS "\-p, \-\-program"
+显示套接字所属进程的PID和名称。
+.SS "\-l, \-\-listening"
+只显示正在侦听的套接字(这是默认的选项)
+.SS "\-a, \-\-all"
+显示所有正在或不在侦听的套接字。加上
+.B --interfaces
+选项将显示没有标记的接口。
+.SS "\-F"
+显示FIB中的路由信息。(这是默认的选项)
+.SS "\-C"
+显示路由缓冲中的路由信息。
+.SS delay
+netstat将循环输出统计信息，每隔
+.B delay 
+秒。
+.P
+.SH 输出 OUTPUT
+.P
+.SS 活动的Internet网络连接 \fR(TCP, UDP, raw)\fR
+.SS "Proto" 
+套接字使用的协议。
+.SS "Recv-Q"
+连接此套接字的用户程序未拷贝的字节数。
+.SS "Send-Q"
+远程主机未确认的字节数。
+.SS "Local Address" 
+套接字的本地地址(本地主机名)和端口号。除非给定-n
+.BR \-\-numeric " (" \-n )
+选项，否则套接字地址按标准主机名(FQDN)进行解析，而端口号则转换到相应的服务名。
+.SS "Foreign Address"
+套接字的远程地址(远程主机名)和端口号。
+Analogous to "Local Address."
+.SS "State"
+套接字的状态。因为在RAW协议中没有状态，而且UDP也不用状态信息，所以此行留空。通常它为以下几个值之一：
+.TP
+.I
+ESTABLISHED
+套接字有一个有效连接。
+.TP
+.I
+SYN_SENT
+套接字尝试建立一个连接。
+.TP
+.I
+SYN_RECV
+从网络上收到一个连接请求。
+.TP
+.I
+FIN_WAIT1
+套接字已关闭，连接正在断开。
+.TP
+.I
+FIN_WAIT2
+连接已关闭，套接字等待远程方中止。
+.TP
+.I
+TIME_WAIT
+在关闭之后，套接字等待处理仍然在网络中的分组
+.TP
+.I
+CLOSED
+套接字未用。
+.TP
+.I
+CLOSE_WAIT
+远程方已关闭，等待套接字关闭。
+.TP
+.I
+LAST_ACK
+远程方中止，套接字已关闭。等待确认。
+.TP
+.I
+LISTEN
+套接字监听进来的连接。如果不设置
+.BR \-\-listening " (" \-l )
+或者
+.BR \-\-all " (" \-a )
+选项，将不显示出来这些连接。
+.TP
+.I
+CLOSING
+套接字都已关闭，而还未把所有数据发出。
+.TP
+.I
+UNKNOWN
+套接字状态未知。
+.SS "User"
+套接字属主的名称或UID。
+.SS "PID/Program name"
+以斜线分隔的处理套接字程序的PID及进程名。
+.B --program
+使此栏目被显示。你需要
+.I superuser
+权限来查看不是你拥有的套接字的信息。对IPX套接字还无法获得此信息。
+.SS "Timer"
+(this needs to be written)
+.P
+.SS 活动的UNIX域套接字
+.SS "Proto" 
+套接字所用的协议(通常是unix)。
+.SS "RefCnt"
+使用数量(也就是通过此套接字连接的进程数)。
+.SS "Flags"
+显示的标志为SO_ACCEPTON(显示为
+.BR ACC ),
+SO_WAITDATA 
+.RB ( W )
+或 SO_NOSPACE 
+.RB ( N )。
+如果相应的进程等待一个连接请求，那么SO_ACCECPTON用于未连接的套接字。其它标志通常并不重要
+.SS "Type"
+套接字使用的一些类型：
+.TP
+.I
+SOCK_DGRAM
+此套接字用于数据报(无连接)模式。
+.TP
+.I
+SOCK_STREAM
+流模式(连接)套接字
+.TP
+.I
+SOCK_RAW
+此套接字用于RAW模式。
+.TP
+.I
+SOCK_RDM
+一种服务可靠性传递信息。
+.TP
+.I
+SOCK_SEQPACKET
+连续分组套接字。
+.TP
+.I
+SOCK_PACKET
+RAW接口使用套接字。
+.TP
+.I
+UNKNOWN
+将来谁知道它的话将告诉我们，就填在这里 :-)
+.PP
+.SS "State"
+此字段包含以下关键字之一：
+.TP
+.I FREE
+套接字未分配。
+.TP
+.I LISTENING 
+套接字正在监听一个连接请求。除非设置
+.BR \-\-listening " (" \-l )
+或者
+.BR \-\-all " (" \-a )
+选项，否则不显示。
+.TP
+.I CONNECTING
+套接字正要建立连接。
+.TP
+.I CONNECTED
+套接字已连接。
+.TP
+.I DISCONNECTING
+套接字已断开。
+.TP
+.I (empty)
+套接字未连。
+.TP
+.I UNKNOWN
+！不应当出现这种状态的。
+.SS "PID/Program name"
+处理此套接字的程序进程名和PID。上面关于活动的Internet连接的部分有更详细的信息。
+.SS "Path"
+当相应进程连入套接字时显示路径名。
+.P
+.SS 活动的IPX套接字
+(this needs to be done by somebody who knows it)
+.P
+.SS Active NET/ROM sockets
+(this needs to be done by somebody who knows it)
+.P
+.SS Active AX.25 sockets
+(this needs to be done by somebody who knows it)
+.PP
+.SH 注意 NOTES
+从linux 2.2内核开始
+.B netstat -i 
+不再显示别名接口的统计信息。要获得每个别名接口的计数器，则需要用
+.BR ipchains(8) 
+命令。 
+
+.SH 文件 FILES
+.ta
+.I /etc/services
+-- 服务解释文件
+
+.I /proc
+-- proc文件系统的挂载点。proc文件系统通过下列文件给出了内核状态信息。
+
+.I /proc/net/dev
+-- 设备信息
+
+.I /proc/net/raw
+-- RAW套接字信息
+
+.I /proc/net/tcp
+-- TCP套接字信息
+
+.I /proc/net/udp
+-- UDP套接字信息
+
+.I /proc/net/igmp
+-- IGMP组播信息
+
+.I /proc/net/unix
+-- Unix域套接字信息
+
+.I /proc/net/ipx
+-- IPX套接字信息
+
+.I /proc/net/ax25
+-- AX25套接字信息
+
+.I /proc/net/appletalk
+-- DDP(appletalk)套接字信息
+
+.I /proc/net/nr
+-- NET/ROM套接字信息
+
+.I /proc/net/route
+-- IP路由信息
+
+.I /proc/net/ax25_route
+-- AX25路由信息
+
+.I /proc/net/ipx_route
+-- IPX路由信息
+
+.I /proc/net/nr_nodes
+-- NET/ROM节点列表
+
+.I /proc/net/nr_neigh
+-- NET/ROM邻站
+
+.I /proc/net/ip_masquerade
+-- 伪装连接
+
+.I /proc/net/snmp
+-- 统计
+.fi
+.P
+.SH 参见 SEE ALSO
+.BR route (8), 
+.BR ifconfig (8), 
+.BR ipchains (8),
+.BR iptables (8),
+.BR proc (5)
+.P
+.SH BUGS
+有时如果一个套接字在查看中发生了改变，会显示一些奇怪的信息。
+一般不会发生这种情况。
+.P
+.SH 作者 AUTHORS
+netstat 程序是 Fred Baumgarten<dc6iq@insu1.etec.uni-karlsruhe.de> 的作品。
+
+手册页是Matt Welsh <mdw@tc.cornell.edu> 写的。
+
+Alan Cox <Alan.Cox@linux.org> 做了一些更新，但是还需要做更多工作。
+
+Tuan Hoang<tqhoang@bigfoot.com> 又做了一些更新。
+
+.br
+Bernd Eckenfels <ecki@linux.de> 彻底重写了手册页和net-tools工具包中的命令。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 
+

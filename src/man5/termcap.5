@@ -1,0 +1,431 @@
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" Modified formatting Sat Jul 24 17:13:38 1993, Rik Faith (faith@cs.unc.edu)
+.\" Modified (extensions and corrections) Sun May  1 14:21:25 MET DST 1994 Michael Haardt
+.\"   If mistakes in the capabilities are found, please send a bug report to:
+.\"   michael@moria.de
+.\" Modified Mon Oct 21 17:47:19 EDT 1996 by Eric S. Raymond (esr@thyrsus.com)
+.TH TERMCAP 5 "" "Linux" "Linux Programmer's Manual"
+.SH NAME
+termcap \- 终端功能数据库
+.SH 描述 DESCRIPTION
+.B termcap 数据库是一个过时 (obsolete) 工具，用来描述以字符为单位的终端和打印机的功能。它之所以被保留，是为了兼容古老的程序；新程序应当使用
+.BR terminfo (5)
+数据库和相关的库。
+.LP
+.B /etc/termcap
+是一个 ASCII 文件 (数据库主控文件)，列出了许多不同类型终端的功能。程序可以读取它，来找到控制实际使用的终端的可视化属性的特定的脱逸字符 (escape code)。(终端的其他方面是 stty 处理的。)termcap 数据库按照 TERM 环境变量进行索引。
+.LP
+.B Termcap
+条目必须以单个逻辑行定义，在新行符处应当用 `\\' 来续行。字段以 `:' 分隔。每个条目的第一个字段从左边起始，包含一系列终端的名称，以 '|' 分隔。
+.LP
+第一个子字段可能 (在 4.3 及以前的 BSD termcap 条目中) 包含由两个字符组成的简称。这个简称可以由大写或小写字母组成。在 4.4BSD termcap 条目中，这个字段被忽略。
+.LP
+第二个子字段 (在较新的 4.4BSD 格式中是第一个字段) 包括环境变量 TERM 使用的名字。只能使用小写字母。可选的硬件功能应当通过附加一个连字符 (hyphen) 和后缀来标记。参见下面的范例。一般使用的后缀是 w (行宽超过 80 个字符)，am (自动加边)，nam (不自动加边)，和 rv (反转视频显示)。
+.LP
+第三个子字段包含一个对这个 termcap 条目的长的描述性的名字。
+.LP
+接下来的字段包含终端功能。任何连续的功能行必须从左边缩进一个指标符 (tab) 位置。
+.LP
+尽管没有定义顺序，建议你将布尔值写在最先，然后是数字值，最后是字符串值；按照字母排序，没有大小写之分。类似功能可以写在同一行。
+.LP
+.nf
+例如：
+.sp
+Head line: vt|vt101|DEC VT 101 terminal in 80 character mode:\e
+Head line: Vt|vt101-w|DEC VT 101 terminal in (wide) 132 character mode:\e
+Boolean: :bs:\e
+Numeric: :co#80:\e
+String: :sr=\eE[H:\e
+.SS "布尔值 Boolean Capabilities"
+.nf
+5i	打印机不在屏幕上回显
+am	自动加边，意味着自动卷行
+bs	Control-H (8 dec.) 执行一个退格 (backspace)
+bw	在行的左边退格回到上一行的右边
+da	显示保留在屏幕上方
+db	显示保留在屏幕下方
+eo	一个空格删除光标所在位置的所有字符
+es	工作在状态行的转义顺序 (escape sequence) 和特殊字符
+gn	普通设备
+hc	这是一个硬拷贝终端
+HC	光标不在底线时几乎看不见
+hs	有一个状态线
+hz	Hazeltine bug, 终端不能打印 ~ 符号
+in	终端插入空字符，不是空格，来填充空白
+km	终端有一个meta键
+mi	光标移动是工作在插入模式下
+ms	光标移动是工作在突出/下划线 (standout/underline) 模式
+NP	无填充字符
+NR	ti 不能反转为 te
+nx	无填充，必须使用 XON/XOFF
+os	终端能重击 (将光标置于要改变的字符下面，再通过键盘输入一个字符来替换原来的字符。)
+ul	终端不能被重击，只能下划线
+xb	蜂窝信号，f1 发射 ESCAPE, f2 发射 ^C
+xn	换行/返转信号
+xo	终端使用xon/xoff协议
+xs	打印的文字超过突出的文本，将显示在突出的位置
+xt	 Teleray 信号，破坏tabs 和奇数化突出模式(standout mode)
+.fi
+.SS "数字值 Numeric Capabilities"
+.nf
+co	列数
+dB	硬拷贝终端上退格 (backspace) 延时，以毫秒为单位
+dC	硬拷贝终端上回车 (carriage return) 延时，以毫秒为单位
+dF	硬拷贝终端上打印纸进纸 (form feed) 延时，以毫秒为单位
+dN	硬拷贝终端上新行符 (new line) 的延时，以毫秒为单位
+dT	硬拷贝终端上制表符停止位 (tabulator stop) 的延时，以毫秒为单位
+dV	硬拷贝终端上垂直制表符停止位的延时，以毫秒为单位
+it	tab 位置间的差分
+lh	软标签高度
+lm	内存线（Lines of memory）
+lw	软标签的宽度
+li	行数
+Nl	软标签的数目
+pb	需要填充的最低波特率
+sg	突出信号
+ug	下划线信号
+vt	虚拟终端数目
+ws	若状态线宽度与屏幕宽度不同时的大小
+.fi
+.SS "字符串值 String Capabilities"
+.nf
+!1	转义为保存键
+!2	转义为挂起键
+!3	转义为撤消键
+#1	转义为帮助键
+#2	转义为 home 键
+#3	转义为输入键
+#4	转义为光标左移键
+%0	重做 (redo) 键
+%1	帮助键
+%2	标记键
+%3	信息 (message) 键
+%4	转移键
+%5	下一对象 (next-object) 键
+%6	打开键
+%7	选项键
+%8	上一对象键
+%9	打印键
+%a	转义为信息 (message) 键
+%b	转义为转移键
+%c	转义为next键
+%d	转义为options键
+%e	转义为previous键
+%f	转义为打印键
+%g	转义为redo键
+%h	转义为替换键
+%i	转义为光标右移键
+%j	转义为恢复键
+&0	转义为取消键
+&1	参考键
+&2	刷新键
+&3	替换键
+&4	重新开始键
+&5	恢复键
+&6	保存键
+&7	挂起键
+&8	撤销键
+&9	转义为开始键
+*0	转义为查找键
+*1	转义为命令键
+*2	转义为拷贝键
+*3	转义为创建键
+*4	转义为删除字符
+*5	转义为删除行
+*6	选择键
+*7	转义为结束键
+*8	转义为清除行键
+*9	转义为退出键
+@0	查找键
+@1	开始键
+@2	取消键
+@3	关闭键
+@4	命令键
+@5	拷贝键
+@6	创建键
+@7	结束键
+@8	回车/发送键
+@9	退出键
+al	插入新行
+AL	缩进 %1 行
+ac	成对的图形字符块，映射替代的字符集
+ae	结束替代的字符集
+as	为图形字符块开始替代的字符集
+bc	退格，如果没有 ^H
+bl	铃声
+bt	移动到前一个tab停止位
+cb	从行的开始处清除到光标处
+cc	虚设命令字符
+cd	清除到屏幕的末端
+ce	清除到行末
+ch	水平移动光标到 %1列
+cl	清除屏幕并将光标置位
+cm	光标移动到%1行，%2列 (屏幕中)
+CM	光标移动到%1行，%2列 (内存中)
+cr	回车
+cs	翻滚区域，从%1行到%2行
+ct	清除tab
+cv	垂直移动光标到%1行
+dc	删除一个字符
+DC	删除%1个字符
+dl	删除一行
+DL	删除%1行
+dm	开始delete模式
+do	光标下移一行
+DO	光标下移#1行
+ds	使状态行不可用
+eA	激活替代的字符集
+ec	从光标处开始，删除%1个字符
+ed	结束delete模式
+ei	结束insert模式
+ff	硬拷贝终端上的走纸符
+fs	在进入状态行之前返回字符到他的位置
+F1	由功能键F11发送的字符串
+F2	由功能键F12发送的字符串
+F3	由功能键F14发送的字符串
+\&...	\&...
+F9	由功能键F19发送的字符串
+FA	由功能键F20发送的字符串
+FB	由功能键F21发送的字符串
+\&...	\&...
+FZ	由功能键F45发送的字符串
+Fa	由功能键F46发送的字符串
+Fb	由功能键F47发送的字符串
+\&...	\&...
+Fr	由功能键F63发送的字符串
+hd	移动光标到下一行的中间
+ho	光标置初始位
+hu	移动光标到上一行的中间
+i1	登录时，初始化的字符串1
+i3	登录时，初始化的字符串3
+is	登录时，初始化的字符串2
+ic	插入一个字符
+IC	插入%1个字符
+if	初始化文件
+im	开始插入模式
+ip	插入填充时间和插入后所需要的特殊字符
+iP	初始化程序
+K1	辅助键盘的上左键
+K2	辅助键盘的center键
+K3	辅助键盘的上右键
+K4	辅助键盘的底部左键
+K5	辅助键盘的底部右键
+k0	功能键0
+k1	功能键1
+k2	功能键2
+k3	功能键3
+k4	功能键4
+k5	功能键5
+k6	功能键6
+k7	功能键7
+k8	功能键8
+k9	功能键9
+k;	功能键10
+ka	清除所有的tab键
+kA	插入行键
+kb	退格键
+kB	退回tab停止位
+kC	清屏键
+kd	光标下移键
+kD	删除光标下的字符键
+ke	关闭辅助键盘
+kE	清除到行末
+kF	向前/后滚卷
+kh	光标置初始位键
+kH	光标hown down键
+kI	插入字符/插入模式键
+kl	光标左移键
+kL	整行删除键
+kM	退出插入模式
+kN	下一页
+kP	上一页
+kr	光标右移键
+kR	向后/前滚卷键
+ks	开辅助键盘
+kS	清除到屏幕末端
+kt	清除这个tab键
+kT	设置这儿的tab键
+ku	光标向上键
+l0	如果没有f0，第零个标签功能键
+l1	如果没有f1，第一个标签功能键
+l2	如果没有f2，第二个标签功能键
+\&...	\&...
+la	如果没有f10，第十个标签功能键
+le	光标左移一个字符
+ll	移动光标到左底角
+LE	光标左移%1个字符
+LF	 关闭软标签
+LO	开启软标签
+mb	开始闪烁
+MC	清除软标记
+md	开始粗体模式
+me	开始所有的模式如so, us, mb, md 和 mr
+mh	开始半闪烁模式
+mk	暗模式 (看不见字符)
+ML	设置左软标记
+mm	使终端为meta模式
+mo	使终端离开meta模式
+mp	打开保护属性
+mr	开始反亮模式
+MR	设置右软标记
+nd	光标右移一个字符
+nw	回车命令
+pc	填充字符
+pf	关闭打印机
+pk	对键%1编程，如同用户打印一样发送字符串%2
+pl	对键%1编程，以本地模式执行字符串%2
+pn	对软标签%1编程来显示字符串%2
+po	打开打印机
+pO	打开打印机%1 (<256)字节
+ps	在打印机上打印屏幕内容
+px	对键%1编程来发送字符串%2给计算机
+r1	向设定的终端重置字符串1到sane模式
+r2	向设定的终端重置字符串2到sane模式
+r3	向设定的终端重置字符串3到sane模式
+RA	取消自动标记功能
+rc	恢复存储的光标位置
+rf	重设字符串文件名
+RF	终端输入请求
+RI	光标右移%1个字符
+rp	重复字符%1，共%2次
+rP	替换模式中，在字符发送后填充
+rs	重设字符串
+RX	关闭XON/XOFF流量控制
+sa	设置 %1 %2 %3 %4 %5 %6 %7 %8 %9属性
+SA	激活自动标记功能
+sc	保存光标位置
+se	结束突出模式
+sf	正常滚卷一行
+SF	正常滚卷%1行
+so	开始突出模式
+sr	反向滚卷
+SR	向上滚卷%1行
+st	 设置所有行的制表符的停止位到当前列
+SX	打开XON/XOFF流量控制
+ta	移动到下一个硬件tab
+tc	 从另一个登记项读取终端描述
+te	结束使用光标动作的程序
+ti	开始光标动作的程序
+ts	移动光标到状态行的%1列
+uc	光标下方字符下划线，并向右移动光标
+ue	结束下划线
+up	光标向上一行
+UP	光标向上%1行
+us	开始下划线
+vb	可视化闹铃
+ve	正常的可见光标
+vi	光标不可见
+vs	突出光标
+wi	设置窗口，从%1行到%2行，从3%列到4%列
+XF	XOFF字符，如果没有 ^S
+.fi
+.LP
+还有一些方法定义字符串值功能的控制代码:
+.LP
+通常的字符表示它们自己，除了 '^','\' 和 '%' 。
+.LP
+一个 '^x' 表示Control-x.	Control-A等于 1 个10进制数。
+.LP
+\x  表示一个特殊的代码。x 可以是以下的一个字符:
+.RS
+E 转义符 Escape (27)
+.br
+n 换行 Linefeed (10)
+.br
+r 回车 Carriage return (13)
+.br
+t 制表符 Tabulation (9)
+.br
+b 退格 Backspace (8)
+.br
+f 走纸符 Form feed (12)
+.br
+0 空字符 Null character.  \exxx 指定八进制为 xxx 的字符.
+.RE
+.IP i
+逐一增加参数
+.IP r
+单个参数功能
+.IP +
+增加下一个字符的值到这个参数并以二进制输出
+.IP 2
+对于2，用一个字段将参数以ASCII输出
+.IP d
+对于3，用一个字段将参数以ASCII输出
+.IP %
+打印一个 '%'
+.LP
+如果你使用二进制输出，那么你应该避免空字符，因为它是字符串的终止符。如果Tab键能够成为一个参数的二进制输出，你应该重新设置Tab键长度。
+.IP 警告:
+以上参数的元字符是针对 Minix 系统的 termcap，可能有一些问题，因为可能不是完全与 Linux 的 termcap 兼容的。
+.LP
+图形字符块通过三个字符串值功能来指定：
+.IP as
+开始替代的字符集
+.IP ae
+结束
+.IP ac
+字符对。第一个字符是图形字符块的名称，第二个字符是它的定义。
+.LP
+可以用下面这些名称：
+.sp
+.nf
++	右箭头 right arrow (>)
+,	 左箭头 left arrow (<)
+\&.	下箭头 down arrow (v)
+0	全直角 full square (#)
+I	上箭头 latern (#)
+-	上箭头 upper arrow (^)
+\&'	菱形 rhombus (+)
+a	棋板 chess board (:)
+f	度数 degree (')
+g	加-减 plus-minus (#)
+h	正方形 square (#)
+j	右下角 right bottom corner (+)
+k	右上角 right upper corner (+)
+l	左上角 left upper corner (+)
+m	左下角 left bottom corner (+)
+n	十字 cross (+)
+o	顶线 upper horizontal line (-)
+q	中线 middle horizontal line (-)
+s	下划线 bottom horizontal line (_)
+t	左侧T型 left tee (+)
+u	右侧T型 right tee (+)
+v	底部T型 bottom tee (+)
+w	常规T型 normal tee (+)
+x	垂直线 vertical line (|)
+~	段落 paragraph (???)
+.fi
+.sp
+如果缺少相应功能，将缺省使用圆括号中的值，那是 curses 库使用的值。
+.SH "参见 SEE ALSO"
+.BR termcap (3),
+.BR curses (3),
+.BR terminfo (5)
+.SH "[中文版维护人]"
+.B Timebob <timebob@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000.12.15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

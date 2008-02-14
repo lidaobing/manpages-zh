@@ -1,0 +1,101 @@
+.\" Copyright (c) 1990, 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" This code is derived from software contributed to Berkeley by
+.\" Chris Torek and the American National Standards Committee X3,
+.\" on Information Processing Systems.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)fclose.3	6.7 (Berkeley) 6/29/91
+.\"
+.\" Converted for Linux, Mon Nov 29 15:19:14 1993, faith@cs.unc.edu
+.\"
+.\" Modified 2000-07-22 by Nicol??s Lichtmaier <nick@debian.org>
+.\"
+.TH FCLOSE 3  1993-11-29 "BSD MANPAGE" "Linux Programmer's Manual"
+.SH NAME
+fclose \- 关闭流
+.SH "SYNOPSIS 总览"
+.B #include <stdio.h>
+.sp
+.BI "int fclose(FILE *" stream );
+.SH "DESCRIPTION 描述"
+函数
+.B fclose
+将名为
+.I stream
+的流与它底层关联的文件或功能集合断开。如果流曾用作输出，任何缓冲的数据都将首先被写入，使用
+.BR fflush (3)
+。
+.SH "RETURN VALUE 返回值"
+成功执行返回 0，否则返回
+.B EOF
+并设置全局变量
+.I errno
+来指示错误发生。任何一种情况下，对流再进行存取 (包括再次调用
+.BR fclose "())"
+都会带来未定义的结果。
+.SH ERRORS
+.TP
+.B EBADF
+.I stream
+底层的文件描述符是无效的。
+.\"  This error cannot occur unless you are mixing ANSI C stdio operations and
+.\"  low-level file operations on the same stream. If you do get this error,
+.\"  you must have closed the stream's low-level file descriptor using
+.\"  something like close(fileno(fp)).
+.PP
+函数
+.B fclose
+也可能失败并置
+.I errno
+为
+.BR close (2),
+.BR write (2)
+或
+.BR fflush (3)
+指定的值。
+.SH "NOTES 要点"
+注意
+.B fclose
+仅仅刷新用户空间的由 C 库提供的缓冲。要保证数据被物理地存储到磁盘上，必须也刷新内核缓冲。例如，使用
+.BR sync (2)
+或
+.BR fsync (2).
+.SH "CONFORMING TO 标准参考"
+函数
+.B fclose
+遵循 ANSI X3.159-1989 (``ANSI C'') 标准。
+.SH "SEE ALSO 参见"
+.BR close (2),
+.BR fcloseall (3),
+.BR fflush (3),
+.BR fopen (3),
+.BR setbuf (3)

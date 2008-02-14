@@ -1,0 +1,84 @@
+.TH MKPASSWD 1 "22 August 1994"
+.SH NAME
+mkpasswd \- 为用户产生新口令
+.SH 总览 SYNOPSIS
+.B mkpasswd
+.I
+[
+.I args
+]
+[
+.I user
+]
+.SH 介绍 INTRODUCTION
+.B mkpasswd
+为用户产生口令并自动应用。它是基于O'Reilly的书\fI《Exploring Expect》\fR第23章中的代码的。
+.SH 用法 USAGE
+不带参数的话，
+.B mkpasswd
+返回一个新口令。带上用户名的话，
+.B mkpasswd
+为该用户分配一个新口令。
+.PP
+根据以下的标志可以随机性的产生口令。
+.SH 标志 FLAGS
+.B \-l
+标志定义口令长度。缺省值为9。以下示例建立一个20位的口令。
+
+	mkpasswd -l 20
+
+
+.B \-d
+标志定义口令必须包含的最少数字位数。缺省值为2。以下示例建立一个含3位数字的口令。
+
+	mkpasswd -d 3
+
+.B \-c
+标志定义口令必须包含的最少小写字母个数。缺省值为2。
+
+
+.B \-C
+标志定义口令必须包含的最少大写字母个数。缺省值也是2。
+
+The
+.B \-s
+flag defines the minimum number of special characters that must be in the password.
+The default is 1.
+
+
+.B \-p
+标志标明设立口令的程序。如果/etc/yppasswd存在的话则它为缺省值，否则就用/bin/passwd。
+
+
+.B \-2
+标志交换键盘上左右手的字母(我想就是左手输入g则为h吧)，以使别人更难监视输入的口令。这也使口令猜测程序更容易成功。(这句不懂，请高手指教！)
+
+
+.B \-v
+使设定口令的交互可见，但缺省是不可见的。
+
+.SH 示例 EXAMPLE
+以下示例建立一个15位包含至少3位数字和5位大写字符的口令。
+
+	mkpasswd -l 15 -d 3 -C 5
+
+.SH 另见 SEE ALSO
+.I
+Don Libes所写的由O'Reilly and Associates于1995年一月出版的
+《Exploring Expect:  A  Tcl-Based	 Toolkit  for  Automating Interactive  Programs》
+一书。
+
+
+.SH 作者 AUTHOR
+Don Libes，国家标准与技术学会(NIST)
+
+.B mkpasswd
+是公共域软件。如果本程序或者它的部分有用的话，将是NIST和我的荣誉。
+
+
+.SH [中文版维护人] 
+.B meaculpa <meaculpa@21cn.com>
+.SH [中文版最新更新] 
+.B 2001/02/24
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

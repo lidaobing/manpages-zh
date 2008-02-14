@@ -1,0 +1,113 @@
+.TH MINGETTY 8 "6 Apr 1996" "Debian-Local" "Linux Programmer's Manual"
+.SH NAME
+mingetty \- 控制台最小的 getty
+.SH 总览 SYNOPSIS
+.B mingetty
+[\-\-noclear] [\-\-nonewline] [\-\-noissue] [\-\-nohangup] [\-\-nohostname]
+[\-\-long\-hostname] [\-\-loginprog=/bin/login] [\-\-nice=10] [\-\-delay=5]
+[\-\-chdir=/home] [\-\-chroot=/chroot] [\-\-autologin username]
+.I tty
+.PP
+.SH 描述 DESCRIPTION
+.B mingetty 
+是一个用于虚拟终端的最小的 getty。不像
+.BR agetty (8)
+，
+.B mingetty
+不适于串行线。我建议使用
+.BR mgetty (8) 
+来替代。
+.PP
+.SH 选项 OPTIONS
+.TP
+.B \-\-noclear
+在提示输入用户名之前不进行清屏操作 (通常屏幕被清除)。
+.TP
+.B \-\-nonewline
+不在向 \fI/etc/issue\fR 输出之前打印一个信行符。
+.TP
+.B \-\-noissue
+不输出 /etc/issue.
+.TP
+.B \-\-nohangup
+不调用 vhangup() 来禁止其他应用程序对此 tty 的写入。
+.TP
+.B \-\-nohostname
+不在提示登录之前打印主机名。
+.TP
+.B \-\-long\-hostname
+默认情况下，主机名只打印第一个句点符 (dot) 前面的部分。允许这个选项之后，将显示 gethostname() 得到的全文。
+.TP
+.B \-\-loginprog /bin/login
+改变登录程序。
+.TP
+.B \-\-nice 10
+调用 nice() 来改变优先级。
+.TP
+.B \-\-delay 5
+启动 \fBmingetty\fR 之后，睡眠这么多秒。
+.TP
+.B \-\-chdir /home
+调用登录程序之前，切换到这个目录。
+.TP
+.B \-\-chroot /chroot
+调用 chroot() ，以这个目录名作为参数。
+.TP
+.B \-\-autologin username
+自动地以指定的用户登录，不询问用户名和密码。为此请检查
+.B /bin/login
+的 \-f 选项。
+.PP
+.SH "ISSUE ESCAPES"
+.B mingetty 
+可以识别下列可以内置于
+.I /etc/issue
+文件中的 escape 序列：
+.IP \fB\ed\fP
+插入当前日期 (本地时间)，
+.IP \fB\el\fP
+在
+.B mingetty 
+运行的终端插入一行，
+.IP \fB\em\fP
+插入机器体系结构 (\fIuname -m\fR)，
+.IP \fB\en\fP
+插入机器的网络节点主机名 (\fIuname -n\fR)，
+.IP \fB\eo\fP
+插入域名，
+.IP \fB\er\fP
+插入操作系统发行版信息 (\fIuname -r\fR)，
+.IP \fB\et\fP
+插入当前时间 (本地时间)，
+.IP \fB\es\fP
+插入操作系统名称，
+.IP \fB\eu\fP
+以及 \fB\eU\fP
+插入当前已登录的用户数。
+\\U 插入 "\fIn\fP users"，但是 \\u 只插入 "\fIn\fP"。
+.IP \fB\ev\fP
+插入操作系统版本号 (\fIuname -v\fR)，
+.PP
+.SH 范例 EXAMPLE
+"\fBLinux\ eos\ i386\ #1\ Tue\ Mar\ 19\ 21:54:09\ MET\ 1996\fP" 是将 "\fB\\s\ \\n\ \\m\ \\v\fP" 写入
+.IR /etc/issue
+产生的。
+.PP
+.SH 文件 FILES
+.IR /etc/issue ,
+.IR /var/run/utmp .
+.PP
+.SH "参见 SEE ALSO"
+.BR mgetty (8),
+.BR agetty (8).
+.PP
+.SH 作者 AUTHOR
+版权所有 1996 Florian La Roche <laroche@redhat.com>。
+David Frey <David.Frey@eos.lugs.ch> 和 Florian La Roche 书写了手册页。
+
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.B Nov 9 2000
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

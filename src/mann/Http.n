@@ -1,0 +1,571 @@
+'\"
+'\" Copyright (c) 1995-1997 Sun Microsystems, Inc.
+'\" Copyright (c) 1998-2000 by Ajuba Solutions.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH "Http" n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+Http \- HTTP/1.0 协议客户端的实现。
+.SH 总览 SYNOPSIS
+\fBpackage require http ?2.4?\fR
+.sp
+\fB::http::config \fI?options?\fR
+.sp
+\fB::http::geturl \fIurl ?options?\fR
+.sp
+\fB::http::formatQuery \fIlist\fR
+.sp
+\fB::http::reset \fItoken\fR
+.sp
+\fB::http::wait \fItoken\fR
+.sp
+\fB::http::status \fItoken\fR
+.sp
+\fB::http::size \fItoken\fR
+.sp
+\fB::http::code \fItoken\fR
+.sp
+\fB::http::ncode \fItoken\fR
+.sp
+\fB::http::data \fItoken\fR
+.sp
+\fB::http::error \fItoken\fR
+.sp
+\fB::http::cleanup \fItoken\fR
+.sp
+\fB::http::register \fIproto port command\fR
+.sp
+\fB::http::unregister \fIproto\fR
+.BE
+
+.SH 描述 DESCRIPTION
+.PP
+\fBhttp\fR包提供 HTTP/1.0 协议的客户端。这个包实现了 HTTP/1.0 的 GET、POST、和 HEAD 操作。它允许配置一个代理(proxy)主机来通过防火墙。这个包与 \fBSafesock\fR 安全策略相容，所以可以被不可信任的 applets 用来从一些受限制的主机做 URL 取回(fetching)。可以扩展这个包来支持附加的 HTTP 传输协议，比如 HTTPS，通过 \fBhttp::register\fR，提供一个定制的 \fBsocket\fR 命令。
+.PP
+\fB::http::geturl\fR 过程做一次 HTTP 事务(transaction)。它的 \fIoptions \fR (选项)确定完成 GET、POST、或 HEAD 事务中的那一个。\fB::http::geturl\fR 的返回值是这个事务的一个记号(token)。这个值也是在::http 名字空间中一个数组的名字，这个数组包含关于这个事务的信息。这个数组的元素在状态数组章节中描述。
+.PP
+如果指定了 \fB-command\fP 选项，则在后台做这个 HTTP 操作。\fB::http::geturl\fR 在生成一个 HTTP 请求和在事务完成时调用的回调过程(callback)之后立即返回。要使它工作，Tcl 事件循环必须是活跃的(active)。在 Tk 应用中总是真的。对于纯 Tcl 应用，调用者可以在调用 \fB::http::geturl\fR 之后使用 \fB::http::wait\fR 来启动事件循环。
+.SH 命令 COMMANDS
+.TP
+\fB::http::config\fP ?\fIoptions\fR?
+使用 \fB::http::config\fR 命令来设置和查询代理服务器的和端口的名字，和在 HTTP 请求中使用的用户代理(User-Agent)名字。如果未指定选项，则返回当前的配制。如果指定了一个单一的参数，则它应该是下面描述的标志之一。在这种情况下返回设置的当前值。否则，选项应该是定义配置的一系列标志和值:
+.RS
+.TP
+\fB\-accept\fP \fImimetypes\fP
+(指定)请求的接受(类型)头部(header)。缺省是 */*，这意味者接受所有类型的文档。否则你可以提供用逗号分隔的你想接收的 mime(多用途互连网邮件扩展)类型模式的一个列表。例如，"image/gif, image/jpeg, text/*"。
+.TP
+\fB\-proxyhost\fP \fIhostname\fP
+如果有代理服务器主机的话，它是代理服务器主机的名字。如果这个值是空串，则直接联系 URL 主机。
+.TP
+\fB\-proxyport\fP \fInumber\fP
+代理服务器端口。
+.TP
+\fB\-proxyfilter\fP \fIcommand\fP
+这个命令设置在 \fB::http::geturl\fR 期间的一个回调过程，用来决定是否为一个给定主机而要求一个代理服务器。在调用它的时候，向命令 \fIcommand\fR 添加的一个参数是主机名字。如果要求一个代理服务器，则这个回调过程应该返回一个有两个元素的数组，分别是代理服务器和代理服务端口。否则这个过滤器应该返回一个空列表。在 \fB\-proxyhost\fR 和 \fB\-proxyport\fR 设置非空的时候，缺省的过滤器返回它们的值。
+.TP
+\fB\-useragent\fP \fIstring\fP
+在 HTTP 请求中客户代理头部的值。缺省是 \fB"Tcl http client package 2.2."\fR
+.RE
+.TP
+\fB::http::geturl\fP \fIurl\fP ?\fIoptions\fP? 
+\fB::http::geturl\fR 命令是包中的主过程。\fB\-query\fR 选项导致一个 POST 操作，而 \fB\-validate\fR 选项导致一个 HEAD 操作；否则，进行一个 GET 操作。\fB::http::geturl\fR 命令返回一个 \fItoken\fR (记号)值，可用它来获得关于这次事务的信息。详情参见状态数组和错误章节。除非用 \fB\-command\fR 选项指定在 HTTP 事务完成时调用的一个回调过程，否则 \fB::http::geturl\fR 命令在操作完成之前一直阻塞。 \fB::http::geturl\fR 接受一些选项:
+.RS
+.TP
+\fB\-binary\fP \fIboolean\fP
+Specifies whether to force interpreting the url data as binary.  Normally
+this is auto-detected (anything not beginning with a \fBtext\fR content
+type or whose content encoding is \fBgzip\fR or \fBcompress\fR is
+considered binary data).
+.TP
+\fB\-blocksize\fP \fIsize\fP
+在读 URL 时使用块大小。一次最多读 \fIsize\fR 字节。读完每一块之后，调用 \fB\-progress\fR 回调过程(如果指定着这个选项的话)。
+.TP
+\fB\-channel\fP \fIname\fP
+复制 URL 内容到叫 \fIname\fR 的通道中而不是保存在 \fBstate(body)\fR 中。
+.TP
+\fB\-command\fP \fIcallback\fP
+在这次 HTTP 事务完成之后调用 \fIcallback\fP。这个选项导致 \fB::http::geturl\fP 立即返回。\fIcallback\fP 得到一个增添的参数，它是从 \fB::http::geturl\fR 返回的 \fItoken\fR (记号)。这个记号是在状态数组章节中描述的一个数组的名字。下面是这个回调过程的一个模版:
+.RS
+.CS
+proc httpCallback {token} {
+    upvar #0 $token state
+    # Access state as a Tcl array
+}
+.CE
+.RE
+.TP
+\fB\-handler\fP \fIcallback\fP
+在可获得 HTTP 数据的时候调用 \fIcallback\fP ；如果(这个回调)存在，则不对 HTTP 数据做其他任何事情。这个过程得到两个增添的参数: 给这些 HTTP 数据的套接口和从 \fB::http::geturl\fR 返回的 \fItoken\fR 。这个记号是在状态数组章节中描述的一个数组的名字。回调过程应返回从这个套接口中读到的字节数目。下面是这个回调过程的一个模版:
+.RS
+.CS
+proc httpHandlerCallback {socket token} {
+    upvar #0 $token state
+    # Access socket, and state as a Tcl array
+    ...
+    (example: set data [read $socket 1000];set nbytes [string length $data])
+    ...
+    return nbytes
+}
+.CE
+.RE
+.TP
+\fB\-headers\fP \fIkeyvaluelist\fP
+使用这个选项来给 HTTP 请求增加额外的头部。\fIkeyvaluelist\fR 参数必须是有偶数个元素的一个列表，这些元素是交替的键(key)和值。这些键变成头部的字段名字。从这些值中去除(strip)换行符，所以头部不会被中断(corrupt)。例如，如果 \fIkeyvaluelist\fR 是 \fBPragma no-cache\fR 则在 HTTP 请求中包含下列头部:
+.CS
+Pragma: no-cache
+.CE
+.TP
+\fB\-progress\fP \fIcallback\fP
+每次从 URL 传输数据之后调用这个 \fIcallback\fR。这个调用得到三个增添的参数: 从 \fB::http::geturl\fR 得来的 \fItoken\fR，从 \fBContent-Length\fR 元(meta)数据得来的期望的内容总体大小，和迄今为止传输的字节数。期望的总体大小可以是未知的，在这种情况下向这个回调传递零。下面是这个回调过程的一个模版:
+.RS
+.CS
+proc httpProgress {token total current} {
+    upvar #0 $token state
+}
+.CE
+.RE
+.TP
+\fB\-query\fP \fIquery\fP
+这个标志导致 \fB::http::geturl\fR 去做向服务器传递 \fIquery\fR 的一次 POST 请求。这个 \fIquery\fR 必须是 x-url-encoding 编码格式的一个查询。可以使用 \fB::http::formatQuery\fR 过程来做格式化。
+.TP
+\fB\-queryblocksize\fP \fIsize\fP
+在向 URL 传送(post)查询数据的时候使用这个块大小。一次最多写 \fIsize\fR 字节。 在每块(被传输完毕)之后，调用 \fB\-queryprogress\fR 回调过程(如果指定了这个选项的话)。
+.TP
+\fB\-querychannel\fP \fIchannelID\fP
+这个标志导致 \fB::http::geturl\fR 去做向服务器传递在 \fIchannelID\fR 中包含的数据的一次 POST 请求。除非使用了下面的 \fB\-type\fP 选项，否则在 \fIchannelID\fR 中包含的数据必须是 x-url-encoding 编码格式的一个查询。如果没有通过 \fB\-headers\fR 选项指定 Content-Length(内容长度)头部，则 \fB::http::geturl\fR 尝试确定传送的数据的大小来建立这个头部。如果不能确定这个大小，它返回一个错误。
+.TP
+\fB\-queryprogress\fP \fIcallback\fP
+在每次到 URL 的数据传输之后调用这个 \fIcallback\fR (例如，POST)，并且表现(act)得与 \fB\-progress\fR 选项精确的相似(回调过程的格式相同)。
+.TP
+\fB\-timeout\fP \fImilliseconds\fP
+如果 \fImilliseconds\fR 是非零(的数)，则 \fB::http::geturl\fR 设置在这个数字指定的毫秒后发生一个超时(timeout)。如果指定了 \fB::http::reset\fP 和 \fB-command\fP 回调过程，一个超时导致对它们的调用。在超时发生之后，\fB::http::status\fP 的返回值是 \fBtimeout\fP。
+.TP
+\fB\-type\fP \fImime-type\fP
+使用 \fImime-type\fR 作为 \fBContent-Type\fR (内容类型)的值，在一次 POST 操作期间，替换缺省值(\fBapplication/x-www-form-urlencoded\fR)。
+.TP
+\fB\-validate\fP \fIboolean\fP
+如果 \fIboolean\fR 是非零，则 \fB::http::geturl\fR 做一次 HTTP HEAD 请求。这个请求返回关于这个 URL 的元(meta)信息，而不返回(具体)内容。这个事务之后在 \fBstate(meta) \fR 变量中可获得这些元信息。详情参见STATE ARRAY章节。
+.RE
+.TP
+\fB::http::formatQuery\fP \fIkey value\fP ?\fIkey value\fP ...?
+这个过程做查询数据的 x-url 编码。它接受偶数个参数，它们是这个查询的键和值。它编码这些键和值，并生成有正确的 & 和 = 分隔符的一个字符串。 结果适合于传递给 \fB::http::geturl\fR 的 \fB\-query\fR 的值。
+.TP
+\fB::http::reset\fP \fItoken\fP ?\fIwhy\fP?
+这个命令重置用 \fItoken\fR 标识的 HTTP 事务。如果有的话，它设置 \fBstate(status)\fP 值为 \fIwhy\fP，它的缺省值是 \fBreset\fR，并且接着调用注册的 \fB\-command\fR 回调。
+.TP
+\fB::http::wait\fP \fItoken\fP
+这是阻塞并等待一个事务完成的一个方便函数。它使用了 \fBvwait\fR 所以只能在可信赖的代码中工作。还有，它对调用 \fB::http::geturl\fP 而不加 \fB-command\fP 选项的情况没有用处，在这种情况下 \fB::http::geturl\fP 在 HTTP 事务完成之前不返回，所以不需等待。
+.TP
+\fB::http::data\fP \fItoken\fP
+这是返回状态数组的 \fBbody\fP 元素(例如，URL 数据)的一个方便过程。
+.TP
+\fB::http::error\fP \fItoken\fP
+这是返回状态数组的 \fBerror\fP 元素的一个方便过程。
+.TP
+\fB::http::status\fP \fItoken\fP
+这是返回状态数组的 \fBstatus\fP 元素的一个方便过程。
+.TP
+\fB::http::code\fP \fItoken\fP
+这是返回状态数组的 \fBhttp\fP 元素的一个方便过程。
+.TP
+\fB::http::ncode\fP \fItoken\fP
+这是只返回状态数组的 \fBhttp\fP 元素的数值返回码(200、404 等)的一个方便过程。
+.TP
+\fB::http::size\fP \fItoken\fP
+这是返回状态数组的 \fBcurrentsize\fP 元素的一个方便过程，它表示在 \fB::http::geturl\fP 调用中从 URL 接收的字节数。
+.TP
+\fB::http::cleanup\fP \fItoken\fP
+这个过程清除与由 \fItoken\fP 标识的连接相关的状态。在这个调用之后，不能使用象 \fB::http::data\fP 这样的过程得到关于这个操作的信息。强烈建议你在做完一个特定的 HTTP 操作之后调用这个函数。不这样做将导致内存不被释放，如果你的应用调用 \fB::http::geturl\fP 次数足够多，内存泄露(leak)将导致性能下降(hit)...或更糟。
+.TP
+\fB::http::register\fP \fIproto port command\fP
+这个过程允许你通过注册一个前缀、缺省端口、和建立 Tcl \fBchannel\fR (通道)的命令，提供定制的 HTTP 传输类型如 HTTPS。比如:
+.RS
+.CS
+package require http
+package require tls
+
+http::register https 443 ::tls::socket
+
+set token [http::geturl https://my.secure.site/]
+.CE
+.RE
+.TP
+\fB::http::unregister\fP \fIproto\fP
+这个过程注销(unregister)以前通过 \fBhttp::register\fR注册的一个协议处理器(handler)。
+
+.SH "错误 ERRORS"
+\fBhttp::geturl\fP 过程在下列情况下将引发(raise)错误: 无效的命令行选项、一个无效的 URL、在一个不存在的主机上的一个 URL、或在一个存在的主机的一个不良端口上的一个 URL。这些错误意味着它不能开始网络事务。如果它在写出 HTTP 请求头部期间得到了一个 I/O 错误，它也引发一个错误。对于同步 \fB::http::geturl\fP 调用(这个未指定 \fB-command\fP)，如果它在读 HTTP 回应头部或数据期间得到一个 I/O 错误，它将引发一个错误。因为在这种情况下 \fB::http::geturl\fP 不返回一个记号，它做所有需要的清除，你的应用没有必要调用 \fB::http::cleanup\fP。
+.PP
+对于异步 \fB::http::geturl\fP  调用，除了在读 HTTP 回应头部或数据期间出现 I/O 错误之外，所有上述错误情况不引起(throw)例外(异常)。这是因为在写完 HTTP 头部之后，\fB::http::geturl\fP 返回，而余下的 HTTP 事务在后台发生。命令的回调过程可以通过调用 \fB::http::status\fP 来检查状态，查看在读的时候是否发生了 \fIerror\fP 错误，如果有错误，调用 \fB::http::error\fP 来得到错误的消息。
+.PP
+另一个选择，如果主程序流到达需要知道异步 HTTP 请求的结果的某点(point)，它可以调用 \fB::http::wait\fP 并接着象上面的回调过程做的那样检查状态和错误。
+.PP
+在任何情况下，你必须在你做完(检查)的时候调用 \fBhttp::cleanup\fP 来删除状态数组。
+.PP
+下面描述的是用 \fBhttp::status\fP 检查状态能确定的 HTTP 事务的可能的结果。
+.TP
+ok
+如果 HTTP 事务完整完成，则状态将是 \fBok\fP。但是，你仍需检查 \fBhttp::code\fP 的值来得到 HTTP 状态。\fBhttp::ncode\fP 过程只提供数值的错误(代码)(例如，200，404 或 500) 而 \fBhttp::code\fP 过程返回象“HTTP 404 File not found”这样的一个值。
+.TP
+eof
+如果服务器关闭了套接口而不回应，则不引发错误，但事务的状态将是 \fBeof\fP。
+.TP
+error
+错误消息将被存储在状态数组的 \fBerror\fP 元素中，可通过 \fB::http::error\fP 访问。
+.PP
+另一个错误的可能是 \fBhttp::geturl\fP 在服务器响应并关闭套接口之前不能向服务器写出所有的 post 查询。错误消息保存在状态数组的 \fBposterror\fP 元素中，而 \fBhttp::geturl\fP 接着尝试完成这个事务。如果它能读到服务器的响应，它将以一个 \fBok\fP 状态结束，否则将有一个 \fBeof\fP 状态。
+
+.SH "状态数组 STATE ARRAY"
+\fB::http::geturl\fR 过程返回一个 \fItoken\fR ，可以用它来得到一个 Tcl 数组形式的 HTTP 事务状态。使用下面这个构造(construct)来建立一个易用的数组变量:
+.CS
+upvar #0 $token state
+.CE
+一旦与某个 url 有关的数据不再需要，应当清除这个数组来释放存储(空间)。为此提供了 \fBhttp::cleanup\fP 过程。这个数组支持下列元素:
+.RS
+.TP
+\fBbody\fR
+URL 的内容。如果指定了 \fB\-channel\fR 选项，则它将为空。用 \fB::http::data\fP 命令返回这个值。
+.TP
+\fBcharset\fR
+The value of the charset attribute from the \fBContent-Type\fR meta-data
+value.  If none was specified, this defaults to the RFC standard
+\fBiso8859-1\fR, or the value of \fB$::http::defaultCharset\fR.  Incoming
+text data will be automatically converted from this charset to utf-8.
+.TP
+\fBcoding\fR
+A copy of the \fBContent-Encoding\fR meta-data value.
+.TP
+\fBcurrentsize\fR
+当前从 URL 取回的字节数。用 \fB::http::size\fP 命令返回这个值。
+.TP
+\fBerror\fR
+如果定义了这个元素，这是终止 HTTP 事务时(描述)错误的字符串。
+.TP
+\fBhttp\fR
+从服务器回应的 HTTP 状态。用 \fB::http::code\fP 命令返回这个值。这个值的格式是:
+.RS
+.CS
+\fIHTTP/1.0 code string\fP
+.CE
+\fIcode\fR 是在 HTTP 标准中定义的一个三位数。代码 200 是 OK。以4或5开始的代码指示错误。以3开始的代码是重定向错误。在这种情况下，\fBLocation\f 元数据指定包含所需信息的一个新 URL。
+.RE
+.TP
+\fBmeta\fR
+HTTP 协议返回描述 URL 内容的元数据。状态数组的 \fBmeta\fR 元素是元数据的键和值的一个列表。下面的格式对初始化只包含元数据的一个数组有用:
+.RS
+.CS
+array set meta $state(meta)
+.CE
+下面列出一些元数据的键，HTTP 标准定义了更多，服务器可自由的添加它们自己的键。
+.TP
+\fBContent-Type\fR
+URL 内容的类型。例子包括 \fBtext/html\fR、\fBimage/gif\fR、\fBapplication/postscript\fR 和 \fBapplication/x-tcl\fR。
+.TP
+\fBContent-Length\fR
+内容的通告(advertise)的大小。通过 \fB::http::geturl\fR 获得的实际大小作为 \fBstate(size)\fR 来获取。
+.TP
+\fBLocation\fR
+包含所需的数据的一个可替代的 URL。
+.RE
+.TP
+\fBposterror\fR
+在向服务器写 post 查询时发生的错误。如果有的话。
+.TP
+\fBstatus\fR
+对于成功完成是 \fBok\fR，对于用户重重置(user-reset)是 \fBreset\fR，如果在事务完成之前发生了超时则是\fBtimeout\fP。或在错误的情况下是 \fBerror\fR。在事务(进行)期间这个值是一个空串。
+.TP
+\fBtotalsize\fR
+\fBContent-Length\fR 元数据值的一个复本。
+.TP
+\fBtype\fR
+\fBContent-Type\fR 元数据值的一个复本。
+.TP
+\fBurl\fR
+请求的 URL。
+.RE
+.SH 示例 EXAMPLE
+.DS
+# Copy a URL to a file and print meta-data
+proc ::http::copy { url file {chunk 4096} } {
+    set out [open $file w]
+    set token [geturl $url -channel $out -progress ::http::Progress \\
+	-blocksize $chunk]
+    close $out
+    # This ends the line started by http::Progress
+    puts stderr ""
+    upvar #0 $token state
+    set max 0
+    foreach {name value} $state(meta) {
+	if {[string length $name] > $max} {
+	    set max [string length $name]
+	}
+	if {[regexp -nocase ^location$ $name]} {
+	    # Handle URL redirects
+	    puts stderr "Location:$value"
+	    return [copy [string trim $value] $file $chunk]
+	}
+    }
+    incr max
+    foreach {name value} $state(meta) {
+	puts [format "%-*s %s" $max $name: $value]
+    }
+
+    return $token
+}
+proc ::http::Progress {args} {
+    puts -nonewline stderr . ; flush stderr
+}
+.DE
+
+.SH "参见 SEE ALSO"
+safe(n), socket(n), safesock(n)
+
+.SH 关键字 KEYWORDS
+security policy, socket
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/09/20
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

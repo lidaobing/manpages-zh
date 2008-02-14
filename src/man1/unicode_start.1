@@ -1,0 +1,31 @@
+.TH UNICODE_START 1 "28 Oct 1997" "控制台工具" "Linux 用户手册"
+
+.SH NAME
+unicode_start \- 将控制台设为Unicode模式.
+
+.SH 总览
+.B unicode_start
+.BI [ " font " [ " screen-font-map " "] ]"
+
+.SH 描述
+.B unicode_start
+命令将显示屏及键盘设为
+.IR "Unicode 模式" ,
+并且有
+可能还会装载所用的
+.I 字体
+和
+.IR "显示屏-字体 映射" . 
+如果没有给出
+参数,就使用当前的
+.I 字体
+和
+.IR "显示屏-字体 映射" . 
+
+.SH BUGS
+如果没有装载"显示屏-字体 映射", 可能会有麻烦.
+
+.SH "另见"
+.BR unicode_stop (1),
+.BR consolechars (8).
+

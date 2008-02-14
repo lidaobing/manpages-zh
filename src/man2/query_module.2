@@ -1,0 +1,89 @@
+.TH	query_module ""
+.SH NAME
+query_module - 向内核查询和模块有关的各个位.   /* 查询有关的位?? */
+.SH 总览
+.B #include <linux/module.h>
+.sp
+int query_module(const char *name, int which,void *buf, size_t bufsize, size
+_t *ret);
+.SH 描述
+query_module请求和可加载模块有关的来自内核的信息.信息的细致的特性和格式依赖于
+which参数,一些函数要求name参数来命名当前被加载的模块.一些允许参数name为null,
+指明内核是正确的.: 
+which的值
+0   Always returns success. Used to probe for the system call.
+0   总是返回成功,用来探测系统调用.   /* 参见 insmod -p 和前面文章 */
+QM_MODULES        Returns the names of all loaded modules. The output buffer
+ format is adjacent null-terminated strings; ret is set to the number of mod
+ules.
+    返回所有已加载的模块的名字.输出缓冲区的格式是邻近的以null终止的字符串;ret
+被
+设置为模块的数目.
+QM_DEPS        Returns the names of all modules used by the indicated module
+. The output buffer format is adjacent null-terminated strings; ret is set t
+o the number of modules.    返回所有被name参数指定的模块使用的模块的名字.输出
+缓
+冲区格式是邻近的以null终止的字符串;ret被设置为模块的数目.
+QM_REFS        Returns the names of all modules using the indicated module.
+This is the inverse of QM_DEPS. The output buffer format is adjacent null-te
+rminated strings; ret is set to the number of modules.
+    返回所有正使用被name参数指定的模块的模块名字.这和QM_DEPS是相反的.输出缓冲
+区
+格式是以邻近的null终止的字符串;ret被设置为模块的数目.
+QM_SYMBOLS        Returns the symbols and values exported by the kernel or t
+he indicated module. The buffer format is an array of:               
+               struct module_symbol
+              {
+                unsigned long value;
+                unsigned long name;
+              };
+              followed by null-terminated strings. The value of name is the
+character offset of the string relative to the start of buf; ret is set to t
+he number of symbols.
+    返回被内核或指定模块导出(开放)的符号和值对.缓冲区格式是一个以null终止的
+结构数组,name的值是相对缓冲区的开始的字符串的字符偏移;ret被设置为符号的数目.
+
+    struct module_symbol
+    {
+      unsigned long value;
+      unsigned long value;
+    }
+QM_INFO        Returns miscelaneous information about the indicated module.
+The output buffer format is:
+              struct module_info
+              {
+                unsigned long address;
+                unsigned long size;                                  
+                unsigned long flags;
+              };
+              where address is the kernel address at which the module reside
+s, size is the size of the module in bytes, and flags is a mask of MOD_RUNNI
+NG, MOD_AUTOCLEAN, et al that indicates the current status of the module. re
+t is set to the size of the            module_info struct.
+    返回各种和指定模块相关的各种信息,输出缓冲区的格式如下:
+    struct module_info
+    {
+    unsigned long address;
+    unsigned long size;
+    unsigned long flags;
+    }
+ address是模块在内核空间中驻留的地址,size是模块以字节计数的大小,flags是MOD_R
+UNING,MOD_AUTOCLEAN等指示模块当前状态的标志的按位或组成的掩玛.ret被设置为mod
+ule_info结构的大小.
+.SH 返回值
+成功时总是返回0,错误是返回-1,全局变量errno被相应设置.
+.SH 错误
+.TP
+ENOENT 
+    被name指定的模块不存在.
+.TP
+EINVAL
+.TP
+ENOSPC
+    提供的缓冲区太小,ret被设置为需要的最小大小.
+.TP
+EFAULT
+    name,buf或ret中至少一个越出了程序可访问的地址空间.       
+
+.SH
+      "雷勇" <nsinit@263.net>

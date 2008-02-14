@@ -1,0 +1,164 @@
+'\" t
+.\" Copyright (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" License.
+.\" Modified Sat Jul 24 17:34:08 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Sun Jan  7 01:41:27 1996 by Andries Brouwer (aeb@cwi.nl)
+.\" Modified Sun Apr 14 12:02:29 1996 by Andries Brouwer (aeb@cwi.nl)
+.\" Modified Sat Nov 13 16:28:23 1999 by Andries Brouwer (aeb@cwi.nl)
+.\"
+.TH SIGNAL 7  "April 14, 1996" "Linux 1.3.88" "Linux Programmer's Manual"
+.SH NAME
+signal \- 有效信号的清单
+
+.SH "描述 (DESCRIPTION)"
+下面 列出 Linux 支持的 信号. 某些 信号 依赖于 体系结构(architecture). 
+
+首先, POSIX.1 描述了 下列 信号.
+
+.sp
+.PP
+.TS
+l c c l
+____
+lB c c l.
+信号	值	动作	说明
+SIGHUP	\01	A	在控制终端上是挂起信号, 或者控制进程结束
+SIGINT	\02	A	从键盘输入的中断
+SIGQUIT	\03	C	从键盘输入的退出
+SIGILL	\04	C	无效硬件指令
+SIGABRT	\06	C	非正常终止, 可能来自 \fIabort\fP(3)
+SIGFPE	\08	C	浮点运算例外
+SIGKILL	\09	AEF	杀死进程信号
+SIGSEGV	11	C	无效的内存引用
+SIGPIPE	13	A	管道中止: 写入无人读取的管道
+SIGALRM	14	A	来自 \fIalarm\fP(2) 的超时信号
+SIGTERM	15	A	终止信号
+SIGUSR1	30,10,16	A	用户定义的信号 1
+SIGUSR2	31,12,17	A	用户定义的信号 2
+SIGCHLD	20,17,18	B	子进程结束或停止
+SIGCONT	19,18,25		继续停止的进程
+SIGSTOP	17,19,23	DEF	停止进程
+SIGTSTP	18,20,24	D	终端上发出的停止信号
+SIGTTIN	21,21,26	D	后台进程试图从控制终端(tty)输入
+SIGTTOU	22,22,27	D	后台进程试图在控制终端(tty)输出
+.TE
+
+下面的 信号 定义 在 SUSv2 中, 而 POSIX.1 没有 定义.
+
+.sp
+.PP
+.TS
+l c c l
+____
+lB c c l.
+信号	值	动作	说明
+SIGBUS	10,7,10	C	总线错误 (不正确的内存访问)
+SIGPOLL		A	I/O就绪事件 (Sys V). 等同于SIGIO
+SIGPROF	27,27,29	A	系统资源定时器(Profiling timer)超时 
+SIGSYS	12,\-,12	C	用错误参数调用系统例程 (SVID)
+SIGTRAP	5	C	跟踪/断点自陷
+SIGURG	16,23,21	B	套接口上出现 urgent 情况 (4.2 BSD)
+SIGVTALRM	26,26,28	A	虚拟超时时钟 (4.2 BSD)
+SIGXCPU	24,24,30	C	超过了CPU时间限制 (4.2 BSD)
+SIGXFSZ	25,25,31	C	超过了文件大小限制 (4.2 BSD)
+.TE
+
+(这里的 SIGSYS, SIGXCPU, SIGXFSZ, 以及 某些 系统上 的 SIGBUS, 
+Linux 的 缺省动作 (到2.3.27版) 是 A(结束), 而 SUSv2 声明是 C(结束且核心转储).)
+
+下面 是 其他 几个 信号.
+
+.sp
+.PP
+.TS
+l c c l
+____
+lB c c l.
+信号	值	动作	说明
+SIGIOT	6	C	IOT 自陷. 等同于 SIGABRT
+SIGEMT	7,\-,7	
+SIGSTKFLT	\-,16,\-	A	协处理器堆栈错误
+SIGIO	23,29,22	A	I/O 有效信号 (4.2 BSD)
+SIGCLD	\-,\-,18		等同于 SIGCHLD
+SIGPWR	29,30,19	A	电源无效 (System V)
+SIGINFO	29,\-,\-		等同于 SIGPWR
+SIGLOST	\-,\-,\-	A	文件锁丢失
+SIGWINCH	28,28,20	B	窗口大小调整信号 (4.3 BSD, Sun)
+SIGUNUSED	\-,31,\-	A	未使用的信号 (将成为 SIGSYS)
+.TE
+
+这里的 \- 指 信号 不存在; 可能 给出 三个值, 第一个值 一般 用于 alpha 和 sparc,
+中间的值 用于 i386, ppc 和 sh, 最后一个 是 mips 的.
+信号29 在 alpha机上 是
+.B SIGINFO
+/
+.B SIGPWR
+, 而在 sparc机上 是
+.B SIGLOST
+.)
+
+
+.PP
+"动作(Action)"栏 的 字母 有 下列 含义:
+.IP A
+缺省动作是结束进程.
+.IP B
+缺省动作是忽略这个信号.
+.IP C
+缺省动作是结束进程, 并且核心转储.
+.IP D
+缺省动作是停止进程.
+.IP E
+信号不能被捕获.
+.IP F
+信号不能被忽略.
+.PP
+(译注: 这里 "结束" 指 进程 终止 并 释放资源, "停止" 指 进程 停止 运行,
+但是 资源 没有 释放, 有可能 继续 运行.)
+
+.SH "遵循 (CONFORMING TO)"
+POSIX.1
+
+.SH BUGS
+.B SIGIO
+和
+.B SIGLOST
+有 相同的 值. 后者 在 内核 源码 中 被注释 掉了,
+但是 某些 软件 构造的 进程 仍然 认为 信号29 是
+.BR SIGLOST .
+
+.SH "另见 (SEE ALSO)"
+.BR kill (1),
+.BR kill (2),
+.BR setitimer (2)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.B 2000/10/15
+第一版
+.br
+.BR 2001/11/24
+第一次修订
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

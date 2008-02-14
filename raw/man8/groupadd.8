@@ -1,0 +1,79 @@
+.\" Copyright 1991, Julianne Frances Haugh
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. Neither the name of Julianne F. Haugh nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY JULIE HAUGH AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL JULIE HAUGH OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.TH GROUPADD 8
+.SH NAME
+groupadd \- Create a new group
+.SH SYNOPSIS
+\fBgroupadd\fR [\fB-g\fI gid \fR[\fB-o\fR]] [\fB-r\fR] [\fB-f\fR] \fIgroup\fR
+.SH DESCRIPTION
+The \fBgroupadd\fR command
+creates a new group account using the values specified on the
+command line and the default values from the system.
+The new group will be entered into the system files as needed.
+The options which apply to the \fBgroupadd\fR command are
+.IP "\fB-g \fIgid\fR"
+The numerical value of the group's ID.
+This value must be unique, unless the \fB-o\fR option is used.
+The value must be non-negative.
+The default is to use the smallest ID value greater than 500 and
+greater than every other group.
+Values between 0 and 499 are typically reserved for \fIsystem accounts\fR.
+.IP \fB-r\fR
+This flag instructs \fBgroupadd\fR to add a \fIsystem
+account\fR.  The first available \fIgid\fR lower than 499 will be
+automatically selected unless the \fB-g\fR option is also given on the
+command line.
+.br
+This is an option added by Red Hat.
+.IP \fB-f\fR
+This is the \fIforce\fR flag. This will cause \fBgroupadd\fR to exit with an
+error when the group about to be added already exists on the
+system. If that is the case, the group won't be altered (or added
+again).
+.br
+This option also modifies the way \fB-g\fR option works. When you
+request a \fIgid\fR that it is not unique and you don't specify the \fB-o\fR
+option too, the group creation will fall back to the standard behavior
+(adding a group as if neither \fB-g\fR or \fB-o\fR options were
+specified).
+.br
+This is an option added by Red Hat.
+.SH FILES
+/etc/group \- group account information
+.br
+/etc/gshadow \- secure group account information
+.SH SEE ALSO
+.BR chfn (1),
+.BR chsh (1),
+.BR passwd (1),
+.BR groupdel (8),
+.BR groupmod (8),
+.BR useradd (8),
+.BR userdel (8),
+.BR usermod (8)
+.SH AUTHOR
+Julianne Frances Haugh (jockgrrl@ix.netcom.com)

@@ -1,0 +1,98 @@
+.\" Hey Emacs! This file is -*- nroff -*- source.
+.\"
+.\" This manpage is Copyright (C) 1992 Drew Eckhardt;
+.\"                               1993 Michael Haardt, Ian Jackson.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified Wed Jul 21 22:40:25 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Sat Feb 18 15:27:48 1995 by Michael Haardt
+.\" Modified Sun Apr 14 11:40:50 1996 by Andries Brouwer <aeb@cwi.nl>:
+.\"   corrected description of effect on locks (thanks to
+.\"   Tigran Aivazian <tigran@sco.com>).
+.\" Modified Fri Jan 31 16:21:46 1997 by Eric S. Raymond <esr@thyrsus.com>
+.\" Modified 2000-07-22 by Nicol醩 Lichtmaier <nick@debian.org>
+.\"   added note about close(2) not guaranteeing that data is safe on close.
+.\"
+.TH CLOSE 2 1996-04-14 "" "Linux Programmer's Manual"
+.SH NAME  名字
+close \- 关闭一个文件描述符
+.SH SYNOPSIS  总览
+.nf
+.B #include <unistd.h>
+.sp
+.BI "int close(int " fd );
+.fi
+.SH DESCRIPTION  描述
+.B close
+关闭 一个 文件 描述符 , 使它 不在 指向 任何 文件 和 可以 在 新的 文件 操作 中 被 再次 使用.
+任何 与 此 文件 相关联 的 以及 程序 所 拥有 的 锁 , 都 会 被 删除 (忽略 那些 持有 锁 的 文件描述符)
+.PP
+假如
+.I fd
+是 最后 一个 文件描述符 与此 资源 相 关联 , 则 这个 资源 将 被 释放.
+若此 描述符 是 最后 一个 引用 到 此 文件 上 的 , 则 文件 将 使用
+.BR unlink (2)
+删除.
+.SH "RETURN VALUE"  返回值
+.B close
+返回 0 表示 成功 , 或者 -1 表示 有 错误 发生 .
+.SH ERRORS  错误信息
+.TP
+.B EBADF
+.I fd
+不是 一个 有效 的 已 被 打开 的 文件 的 描述符
+.TP
+.B EINTR
+The
+.BR close ()
+调用 被 一 信号 中断.
+.TP
+.B EIO
+I/O 有 错误 发生
+.SH "CONFORMING TO"
+SVr4, SVID, POSIX, X/OPEN, BSD 4.3.  SVr4 documents an additional
+ENOLINK error condition.
+.SH NOTES  注意
+通常 不检测 返回值 , 除了 发生 严重 的 程序 错误.  文件系统  使用 了
+"write-behind" 的 技术 提高 了 执行
+.BR write (2)
+时 的 性能 . 即使 还 没有 被 写 , 写操作 也会 成功 . 错误 信息 在 写操作 以后
+报告 , 但是 这 保证 在 关闭 文件 时 报告 . 在 关闭 文件 时 不检测 返回值 可能
+会 导致 数据 的 丢失 . 这 一点 在 NFS 和 磁盘 配额 上 比较 明显.
+.PP
+由于 内核 会 延迟 写 , 所以 就算 成功 关闭 一个 文件 不能 保证 数据 被 成功 的 写到 磁盘 上.
+当 文件流 关闭 时 , 对 文件系统 来说 一般 不去 刷新 缓冲区 . 如果 你 要 保证 数据 写入
+磁盘 等 物理 存贮器 中
+就 使用 fsync(2) 或 sync(2), 他们 会 做到 你想做的 (对于 这一点 要 依赖于 磁盘 设备).
+.SH "SEE ALSO"  参考
+.BR open (2),
+.BR fcntl (2),
+.BR shutdown (2),
+.BR unlink (2),
+.BR fclose (3)
+
+.SH [中文维护]
+	Daniel (badlong@163.com)
+.SH [中文更新]
+	2002/1/10
+.SH [说明]
+	若 发现 错误 或 不足 请 与 我 联系.

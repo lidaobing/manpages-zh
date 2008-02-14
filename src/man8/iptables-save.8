@@ -1,0 +1,56 @@
+.TH IPTABLES-SAVE 8 "Jan 04, 2001" "" ""
+.\"
+.\" Man page written by Harald Welte <laforge@gnumonks.org>
+.\" It is based on the iptables man page.
+.\"
+.\"	This program is free software; you can redistribute it and/or modify
+.\"	it under the terms of the GNU General Public License as published by
+.\"	the Free Software Foundation; either version 2 of the License, or
+.\"	(at your option) any later version.
+.\"
+.\"	This program is distributed in the hope that it will be useful,
+.\"	but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"	GNU General Public License for more details.
+.\"
+.\"	You should have received a copy of the GNU General Public License
+.\"	along with this program; if not, write to the Free Software
+.\"	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"
+.SH NAME
+iptables-save \- 保存 IP Tables
+.SH "总览 SYNOPSIS"
+.BR "iptables-save " "[-c] [-t table]"
+.br
+.SH "描述 DESCRIPTION"
+.PP
+.B iptables-save
+用来将 IP Table 转储为可以简单解析的格式，输出到标准输出 STDOUT。
+可以使用 shell 的 I/O 重定向功能来写入文件
+.TP
+\fB\-c\fR, \fB\-\-counters\fR
+在输出中包含所有报文和字节计数的当前值
+.TP
+\fB\-t\fR, \fB\-\-table\fR \fBtablename\fR
+.TP
+限制只输出一个表。如果不指定，会输出所有可能的表
+.SH BUGS
+无
+.SH "作者 AUTHOR"
+Harald Welte <laforge@gnumonks.org>
+.SH "参见 SEE ALSO"
+.BR iptables-restore "(8), " iptables "(8) "
+.PP
+iptables-HOWTO 记述了 iptables 用法的细节，
+NAT-HOWTO 记述了 NAT 的细节，
+netfilter-hacking-HOWTO 记述了内部实现的细节
+.
+.SH "[中文版维护人]"
+.B 杨鹏 NetSnake <email>
+.br
+.B Poopy <email> (?)
+.SH "[中文版最新更新]"
+.B 2002.05.01
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

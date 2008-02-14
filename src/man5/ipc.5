@@ -1,0 +1,374 @@
+.\" Copyright 1993 Giorgio Ciucci (giorgio@crcc.it)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.TH IPC 5 "November 1, 1993" "Linux 0.99.13" "Linux Programmer's Manual" 
+.SH NAME
+ipc \- System V 进程间通信机制
+.SH SYNOPSIS 总览
+.nf
+.B
+# include <sys/types.h>
+.B
+# include <sys/ipc.h>
+.B
+# include <sys/msg.h>
+.B
+# include <sys/sem.h>
+.B
+# include <sys/shm.h>
+.SH DESCRIPTION
+本手册页涉及 System V 进程间通信机制在 Linux 下的实现:
+消息队列, 信号灯集合, 以及共享内存段. 下面提到
+.B 资源
+时, 就是指上面这些通信机制中的一种.
+.SS 资源访问权限
+对每个资源, 系统用一个共有的
+.BR "struct ipc_perm"
+结构来存放权限信息, 以确定一个 ipc 操作是否可访问该资源. 在
+.I <sys/ipc.h>
+中定义了
+.B ipc_perm,
+其成员如下: 
+.sp
+.B
+	ushort cuid;	
+/* 创建者 uid */
+.br
+.B
+	ushort cgid;	
+/* 创建者 gid */
+.br
+.B
+	ushort uid;
+/* 所有者 uid */
+.br
+.B
+	ushort gid;
+/* 所有者 gid */
+.br
+.B
+	ushort mode;
+/* 读/写权限 */
+.PP
+结构
+.B ipc_perm
+的成员
+.B mode
+的低九位定义了对该资源的访问许
+可, 以确定一个执行了 ipc 系统调用的进程能否访问该资源. 其解
+释如下:
+.sp
+.nf
+	0400	用户可读.
+	0200	用户可写.
+.sp .5
+	0040	组成员可读.
+	0020	组成员可写.
+.sp .5
+	0004	其他用户可读.
+	0002	其他用户可写.
+.fi
+.PP
+系统没有使用执行位 0100, 0010 和 0001. 另外, 这里的 "可写" 等
+效于信号灯集合里的 "可更改". 
+.PP
+在
+.I <sys/ipc.h>
+系统头文件里还定义了如下符号常数:
+.TP 14
+.B IPC_CREAT
+如果 key 不存在就创建.
+.TP
+.B IPC_EXCL
+如果 key 已经存在则失败.
+.TP
+.B IPC_NOWAIT
+如果请求必须等待, 产生错误.
+.TP
+.B IPC_PRIVATE
+私有 key.
+.TP
+.B IPC_RMID
+删除资源.
+.TP
+.B IPC_SET
+设置资源选项.
+.TP
+.B IPC_STAT
+取得资源选项.
+.PP
+请注意
+.B IPC_PRIVATE
+是一个
+.B key_t
+类型, 而别的符号常数都是标志域,它们的可以或( OR )在一起形成
+.B int
+类型.
+.SS 消息队列
+消息队列由正整数
+.RI "(它的 " msqid )
+唯一标识, 其结构体
+.BR "struct msquid_ds"
+在
+.IR <sys/msg.h>
+中定义, 包含如下成员: 
+.sp
+.B
+	struct ipc_perm msg_perm;
+.br
+.B
+	ushort msg_qnum;	
+/* 队列中消息数目 */
+.br
+.B
+	ushort msg_qbytes;	
+/* 一条队列最大字节数 */
+.br
+.B
+	ushort msg_lspid;	
+/* 上一次 msgsnd 调用的 pid  */
+.br
+.B
+	ushort msg_lrpid;	
+/* 上一次 msgrcv 调用的 pid */
+.br
+.B
+	time_t msg_stime;	
+/* 上一次 msgsnd 的时间 */
+.br
+.B
+	time_t msg_rtime;	
+/* 上一次 msgrcv 的时间 */
+.br
+.B
+	time_t msg_ctime;	
+/* 上一次修改时间 */
+.TP 11
+.B msg_perm
+.B ipc_perm
+结构, 指明了对该消息队列的访问权限. 
+.TP
+.B msg_qnum
+该队列当前的消息总数.
+.TP
+.B msg_qbytes
+该队列所允许的消息正文最大字节总数.
+.TP
+.B msg_lspid
+最后做
+.B msgsnd
+系统调用的进程的 ID. 
+.TP
+.B msg_lrpid
+最后做
+.B msgrcv
+系统调用的进程的 ID. 
+.TP
+.B msg_stime
+最近做
+.B msgsnd
+系统调用的时间.
+.TP
+.B msg_rtime
+最近做
+.B msgrcv
+系统调用的时间.
+.TP
+.B msg_ctime
+最后一次改变
+.B msqid_ds
+结构成员的时间. 
+.SS 信号灯集合
+信号灯集合由正整数
+.RI "(它的 " semid )
+唯一标识, 并有一个与之关联的结构体
+.BR "struct semid_ds"
+它在
+.IR <sys/sem.h>
+中定义, 包含如下成员: 
+.sp
+.B
+	struct ipc_perm sem_perm;
+.br
+.B
+	time_t sem_otime;	
+/* 上一次操作的时间 */
+.br
+.B
+	time_t sem_ctime;	
+/* 上一次修改的时间 */
+.br
+.B
+	ushort sem_nsems;	
+/* 集合中信号灯数目 */
+.TP 11
+.B sem_perm
+.B ipc_perm
+结构, 指明对该信号灯集合的访问权限. 
+.TP
+.B sem_otime
+最近做
+.B semop
+系统调用的时间.
+.TP
+.B sem_ctime
+最近做
+.B semctl
+系统调用的时间, 该调用修改了上面结构的一个成员
+或者改变了属于该集合的一个信号灯. 
+.TP
+.B sem_nsems
+该信号灯集合的信号灯数目. 集合中每个信号灯都可以用从
+.B 0
+到
+.BR sem_nsems\-1
+的一个非负整数来引用. 
+.PP
+一个信号灯就是一个
+.B "struct sem"
+结构, 包含如下成员: 
+.sp
+.B
+	ushort semval;	
+/* 信号灯值 */
+.br
+.B
+	short sempid;	
+/* 上一次操作的进程的 pid */
+.br
+.B
+	ushort semncnt;	
+/* 等待增加 semval 值的进程数目 */
+.br
+.B
+	ushort semzcnt;	
+/* 等待 semval = 0 的进程数目 */
+.TP 11
+.B semval
+该信号灯值,是一个非负整数. 
+.TP
+.B sempid
+最后一个对该信号灯做操作的进程 ID. 
+.TP
+.B semncnt
+等待增加
+.B semval
+的进程数. 
+.TP
+.B semznt
+等待
+.B semval
+变成 0 的进程数. 
+.SS 共享内存段
+共享内存段由正整数
+.RI "(它的 " shmid )
+唯一标识, 有一个关联的结构类型
+.BR "struct shmid_ds"
+在
+.IR <sys/shm.h>
+中定义, 包含如下成员: 
+.sp
+.B
+	struct ipc_perm shm_perm;
+.br
+.B
+	int shm_segsz;	
+/* 段尺寸 */
+.br
+.B
+	ushort shm_cpid;	
+/* 创建者 pid */
+.br
+.B
+	ushort shm_lpid;	
+/* 上一次操作的进程的 pid */
+.br
+.B
+	short shm_nattch;	
+/* 目前附着的进程数目 */
+.br
+.B
+	time_t shm_atime;	
+/* 上一次附着的时间 */
+.br
+.B
+	time_t shm_dtime;	
+/* 上一次脱离的时间 */
+.br
+.B
+	time_t shm_ctime;	
+/* 上一次修改的时间 */
+.TP 11
+.B shm_perm
+.B ipc_perm
+结构, 指明对共享内存段的访问权限. 
+.TP
+.B shm_segsz
+共享内存段的大小, 以字节为单位. 
+.TP
+.B shm_cpid
+创建该共享内存段的进程的 ID. 
+.TP
+.B shm_lpid
+最后执行
+.B shmat
+或者
+.B shmdt
+系统调用的进程 ID. 
+.TP
+.B shm_nattch
+当前对该共享内存段的活跃连接数. 
+.TP
+.B shm_atime
+最后做
+.B shmat
+系统调用的时间.
+.TP
+.B shm_dtime
+最后做
+.B shmdt
+系统调用的时间.
+.TP
+.B shm_ctime
+最后做
+.B shmctl
+系统调用的时间, 如果该调用改变了
+shmid_ds.
+.SH "又见"
+.BR ftok (3),
+.BR msgctl (2),
+.BR msgget (2),
+.BR msgrcv (2),
+.BR msgsnd (2),
+.BR semctl (2),
+.BR semget (2),
+.BR semop (2),
+.BR shmat (2),
+.BR shmctl (2),
+.BR shmget (2),
+.BR shmdt (2).
+
+.SH "[中文版维护人]"
+.B name <email>
+.SH "[中文版最新更新]"
+.BR 2001/02/02
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

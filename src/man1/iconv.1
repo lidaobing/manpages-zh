@@ -1,0 +1,36 @@
+.\" Copyright (c) Bruno Haible <haible@clisp.cons.org>
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" References consulted:
+.\"   OpenGroup's Single Unix specification http://www.UNIX-systems.org/online.html
+.\"
+.TH ICONV 1  "February 20, 2001" "GNU" "Linux Programmer's Manual"
+
+.SH NAME
+iconv \- 字符集转换
+
+.SH "总览 (SYNOPSIS)"
+iconv [\fB-f\fP \fIencoding\fP] [\fB-t\fP \fIencoding\fP] [\fIinputfile\fP ...]
+
+.SH "描述 (DESCRIPTION)"
+\fBiconv\fP 程序 把 文本 从 一种 编码 转换 为 另一种 编码.
+更准确一点, 他是 把 \fB-f\fP 指定的 编码 转换为 \fB-t\fP 指定的 编码.
+这两种 编码 默认 都是 当前 locale 的编码, 所有 \fIinputfile\fP 都依次
+进行转换. 如果没有指定 \fIinputfile\fP 则使用 标准输入. 转换后的 内容 会
+输出到 标准输出.
+.PP
+允许的 编码 与 具体系统 有关. 具体 实现 可以 查看 iconv_open(3) 手册页.
+
+.SH "参见 (SEE ALSO)"
+.BR iconv_open "(3), " locale (7)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2002/3/21
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

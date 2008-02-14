@@ -1,0 +1,47 @@
+.TH SETMETAMODE 1 "09 Oct 1997" "控制台工具" "Linux 用户手册"
+
+.SH NAME
+setmetamode \- define the keyboard meta key handling
+
+.SH 总览
+.BI "setmetamode [ " meta | bit | metabit " | " esc | prefix | escprefix " ]"
+.IX "setmetamode command" "" "\fLsetmetamode\fR command"  
+
+.SH 描述
+.PP
+没有参数时, 
+.B setmetamode
+将打印当前 Meta 键模式; 有参数时, 设置所指出的 Meta 键模式.
+.LP
+The Meta key mode is specific for each VT (and the VT
+corresponding to stdin is used).
+
+.SH 选项
+.TP
+.I esc prefix escprefix
+The Meta key sends an Escape prefix.
+.TP
+.I meta bit metabit
+The Meta key sets the high order bit of the character.
+
+.SH 范例
+
+可以用
+.B setmetamode
+在 
+.I /etc/rc
+脚本中定义 Meta 键模式的初始状态. 例如, 可以如下设置: 
+.RS
+INITTY=/dev/tty[1\-8]
+.br
+for tty in $INITTY; do
+.RS
+setmetamode escprefix < $tty
+.RE
+done
+.RE
+
+.SH "另见"
+.BR loadkeys (1).
+
+

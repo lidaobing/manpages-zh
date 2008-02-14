@@ -1,0 +1,104 @@
+.\" This man page is Copyright (C) 1998 Heiner Eisen. 
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.TH X25 4 "1 Dec 1998" "Linux Man Page" "Linux Programmer's Manual" 
+.SH NAME
+x25, PF_X25 \- ITU-T X.25 / ISO-8208 协议接口。
+.SH 总览
+.B #include <sys/socket.h>
+.br 
+.B #include <linux/x25.h> 
+.br
+x25_socket = socket(PF_X25, SOCK_SEQPACKET, 0); 
+.SH 描述
+X25 sockets 为 X.25 数据包层协议（packet layer protocol）提供接口。
+这令应用程序可以使用标准的 ITU X.25 建议
+（X.25 DTE-DCE 模式）在公共 X.25 数据网中进行通讯。
+X25 socket 也可以在没有在 ISO-8208中描述的那样的 
+X.25 中介（X.25 DTE-DCE 模式）的网络进行通讯．
+.PP 
+信息分界的保持 - 对 socket 进行
+.BR  read(2)
+得到的数据块与对端 socket 对应
+.BR write(2)
+动作输出的数据块是完全一样的．
+如果必要，内核负责处理信息片段和重组长信息，
+用的是 X.25 M-bit 方法（校注：请懂 x.25 的同志指正）。
+对信息大小没有硬编码的上限。 
+但是重组长信息有时会失败
+（比如系统资源暂时匮乏，或是出现其他的诸如此类的限制时）。
+如果出现这种情况，X.25 连接将被重置。
+.SH 套接口地址 SOCKET ADDRESS
+AF_X25 socket 地址族用 struct sockaddr_x25 代表 
+ITU-T X.121 规范中定义的网络地址。 
+.PP
+.RS
+.nf
+.ta 4n 18n 32n  
+struct sockaddr_x25 {
+sa_family_t   sx25_family;  /* 必须是 AF_X25 */
+x25_address   sx25_addr;    /* X.121 地址 */
+};
+.ta
+.fi
+.RE
+.PP
+.I sx25_addr
+包含一个空零结尾的字符串
+.I x25_addr[]
+。 
+.I sx25_addr.x25_addr[]
+由最多 15 个 ASCII 字符（不包括结束的 0）构成 X.121 地址。
+只能使用数字 `0' 到 `9' 。
+.SH 套接字选项 SOCKET OPTIONS
+以下 X.25 相关的套接字选项
+可以在级别参数设置为
+.BR SOL_X25
+时用
+.BR setsockopt(2)
+设定并可用 
+.BR getsockopt(2) 
+读取。 
+.TP
+.B X25_QBITINCL 
+控制用户是否能够访问 X.25 Q-bit
+(（资格数据位）Qualified Data Bit)。
+接受整型参数。 如果设为 0 (缺省),
+那么传出的数据包不设置 Q-bit 传入的数据包中的 Q-bit 被忽略。
+如果设为 1, 就会在通过该套接字传入传出的信息中附加一个前置的首字节。
+对于从套接字中数据， 首位字节的 0 
+表示对应的读入包未设置 Q-bit；而如果是 1 则相反。 
+如果通过套接字写入（传出）的数据中首位字节为 1 则传出包设置 Q-bit ，
+如果是 0 则不设置 Q-bit。
+.SH 缺憾
+有很多, 比如 X.25 PLP 实现
+.BR CONFIG_EXPERIMENTAL. （译注：内核编译选项，尚处于试验阶段）。
+.PP
+本手册页也不完善。
+.PP
+还没有给程序员用的头文件；您需要包含内核头文件
+.BR linux/x25.h
+.B CONFIG_EXPERIMENTAL
+也暗示着未来的接口版本可能在二进制级别不兼容。
+.PP
+X.25 N-重置事件（Reset events）还不会传播给用户进程。
+因此，如果重置，可能会发生数据丢失而得不到任何提示。 
+.SH 另见
+.BR socket(7),
+.BR socket(2).
+.PP 
+Jonathan Simon Naylor:
+\(lqThe Re-Analysis and Re-Implementation of X.25.\(rq
+The URL is
+.Iftp://ftp.pspt.fi/pub/ham/linux/ax25/x25doc.tgz 
+.SH 版本
+PF_X25 协议族是 Linux 2.2 的新特性. 
+
+.SH "[中文版维护人]"
+.B RedCandle <redcandle51@chinaren.com>
+.SH "[中文版最新更新]"
+.B 2000/10/26
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

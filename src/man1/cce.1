@@ -1,0 +1,70 @@
+.TH cce 1 "cce v0.35" "Sep 1999"
+
+.SH NAME
+cce \- 控制台中文环境
+
+.SH 语法 (SYNTAX) 
+.B cce [-e program]
+
+.SH 描述 (DESCRIPTION)
+该程序是一个类似于 WZCE ， yact 和 chdrv 的控制台中文平台。
+进入该环境后可以用“空格 + Ctrl”键来切换中文／英文的不同输
+入方式，“ Ctrl+Alt+0~9 ”可以用来改变不同的输入法。
+“ Ctrl+Alt+9 ”是内码输入法。“ Ctrl+Alt+0 ”是拼音输入法。
+默认情况下，CCE以全拼输入法作为输入法 1 （默认输入法），五笔
+输入法作为输入法 2 。你可以通过使用工具软件 cin2tab（安装在
+/usr/lib/cce 中）和 tab2cin 来创建自己的输入法。 cin2tab 会
+将输入法的源文件格式（ *.cin ）转换成二进制格式，而 tab2cin 
+完成的是相反的工作。
+.PP
+为了使用鼠标的剪切和粘贴功能，你必须在你的配置文件（ cce.cfg ）
+中设置你的鼠标类型。 Microsoft （串行鼠标）或 PS2 （默认）。
+
+.SH 选项 (OPTIONS)
+.B -e
+.PP
+定义 CCE 启动后自动运行的程序，默认的是 shell
+.PP
+例如：
+.PP
+cce -e vi
+
+
+.SH 配置 (CONFIGURATION)
+CCE 的配置文件是 /usr/lib/cce/cce.cfg 。你可以在这个文件中定义
+很多选项。
+
+.SH 使用方法 (USAGE)
+ Ctrl+Space              切换中文/英文输入法
+ Ctrl+Alt+0              拼音输入法
+ Ctrl+Alt+9              内码输入法
+ Ctrl+Alt+1              全拼输入法
+ Ctrl+Alt+2              五笔输入法
+ Ctrl+Alt+3-Ctrl+Alt+8   其它输入法
+
+.SH 
+作者(AUTHORS)
+yact:  Nicholas Pearl <Nicholas.bbs@bbs.csie.nctu.edu.tw>
+.PP
+bcs16: Server <cnoize.bbs@bbs.cis.nctu.edu.tw>
+.PP
+chdrv: Youzhong Wang <wycc@iis.sinica.edu.tw> 
+.PP
+kon: Takashi MANABE (manabe@papilio.tutics.tut.ac.jp)
+.PP
+pyinput: ZhenChun Li (zhchli@163.net)
+.PP
+cce:  Rui He <herui@cs.duke.edu>
+
+.SH 程序错误 (BUGS)
+如果发现任何程序错误或对该程序有任何建议，请发信到以下地址：
+herui@cs.duke.edu
+
+.SH 声明（DISCLAIMER）
+本程序不提供任何形式的保证，无论是书面的还是暗示的。不保证
+本程序的任何适用性。本程序作者不对本程序承担任何担保。
+
+8月29日 1999		    cce v0.35
+翻译者：所罗门
+10月20日 2000
+

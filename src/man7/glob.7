@@ -1,0 +1,173 @@
+.\" Copyright (c) 1998 Andries Brouwer
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+
+.TH GLOB 7 "12 June 1998" "Unix" "Linux Programmer's Manual"
+.SH NAME
+glob \- 形成路径名称
+
+.SH "描述 (DESCRIPTION)"
+很久以前 在 UNIX V6 版 中 有一个 程序 
+.I /etc/glob
+用来 展开 通配符模板. 不久以后 它 成为 shell 内建功能.
+现在 人们 开发了 类似的 库函数
+.BR glob (3),
+让 用户程序 实现 同样的 功能.
+
+此 规则 遵循 (POSIX 1003.2, 3.13). 
+
+.SH "通配符匹配 (WILDCARD MATCHING)"
+包含 '?', '*' 或 '[' 字符的 字符串 称为 通配符模板(wildcard pattern).
+形成路径名(globbing) 指 一种 操作, 把 通配符模板 展开为 匹配 该串的 路径名.
+匹配 定义为:
+
+不在 方括弧中 的 '?' 匹配 任意 单个 字符.
+
+不在 方括弧中 的 '*' 匹配 任意 字符串, 包括 空串.
+
+.SS "字符集 (Character classes)"
+对于 表达式 `[...]', 如果 在 第一个 '['符 后面 出现的 第一个 字符 不是 '!', 
+则 该 表达式 匹配 任意 一个 在 `[...]'内 出现的 字符. 方括弧内 不能 有 空串,
+因此 ']' 可以 作为 第一个 字符 出现在 方括弧内. (像 这样, '[][!]' 匹配 下列
+三个 字符 中的 任意 一个, '[', ']' 和 '!'.)
+
+.SS "范围集 (Ranges)"
+字符集 有一个 特例:
+用 '-' 分开的 两个 字符 表示 一个 范围集.
+(像 这样, `[A-Fa-f0-9]' 等于 `[ABCDEFabcdef0123456789]'.)
+把 '-' 放到 方括弧内 的 开头 或 最后 可以 获得 它的 本意.
+(像 这样, `[]-]' 匹配 ']'和'-' 中 任意 一个. 而 `[--/]' 匹配 `-', `.' 和`/'中
+任意 一个.)
+
+.SS "补集 (Complementation)"
+表达式 '[!...]' 表示 一个 字符, 该 字符 不匹配 方括弧内 去掉 开头 '!' 后
+的 表达式. (像 这样, `[!]a-]' 匹配 除了 ']', 'a' 和 '-' 的 任意 一个 字符.)
+
+要 去掉 '?', '*' 和 '[' 的 特殊 含义, 可以 通过 前面 加 一个 反斜杠;
+或者 在 shell 命令行 中, 通过 引号 来 引用 这些 字符.
+在 方括弧内 这些 字符 显露出 本意, 所以, '[[?*\e]' 匹配 这 四个字符
+中 的 一个: '[', '?', '*', '\e'.
+
+.SH "路径名 (PATHNAME)"
+形成路径名 功能 应用于 路径 中 的 每一个 成员部分. 路径 中 的 '/' 不能 被
+通配符 '?' 或 '*', 或 范围集 如 '[.-0]' 匹配. 范围集 不能 直接 包含 '/', 
+否则 导致 语法错误.
+
+如果 待匹配的 文件名 以'.'开头, 那么 这个 '.' 字符 必须 直接 给出. (比如说, 
+'rm *' 不会 删除 '.profile' 文件, 'tar c *' 不会 打包 你的 所有 文件; 
+用 'tar c .' 会 更好.)
+
+.SH "空列表 (EMPTY LISTS)"
+上述的 简单优雅 规则, 把 通配符模板 展开为 匹配的 路径名, 来源于 
+最初的 UNIX 定义. 它 允许 展开出 空串, 例如
+
+.br
+.nf
+	xv -wait 0 *.gif *.jpg
+.fi
+
+这里 可能 没有 *.gif 文件 (而且 不算 错误).
+
+然而, POSIX 要求 句法 错误 或 路径名 列表 为 空 时, 保留 通配符模板 不变.
+(译注: 即 不展开.)
+
+在
+.I bash
+中 可以 通过 设置
+.IR allow_null_glob_expansion=true
+把 它 强置为 传统的 风格. (其他 地方 也有 类似的 问题, 例如, 老式的 语句 是
+.br
+.nf
+	rm `find . -name "*~"`
+.fi
+新的 写法 为
+.br
+.nf
+	rm -f nosuchfile `find . -name "*~"`
+.fi
+以 避免 由于 空参数调用
+.I rm
+而 产生 错误信息.)
+
+.SH "注意 (NOTES)"
+.SS "正规表达式 (Regular expressions)"
+注意, 通配符模板 不是 正规表达式, 尽管 它们 有点象. 首先, 
+它 匹配 文件名, 而 不是 正文; 其次, 规则 不一样, 例如 正规表达式 里 的 '*'
+代表 零个或多个 前面内容的 重复.
+
+正规表达式 的 方括弧表达式 用 '^' 引导 取反操作, (而不是 '[!...]').
+POSIX 声明, 在 通配符模板 中, '[^...]' 未做 定义.
+
+.SS "字符集 和 国际化 (Character classes and Internationalization )"
+当然, 范围集 最初 指 ASCII的 范围, 因此 '[ -%]' 意思是 '[ !"#$%]',
+'[a-z]' 指 所有 小写字符.
+
+一些 UNIX实现 把 这个 归纳为: 范围 X-Y 指 X的编码 到 Y的编码 之间的
+编码字符. 可是, 这 要求 用户 知道 他们 本地系统的 字符编码, 此外, 如果
+本地的 字母表顺序 和 字符集顺序 不对应, 那 就 更不方便了.
+
+因此, POSIX 对 通配符模板 和 正规表达式 的 方括弧表达法 作了 重大扩展,
+上面 我们 知道了 方括弧表达式 中 的 三个 类型, 它们是 (i) 取补集
+(ii) 直接列出的 单个字符 和 (iii) 范围集.
+
+POSIX 对 范围集 在 国际化 方面 作了 更有力的 说明, 并且 增加了 三个 类型:
+
+(iii) 范围 X-Y 由 X 和 Y 之间 所有的字符 组成 (包括X和Y), X 和 Y 的 
+当前编码序列 由 当前场合的 LC_COLLATE 分类定义.
+
+(iv) 命名字符集, 象
+.br
+.nf
+[:alnum:]  [:alpha:]  [:blank:]  [:cntrl:]
+[:digit:]  [:graph:]  [:lower:]  [:print:]
+[:punct:]  [:space:]  [:upper:]  [:xdigit:]
+.fi
+因此 可以 用 '[[:lower:]]' 代替 '[a-z]', 它 在 丹麦语 里 同样 有效, 虽然 
+丹麦的 字母表 里 'z' 后面 还有 三个 字母.
+这些 字符集 由 当前场合的 LC_CTYPE 分类定义.
+
+(v) 符号对映, 象 '[.ch.]' 或 '[.a-acute.]',
+在 '[.' 和 '.]' 之间的 字符串 是 定义 在 当前场合的 对映元素.
+注意 这 可以 是 多字符元素.
+
+(vi) 等类表达式, 象 '[=a=]',
+在 '[=' 和 '=]' 之间的 字符串 是 任意 等类 中 的 对映元素, 它 定义在 当前场合.
+例如, '[[=a=]]' 可以 等同于 `[a徉溻]' (警告: 这里 有 Latin-1 字符),
+也就是 `[a[.a-acute.][.a-grave.][.a-umlaut.][.a-circumflex.]]'.
+
+.SH "SEE ALSO"
+.BR sh (1),
+.BR glob (3),
+.BR fnmatch (3),
+.BR locale (7),
+.BR regex (7)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/15
+第一版
+.br
+.BR 2001/11/17
+第一次修订
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

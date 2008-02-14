@@ -1,0 +1,169 @@
+.\" vmstat.8 - manpage for the vmstat(8) utility, part of procps
+.\"
+.\" Copyright (C) 2003 Robert Love
+.\" Licensed under the terms of the GNU General Public License, v2
+.TH VMSTAT 8 "02 Jun 2003" "Linux" "Linux User's Manual"
+.SH NAME
+vmstat \- display virtual memory statistics
+
+.SH SYNOPSIS
+.BI "vmstat [flags]
+.RI [ delay " [" count ]]
+
+.SH DESCRIPTION
+The
+.BR vmstat (8)
+utility reports statistical information about process status, memory
+consumption, paging activity, block I/O operations, interrupts, context
+switches, and processor usage.
+
+The
+.BR vmstat (8)
+utility is most commonly used to produce a continuous report every
+.IR delay
+seconds.  In this mode, the first report given is the average of the statistics
+since system boot. Each subsequent line pertains to that sampling period (that
+is, the last
+.IR delay
+seconds).  If no
+.IR delay
+value is given, only one report is given, which is the average since system
+boot.
+
+The optional
+.IR count
+value specifies a maximum number of reports to print before terminating. By
+default (that is, when no
+.IR count
+value is given)
+.BR vmstat (8)
+will continue to print reports every
+.IR delay
+seconds until interrupted.
+
+.SH OPTIONS
+Normal invocation of 
+.BR vmstat (8)
+does not require any options.  The output, however, can be fine-tuned by
+specifying one or more of the following flags:
+.TP
+.B \-\-active, \-a
+Display active and inactive memory statistics in lieu of the buffer and cache
+statistics.
+.TP
+.B \-\-noheaders, \-n
+Do not regularly update the header describing each column. Normally, the header
+is periodically reprinted to ensure it is always viewable.
+.TP
+.B \-\-bytes, \-b
+Display the statistics in bytes.
+.TP
+.B \-\-kb, \-kb
+Display the statistics in kilobytes.  This is the default.
+.TP
+.B \-\-mb, \-m
+Display the statistics in megabytes.
+.TP
+.B \-\-gb, -g
+Display the statistics in gigabytes.  Note that the translation silently rounds
+down any underflow and displays the result as an integer.  This means that the
+translation is efficient and simple, but that a large unit (i.e., MB or GB)
+with small statistics will display zero and not a decimal fraction.
+.TP
+.B \-\-version, \-V
+Display version information and then exit.
+.TP
+.B \--help
+Display usage information and then exit.
+
+.SH FIELDS
+.SS
+.B "procs"
+.nf
+r: The number of runnable processes (that is, processes running or
+   waiting to run).
+b: The number of processes in uninterruptible sleep.
+.fi
+.PP
+.SS
+.B "memory"
+.nf
+swpd  : the amount of memory paged to disk (in KB by default)
+free  : the amount of free physical memory (in KB by default)
+buff  : the amount of memory consumed by buffers (in KB by default)
+inact : the amount of memory on the inactive list (in KB by default)
+active: the amount of memory on the active list (in KB by default)
+.fi
+.PP
+.SS
+.B "swap"
+.nf
+si: the amount of memory paged in from disk (in KB/s by default)
+so: the amount of memory paged out to disk (in KB/s by default)
+.fi
+.PP
+.SS
+.B "io"
+.nf
+bi: blocks sent out to a block device (in blocks/s)
+bo: blocks received from a block device (in blocks/s)
+.fi
+.PP
+.SS
+.B "system"
+.nf
+in: the number of interrupts received (in interrupts/s)
+cs: the number of context switches (in switches/s)
+.fi
+.PP
+.SS
+.B "cpu"
+.nf
+us: percentage of total processor time consumed by user-space
+sy: percentage of total processor time consumed by the kernel
+wa: percentage of total processor time spent in I/O wait
+id: percentage of total processor time spent idle
+.fi
+
+.SH NOTES
+
+The current implementation of
+.BR vmstat (8)
+does not display the traditional "w" field under "procs".  This is because
+Linux is a demand paging operating system and does not support the notion of
+swapping out entire processes.  Thus this statistic is worthless.  Older
+versions of
+.BR vmstat (8)
+just displayed a hardcoded zero for this value.  Even older versions
+calculated the field based on the number of RSS pages the process owns.
+Although this is a close analogy to the concept of "swapped out", it is still a
+misleading statistic as the Linux kernel has not explicitly decided to swap to
+disk the entire process.
+
+This version of
+.BR vmstat(8)
+displays I/O wait statistics as "wa" under the "cpu" section.  This field is
+not part of traditional
+.BR vmstat (8)
+implementations, but Linux kernels since 2.5 have exported this (very useful)
+information.  Earlier kernels will simply display zero for this field.
+
+.SH FILES
+.IR /proc/meminfo " \-\- memory information"
+.TP
+.IR /proc/stat " \-\- system statistics"
+.TP
+.IR /proc/[1-9]*/stat " \-\- process statistics"
+
+.SH "SEE ALSO"
+.BR ps (1),
+.BR top (1),
+.BR free (1)
+
+.SH AUTHORS
+Written by Robert Love.
+
+The procps package is maintained by Robert Love and was created by Michael
+Johnson.
+
+Send bug reports to <procps-list@redhat.com>.

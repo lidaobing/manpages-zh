@@ -1,0 +1,100 @@
+.TH SMBTAR 1 "11 Nov 1999" "smbtar 2.0.6"
+.PP 
+.SH NAME
+smbtar \ - 直接备份SMB/CIFS共享资源到UNIX磁带设备的shell脚本
+.PP
+.SH 总览
+.PP 
+\fBsmbtar\fP -s server [-p password] [-x service] [-X] [-d directory] [-u user] [-t tape] [-b blocksize] [-N filename] [-i] [-r] [-l log level] [-v] filenames
+.PP 
+.SH 描述
+.PP
+此程序是samba套件的一部分。
+.PP
+smbtar是个在smbclient基础上建立的非常小的shell脚本，用于把SMB共享资源直接写到磁带上。
+.PP
+.SH 选项 
+.PP 
+.IP 
+.IP "\fB-s server\fP" 
+指定提供共享资源的SMB/CIFS服务器。 
+.IP 
+.IP "\fB-x service\fP" 
+指定要联接的共享资源。默认情况下就是备份。 
+.IP 
+.IP "\fB-X\fP" 
+排除模式，从建立或者恢复的备份项中排除文件名。 
+.IP 
+.IP "\fB-d directory\fP" 
+在恢复 / 备份文件前改变初始化目录directory。 
+.IP 
+.IP "\fB-v\fP" 
+指定用详细模式。 
+.IP 
+.IP "\fB-p password\fP" 
+指定要访问的共享资源的口令。默认是：none。 
+.IP 
+.IP "\fB-u user\fP" 
+指定联接时的用户账号。默认是：UNIX登录账号。 
+.IP 
+.IP "\fB-t tape\fP" 
+指定所用的磁带设备。这里可能是正常的文件或磁带设备。默认是：TAPE 环境变量；如
+果不指定的话，以tar.out作为文件名。 
+.IP 
+.IP "\fB-b blocksize\fP" 
+指定块比例。默认是20，请查看tar (1)中的完整解释。
+.IP 
+.IP "\fB-N filename\fP" 
+只备份比filename指定文件更新的文件。可以用在记录文件中以实现增量备份。 
+.IP 
+.IP "\fB-i\fP" 
+指定增量模式；tar文件只备份设定归档位的文件。在对每个文件进行读取时归档位可以重新设定。 
+.IP 
+.IP "\fB-r\fP" 
+指定做恢复操作。从tar备份文件中恢复文件到共享资源上。 
+.IP 
+.IP "\fB-l log level\fP" 
+记录(调试)等级。这与smbclient (1)的-d参数含义相当。 
+.IP 
+.PP 
+.SH 环境变量
+.PP
+TAPE变量指定了执行写操作的默认磁带设备。可以用-t选项来重设。
+.PP
+.SH 错误
+.PP
+从smbclient中调用tar命令及原始的tar命令与smbtar脚本有些不大相同的选项。
+.PP
+.SH 警告
+.PP
+基于安全性方面的站点不太喜欢用脚本来处理PC口令。在共享资源接口上备份和恢复会在文件
+列表上进行工作。smbtar和GNU的tar一起使用非常出色，但可能和其它的一些版本使用时并
+不太好。
+.PP
+.SH 版本
+.PP
+此手册页是针对samba套件版本2.0的。 
+.PP
+.SH 另见
+.PP 
+\fBsmbclient (1)\fP, \fBsmb\&.conf
+(5)\fP
+.PP 
+.SH 诊断
+参见smbclient命令中的DIAGNOSTICS部分。
+.SH 作者
+.PP
+samba软件和相关工具最初由Andrew Tridgell samba-bugs@samba.org创建。samba现在由
+开发组作为类似Linux内核开发采用的开放源代码计划方式来发展。
+.PP
+samba手册页最初由Karl Auer撰写。它的源码已被转换成YODL(一种极好的开放源代码软件，可
+以在ftp://ftp.icce.rug.nl/pub/unix/处获得)格式并已由Jeremy Allison更新到samba2.0版本。
+.PP
+请参见samba (7)查找如何获得一份完整的维护者列表以及如何提交错误报告及注解等等。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

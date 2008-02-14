@@ -1,0 +1,324 @@
+.\" Copyright (c) 1990, 1991 Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)stdio.3	6.5 (Berkeley) 5/6/91
+.\"
+.\" Converted for Linux, Mon Nov 29 16:07:22 1993, faith@cs.unc.edu
+.\" Modified, 2001-12-26, aeb
+.\"
+.TH STDIO 3  2001-12-26 "" "Linux Programmer's Manual"
+.SH NAME
+stdio \- 标准输入输出库函数
+.SH "SYNOPSIS 总览"
+.B #include <stdio.h>
+.sp
+.B FILE *stdin;
+.br
+.B FILE *stdout;
+.br
+.B FILE *stderr;
+.SH "DESCRIPTION 描述"
+标注 I/O 库函数提供了一个简单而有效的，带缓冲的流输出输出接口。输入和输出被映射为逻辑的数据流，物理的 I/O 特性则被隐藏起来。库中包含的函数与宏列在下面；更多信息可以从独立的 man 手册页中得到。
+.PP
+将一个流关联到一个外部文件 (可能是一个物理设备) 的方法是打开 (
+.I opening
+) 这个文件，其中可能牵涉到创建一个新文件。创建已有的文件使得文件中已有的内容被丢弃。如果文件支持定位请求 (例如磁盘文件；但终端不是这样)，那么一个与文件关联的定位标记 (
+.I file position indicator
+) 被定位到文件的起始 (0 字节)，除非以追加模式打开文件。使用追加模式时，究竟定位标记位于文件的开始还是结束是没有指定的。定位标记由后续的读、写和定位请求来维护。从流中输入时，就如同字符是连续地成功调用了函数
+.BR fgetc (3)
+而读入的；产生输出时，就如同所有字符是连续地成功调用了函数
+.BR fputc (3)
+而输出的。
+.PP
+将一个流与一个与之关联的文件断开的办法是关闭 (
+.I closing
+) 这个文件。在流与文件断开之前，输出流被刷新 (任何未写入的缓冲的内容都被传输给主机环境)。在文件被关闭之后，指向
+.B FILE
+对象的指针的值是不确定的 (无用数据)。
+.PP
+一个文件可以继续被相同的或是不同的程序实体再次打开，它的内容可以被恢复或者修改 (如果它可以被重定位到文件开始的话)。如果 main 函数返回到它最初的调用者，或者调用了函数
+.BR exit (3)
+，在程序终止前，所有打开的文件都将被关闭 (因此所有的输出流都被刷新)。其他终止程序的方法，例如
+.BR abort (3)
+不会进行正常的关闭文件操作。
+.PP
+在程序启动时，会预先定义三个文本流，它们不需要显式地打开 \(em
+.I 标准输入
+(用于读入常规内容)，\(em
+.I 标准输出
+(用于输出常规内容)，以及
+.I 标准错误
+(用于输出诊断信息)。这些流的缩写是
+.IR stdin，stdout
+和
+.IR stderr
+。在打开时，标准错误流不会完全缓冲；当且仅当流不是一个交互的设备时，标准输入和标准输出流才被完全缓冲。
+.PP
+指向终端设备的输出流总是默认使用行缓冲；未定的输出总是在指向一个终端设备的输入流被读取时自动被写入。如果在一个输出终端上打印了一行的一部分，然后运行了大量的计算后，应当在退出和计算前
+.BR fflush (3)
+标准输出，使得输出可以显示出来。(?)
+.PP
+标准输入输出库
+.B stdio
+是函数库
+.B libc
+的一部分，需要时可以被编译器
+.BR cc (1)
+和
+.BR pc (1)
+自动加载。下列手册页的
+.B "SYNOPSIS 总览"
+段落会指出要包含哪些文件，函数定义的格式，以及它们受到哪些外部变量的影响。
+.PP
+下列为已定义的宏；如果不用
+.BR #undef
+取消这些名称的当前定义的话，是不能重新使用它们的：
+.BR BUFSIZ ,
+.BR EOF ,
+.BR FILENAME_MAX ,
+.BR FOPEN_MAX ,
+.BR L_cuserid ,
+.BR L_ctermid ,
+.BR L_tmpnam,
+.BR NULL ,
+.BR SEEK_END ,
+.BR SEEK_SET ,
+.BR SEE_CUR ,
+.BR TMP_MAX ,
+.BR clearerr ,
+.BR feof ,
+.BR ferror ,
+.BR fileno ,
+.BR fropen ,
+.BR fwopen ,
+.BR getc ,
+.BR getchar ,
+.BR putc ,
+.BR putchar ,
+.BR stderr ,
+.BR stdin ,
+.BR stdout .
+另外，还有与这些宏的功能对应的，函数形式的版本
+.BR feof ,
+.BR ferror ,
+.BR clearerr ,
+.BR fileno ,
+.BR getc ,
+.BR getchar ,
+.BR putc ,
+和
+.B putchar
+，在显式地取消宏的定义时，可以使用它们。
+.SH "LIST OF FUNCTIONS 函数列表"
+.TP 10n
+.B "Function 函数"
+.B "Description 描述"
+.TP
+.B clearerr
+检测并重置流状态
+.TP
+.B fclose
+关闭流
+.TP
+.B fdopen
+打开流
+.TP
+.B feof
+检测并重置流状态
+.TP
+.B ferror
+检测并重置流状态
+.TP
+.B fflush
+刷新流
+.TP
+.B fgetc
+从输入流中获取下一个字符或词
+.\" .TP
+.\" .B fgetline
+.\" get a line from a stream (BSD only; renamed to fgetln())
+.TP
+.B fgetpos
+重定位流
+.TP
+.B fgets
+从流中获取一行
+.TP
+.B fileno
+返回流参数的整数形式的描述符
+.TP
+.B fopen
+打开流
+.TP
+.B fprintf
+按照格式输出常规内容
+.TP
+.B fpurge
+刷新流
+.TP
+.B fputc
+向流输出一个字符或词
+.TP
+.B fputs
+向流输出一行
+.TP
+.B fread
+二进制输入/输出
+.TP
+.B freopen
+打开流
+.TP
+.B fropen
+打开流
+.TP
+.B fscanf
+按照格式输入常规内容
+.TP
+.B fseek
+重定位流
+.TP
+.B fsetpos
+重定位流
+.TP
+.B ftell
+重定位流
+.TP
+.B fwrite
+二进制输入/输出
+.TP
+.B getc
+从输入流中获取下一个字符或词
+.TP
+.B getchar
+从输入流中获取下一个字符或词
+.TP
+.B gets
+从流中获取一行
+.TP
+.B getw
+从输入流中获取下一个字符或词
+.TP
+.B mktemp
+创建 (唯一的) 临时文件名
+.TP
+.B perror
+系统错误消息
+.TP
+.B printf
+按照格式输出常规内容
+.TP
+.B putc
+向流输出一个字符或词
+.TP
+.B putchar
+向流输出一个字符或词
+.TP
+.B puts
+向流输出一行
+.TP
+.B putw
+向流输出一个字符或词
+.TP
+.B remove
+删除目录项
+.TP
+.B rewind
+重定位流
+.TP
+.B scanf
+按照格式输入常规内容
+.TP
+.B setbuf
+流缓冲操作
+.TP
+.B setbuffer
+流缓冲操作
+.TP
+.B setlinebuf
+流缓冲操作
+.TP
+.B setvbuf
+流缓冲操作
+.TP
+.B sprintf
+按照格式输出常规内容
+.TP
+.B sscanf
+按照格式输入常规内容
+.TP
+.B strerror
+系统错误消息
+.TP
+.B sys_errlist
+系统错误消息
+.TP
+.B sys_nerr
+系统错误消息
+.TP
+.B tempnam
+临时文件控制
+.TP
+.B tmpfile
+临时文件控制
+.TP
+.B tmpnam
+临时文件控制
+.TP
+.B ungetc
+向输入流中退回字符
+.TP
+.B vfprintf
+按照格式输出常规内容
+.TP
+.B vfscanf
+按照格式输入常规内容
+.TP
+.B vprintf
+按照格式输出常规内容
+.TP
+.B vscanf
+按照格式输入常规内容
+.TP
+.B vsprintf
+按照格式输出常规内容
+.TP
+.B vsscanf
+按照格式输入常规内容
+.SH "CONFORMING TO 标准参考"
+函数库
+.B stdio
+遵循 ANSI X3.159-1989 (``ANSI C'') 标准。
+.SH "SEE ALSO 参见"
+.BR open (2),
+.BR close (2),
+.BR read (2),
+.BR write (2),
+.BR stdout (3)

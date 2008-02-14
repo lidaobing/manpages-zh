@@ -1,0 +1,312 @@
+'\"
+'\" Copyright (c) 1995-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: load.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: load.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH load n 7.5 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+load \- 装载机器代码并初始化新命令。
+.SH "总览 SYNOPSIS"
+\fBload \fIfileName\fR
+.br
+\fBload \fIfileName packageName\fR
+.br
+\fBload \fIfileName packageName interp\fR
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令把二进制代码从一个文件装载到应用的地址空间中并调用在包(package)中的初始化过程来把它加入到解释器中。\fIfileName\fR    是包含代码的文件的名字；它准确的形式在不同的系统上是不同的，但在多数系统上是一个共享库，例如，在 Solaris  下的 \fB.so\fR  文件或在 Windows 下的一个 DLL。\fIpackageName\fR   是包的名字，并被用于计算初始化过程的名字。\fIinterp\fR   是要在其中装载包的解释器的路径名(详情参见 \fBinterp\fR   手册条目)；如果省略了 \fIinterp\fR  ，它的缺省是在其中调用  \fBload \fR命令的那个解释器。
+.PP
+一旦已经被装载到应用的地址空间中，两个初始化过程之一将在新代码中被调用。典型的，初始化进程将向一个   Tcl 解释器添加新命令。初始化过程的名字由    \fIpackageName\fR   和目标解释器是否是安全解释器来确定。对于通常的解释器，初始化过程的名字的形式是 \fIpkg\fR\fB_Init\fR，这里 \fIpkg\fR     与 \fIpackageName\fR   相同，但是第一个字母被转换成大写而所有其他字母被转换成小写。例如，如果 \fIpackageName\fR   是    
+\fBfoo\fR 或 \fBFOo\fR，则初始化过程的名字将是 \fBFoo_Init\fR。
+.PP
+如果目标解释器是一个安全解释器，则初始化过程的名字将是 \fIpkg\fR\fB_SafeInit\fR     而不是 \fIpkg\fR\fB_Init\fR。写 \fIpkg\fR\fB_SafeInit\fR   函数要仔细，在包中提供的功能中，只用由不可信任的代码使用是安全的的那部分初始化安全解释器。  关于 Safe-Tcl 的详细的信息，请参见 \fBsafe\fR  手册条目。
+.PP
+初始化过程必须匹配下列原型 (prototype):   
+.CS
+typedef int Tcl_PackageInitProc(Tcl_Interp *\fIinterp\fR);
+.CE
+\fIinterp\fR   
+参数标识在其中装载包的解释器。初始化过程必须返回    \fBTCL_OK\fR 或 \fBTCL_ERROR\fR  来指示是否成功完成；在有错误的情况下，应把解释器的结果设置为指向一个错误消息。初始化过程返回的结果就是  \fBload\fR  命令的结果。
+.PP
+在一个应用中对每个 \fIfileName \fR只进行一次文件的实际装载。如果一个给定的 \fIfileName\fR   被装载到多个解释器中，则第一个 \fBload\fR   将装载代码并调用初始化过程；随后的 \fBload\fR  将调用初始化过程而不再次装载代码  。不可能卸载或重载一个包。
+.PP
+\fBload\fR   命令还支持同应用静态连接的包，条件是这些包已经通过调用 \fBTcl_StaticPackage\fR  过程注册过了。如果 \fIfileName\fR  是一个空串，则必须指定\fIpackageName\fR   。
+.PP
+如果省略了 \fIpackageName\fR  或被指定为一个空串，Tcl  尝试着猜出包的名字。在不同的平台上可能是不同的。在多数 UNIX  平台上，缺省的猜测是接受 \fIfileName\fR  的最后的组成部分，如果前三个字符是 \fBlib \fR就去掉它们，使用所有随后的
+.VS
+字母和下划线作为模块的名字。
+.VE
+例如，命令 \fBload libxyz4.2.so\fR   使用模块名 \fBxyz\fR  而命令 \fBload bin/last.so {}\fR   使用模块名 \fBlast\fR。
+.VS "" br
+.PP
+如果 \fIfileName\fR  是一个空串，则必须指定 \fIpackageName\fR。\fBload\fR   命令首先用这个名字查找一个静态装载包(通过调用 \fBTcl_StaticPackage\fR    过程注册的包)；如果找到了就使用它。否则，\fBload\fR   命令用这个名字查找动态装载包，如果找到就使用它。如果一些不同的文件被装载成包的不同版本，Tcl  选择被最先装载的文件。   
+.VE
+
+.SH "移植要点 PORTABILITY ISSUES"
+.TP
+\fBWindows\fR\0\0\0\0\0
+.
+在装载出现 "library not found" 错误的时候，也有可能是没找到一个依赖库。要查看依赖库，在一个 DOS  控制台中“dumpbin -imports <dllname>”来查看必须导入那些库。在当前目录中装载一个 DLL  的时候，Windows 将忽略作为一个路径指定符(specifier)的“./”，转而使用一次启发式(heuristic)的查找来找到这个 DLL。要避免如此，装载DLL  就要用   
+.CS
+    load [file join [pwd] mylib.DLL]
+.CE
+
+.SH BUGS
+.PP
+如果以不同的\fIfileName\fRs 装载同一个文件，它将被多次载入这个进程的地址空间。在不同的系统上装载的行为是不同的(一些系统可以检测多余的装载，其他的可能不能)。   
+
+.SH "参见 SEE ALSO"
+\fBinfo sharedlibextension\fR, Tcl_StaticPackage(3), safe(n)
+
+.SH "关键字 KEYWORDS"
+binary code, loading, safe interpreter, shared library
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/08/30  
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

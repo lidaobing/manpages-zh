@@ -1,0 +1,251 @@
+'\" t
+.\" Don't change the first line, it tells man that tbl is needed.
+.\" This man page is Copyright (C) 1999 Andi Kleen <ak@muc.de>.
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.TH NETDEVICE  7 "2 May 1999" "Linux Man Page" "Linux Programmer's Manual" 
+.SH NAME
+netdevice \- 底层访问 Linux 网络设备.
+
+.SH "总览 (SYNOPSIS)"
+.B "#include <sys/ioctl.h>"
+.br
+.B "#include <net/if.h>"
+
+.SH "描述 (DESCRIPTION)"
+本手册 描述 用于 配置 网络设备 的 套接字(socket) 接口.
+
+Linux 支持 一些 配置 网络设备 的 标准 ioctl. 他们 用于 任意的 套接字 描述符,
+而 无须 了解 其 类型 或 系列. 他们 传递 一个
+.B ifreq 
+结构:
+
+.nf
+.ta 4 20 42
+struct ifreq
+{
+	char	ifr_name[IFNAMSIZ];	/* Interface name */
+	union {
+		struct sockaddr	ifr_addr;
+		struct sockaddr	ifr_dstaddr;
+		struct sockaddr	ifr_broadaddr;
+		struct sockaddr	ifr_netmask;
+		struct sockaddr	ifr_hwaddr;
+		short	ifr_flags;
+		int	ifr_ifindex;
+		int	ifr_metric;
+		int	ifr_mtu;
+		struct ifmap	ifr_map;
+		char	ifr_slave[IFNAMSIZ];
+		char	ifr_newname[IFNAMSIZ];
+		char *	ifr_data;
+	};
+}
+
+struct ifconf 
+{ 
+  	int ifc_len;		/* size of buffer */
+	union {            
+		char *	ifc_buf; /* buffer address */ 
+		struct ifreq *ifc_req; /* array of structures */
+	};  
+}; 	   
+.ta
+.fi
+
+一般说来, ioctl 通过 把
+.B ifr_name
+设置为 接口 的 名字 来 指定 将要 操作 的 设备. 结构的 其他成员 可以 分享 内存.
+
+.SH IOCTLS
+如果 某个 ioctl 标记为 特权操作, 那么 操作时 需要 有效uid 为 0, 或者 拥有
+.B CAP_NET_ADMIN
+能力. 否则 将 返回
+.B EPERM .
+
+.TP
+.B SIOCGIFNAME
+给定
+.BR ifr_ifindex,
+返回
+.BR ifr_name 
+中 的 接口名字. 这是 唯一 返回 
+.BR ifr_name 
+内容 的 ioctl.
+
+.TP
+.B SIOCGIFINDEX
+把 接口 的 索引 存入
+.BR ifr_ifindex .
+
+.TP
+.BR SIOCGIFFLAGS ", " SIOCSIFFLAGS
+读取 或 设置 设备的 活动标志字.
+.B ifr_flags
+包含 下列值 的 屏蔽位:
+
+.TS
+tab(:);
+c s
+l l.
+设备标志
+IFF_UP: 接口正在运行.
+IFF_BROADCAST: 有效的广播地址集.
+IFF_DEBUG: 内部调试标志.
+IFF_LOOPBACK: 这是自环接口.
+IFF_POINTOPOINT: 这是点到点的链路接口.
+IFF_RUNNING: 资源已分配.
+IFF_NOARP: 无arp协议, 没有设置第二层目的地址.
+IFF_PROMISC: 接口为杂凑(promiscuous)模式.
+IFF_NOTRAILERS: 避免使用trailer .
+IFF_ALLMULTI: 接收所有组播(multicast)报文.
+IFF_MASTER: 主负载平衡群(bundle).
+IFF_SLAVE: 从负载平衡群(bundle).
+IFF_MULTICAST: 支持组播(multicast).
+IFF_PORTSEL: 可以通过ifmap选择介质(media)类型.
+IFF_AUTOMEDIA: 自动选择介质.
+IFF_DYNAMIC: 接口关闭时丢弃地址.
+.TE 
+
+设置 活动标志字 是 特权操作, 但是 任何进程 都可以 读取 标志字.
+
+.TP
+.BR SIOCGIFMETRIC ", " SIOCSIFMETRIC
+使用
+.BR ifr_metric 
+读取 或 设置 设备的 metric 值. 该功能 目前 还没有 实现. 读取操作 使
+.B ifr_metric
+置 0, 而 设置操作 则 返回
+.B EOPNOTSUPP.
+
+.TP
+.BR SIOCGIFMTU ", " SIOCSIFMTU
+使用
+.BR ifr_mtu 
+读取 或 设置 设备的 MTU(最大传输单元).
+设置 MTU 是 特权操作. 过小的 MTU 可能 导致 内核 崩溃.
+
+.TP
+.BR SIOCGIFHWADDR ", " SIOCSIFHWADDR
+使用
+.BR ifr_hwaddr 
+读取 或 设置 设备的 硬件地址. 设置 硬件地址 是 特权操作.
+
+.TP
+.B SIOCSIFHWBROADCAST
+使用
+.BR ifr_hwaddr 
+读取 或 设置 设备的 硬件广播地址. 这是个 特权操作.
+
+.TP
+.BR SIOCGIFMAP ", " SIOCSIFMAP
+使用
+.BR ifr_map 
+读取 或 设置 接口的 硬件参数. 设置 这个参数 是 特权操作.
+
+.nf
+.ta 4 20 42
+struct ifmap 
+{
+	unsigned long	mem_start;
+	unsigned long	mem_end;
+	unsigned short	base_addr; 
+	unsigned char	irq;	
+	unsigned char	dma; 
+	unsigned char	port; 
+};
+.ta
+.fi
+
+对 ifmap 结构 的 解释 取决于 设备驱动程序 和 体系结构.
+
+.TP
+.BR SIOCADDMULTI ", " SIOCDELMULTI
+使用
+.BR ifr_hwaddr 
+在 设备的 链路层 组播过滤器 (multicase filter) 中 添加 或 删除 地址.
+这些是 特权操作. 参看
+.BR packet (7) .
+
+.TP
+.BR SIOCGIFTXQLEN ", " SIOCSIFTXQLEN
+使用
+.BR ifr_qlen 
+读取 或 设置 设备的 传输队列长度.
+设置 传输队列长度 是 特权操作.
+
+.TP
+.B SIOCSIFNAME
+把
+.BR ifr_ifindex
+中 指定的 接口名字 改成
+.BR ifr_newname .
+这是个 特权操作.
+
+.TP
+.B SIOCGIFCONF
+返回 接口地址(传输层) 列表. 出于 兼容性, 目前 只代表 AF_INET 地址.
+用户 传送 一个
+.B ifconf
+结构 作为 ioctl 的 参数. 其中
+.B ifc_req
+包含 一个 指针 指向
+.I ifreq
+结构数组, 他的 长度 以字节 为单位 存放在
+.B ifc_len 
+中. 内核 用 所有 当前的 L3(第三层?) 接口地址 填充 ifreqs,
+这些 接口 正在 运行:
+.I ifr_name 
+存放 接口名字 (eth0:1等),
+.I ifr_addr
+存放 地址. 内核 在
+.I ifc_len
+中 返回 实际长度;
+如果 他 等于 初始长度, 表示 溢出了, 用户 应该 换一个 大些的 缓冲区 重试 一下.
+没有 发生 错误时 ioctl 返回 0, 否则 返回 -1, 溢出 不算 错误.
+
+\" XXX Slaving isn't supported in 2.2
+.\" .TP
+.\" .BR SIOCGIFSLAVE ", " SIOCSIFSLAVE
+.\" Get or set the slave device using
+.\" .BR ifr_slave .
+.\" Setting the slave device is a privileged operation.
+
+.PP
+
+.\" XXX add amateur radio stuff.
+.PP
+大多数 协议 使用 自己的 ioctl 配置 协议 特定的 接口 操作. 具体 情况
+参看 协议的 帮助手册. 要配置 IP 地址 可以 参看
+.BR ip (7).
+.PP
+另外, 某些 设备 有 专用的 ioctl, 这里 不做 叙述.
+
+.SH "注意 (NOTE)"
+严格说来
+.B SIOCGIFCONF 
+是 专门 针对 IP 的, 它 属于
+.BR ip (7).
+
+.SH "注意 (NOTE)"
+可以 通过
+.I /proc/net/dev
+看到 没有 地址 或 没有
+.B IFF_RUNNING 
+标志 的 接口名字.
+
+.SH "另见 (SEE ALSO)"
+.BR ip "(7), " proc "(7)"
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.B 2000/10/15
+第一版
+.br
+.BR 2001/11/24
+第一次修订
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

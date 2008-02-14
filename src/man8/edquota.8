@@ -1,0 +1,120 @@
+.TH EDQUOTA 8 "2001年3月9日星期五"
+.SH NAME(名称)
+edquota \- 编辑用户配额
+.SH SYNOPSIS(总览)
+.B edquota
+[
+.B \-p
+.I proto-username
+] [
+.B \-u
+|
+.B \-g
+]
+.IR username .\|.\|.
+.LP
+.B edquota
+[
+.B \-u
+|
+.B \-g
+]
+.B \-t
+.SH DESCRIPTION(描述)
+.IX  "edquota command"  ""  "\fLedquota\fP \(em edit user quotas"
+.IX  edit "user quotas \(em \fLedquota\fP"
+.IX  "user quotas"  "edquota command"  ""  "\fLedquota\fP \(em edit user quotas"
+.IX  "disk quotas"  "edquota command"  ""  "\fLedquota\fP \(em edit user quotas"
+.IX  "quotas"  "edquota command"  ""  "\fLedquota\fP \(em edit user quotas"
+.IX  "file system"  "edquota command"  ""  "\fLedquota\fP \(em edit user quotas"
+.B edquota
+是一个配额编辑器(如果你想在脚本中设置配额,请参看
+.BR setquota (8)
+).
+在命令行上可以指定一个或多个用户或组.对于每个用户或组,会用
+.SM ASCII
+形式创建一个针对该用户或组的当前磁盘配额的临时文件,并对这个文件
+调用编辑器.随后可以修改配额,添加新的配额,等等.
+设置某个配额为零表示不施加任何配额限制.
+.PP
+可以允许用户超出它们的软限制一段宽限期,该宽限期对每个文件系统指定.
+一旦超出此宽限期,软限制即作为硬限制来执行.
+.PP
+文件中列出的当前的使用信息是用于提供信息的；
+只可以修改硬和软限制.
+.PP
+一旦离开编辑器,
+.B edquota
+就读入临时文件并修改二进制配额文件以反映所作的修改.
+.LP
+调用的编辑器为
+.BR vi (1)
+除非
+.SB VISUAL
+或者
+.SB EDITOR
+环境变量指定了其它的编辑器.
+.LP
+只有超级用户可以编辑配额.(为了在一个文件系统上建立配额,文件系统的
+root目录下必须包含一个由root所有,叫做
+.BR aquota.user
+或
+.BR aquota.group
+的文件.
+参看
+.BR quotaon (8)
+以了解详情.)
+.SH OPTIONS(选项)
+.TP
+.B \-u
+编辑用户配额.这是默认的选项.
+.TP
+.B \-g
+编辑组配额.
+.TP
+.B \-p
+对每个指定的用户/组的原配额加倍.
+这是用来对一组用户/组初始化配额时常用的方法.
+.TP
+.B \-t
+对每个文件系统编辑软时间限制.
+sec(onds),min(utes),hour(s),day(s)时间单元都是可识别的.
+时间限制显示为最大的可能时间单元,以使该值大于或等于任何值.
+.SH FILES(相关文件)
+.PD 0
+.TP 20
+位于文件系统root下的
+.BR aquota.user
+或
+.BR aquota.group
+配额文件.
+.TP
+.B /etc/mtab
+已挂载的文件系统表
+.PD
+.SH SEE ALSO(另见)
+.BR quota (1),
+.BR vi (1),
+.BR quotactl (2),
+.BR quotacheck (8),
+.BR quotaon (8),
+.BR repquota (8),
+.BR convertquota (8),
+.BR setquota (8)
+.SH BUGS(漏洞)
+临时文件的格式是无法预测的.
+.SH AUTHOR(作者)
+Jan Kara \<jack@atrey.karlin.mff.cuni.cz\>
+.br
+基于老的
+.B edquota
+可能作者:
+.br
+Marco van Wieringen \<mvw@planets.elm.net\>
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.B 2001.07.09
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

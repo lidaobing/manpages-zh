@@ -1,0 +1,184 @@
+.\" Copyright (C) Markus Kuhn, 1996
+.\" 中文版 Copyright (c) Bill Pan 和 www.LinuxForum.net
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" 1995-11-26 Markus Kuhn 
+.\" First version written
+.\"
+.TH UTF-8 7 "1995-11-26" "Linux" "Linux Programmer's Manual"
+.SH NAME
+UTF-8 \- ASCII 兼容的多字节 Unicode 编码
+.SH 描述
+The
+.B Unicode
+字符集使用的是 16 位（双字节）码。最普遍的 Unicode 编码方法（
+.BR UCS-2 )
+由一个 16 位双字序列组成。
+这样的字符串中包括了的一些如‘\\0’或‘/’这样的在文件名中或者是在 C
+库函数中具有特殊意义的字符。
+另外，如果没有做重大的修正的话，大部分操作 ASCII 码文件的 UNIX
+工具不能够正确识别 16 位的字符。因此，
+.B UCS-2
+对于
+.B Unicode
+的文件名、文本文件、环境变量等等来说并不是一种合适的外部编码方式。
+.BR "ISO 10646 Universal Character Set (UCS)" ,
+是 Unicode 的超集，甚至使用了 31 位编码方式，
+另外还有使用 32 编码的 UCS-4 也有同样上述的问题。
+.B UCS-4
+而用
+.B UTF-8
+对
+.B Unicode
+.B UCS
+编码
+就不会存在这样的问题。所以，UTF-8 很明显的是在 UNIX 类操作系统下的
+.B Unicode
+字符集的解决方案。
+.SH 属性
+
+.B UTF-8 
+编码具有以下优良属性：
+.TP 0.2i
+*
+.B UCS
+字符从 0x00000000 到 0x0000007f （传统的
+.B US-ASCII
+字符）简单地编码为字节 0x00 到 0x7f （与 ASCII 码兼容）。
+这意味着只包含 7 位 ASCII 字符的文件和字符串在
+.B ASCII
+和
+.BR UTF-8 .
+编码方式下是完全一样的。
+.TP
+*
+所有大于 0x7f 的
+.B UCS
+字符被编码成为多字节序列。该序列全部是由 0x80 到 0fd 的字符组成，
+这样就不会有标准 ASCII 字符会
+被作为某个字的一个部分这种现象出现，
+对于‘\\0’和‘\’这样的特殊字符来说也就不会有问题了。
+.TP
+*
+保留了
+.B UCS-4
+字典中的字节串的排列顺序。
+.TP
+*
+所有 2^32 次方的 UCS 码都能够使用
+.BR UTF-8 
+来进行编码。
+.TP
+*
+0xfe 和 0xff 两个字符在
+.B UTF-8
+中不会被用到。
+.TP
+* 
+表示非 ASCII 码的
+.B UCS
+多字节串的开始字符总是 0xc0 到 0xfd 之间的字符，并会指出该串的长度。
+多字节串的其他字符都是 0x80
+到 0xbf 之间的字符。
+这使得再同步非常简单，并令编码是无态的，
+丢字节现象也不容易发生。
+.TP
+*
+用
+.B UTF-8
+编码的
+.B UCS
+字符可以增加到 6 个字节的长度。而
+.B Unicode
+只能增加到 3 个字节长。由于 Linux 只使用 16 位的
+.B Unicode
+，
+.BR UCS 
+的子集。所以在 Linux 下，
+.B UTF-8
+多字节串长度最多不会超过三个字节。
+.SH 编码方式
+下面的字节串用来表示一个字符。用什么串依照该字符在 UCS 编码中的序号来定：
+.TP 0.4i
+0x00000000 - 0x0000007F:
+.RI 0xxxxxxx
+.TP
+0x00000080 - 0x000007FF:
+.RI 110xxxxx 
+.RI 10xxxxxx
+.TP
+0x00000800 - 0x0000FFFF:
+.RI 1110xxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.TP
+0x00010000 - 0x001FFFFF:
+.RI 11110xxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.TP
+0x00200000 - 0x03FFFFFF:
+.RI 111110xx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.TP
+0x04000000 - 0x7FFFFFFF:
+.RI 1111110x
+.RI 10xxxxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.RI 10xxxxxx
+.PP
+这里
+.I xxx
+的位置二进制位形式的字符编码填入。
+只用最短的那个足够表达一个字符编码数的多字节串。
+.SH 举例说明
+.B Unicode
+字符 0xa9 = 1010 1001 (版权所有的符号) 在 UTF-8 中被编码为：
+.PP
+.RS
+11000010 10101001 = 0xc2 0xa9
+.RE
+.PP
+字符0x2260 = 0010 0010 0110 0000 (“不等于”符号)被编码为：
+.PP
+.RS
+11100010 10001001 10100000 = 0xe2 0x89 0xa0
+.RE
+.SH 遵循标准
+ISO 10646, Unicode 1.1, XPG4, Plan 9.
+.SH 作者
+Markus Kuhn 
+.SH 参考
+.BR unicode (7)
+
+.SH "[中文版维护人]"
+.B billpan <billpan@yeah.net>
+.SH "[中文版最新更新]"
+.BR 2000/11/09
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

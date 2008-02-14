@@ -1,0 +1,138 @@
+.TH quotacheck 8 "Mon Jul 17 2000"
+.SH NAME
+quotacheck \- 扫描文件系统,创建,检测并修补配额文件
+.SH 总览(SYNOPSIS)
+.B quotacheck
+[
+.B -agucfinvdFR
+]
+.I filesystem
+.br
+.SH 描述(DESCRIPTION)
+.B quotacheck 
+察看每一个文件系统,建立当前磁盘使用情况表,并将
+此表与配额文件中相应内容比较(如果使用了选项 
+.B \-c
+, 这一步将省略).如果发现任何不一致,同时更新配额文件和当前
+不正确的系统配额拷贝(只有当选择使用配额的文件系统时,才更新
+后者).在缺省状态下,只选择用户配额.
+.PP
+.B quotacheck
+要求每个被检测的文件系统在其根目录中都有名为
+.I aquota.user
+和
+.I aquota.group
+的配额文件.如果上述文件不存在,
+.B quotacheck
+将创建它(们).
+.PP
+.B quotacheck
+通常在系统启动的时候由位于
+.I /etc/init.d
+的初始化脚本在 quotaon(8) 建立磁盘配额之前运行.
+.PP
+强烈建议在运行
+.B quotacheck
+之前关掉配额,卸载文件系统或者将其设为只读模式,否则会出现
+配额损坏.
+.br
+.B quotacheck
+在开始扫描之前,会尝试以只读模式装配各文件系统. 当扫描完
+成时,它会以读写模式重新装配文件系统.你可以用-F选项使
+.B quotacheck
+在尝试以只读模式重新装配文件系统失败之后继续运行.
+.PP
+完成扫描所需要的时间与磁盘的使用程度成正比.
+.SH 选项(OPTIONS)
+.TP
+.B \-v
+.B quotacheck
+在运行时报告其每一项操作.在缺省状态下不报告.
+.TP
+.B \-d
+进入调试状态.这会产生许多用于调试程序的信息.输出的信息
+非常详尽,而扫描速度会减慢.
+.TP
+.B \-a
+如果用它取代任何文件系统的名字,
+.B quotacheck
+将检测所有在
+.I /etc/mtab
+中列为可读写的文件系统的配额.在缺省状态下,只有在
+.I /etc/mtab
+中被列为配额的文件系统才会被检测.
+.TP
+.B \-u
+只检测在
+.I /etc/mtab
+列出或指定的文件系统中的用户配额.这是缺省状态下采取的行动.
+.TP
+.B \-g
+只检测在
+.I /etc/mtab
+中列出或制定的文件系统中的组配额
+.TP
+.B \-c
+不读已经存在的配额文件.执行一次新的扫描,并且把结果保存到磁盘上.
+.TP
+.B \-f
+强制检测所有使用配额的文件系统.不推荐使用该选项,因为其产生的
+配额文件可能会不同步.
+.TP
+.B \-F
+强制在可读写状态下检测文件系统.当使用该选项时,请先确定在对文件
+系统进行扫描的时候,没有进程需要对该文件系统写入数据.
+.TP
+.B \-R
+当与
+.B \-a
+一起使用时,检测除根(root)文件系统外的其他所有文件系统.
+.TP
+.B \-i
+交互模式.在缺省状态下,
+.B quotacheck
+在发现错误后即退出.在交互模式下,用户会被问取建议.
+参考选项
+.BR \-n .
+.TP
+.B \-n
+有时候对同一个ID会找到多个结果. 通常遇到这种情况
+.B quotacheck
+就终止运行.该选项强制使用第一个结果(该选项在交互模式下同样有效).
+.SH 注意 (NOTE)
+.B quotacheck
+应该只能由超级用户执行.因为未授权用户通常不能读
+一个给定文件系统上的所有目录.
+.SH 参见(SEE ALSO)
+.BR quota (1),
+.BR quotactl (2),
+.BR fstab (5),
+.BR quotaon (8),
+.BR repquota (8),
+.BR convertquota (8),
+.BR setquota (8),
+.BR edquota (8),
+.BR fsck (8),
+.BR efsck (8),
+.BR e2fsck (8),
+.BR xfsck (8)
+.SH 文件(FILES)
+.B aquota.user
+与用户配额位于文件系统根目录
+.br
+.B aquota.group
+与组配额位于文件系统根目录
+.br
+.B /etc/mtab
+是已装配文件系统表.
+
+.SH 作者(AUTHOR)
+Jan Kara \<jack@atrey.karlin.mff.cuni.cz\>
+.br
+基于旧版
+.B quotacheck
+作者:
+.br
+Edvard Tuinder \<ed@elm.net\>
+.br
+Marco van Wieringen \<mvw@planets.elm.net\>

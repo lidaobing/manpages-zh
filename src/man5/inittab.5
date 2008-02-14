@@ -1,0 +1,241 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH INITTAB 5 "May 19, 1998" "" "Linux 系统管理员手册"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+inittab \- 与 sysv 兼容的 init 进程使用的初始化文件格式
+.\"}}}
+.\"{{{  Description
+.SH 描述
+\fBinittab\fP 文件描述在系统引导及通常的操作期间,
+都启动哪些进程 (比如 \& /etc/init.d/boot, /etc/init.d/rc, getty 等等).
+.BR Init (8)
+讨论有关 \fIrunlevels (运行级)\fP 的概念, 每一个
+运行级都有它自己启动进程的集合. 有效的运行级
+为 \fB0\fP\-\fB6\fP 加上用于 \fBondemand\fP 条目
+的 \fBA\fP, \fBB\fP 和 \fBC\fP.
+\fBinittab\fP 文件中的每一个条目有如下的格式:
+.RS
+.sp
+\fIid\fP:\fIrunlevels\fP:\fIaction\fP:\fIprocess\fP
+.sp
+.RE
+以 `#' 开头的行被忽略.
+.\"{{{  id
+.IP \fIid\fP
+.B inittab 
+文件中条目的唯一标识, 限于 1-4 个字符
+(如果是用版本号小于 5.2.18 或 a.out 的库编译生成的
+sysvinit 程序, 则仅限于 2 个字符).
+.sp
+注意: 对于 getty 或其它的注册进程, \fIid\fP 必须是
+响应的终端线路的 tty 后缀, 如 \fB1\fP 响应 \fBtty1\fP,
+否则, 注册过程不能正常的工作.
+.\"}}}
+.\"{{{  runlevels
+.IP \fIrunlevels\fP
+列出发生指定动作的运行级.
+.\"}}}
+.\"{{{  action
+.IP \fIaction\fP
+描述要发生的动作.
+.\"}}}
+.\"{{{  process
+.IP \fIprocess\fP
+要执行的进程. 如果 process 域以一个 `+' 开头,
+.B init 
+不会在 utmp 和 wtmp 文件中为此进程记帐.
+这是由于 getty 自己主持 utmp/wtmp 记帐的需要,
+同时这也是一个历史遗留的漏洞.
+.\"}}}
+.PP
+\fIrunlevels\fP 域可以包含表示不同运行级的多
+个字符, 例如 \fB123\fP 表示本进程在运行级为
+1, 2 和 3 时都要启动.
+用于 \fBondemand\fP 条目的 \fIrunlevels\fP 域可以
+包含 \fBA\fP, \fBB\fP, 或 \fBC\fP.  
+用于 \fBsysinit\fP, \fBboot\fP, 和 \fBbootwait\fP 
+条目的 \fIrunlevels\fP 域被忽略.
+.PP
+当改变运行级时, 在新运行级中没有给出的那些正在
+运行的进程被杀死, 先使用 \s-2SIGTERM\s0 信号,
+然后是 \s-2SIGKILL\s0.
+.PP
+\fIaction\fP 域可以使用的动作有:
+.\"{{{  respawn
+.IP \fBrespawn\fP
+该进程只要终止就立即重新启动 (如 \& getty).
+.\"}}}
+.\"{{{  wait
+.IP \fBwait\fP
+只要进入指定的运行级就启动本进程, 并且
+.B init 
+等待该进程的结束.
+.\"}}}
+.\"{{{  once
+.IP \fBonce\fP
+只要进入指定的运行级就启动一次本进程.
+.\"}}}
+.\"{{{  boot
+.IP \fBboot\fP
+在系统引导期间执行本进程. \fIrunlevels\fP
+域被忽略.
+.\"}}}
+.\"{{{  bootwait
+.IP \fBbootwait\fP
+在系统引导期间执行本进程. 并且
+.B init 
+等待该进程的结束 (如 \& /etc/rc).  
+\fIrunlevels\fP 域被忽略.
+.\"}}}
+.\"{{{  off
+.IP \fBoff\fP
+什么也不做.
+.\"}}}
+.\"{{{  ondemand
+.IP \fBondemand\fP
+在进入 \fBondemand\fP 运行级时才会执行
+标记为 \fBondemand\fP 的那些进程.
+无论怎样, 实际上没有改变运行级 
+(\fBondemand\fP 运行级就是 `a', `b',
+和 `c').
+.\"}}}
+.\"{{{  initdefault
+.IP \fBinitdefault\fP
+\fBinitdefault\fP 条目给出系统引导
+完成后进入的运行级, 如果不存在这样的条目,
+.B init
+就会在控制台询问要进入的运行级.
+\fIprocess\fP 域被忽略.
+.\"}}}
+.\"{{{  sysinit
+.IP \fBsysinit\fP
+系统引导期间执行此进程. 本进程会在 \fBboot\fP 或
+\fB bootwait\fP 条目之前得到执行.
+\fIrunlevels\fP 域被忽略.
+.\"}}}
+.\"{{{  powerwait
+.IP \fBpowerwait\fP
+本进程在电源不足时执行.
+通常在有进程把 UPS 和计算机相连时
+通知 init 进程, \fBInit\fP 在继续其它工作
+之前要等待此进程结束.
+.\"}}}
+.\"{{{  powerfail
+.IP \fBpowerfail\fP
+类似 \fBpowerwait\fP, 但是\fBinit\fP 不等待
+此进程完成.
+.\"}}}
+.\"{{{  powerokwait
+.IP \fBpowerokwait\fP
+在 \fBinit\fP 收到电源已经恢复的通知后
+立即执行此进程.
+.\"}}}
+.\"{{{  powerfailnow
+.IP \fBpowerfailnow\fP
+本进程在 \fBinit\fP 被告知 UPS 电源快耗尽
+同时外部电源失败 (无效) 时被执行.
+(假设 UPS 和监视进程能够发现这样的情况).
+.\"}}}
+.\"{{{  ctrlaltdel
+.IP \fBctrlaltdel\fP
+在 \fBinit\fP 收到 SIGINT 信号时执行此进程.
+这意味着有人在控制台按下了
+\fBCTRL\-ALT\-DEL\fP 组合键,
+典型地, 可能是想执行类似
+\fBshutdown\fP 然后进入单用户模式或
+重新引导机器.
+.\"}}}
+.\"{{{  kbrequest
+.IP \fBkbrequest\fP
+本进程在 \fBinit\fP 收到一个从控制台
+键盘产生的特殊组合按键信号时执行.
+.sp
+对于此功能本文档尚未完成; 可以在 kbd-x.xx 包中
+找到更多信息 (在写作本文档时最新的是 kbd-0.94).
+当然你可能想为某些 "KeyboardSignal" 行为
+映射组合键, 如为了映射 (Alt-上箭头)
+可以在键盘映射文件中 使用如下的方式:
+.RS
+.sp
+alt keycode 103 = KeyboardSignal
+.sp
+.RE
+.\"}}}
+.\"}}}
+.\"{{{  Examples
+.SH 举例 
+这是一个与老的 Linux inittab 文件类似的例子文件:
+.RS
+.sp
+.nf
+.ne 7
+# inittab for linux
+id:1:initdefault:
+rc::bootwait:/etc/rc
+1:1:respawn:/etc/getty 9600 tty1
+2:1:respawn:/etc/getty 9600 tty2
+3:1:respawn:/etc/getty 9600 tty3
+4:1:respawn:/etc/getty 9600 tty4
+.fi
+.sp
+.RE
+本文件在引导时执行 \fB/etc/rc\fP 并且在
+ty1\-tty4 上启动 getty 进程.
+.PP
+一个更详尽的 \fBinittab\fP 会有不同的运行级
+(参考本身的注释):
+.RS
+.sp
+.nf
+.ne 19
+# 进入默认的运行级
+id:2:initdefault:
+
+# 在进行其它工作之前先完成系统初始化.
+si::sysinit:/etc/rc.d/bcheckrc
+
+# 运行级 0 挂起系统, 6 重新引导, 1 单用户模式.
+l0:0:wait:/etc/rc.d/rc.halt
+l1:1:wait:/etc/rc.d/rc.single
+l2:2345:wait:/etc/rc.d/rc.multi
+l6:6:wait:/etc/rc.d/rc.reboot
+
+# "3 个键" 按下时要做的工作.
+ca::ctrlaltdel:/sbin/shutdown -t5 -rf now
+
+# 运行级2和3: 在控制台生成 getty 进程, 运行级为3时在 modem 上生成 getty.
+1:23:respawn:/sbin/getty tty1 VC linux
+2:23:respawn:/sbin/getty tty2 VC linux
+3:23:respawn:/sbin/getty tty3 VC linux
+4:23:respawn:/sbin/getty tty4 VC linux
+S2:3:respawn:/sbin/uugetty ttyS2 M19200
+
+.fi
+.sp
+.RE
+.\"}}}
+.\"{{{  Files
+.SH 文件 
+/etc/inittab
+.\"}}}
+.\"{{{  Author
+.SH 作者  
+\fBInit\fP 由 Miquel van Smoorenburg 
+(miquels@cistron.nl) 所写. 本手册页由
+Sebastian Lederer (lederer@francium.informatik.uni-bonn.de) 所写,
+由 Michael Haardt (u31b3hs@pool.informatik.rwth-aachen.de) 修改.
+.\"}}}
+.\"{{{  See also
+.SH 参考     
+.BR init (8),
+.BR telinit (8)
+.\"}}}
+
+.SH 中文版维护人
+.B Yin Huaming <yhmact@pzh-public.sc.cninfo.net>
+.SH 中文版最新更新
+2002年7月13日
+.SH 中国 Linux 论坛 man 手册页翻译计划
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,69 @@
+.TH FMT "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+fmt \- 简易的文本格式优化工具
+simple optimal text formatter
+.SH "总览 (SYNOPSIS)"
+.B ../src/fmt
+[\fI-DIGITS\fR] [\fIOPTION\fR]... [\fIFILE\fR]...
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+重新 格式化 文件 FILE(s) 中的 每一个 段落, 结果 写到 标准输出.
+如果 文件 FILE 不存在, 或者 FILE 是 '-', 就从 标准输入 读取 数据.
+.PP
+长选项 后面的 参数 对于 短选项 形式 也是 必须的.
+.TP
+\fB\-c\fR, \fB\-\-crown\-margin\fR
+保持 前两行 的 缩排形式
+.TP
+\fB\-p\fR, \fB\-\-prefix\fR=\fISTRING\fR
+只处理 STRING 起始 的 行
+.TP
+\fB\-s\fR, \fB\-\-split\-only\fR
+断裂 长行, 而且 不再 合并 短行
+.TP
+\fB\-t\fR, \fB\-\-tagged\-paragraph\fR
+首行 的 缩排 和 第二行 不同
+.TP
+\fB\-u\fR, \fB\-\-uniform\-spacing\fR
+单词 之间 有 一个 空格, 句子 之间 两个 空格
+.TP
+\fB\-w\fR, \fB\-\-width\fR=\fINUMBER\fR
+最大行宽 (缺省为 75 列)
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 退出.
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 退出.
+.PP
+在 \fB\-wNUMBER\fR 选项 中, 字母 `w' 可以 省略.
+.SH "作者 (AUTHOR)"
+Ross Paterson.
+.SH "报告 BUGS"
+发现 的 错误 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B fmt
+的 完整 文档 以 Texinfo 手册 形式 维护. 如果 正确 安装 了
+.B info
+和
+.B fmt
+程序, 用 命令
+.IP
+.B info fmt
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/17
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net
+

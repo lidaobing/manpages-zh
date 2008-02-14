@@ -1,0 +1,347 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\" Copyright (c) 2000 Scriptics Corporation.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: scan.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: scan.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH scan n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+scan \- 使用 sscanf 式样的转换指定符分析字符串
+.SH "总览 SYNOPSIS"
+\fBscan \fIstring format \fR?\fIvarName varName ...\fR?
+.BE
+
+.SH INTRODUCTION
+.PP
+这个命令用与 ANSI C \fBsscanf\fR 过程相同的方式从输入字符串中分析字段并返回完成的转换数目的总计，如果在任何转换被完成之前到达了输入字符串的结束则返回 -1。\fIString\fR 给出要被分析的输入而 \fIformat\fR 指示如何分析它，使用与 \fBsscanf\fR 相同的 \fB%\fR 转换指定符。每个 \fIvarName\fR 给出一个变量的名字；在从 \fIstring\fR 中检索出一个字段的时候，结果被转换回一个字符串并赋值给相应的变量。
+.VS 8.3
+如果未指定 \fIvarName\fR 变量，则 \fBscan\fR 在行内(inline)方式下工作，返回的数据将是一个列表而不存储在变量中。在行内方式下，如果在任何转换被完成之前到达了输入字符串的结束则返回，则返回一个空串。
+.VE 8.3
+
+.SH "检索细节 DETAILS ON SCANNING"
+.PP
+\fBScan\fR 操作一起检索 \fIstring\fR 和 \fIformat\fR。如果在 \fIformat\fR 的下一个字符是一个空字符(blank)或跳格字符(tab)则它匹配在 \fIstring\fR 中任何数目(包括零个)的白空格字符。
+如果它不是一个 \fB%\fR 字符则它必须匹配 \fIstring \fR的下一个字符。当在 \fIformat\fR 中遇到一个 \fB%\fR 的时候，它指示一个转换指定符的开始。
+一个转换指定符包括 \fB% \fR和后面的最多四个字段: 一个 \fB*\fR，它指示丢弃被转换出的值而不是赋值到变量中；一个 XPG3 位置指定符；一个数指示最大的字段宽度；和一个转换字符。除了转换字符之外所有这些字段都是可选的。存在的字段必须按照上面给出的次序出现。
+.PP
+当 \fBscan\fR 在 \fIformat \fR中发现一个转换指定符的时候，它首先跳过 \fIstring\fR 中的所有白空格(除非指定符是 \fB[\fR 或 \fBc\fR)。接着它依据转换指定符转换下一组输入字符，并把结果存储到用给 \fBscan\fR 的下一个参数给出的变量中。
+.PP
+如果 \fB%\fR 跟随着一个十进制数和一个 \fB$\fR，比如``\fB%2$d\fR''，则使用的变量不取自下一个顺序的参数。而是取自用这个数字指定的参数，这里 1 对应着第一个 \fIvarName\fR。如果在 \fIformat\fR 中有任何位置指定符则所有指定符都必须被指定位置。每个在参数列表上的 \fIvarName\fR 必须准确的对应于一个转换指定符，否则生成一个错误。在行内方式下，任何位置指定符可以指定最多一次，并且用空串填充空位置指定符。
+.PP
+支持下列转换字符:
+.TP 10
+\fBd\fR
+输入字段必须是一个十进制整数。它被读入并作为一个十进制字符串存储到变量中。
+.TP 10
+\fBo\fR
+输入字段必须是一个八进制整数。它被读入并作为一个八进制字符串存储到变量中。
+.VS 8.4
+If the value exceeds MAX_INT (017777777777 on platforms using 32-bit
+integers), it will be truncated to a signed integer.  Hence, 037777777777
+will appear as -1 on a 32-bit machine.
+.VE 8.4
+.TP 10
+\fBx\fR
+输入字段必须是一个十六进制整数。它被读入并作为一个十六进制字符串存储到变量中。
+.VS 8.4
+If the value exceeds MAX_INT (0x7FFFFFFF on platforms using 32-bit
+integers), it will be truncated to a signed integer.  Hence, 0xFFFFFFFF
+will appear as -1 on a 32-bit machine.
+.VE 8.4
+.TP 10
+\fBu\fR
+输入字段必须是一个十进制整数。它被读入并作为一个无符号十进制字符串存储到变量中。
+.TP 10
+\fBi\fR 
+输入字段必须是一个整数。使用与 \fBexpr\fR 中描述的相同方式确定基数(base)(例如，十进制、八进制、或十六进制)。值被作为一个十进制字符串存储到变量中。
+.TP 10
+\fBc\fR
+读入一个单一的字符并把它的二进制值作为一个十进制字符串存储到变量中。在这种情况下不跳过初始的白空格，这样输入字段可以是一个白空格字符。这个转换不同于  ANSI 标准的地方是输入字段总是由一个单一字段组成并且不可以指定字段宽度。
+.TP 10
+\fBs\fR
+输入字段由到下一个白空格为止的所有字符组成；把这些字符复制到变量中。
+.TP 10
+\fBe\fR 或 \fBf\fR 或 \fBg\fR
+输入字段必须是一个浮点数，其组成是一个可选的正负号，一个可能有小数点的十进制数字的字符串，和一个可选的指数，它由一个 \fBe\fR 或 \fBE\fR  并跟随着一个可选的正负号和一个十进制数字的字符串组成。它被读入并作为一个浮点数存储到变量中。
+.TP 10
+\fB[\fIchars\fB]\fR
+输入字段由任何数目的在 \fIchars \fR中的字符组成。把匹配的字符串存储到变量中。如果在方括号之间的第一个字符是\fB]\fR 则它被作为 \fIchars\fR 的一部分来对待而不是这个字符集合的闭合方括号。
+如果 \fIchars\fR 包括一个 \fIa\fB\-\fIb\fR 形式的序列，则匹配在 \fIa\fR 和 \fIb\fR 之间(包括二者)的任何字符。如果在方括号之间的第一个或最后一个字符是一个 \fB-\fR，则它被作为 \fIchars\fR 的一部分来对待而不是指示一个范围。
+.TP 10
+\fB[^\fIchars\fB]\fR
+输入字段由任何数目的不在 \fIchars \fR中的字符组成。把匹配的字符串存储到变量中。如果紧随在     \fB^\fR 后面的字符是一个 \fB]\fR 则它被作为 \fIchars\fR     的一部分来对待而不是这个字符集合的闭合方括号。
+如果\fIchars\fR     包括一个 \fIa\fB\-\fIb\fR  形式的序列，则从字符的集合中排除在 \fIa\fR 和 \fIb\fR     之间(包括二者)的任何字符。如果在方括号之间的第一个或最后一个字符是一个     \fB-\fR，则它被作为 \fIchars\fR     的一部分来对待而不是指示一个范围。
+.TP 10
+\fBn\fR
+不从输入字符串中消耗输入。而是把到现在为止从输入字符串中检索到的字符总数存储到变量中。
+.LP
+对于一个转换从输入中读的字符数目应该是对特定转换最大的数目(例如，对 \fB%d \fR是尽可能多的十进制数字，对于 \fB%o \fR是尽可能多的八进制数字，以此类推)。给一个给定转换的输入要么终止于遇到一个白空格要么终止于达到了最大的字段宽度，只要其中一种情况满足就终止。如果在转换指定符中存在一个 \fB*\fR 则不赋值变量并且不消耗下一个检索参数。
+
+.SH "与ANSI SSCANF 的区别 DIFFERENCES FROM ANSI SSCANF"
+.PP
+除了下列区别之外 \fBscan\fR 命令的行为与 ANSI C \fBsscanf\fR 过程的行为相同:
+.IP [1]
+当前不支持 \fB%p\fR 转换指定符。
+.IP [2]
+对于 \fB%c\fR  转换，把一个单一字符转换成一个十进制字符串，接着把它赋值给相应的  \fIvarName\fR；对于这个转换不能指定字段宽度。
+.IP [3]
+忽略 \fBl\fR、\fBh\fR、和 \fBL\fR  修饰符；转换整数值总是如同不存在修饰符，而转换实数值总是如同存在  \fBl\fR 修饰符(就是说，对于内部表示使用类型 \fBdouble\fR)。
+.IP [4]
+.VS 8.3
+如果在任何转换被完成之前到达了输入字符串的结束并且未给出变量，则返回一个空串。
+.VE 8.3
+
+.SH "参见 SEE ALSO"
+format(n), sscanf(3)
+
+.SH "关键字 KEYWORDS"
+conversion specifier, parse, scan
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/11/07
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

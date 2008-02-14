@@ -1,0 +1,409 @@
+.ig \"-*- nroff -*-
+Copyright (C) 1999 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in
+translations approved by the Free Software Foundation instead of in
+the original English.
+..
+.de TQ
+.br
+.ns
+.TP \\$1
+..
+.\" Like TP, but if specified indent is more than half
+.\" the current line-length - indent, use the default indent.
+.de Tp
+.ie \\n(.$=0:((0\\$1)*2u>(\\n(.lu-\\n(.iu)) .TP
+.el .TP "\\$1"
+..
+.TH GROFF 1 "21 December 1999" "Groff Version 1.15"
+.SH NAME
+groff \- groff 文档排版系统前端
+.SH "总览 (SYNOPSIS)"
+.B groff
+[
+.B \-abehilpstvzCENRSUVXZ
+]
+[
+.BI \-w name
+]
+[
+.BI \-W name
+]
+[
+.BI \-m name
+]
+[
+.BI \-F dir
+]
+[
+.BI \-I dir
+]
+[
+.BI \-T dev
+]
+[
+.BI \-f fam
+]
+[
+.BI \-M dir
+]
+[
+.BI \-d cs
+]
+[
+.BI \-r cn
+]
+[
+.BI \-n num
+]
+[
+.BI \-o list
+]
+[
+.BI \-P arg
+]
+[
+.BI \-L arg
+]
+[
+.IR files \|.\|.\|.\|
+]
+.SH "描述 (DESCRIPTION)"
+.B groff
+是 groff 文档排版系统的前端。 一般来说， 它运行
+.B troff
+程序和一个同选择的设备相对应的后处理器。 可选的设备有
+.TP
+.B ps
+PostScript 打印机和查看器。
+.TP
+.B dvi
+TeX dvi 格式。
+.TP
+.B X75
+一个 75 点每英寸的 X11 查看器。
+.TP
+.B X100
+一个 100 点每英寸的 X11 查看器。
+.TP
+.B ascii
+打字机一类的设备。
+.TP
+.B latin1
+用 ISO Latin-1 字符集的打字机设备。
+.TP 
+.B lj4
+一个兼容 HP LaserJet4 的(或者其它兼容 PCL5 的) 打印机。
+.TP
+.B html
+输出 HTML 格式。
+.LP
+在设备描述文件里， 设备的后处理器是通过
+.B postpro
+命令指定的。 这个可以被
+.B \-X
+选项改写。
+.LP
+默认的设备是
+.BR ps 。
+它可以选择用
+.BR pic ,
+.BR eqn ,
+.BR tbl ,
+.BR refer ,
+或者
+.B soelim
+等预处理器。
+.LP
+如果没有任何选项， 可以用一个单独的
+.BR \- 
+来代替。 文件名
+.B \-
+代表标准输入。
+.LP
+.B grog
+命令可以根据文件格式猜测相应的 groff 命令。
+.SH "选项 (OPTIONS)"
+.TP
+.B \-h
+打印帮助信息。
+.TP
+.B \-e
+用 eqn 预处理。
+.TP
+.B \-t
+用 tbl 预处理。
+.TP
+.B \-p
+用 pic 预处理。
+.TP
+.B \-s
+用 soelim 预处理。
+.TP
+.BI \-I dir
+此选项在
+.BR soelim (1) 
+中描述。 此选项包含
+.B \-s
+选项。
+.TP
+.B \-R
+用 refer 预处理。 没有传输参数给
+.B refer
+的机制， 因为很多 refer 选项在文件里有相应的命令。 细节请参照
+.BR refer (1) 。
+.TP
+.B \-v
+使
+.B groff
+运行的程序打印出版本号。
+.TP
+.B \-V
+在标准输出打印管道线， 而不执行它。
+.TP
+.B \-z
+禁止
+.BR troff
+输出。 只有出错信息显示出来。
+.TP
+.B \-Z
+不后处理
+.BR troff
+的输出。 一般
+.B groff
+会自动运行相应的后处理器。
+.TP
+.BI \-P arg
+把
+.I arg
+传给后处理器。 每个参数都要用单独的
+.B \-P
+选项分开。 注意
+.B groff
+在传
+.I arg
+给后处理器时不会在前加上
+.B \- 。
+.TP
+.B \-l
+把输出送到打印机， 所用的命令在设备描述文件中用
+.B print
+命令分开。
+.TP
+.BI \-L arg
+把
+.I arg
+传给打印机。 每个参数都要用单独的
+.B \-L
+选项分开。 注意
+.B groff
+在传
+.I arg
+给后处理器时不会在前加上
+.B \- 。
+.TP
+.BI \-T dev
+生成针对
+.IR dev
+设备的输出。 默认的设备是
+.BR ps 。
+.TP
+.B \-X
+用
+.B gxditview
+预览， 而不是用一般的后处理器。
+.B Groff
+会传给
+.B gxditview
+一个
+.B -printCommand
+选项， 这样如果有
+.B -l
+选项
+.B Print
+就会做
+.B groff
+会做的事。 除非有
+.BR \-Tps
+选项， 否则这并不能产生好的输出。
+.TP
+.B \-N
+在 eqn 分割符出不产生新行符（newline）。 这个同
+.BR eqn
+中的
+.B \-N
+选项有一样的作用。
+.TP
+.B \-S
+安全模式。 把
+.B \-S
+选项传给
+.B pic
+并且对
+.BR troff
+用
+.B \%\-msafer
+宏。 （默认开启）
+.TP
+.B \-U
+不安全模式。 用以前的不安全的特性。
+.TP
+.B \-a
+.TQ
+.B \-b
+.TQ
+.B \-i
+.TQ
+.B \-C
+.TQ
+.B \-E
+.TQ
+.BI \-w name
+.TQ
+.BI \-W name
+.TQ
+.BI \-m name
+.TQ
+.BI \-o list
+.TQ
+.BI \-d cs
+.TQ
+.BI \-r cn
+.TQ
+.BI \-F dir
+.TQ
+.BI \-M dir
+.TQ
+.BI \-f fam
+.TQ
+.BI \-n num
+这些都在
+.BR troff (1)
+中描述。
+.SH "环境 (ENVIRONMENT)"
+.TP
+.SM
+.B GROFF_COMMAND_PREFIX
+如果这个变量设为
+.IR X ，
+.B groff
+会运行
+.IB X troff ，
+而不是
+.BR troff 。
+这也适用于
+.BR tbl ，
+.BR pic ，
+.BR eqn ，
+.BR refer ，
+和
+.BR soelim。 但并不适用于
+.BR grops ，
+.BR grodvi ，
+.BR grotty ，
+.BR grolj4 ，
+.BR grohtml ，
+和
+.BR gxditview 。
+.TP
+.SM
+.B GROFF_TMAC_PATH
+一个冒号分开的列表， 包含寻找宏文件的路径。
+.TP
+.SM
+.B GROFF_TYPESETTER
+缺省设备。
+.TP
+.SM
+.B GROFF_FONT_PATH
+一个冒号分开的列表， 包含寻找
+.BI dev name
+的路径。
+.TP
+.SM
+.B PATH
+.BR groff
+执行命令的搜寻路径。
+.TP
+.SM
+.B GROFF_TMPDIR
+临时文件目录。 如果没有设置此变量但是设置了
+.B
+.SM TMPDIR
+临时文件就会在那个目录中创建。 否则临时文件就会在
+.BR /tmp
+中创建。 
+.BR grops (1)
+和
+.BR refer (1)
+命令都会创建临时文件。
+.SH "文件 (FILES)"
+.Tp \w'\fB/usr/lib/groff/font/dev\fIname\fB/DESC'u+3n
+.BI /usr/lib/groff/font/dev name /DESC
+.IR name
+设备的设备描述文件。
+.TP
+.BI /usr/lib/groff/font/dev name / F
+.IR name
+设备的
+.I F
+字体的字体文件。
+.SH "作者 (AUTHOR)"
+James Clark <jjc@jclark.com>
+.SH "错误 (BUGS)"
+报错误报告给 bug-groff@gnu.org。 请包含一个完整的报告， 还有一个能使错误再次出现的例子，
+并注明用的是 groff 的哪个版本。
+.SH "版权 (COPYRIGHT)"
+版权所有 \(co 1989, 1990, 1991, 1992, 1999 自由软件基金会
+.LP
+这一程序是自由软件， 你可以遵照自由软件基金会出版的 GNU 通用公共许可
+证条款来修改和重新发布这一程序。 或者用许可证的第二版， 或者（根据你的选
+择）用任何更新的版本。
+.LP
+发布 groff 程序的目的是希望它有用， 但没有任何担保。 甚至没有适合特定目
+的的隐含的担保。 更详细的情况请参阅 GNU 通用公共许可证。
+.LP
+你应该已经和程序一起收到一份 GNU 通用公共许可证的副本。 如果还没有， 写信给：
+The Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
+MA02139, USA
+.SH "获取 (AVAILABILITY)"
+groff 的最新版本可以通过匿名 ftp 从 ftp.gnu.org/gnu/groff 得到。
+.SH "参见 (SEE ALSO)"
+.BR grog (1),
+.BR troff (1),
+.BR tbl (1),
+.BR pic (1),
+.BR eqn (1),
+.BR soelim (1) ,
+.BR refer (1),
+.BR grops (1),
+.BR grodvi (1),
+.BR grotty (1),
+.BR grohtml (1),
+.BR gxditview (1),
+.BR groff_font (5),
+.BR groff_out (5),
+.BR groff_man (7),
+.BR groff_ms (7),
+.BR groff_me (7),
+.BR groff_char (7),
+.BR groff_msafer (7)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/8/29
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

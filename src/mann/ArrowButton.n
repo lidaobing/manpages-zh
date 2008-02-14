@@ -1,0 +1,99 @@
+.TH ArrowButton "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B ArrowButton 带有一个箭头形状的按钮组件。
+
+.SH 创建 CREATION
+.B ArrowButton pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+ArrowButton 根据 type 选项而可以有两种类型: 对 button 类型，它是在其上画着一个箭头的一个标准按钮；对于 arrow 类型，它是象滚动条的箭头那样的一个箭头。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+
+.TP
+-armcommand
+指定当在 ArrowButton 上点击鼠标按钮 1 的时候与 ArrowButton 相关联的一个 Tcl 命令。在 repeatdelay 或 repeatinterval 选项是正整数的时候，如果鼠标指针在这个按钮之上，则反复的调用这个命令，直到释放鼠标按钮 1。
+
+.TP
+-arrowbd
+在 ArrowButton 的 type 是 arrow 的时候，指定箭头的边框宽度。必须是 1 或 2。
+
+.TP
+-arrowrelief
+在 ArrowButton 的 type 是 arrow 的时候，指定箭头的面型(relief)。必须是 raised 或 sunken。
+
+.TP
+-clean
+为箭头指定品质级别，在 0 到 2 之间。如果是 0，则用最大的宽度和高度画这个箭头。If 1, the base of arrow is arranged to be odd to have same edges. If 2, the base of arrow is arranged to be odd and the orthogonal to be (base+1)/2 to have 'straight' diagonal for edges. 
+
+.TP
+-command
+指定与 ArrowButton 相关联的一个 Tcl 命令。典型的当鼠标按钮 1 在 ArrowButton 窗口上释放的时候调用这个命令。
+
+.TP
+-dir
+指定箭头的方向: top、bottom、left 或 right。 
+
+.TP
+-disarmcommand
+指定在鼠标按钮 1 释放的时候与 ArrowButton 相关联的一个 Tcl 命令。即使鼠标指针不在 ArrowButton 上也要调用这个命令，并且总是在用 command 选项指定的命令之前。它典型的与 armcommand、repeatdelay 和 repeatinterval 联合使用。
+
+.TP
+-height
+为 ArrowButton 指定想要的高度。值的单位是屏幕单位。
+
+.TP
+-helptext
+动态帮助的文本。如果为空，则这个组件不能获得帮助。
+
+.TP
+-helptype
+动态帮助的类型。使用 balloon 或 variable.
+
+.TP
+-helpvar
+在 helptype 选项是 variable 的时候使用的变量。
+
+.TP
+-ipadx
+指定在 ArrowButton 边框和箭头的左右两边之间的一个最小边距(pad)。这个值的单位是屏幕单位。
+
+.TP
+-ipady
+指定在 ArrowButton 边框和箭头的上下两边之间的一个最小边距(pad)。这个值的单位是屏幕单位。
+
+.TP
+-state
+指定 ArrowButton 为三种状态之一: normal、active、或 disabled。 如果 ArrowButton 的 type 是 button: 在普通状态下，使用 foreground 和 background 选项来显示 ArrowButton。在指针处于 ArrowButton 之上的时候典型的使用活跃状态。在活跃状态下，使用 activeforeground 和 activebackground 选项显示 ArrowButton。在停用状态下，使用 disabledforeground 和 background 选项显示 ArrowButton。 如果 ArrowButton 的 type 是 arrow: 只改变箭头的颜色。总是使用 troughcolor 选项显示 ArrowButton 的背景。在普通状态下，使用 background 选项显示 ArrowButton。在指针处于 ArrowButton 之上的时候典型的使用活跃状态。在活跃状态下，使用 activebackground 选项显示 ArrowButton。在停用状态下，用模糊的点描(stipple)显示 ArrowButton。 停用状态意味着 ArrowButton 应当是没有感觉的(insensitive): 缺省绑定将拒绝激活这个组件并将忽略鼠标按扭按下。
+
+.TP
+-type
+决定 ArrowButton 的类型: button 是标准按扭外观，arrow 是滚动条的箭头外观。
+
+.TP
+-width
+为 ArrowButton 指定想要的宽度。值的单位是屏幕单位。 
+
+.SH 组件命令
+
+.TP
+pathName cget  option
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。 
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。
+
+.TP
+pathName invoke 
+如果 ArrowButton 的 state 不是停用。它调用这个按钮的命令。用活跃颜色和 sunken 面型(relief)重新显示 ArrowButton，并调用 armcommand。接着用普通颜色和它定义的面型显示 ArrowButton，并调用 disarmcommand 接着调用 command.
+
+在 ArrowButton 获得输入聚焦并且用户按 space bar 的时候调用 invoke。
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/04
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,60 @@
+.\" -*- nroff -*-
+.\" Copyright 1998 Andries E. Brouwer (aeb@cwi.nl)
+.\"
+.\" May be distributed under the GNU General Public License
+.TH BLOCKDEV 8 "May 2000" ""
+.SH NAME
+blockdev \- 从命令行调用区块设备控制程序
+.SH 总览（SYNOPSIS）
+.B blockdev
+.RI [ options ]
+.I commands devices
+.SH 描述（DESCRIPTION）
+.B blockdev
+工具允许从命令行调用区块设备控制程序。
+.SH 选项（OPTIONS）
+.TP
+.B \-V
+打印版本信息并退出。
+.TP
+.B \-q
+安静。
+.TP
+.B \-v
+详细信息。
+.SH 命令（COMMANDS）
+.TP
+.B \--setro
+设置只读模式。
+.TP
+.B \--setrw
+设置读写模式。
+.TP
+.B \--getro
+只读模式检测。如果是只读模式，显示1，否则显示0。
+.TP
+.B \--getss
+用字节为单位打印扇区大小——一般是512字节。
+.TP
+.B \--getsize
+显示设备容量（使用512个字节大小的扇区为单位）
+.TP
+.BI \--setra " N"
+设置预读扇区（512字节）为
+.I N
+个。
+.TP
+.B \--getra
+打印预读扇区（512字节）
+.TP
+.B \--flushbufs
+刷新缓存。
+.TP
+.B \--rereadpt
+重读分区表。
+.SH "[中文版维护人]"
+.B billpan <billpan@netease.com>
+.SH "[中文版最新更新]"
+.BR 2002/01/10
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

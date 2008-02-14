@@ -1,0 +1,787 @@
+.\"  -*- nroff -*-
+.\"
+.\" Author: Tatu Ylonen <ylo@cs.hut.fi>
+.\" Copyright (c) 1995 Tatu Ylonen <ylo@cs.hut.fi>, Espoo, Finland
+.\"                    All rights reserved
+.\"
+.\" As far as I am concerned, the code I have written for this software
+.\" can be used freely for any purpose.  Any derived versions of this
+.\" software must be clearly marked as such, and if the derived work is
+.\" incompatible with the protocol description in the RFC file, it must be
+.\" called by a name other than "ssh" or "Secure Shell".
+.\"
+.\" Copyright (c) 1999,2000 Markus Friedl.  All rights reserved.
+.\" Copyright (c) 1999 Aaron Campbell.  All rights reserved.
+.\" Copyright (c) 1999 Theo de Raadt.  All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+.\" OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+.\" IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+.\" INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+.\" NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+.\" DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+.\" THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+.\" (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+.\" THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"
+.\" $OpenBSD: ssh.1,v 1.168 2003/03/28 10:11:43 jmc Exp $
+.Dd September 25, 1999
+.Dt SSH 1
+.Os
+.Sh NAME
+.Nm ssh
+.Nd OpenSSH SSH 客户端 (远程登录程序)
+.Sh "总览 (SYNOPSIS)"
+.Nm ssh
+.Op Fl l Ar login_name
+.Ar hostname | user@hostname
+.Op Ar command
+.Pp
+.Nm ssh
+.Bk -words
+.Op Fl afgknqstvxACNTX1246
+.Op Fl b Ar bind_address
+.Op Fl c Ar cipher_spec
+.Op Fl e Ar escape_char
+.Op Fl i Ar identity_file
+.Op Fl l Ar login_name
+.Op Fl m Ar mac_spec
+.Op Fl o Ar option
+.Op Fl p Ar port
+.Op Fl F Ar configfile
+.Oo Fl L Xo
+.Sm off
+.Ar port :
+.Ar host :
+.Ar hostport
+.Sm on
+.Xc
+.Oc
+.Ek
+.Bk -words
+.Oo Fl R Xo
+.Sm off
+.Ar port :
+.Ar host :
+.Ar hostport
+.Sm on
+.Xc
+.Oc
+.Op Fl D Ar port
+.Ar hostname | user@hostname
+.Op Ar command
+.Ek
+.Sh "描述 (DESCRIPTION)"
+.Nm
+(SSH 客户端) 用于登录远程主机, 并且在远程主机上执行命令.
+它的目的是替换 rlogin 和 rsh, 同时在不安全的网络之上, 两个互不
+信任的主机之间, 提供加密的, 安全的通信连接.
+X11 连接和任意 TCP/IP 端口均可以通过此安全通道转发(forward).
+.Pp
+当用户通过
+.Nm
+连接并登录主机
+.Ar hostname
+后, 根据所用的协议版本, 用户必须通过下述方法之一向远程主机证明他/她的身份:
+.Pp
+.Ss "SSH 协议第一版"
+.Pp
+第一, 如果发出登录命令的本地主机已经列在远程主机的
+.Pa /etc/hosts.equiv
+或
+.Pa /etc/ssh/shosts.equiv
+文件中, 并且两端的用户名相同, 则立即允许该用户登录.
+第二, 如果远程主机的用户根目录 (home 目录) 下存在
+.Pa \&.rhosts
+或
+.Pa \&.shosts ,
+并且其中有一行包含了客户机的名字和客户机上的用户名, 则允许该用户登录.
+一般来说, 服务器不允许单独使用这种认证方式, 因为它不安全.
+.Pp
+第二种认证方法是
+.Pa rhosts
+或
+.Pa hosts.equiv
+文件结合基于 RSA 的主机认证. 这意味着如果
+.Pa $HOME/.rhosts ,
+.Pa $HOME/.shosts ,
+.Pa /etc/hosts.equiv ,
+或
+.Pa /etc/ssh/shosts.equiv
+允许登录, 并且如果服务器能够验证客户的主机密钥(host key)
+(参见
+.Sx "文件(FILE)"
+节的
+.Pa /etc/ssh/ssh_known_hosts
+和
+.Pa $HOME/.ssh/known_hosts
+), 主机才允许客户登录.
+这个认证方法关闭了因 IP 欺骗, DNS 欺骗和路由欺骗造成的安全漏洞.
+[系统管理员注意: 一般说来
+.Pa /etc/hosts.equiv ,
+.Pa $HOME/.rhosts ,
+和 rlogin/rsh 协议的本质是不可靠地, 要安全就应该关掉它们.]
+.Pp
+作为第三种认证方式, 
+.Nm
+支持基于 RSA 的认证. 
+这种方案依托于公开密钥算法: 密码系统的加密和解密通过不同的密钥完成, 无法
+通过加密密钥推导出解密密钥. RSA 就是这种密码系统.
+每个用户创建一对公开/私密钥匙用于认证.
+服务器知道用户的公钥, 只有用户知道他自己的私钥.
+.Pa $HOME/.ssh/authorized_keys
+文件列出允许登录的(用户的)公钥. 当用户开始登录,
+.Nm
+程序告诉服务器它准备使用哪对钥匙(公钥)做认证.
+服务器检查这只密钥(公钥)是否获得许可, 如果许可, 服务器向用户
+(实际上是用户面前运行的
+.Nm
+程序) 发出测试, 用用户的公钥加密一个随机数. 这个随机数只能用正确的私钥解密.
+随后用户的客户程序用私钥解出测试数字, 即可证明他/她掌握私钥, 
+而又无需(把私钥)暴露给服务器.
+.Pp
+.Nm
+能够自动执行 RSA 认证协议. 用户通过运行
+.Xr ssh-keygen 1
+创建他/她的 RSA 密钥对. 私钥存放在用户根目录下的
+.Pa $HOME/.ssh/identity
+中, 而公钥存放在
+.Pa $HOME/.ssh/identity.pub
+中. 随后, 用户应该把
+.Pa identity.pub
+复制到远程服务器中, 作为
+.Pa $HOME/.ssh/authorized_keys
+存放到他/她的用户根目录下 (
+.Pa authorized_keys
+对应传统的
+.Pa $HOME/.rhosts
+文件, 每一行只有一只密钥, 尽管一行可以很长).
+用户无须密码就可以直接登录. RSA 认证远比 rhosts 认证安全.
+.Pp
+RAS 认证最便捷的用法大概就是使用认证代理(authentication agent) 了. 详见
+.Xr ssh-agent 1
+手册页.
+.Pp
+如果这些认证方式都失败了,
+.Nm
+就提示用户输入口令(password), 然后把口令送到服务器做验证. 由于整个通信过程是
+加密的, 因此别人不可能通过侦听网络获得这个口令.
+.Pp
+.Ss "SSH 协议第二版"
+.Pp
+当用户以协议第二版连接时, 类似的认证方法一样有效. 如果使用了
+.Cm PreferredAuthentications
+的默认内容, 客户端首先试着用基于主机的认证方法进行连接; 如果这个方法失败了
+就用公开密钥方法作认证; 最后, 如果它也失败了, 就进入键盘操作, 试试
+用户口令认证.
+.Pp
+这个公开密钥方法类似于上一节描述的 RAS 认证, 并且允许使用 RAS 或 DSA 算法:
+客户端用他的私钥 (
+.Pa $HOME/.ssh/id_dsa
+或
+.Pa $HOME/.ssh/id_rsa 
+) 对会话标识符(session identifier)签名, 然后把结果送到服务器. 
+服务器检查
+.Pa $HOME/.ssh/authorized_keys
+中是否有匹配的公钥, 如果密钥和签名都正确, 访问就可以继续进行.
+会话标识符来自共享的 Diffie-Hellman 值, 只有客户端和服务器端才知道这个值.
+.Pp
+如果公钥认证失败或无效, 用户口令将会加密后送到远端主机来证明用户的身份.
+.Pp
+另外,
+.Nm
+支持基于主机或测试应答的认证方式.
+.Pp
+协议第二版提供附加机制增强保密性
+(数据流用 3DES, Blowfish, CAST128 或 Arcfour 加密) 和完整性
+(hmac-md5, hmac-sha1).
+注意, 协议第一版缺少强有力的机制确保连接的完整性.
+.Pp
+.Ss 登录会话和远程执行
+.Pp
+服务器接受用户身份后, 服务器即可以执行给定的命令, 也可以让用户登录并给他
+一个正常的 shell. 所有和远端命令或 shell 的通信被自动加密.
+.Pp
+如果分配了伪终端(pseudo-terminal)(普通的登录会话), 用户可以使用后面将
+提到的 escape 字符.
+.Pp
+如果没有分配伪终端, 则会话是透明的(transparent), 能够可靠的传送二进制数据.
+大多数系统上, 即使分配了终端, 把 escape 字符设为
+.Dq none
+也可以让会话透明.
+.Pp
+当远程主机上的命令或 shell 退出时, 会话即结束, 并关闭所有 X11 和 TCP/IP 连接.
+远端程序的返回码做为
+.Nm
+的返回码返回.
+.Pp
+.Ss Escape 字符
+.Pp
+如果启用了伪终端, 
+.Nm
+能够通过 escape 字符支持一组功能.
+.Pp
+单独的波浪符可以用
+.Ic ~~
+送出去, 只要后面不跟下面列举的字符, 也可以把它直接送出去.
+escape 字符必须接在换行(newline)后面, 这样才具有特别含义.
+在配置文件中可以用
+.Cm EscapeChar
+命令更改 escape 字符, 在命令行上可以用
+.Fl e
+选项更改.
+.Pp
+已支持的 escape 命令 (假设是默认的
+.Ql ~ )
+有:
+.Bl -tag -width Ds
+.It Cm ~.
+断开连接
+.It Cm ~^Z
+把 ssh 送到后台
+.It Cm ~#
+列出转发的连接 (forwarded connection)
+.It Cm ~&
+当等待转发的连接/X11会话结束时, ssh 在后台退出登录
+.It Cm ~?
+显示 escape 字符的列表
+.It Cm ~C
+打开命令行 (仅用于
+.Fl L
+和
+.Fl R
+选项增加端口转发)
+.It Cm ~R
+请求连接的重建(rekeying) (仅用于SSH协议第二版, 且对方支持)
+.El
+.Pp
+.Ss X11 和 TCP 转发 (forwarding)
+.Pp
+如果
+.Cm ForwardX11
+变量设为
+.Dq yes
+(或参见后面对
+.Fl X
+和
+.Fl x
+选项的描述), 并且用户正在使用 X11 (设置了
+.Ev DISPLAY
+环境变量), 和 X11 显示器的连接将自动以这种形式转发到远端:
+任何用 shell 或命令启动的 X11 程序将穿过加密的通道, 从本地机器连接真正的
+X 服务器. 用户不应该手动设置
+.Ev DISPLAY .
+可以在命令行上, 也可以在配置文件中设置 X11 连接的转发.
+.Pp
+.Nm
+设置的
+.Ev DISPLAY
+值将指向服务器, 但是显示器号大于零. 这很自然, 因为
+.Nm
+在服务器上创建了一个
+.Dq proxy
+X 服务器, 把连接通过加密通道转发出去.
+.Pp
+.Nm
+将自动在服务器上设置 Xauthority 数据. 目的是这样的:
+SSH 生成一个随机的授权 cookie, 存放在服务器的 Xauthority 中.
+SSH 检查并确保转发的连接携带了这个 cookie, 打开连接后,
+把它替换为真正的 cookie.
+真正的认证 cookie 绝不会送往服务器 (也不会有任何明文传送的 cookie).
+.Pp
+如果
+.Cm ForwardAgent
+变量设为
+.Dq yes
+(或参见后面对
+.Fl A
+和
+.Fl a
+选项的描述), 并且用户正在使用认证代理(authentication agent), 
+则和代理的连接将自动转发到远程主机.
+.Pp
+既可以在命令行上, 也可以在配置文件中指定通过加密通道转发的任何 TCP/IP 连接.
+TCP/IP 转向的应用有, 比如说, 和电子钱包的安全连接, 或者是穿过防火墙等.
+.Pp
+.Ss 服务器认证
+.Pp
+.Nm
+自动维护并检查一个身份数据库, 它包含所有(成功)来访的主机的身份数据.
+主机密钥存放在用户根目录下的
+.Pa $HOME/.ssh/known_hosts
+文件中. 另外, SSH 自动检查
+.Pa /etc/ssh/ssh_known_hosts
+里面已知的主机. 任何新主机将被自动添加到用户文件中.
+如果某个主机的身份发生改变,
+.Nm
+就会发出警告, 并且关闭对它的密码认证, 以防止特洛伊木马窃取用户密码.
+这个机制的另一个目的是防止中间人攻击, 否则这种攻击可能会绕过加密系统.
+.Cm StrictHostKeyChecking
+选项用来防止登录到主机密钥不能识别或发生改变的那些机器.
+.Pp
+命令行选项有:
+.Bl -tag -width Ds
+.It Fl a
+禁止转发认证代理的连接.
+.It Fl A
+允许转发认证代理的连接. 
+可以在配置文件中对每个主机单独设定这个参数.
+.Pp
+代理转发须谨慎. 
+某些用户能够在远程主机上绕过文件访问权限 (由于代理的 UNIX 域 socket),
+他们可以通过转发的连接访问本地代理.
+攻击者不可能从代理获得密钥内容, 但是他们能够操作这些密钥, 利用加载到代理上
+的身份信息通过认证.
+.It Fl b Ar bind_address
+在拥有多个接口或地址别名的机器上, 指定收发接口.
+.It Fl c Ar blowfish|3des|des
+选择加密会话的密码术.
+.Ar 3des
+是默认算法.
+.Ar 3des
+(triple-des) 用三支不同的密钥做加密-解密-加密三次运算, 被认为比较可靠.
+.Ar blowfish
+是一种快速的分组加密术(block cipher), 非常安全, 而且速度比
+.Ar 3des
+快的多.
+.Ar des
+仅支持
+.Nm
+客户端, 目的是能够和老式的不支持
+.Ar 3des
+的协议第一版互操作. 由于其密码算法上的弱点, 强烈建议避免使用.
+.It Fl c Ar cipher_spec
+另外, 对于协议第二版, 这里可以指定一组用逗号隔开, 按优先顺序排列的密码术.
+详见
+.Cm Ciphers .
+.It Fl e Ar ch|^ch|none
+设置 pty 会话的 escape 字符 (默认字符:
+.Ql ~ ) .
+escape 字符只在行首有效, escape 字符后面跟一个点
+.Pq Ql \&.
+表示结束连接, 跟一个 control-Z 表示挂起连接(suspend), 跟 escape 字符自己
+表示输出这个字符. 把这个字符设为
+.Dq none
+则禁止 escape 功能, 使会话完全透明.
+.It Fl f
+要求
+.Nm
+在执行命令前退至后台. 它用于当
+.Nm
+准备询问口令或密语, 但是用户希望它在后台进行. 该选项隐含了
+.Fl n 
+选项. 在远端机器上启动 X11 程序的推荐手法就是类似于
+.Ic ssh -f host xterm 
+的命令.
+.It Fl g
+允许远端主机连接本地转发的端口.
+.It Fl i Ar identity_file
+指定一个 RSA 或 DSA 认证所需的身份(私钥)文件. 默认文件是协议第一版的
+.Pa $HOME/.ssh/identity
+以及协议第二版的
+.Pa $HOME/.ssh/id_rsa
+和
+.Pa $HOME/.ssh/id_dsa
+文件. 也可以在配置文件中对每个主机单独指定身份文件.
+可以同时使用多个
+.Fl i
+选项 (也可以在配置文件中指定多个身份文件).
+.It Fl I Ar smartcard_device
+指定智能卡(smartcard)设备. 参数是设备文件,
+.Nm
+能够用它和智能卡通信, 智能卡里面存储了用户的 RSA 私钥.
+.It Fl k
+禁止转发 Kerberos 门票和 AFS 令牌. 
+可以在配置文件中对每个主机单独设定这个参数.
+.It Fl l Ar login_name
+指定登录远程主机的用户.
+可以在配置文件中对每个主机单独设定这个参数.
+.It Fl m Ar mac_spec
+另外, 对于协议第二版, 这里可以指定一组用逗号隔开, 按优先顺序排列的
+MAC(消息验证码)算法 (message authentication code). 详情以
+.Cm MACs
+为关键字查询.
+.It Fl n
+把 stdin 重定向到
+.Pa /dev/null
+(实际上防止从 stdin 读取数据).
+.Nm
+在后台运行时一定会用到这个选项. 它的常用技巧是远程运行 X11 程序. 例如,
+.Ic ssh -n shadows.cs.hut.fi emacs &
+将会在 shadows.cs.hut.fi 上启动 emacs, 同时自动在加密通道中转发 X11 连接.
+.Nm
+在后台运行. (但是如果
+.Nm
+要求口令或密语, 这种方式就无法工作; 参见
+.Fl f
+选项.)
+.It Fl N
+不执行远程命令. 用于转发端口. (仅限协议第二版)
+.It Fl o Ar option
+可以在这里给出某些选项, 格式和配置文件中的格式一样.
+它用来设置那些没有命令行开关的选项.
+.It Fl p Ar port
+指定远程主机的端口. 可以在配置文件中对每个主机单独设定这个参数.
+.It Fl q
+安静模式. 消除所有的警告和诊断信息.
+.It Fl s
+请求远程系统激活一个子系统. 子系统是 SSH2 协议的一个特性, 能够协助
+其他应用程序(如 sftp)把SSH用做安全通路. 子系统通过远程命令指定.
+.It Fl t
+强制分配伪终端.
+可以在远程机器上执行任何全屏幕(screen-based)程序, 所以非常有用,
+例如菜单服务. 并联的
+.Fl t
+选项强制分配终端, 即使 
+.Nm
+没有本地终端.
+.It Fl T
+禁止分配伪终端.
+.It Fl v
+冗详模式. 使
+.Nm
+打印关于运行情况的调试信息. 在调试连接, 认证和配置问题时非常有用. 并联的
+.Fl v
+选项能够增加冗详程度. 最多为三个.
+.It Fl x
+禁止 X11 转发.
+.It Fl X
+允许 X11 转发. 可以在配置文件中对每个主机单独设定这个参数.
+.Pp
+应该谨慎使用 X11 转发. 如果用户在远程主机上能够绕过文件访问权限
+(根据用户的X授权数据库), 他就可以通过转发的连接访问本地 X11 显示器.
+攻击者可以据此采取行动, 如监视键盘输入等.
+.It Fl C
+要求进行数据压缩 (包括 stdin, stdout, stderr 以及转发 X11 和 TCP/IP 连接
+的数据).  压缩算法和
+.Xr gzip 1
+的一样, 协议第一版中, 压缩级别
+.Dq level
+用
+.Cm CompressionLevel
+选项控制. 压缩技术在 modem 线路或其他慢速连接上很有用, 但是在高速网络上反而
+可能降低速度. 可以在配置文件中对每个主机单独设定这个参数. 另见
+.Cm Compression
+选项.
+.It Fl F Ar configfile
+指定一个用户级配置文件. 如果在命令行上指定了配置文件, 系统级配置文件
+.Pq Pa /etc/ssh/ssh_config
+将被忽略. 默认的用户级配置文件是
+.Pa $HOME/.ssh/config .
+.It Fl L Ar port:host:hostport
+将本地机(客户机)的某个端口转发到远端指定机器的指定端口.
+工作原理是这样的, 本地机器上分配了一个 socket 侦听
+.Ar port
+端口, 一旦这个端口上有了连接, 该连接就经过安全通道转发出去,
+同时远程主机和
+.Ar host
+的
+.Ar hostport
+端口建立连接. 可以在配置文件中指定端口的转发. 只有 root 才能转发特权端口.
+IPv6 地址用另一种格式说明:
+.Ar port/host/hostport
+.It Fl R Ar port:host:hostport
+将远程主机(服务器)的某个端口转发到本地端指定机器的指定端口.
+工作原理是这样的, 远程主机上分配了一个 socket 侦听
+.Ar port
+端口, 一旦这个端口上有了连接, 该连接就经过安全通道转向出去,
+同时本地主机和
+.Ar host
+的
+.Ar hostport
+端口建立连接. 可以在配置文件中指定端口的转发. 只有用 root 登录远程主机
+才能转发特权端口. IPv6 地址用另一种格式说明:
+.Ar port/host/hostport
+.It Fl D Ar port
+指定一个本地机器
+.Dq 动态的
+应用程序端口转发. 工作原理是这样的, 本地机器上分配了一个 socket 侦听
+.Ar port
+端口, 一旦这个端口上有了连接, 该连接就经过安全通道转发出去,
+根据应用程序的协议可以判断出远程主机将和哪里连接. 目前支持 SOCKS4 协议, 
+.Nm
+将充当 SOCKS4 服务器. 只有 root 才能转发特权端口.
+可以在配置文件中指定动态端口的转发.
+.It Fl 1
+强制
+.Nm
+只使用协议第一版.
+.It Fl 2
+强制
+.Nm
+只使用协议第二版.
+.It Fl 4
+强制
+.Nm
+只使用 IPv4 地址.
+.It Fl 6
+强制
+.Nm
+只使用 IPv6 地址.
+.El
+.Sh "配置文件 (CONFIGURATION FILES)"
+.Nm
+可以从用户级配置文件和系统级配置文件中获取更多的配置数据.
+配置文件的格式及其内容参见
+.Xr ssh_config 5 .
+.Sh “环境变量 (ENVIRONMENT)"
+.Nm
+一般将设置下面的环境变量:
+.Bl -tag -width Ds
+.It Ev DISPLAY
+环境变量
+.Ev DISPLAY
+指出 X11 服务器的位置. 
+.Nm
+自动设置这个变量, 变量指向
+.Dq hostname:n
+格式的数据, 其中 hostname 指出运行 shell 的主机, 而 n 是大于等于 1 的整数.
+.Nm
+根据这个数据, 用安全通路转发 X11 连接. 用户一般不需要主动设置
+.Ev DISPLAY
+变量, 否则会导致 X11 连接不安全 (而且会导致用户手工复制所需的授权 cookie).
+.It Ev HOME
+设置为用户根目录的路径.
+.It Ev LOGNAME
+等于
+.Ev USER ;
+用来兼容使用这个变量的系统.
+.It Ev MAIL
+设置为用户邮箱的路径.
+.It Ev PATH
+设置为默认的
+.Ev PATH ,
+如同编译
+.Nm ssh 
+时要求的一样.
+.It Ev SSH_ASKPASS
+如果
+.Nm
+需要一个密语(passphrase), 只要它是终端上启动的, 它会从当前终端上读取. 如果
+.Nm
+没有联接终端, 但是设置了
+.Ev DISPLAY
+和
+.Ev SSH_ASKPASS
+变量,
+.Nm
+就运行
+.Ev SSH_ASKPASS
+指定的程序, 打开一个 X11 窗口读取密语. 当从
+.Pa .Xsession
+或类似的 script 中调用
+.Nm
+时, 这个功能特别有用. (注意, 某些机器上可能需要将输入重定向为
+.Pa /dev/null
+才能工作.)
+.It Ev SSH_AUTH_SOCK
+标识某个 UNIX 域 socket 的路径, 用于和代理通信.
+.It Ev SSH_CONNECTION
+标识连接的客户端和服务器端. 变量包含四个用空格隔开的字段: 客户端IP地址,
+客户端端口号, 服务器IP地址, 服务器端口号.
+.It Ev SSH_ORIGINAL_COMMAND
+如果强制执行了某条命令, 该变量就保存了最初的命令行. 可以用它获取初始参数.
+.It Ev SSH_TTY
+设置为关联当前 shell 或命令的终端名字(设备的路径).
+如果会话没有终端, 就不设置这个变量.
+.It Ev TZ
+如果启动后台进程(daemon)时设置了时区, 就设置这个时区变量, 指出现在的时区
+(就是说, 后台进程会把这个变量传给新建连接).
+.It Ev USER
+设置为登录的用户名.
+.El
+.Pp
+另外, 如果允许用户改变他们的环境数据, 而且有
+.Pa $HOME/.ssh/environment
+这个文件,
+.Nm
+将读取其中数据, 把
+.Dq VARNAME=value
+这种格式的数据行添加进环境数据区. 另见
+.Xr sshd_config 5 
+的
+.Cm PermitUserEnvironment
+选项.
+.Sh "文件 (FILES)"
+.Bl -tag -width Ds
+.It Pa $HOME/.ssh/known_hosts
+主机密钥的记录, 记录有用户登录上来, 但是没有列在 
+.Pa /etc/ssh/ssh_known_hosts 
+中的主机. 参见
+.Xr sshd 8 .
+.It Pa $HOME/.ssh/identity, $HOME/.ssh/id_dsa, $HOME/.ssh/id_rsa
+包含了用户的身份信息. 它们分别是协议第一版的 RSA, 协议第二版的 DSA,
+协议第二版的 RSA. 这些文件存有敏感信息, 只应由该用户读取, 不允许其他用户
+访问(读/写/执行). 注意, 如果一个私钥文件能够让其他用户访问,
+.Nm
+将忽略这个文件. 在生成密钥的时候可以指定一个密语(passphrase), 用这个密语和
+3DES 加密文件的敏感部分.
+.It Pa $HOME/.ssh/identity.pub, $HOME/.ssh/id_dsa.pub, $HOME/.ssh/id_rsa.pub
+包含认证用的公钥 (以文本格式保存的身份文件的公开部分).
+如果用户希望用协议第一版的 RSA 认证登录这些机器,
+.Pa $HOME/.ssh/identity.pub
+的内容应该添加到所有机器的
+.Pa $HOME/.ssh/authorized_keys
+中. 如果用户希望用协议第二版的 DSA/RSA 认证登录这些机器,
+.Pa $HOME/.ssh/id_dsa.pub
+和
+.Pa $HOME/.ssh/id_rsa.pub
+的内容应该添加到所有机器的
+.Pa $HOME/.ssh/authorized_keys
+中. 这些文件没有敏感数据, 可以(但不是必须)让任何人读取. 
+ssh 绝不会自动访问这些文件, 它们也不是不可或缺; 
+只是为了用户方便才提供这些文件.
+.It Pa $HOME/.ssh/config
+用户级配置文件. 
+.Xr ssh_config 5
+描述了文件格式及其配置选项.
+.It Pa $HOME/.ssh/authorized_keys
+存放 RSA/DSA 公钥, 用户通过它登录机器. 
+.Xr sshd 8
+手册页描述了这个文件的格式. 最简单的文件格式和 .pub 身份文件一样.
+文件内容并非高度敏感, 但是仍然建议仅让此文件的用户读写, 而拒绝其他用户的访问.
+.It Pa /etc/ssh/ssh_known_hosts
+已知的主机密钥的系统级列表. 系统管理员应该准备好这个文件, 把所需主机的公钥
+保存在文件里面. 这个文件应该能够全局读取. 文件中一行一支公钥, 格式是
+(字段用空格隔开): 系统名字, 公钥, 可选的注释域. 如果同一个机器使用了多个名字,
+所有名字都应该(用逗号隔开)列出来. 文件格式在
+.Xr sshd 8
+手册页中有描述.
+.Pp
+登录的时候,
+.Xr sshd 8
+用规范的系统名字(名字服务器返回的)确认客户机; 其他名字也需要, 因为校验密钥前
+.Nm
+不会把用户提供的名字转换为规范名字, 防止能够操作名字服务器的人欺骗主机认证.
+.It Pa /etc/ssh/ssh_config
+系统级配置文件. 
+.Xr ssh_config 5 
+描述了文件格式和配置选项.
+.It Pa /etc/ssh/ssh_host_key, /etc/ssh/ssh_host_dsa_key, /etc/ssh/ssh_host_rsa_key
+这三个文件包含了主机密钥的私有部分, 它们用于
+.Cm RhostsRSAAuthentication
+和
+.Cm HostbasedAuthentication .
+如果使用了协议第一版的
+.Cm RhostsRSAAuthentication
+方法,
+.Nm
+必须是 setuid root, 因为只有 root 才能读取主机密钥. 而对于协议第二版的
+.Cm HostbasedAuthentication
+方法,
+.Nm
+使用
+.Xr ssh-keysign 8
+访问主机密钥. 这样消除了验证身份时对
+.Nm
+setuid root 的要求. 默认情况下
+.Nm
+不是 setuid root.
+.It Pa $HOME/.rhosts
+该文件用于
+.Pa \&.rhosts
+认证, 里面列出允许登录的主机/用户对. 
+(注意 rlogin 和 rsh 也使用这个文件, 导致这个文件的应用变得不安全)
+文件中的每一行包括一个主机名字(用名字服务器返回的规范名字), 和主机上的
+用户名字, 用空格隔开. 某些机器上, 如果用户根目录位于 NFS 分区, 
+这个文件可能需要全局可读, 因为
+.Xr sshd 8
+以 root 身份读它. 此外, 该文件必须属于这个用户, 其他人不允许持有写权限.
+对大多数机器推荐的访问权限是, 它的用户可以读写, 而不让其他人访问.
+.Pp
+注意, 默认情况下会安装
+.Xr sshd 8 
+, 因此在允许 \s+2.\s0rhosts 认证前, 
+.Xr sshd 8 
+要求成功进行了 RSA 主机验证. 如果没有
+.Pa /etc/ssh/ssh_known_hosts
+文件存放客户的主机密钥, 密钥可以存放在
+.Pa $HOME/.ssh/known_hosts 
+中. 最简单的做法是用 ssh 从服务器回连客户机; 这样会自动把主机密钥添加到
+.Pa $HOME/.ssh/known_hosts .
+.It Pa $HOME/.shosts
+这个文件的用法和
+.Pa \&.rhosts
+完全一样. 它的目的是允许
+.Nm
+做 rhosts 认证的同时防止
+.Nm rlogin
+或
+.Xr rsh 1
+登录.
+.It Pa /etc/hosts.equiv
+.Pa \&.rhosts 认证
+使用这个文件. 它包含规范的主机名字, 一行一个(
+.Xr sshd 8
+手册页描述了完整的格式). 如果文件中发现了客户机的名字, 
+而且客户机和服务器的用户名相同, 则自动允许登录.
+另外, 一般情况下要求 RSA 主机认证成功. 这个文件只应该让 root 可写.
+.It Pa /etc/ssh/shosts.equiv
+这个文件的用法和
+.Pa /etc/hosts.equiv
+完全一样. 用于允许
+.Nm
+登录, 但不允许 rsh/rlogin 的时候.
+.It Pa /etc/ssh/sshrc
+当用户登录后, 运行 shell (或命令)前, 
+.Nm
+执行这个文件中的命令. 详见
+.Xr sshd 8
+手册页.
+.It Pa $HOME/.ssh/rc
+当用户登录后, 运行 shell (或命令)前, 
+.Nm
+执行这个文件中的命令. 详见
+.Xr sshd 8
+手册页.
+.It Pa $HOME/.ssh/environment
+含有关于环境变量的附加定义, 另见前面的
+.Sx ENVIRONMENT
+节.
+.El
+.Sh "诊断 (DIAGNOSTICS)"
+.Nm
+结束时的状态码就是远端命令结束时的返回码, 如果发生了错误就返回255.
+.Sh "作者 (AUTHORS)"
+OpenSSH 源自最初 Tatu Ylonen 发表的自由 ssh 1.2.12.
+Aaron Campbell, Bob Beck, Markus Friedl, Niels Provos,
+Theo de Raadt 和 Dug Song 消除了许多 BUGS, 增加新的特征, 从而创建了 OpenSSH.
+Markus Friedl 贡献了对 SSH 协议1.5版和2.0版的支持.
+.Sh "另见 (SEE ALSO)"
+.Xr rsh 1 ,
+.Xr scp 1 ,
+.Xr sftp 1 ,
+.Xr ssh-add 1 ,
+.Xr ssh-agent 1 ,
+.Xr ssh-keygen 1 ,
+.Xr telnet 1 ,
+.Xr ssh_config 5 ,
+.Xr ssh-keysign 8 ,
+.Xr sshd 8
+.Rs
+.%A T. Ylonen
+.%A T. Kivinen
+.%A M. Saarinen
+.%A T. Rinne
+.%A S. Lehtinen
+.%T "SSH Protocol Architecture"
+.%N draft-ietf-secsh-architecture-12.txt
+.%D January 2002
+.%O work in progress material
+.Re
+.Sh "[中文版维护人]"
+徐明 <xuming@users.sourceforge.net>
+.Sh "[中文版最新更新]"
+2004/06/11 第一版
+.Sh "《中国Linux论坛man手册页翻译计划》"
+http://cmpp.linuxforum.net

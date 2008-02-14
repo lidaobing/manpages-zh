@@ -1,0 +1,315 @@
+.\" This man page is Copyright (C) 1999 Andi Kleen .
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.TH PACKET(7) Linux Programmer's Manual PACKET(7)
+.SH NAME
+
+分组(也译为数据包)，PF_PACKET - 在设备层的分组接口
+译注：PF_PACKET 中的 PF 是 protocol family(协议族)的缩写。
+
+.SH SYNOPSIS 总览
+.nf
+.B #include <sys/socket.h>
+.br
+.B #include <features.h> /* 需要里面的 glibc 版本号 */
+.br
+.B #if __GLIBC__ >= 2 && __GLIBC_MINOR >= 1
+.br
+.B #include <netpacket/packet.h>
+.br
+.B #include <net/ethernet.h> /* 链路层（L2）协议 */
+.br
+.B #else
+.br
+.B #include <asm/types.h>
+.br
+.B #include <linux/if_packet.h>
+.br
+.B #include <linux/if_ether.h> /* 链路层协议 */
+.br
+.B #endif
+.sp
+.PP
+.BI packet_socket = socket(PF_PACKET, int socket_type, int protocol);
+.fi
+.SH DESCRIPTION 描述
+分组套接口(也译为插口或套接字)被用于在设备层(OSI 的链路层)
+收发原始(raw )分组。它允许用户在用户空间实现在物理层之上的
+协议模块。
+
+
+对于包含链路层报头的原始分组，socket_type 参数是 SOCK_RAW；
+对于去除了链路层报头的加工过的分组，socket_type 参数是
+SOCK_DGRAM。链路层报头信息可在作为一般格式的 sockaddr_ll 中
+的中得到。socket 的 protocol 参数指的是 IEEE 802.3 的按网络
+层排序的协议号，在头文件中有所有被允许的
+协议的列表。当 protocol 被设置为 htons(ETH_P_ALL)时，可以接
+收所有的协议。到来的此种类型的分组在传送到在内核实现的协议
+之前要先传送给分组套接口。
+
+译注：DGRAM 是数据报的意思，htons 函数名是 hosts to networks
+of a short (16位整数的从主机到网络的字节序变换)的缩写。
+
+只有有效 uid 是 0 或有 CAP_NET_RAW 能力的进程可以打开分组
+套接口。
+
+
+传送到设备和从设备传送来的 SOCK_RAW 分组不改变任何分组数据。
+当收到一个 SOCK_RAW 分组时, 地址仍被分析并传送到一个标准的
+sockaddr_ll 地址结构中。当发送一个 SOCK_RAW 分组时, 用户供
+给的缓冲区应该包含物理层报头。接着此分组不加修改的放入目的
+地址定义的接口的网络驱动程序的队列中。一些设备驱动程序总是
+增加其他报头。SOCK_RAW 分组与已被废弃的 Linux 2.0 的
+SOCK_PACKET 分组类似但不兼容。
+
+对 SOCK_DGRAM 分组的操作要稍微高一层次。在分组被传送到用户
+之前物理报头已被去除。从 SOCK_DGRAM分组套接口送出的分组在被
+放入网络驱动程序的队列之前，基于在 sockaddr_ll 中的目的地址
+得到一个适合的物理层报头。
+
+缺省的所有特定协议类型的分组被发送到分组套接口。为了只从特
+定的接口得到分组，使用bind(2)来指定一个在 sockaddr_ll 结构
+中的地址，以此把一个分组套接口绑定到一个接口上。只有地址字
+段 sll_protocol 和 sll_ifindex 被绑定用途所使用。
+
+不支持在分组套接口上的 connect(2) 操作。(不能作为客户端使用)
+
+.SH ADDRESS TYPES 地址类型
+sockaddr_ll 是设备无关的物理层地址。
+
+.RS
+.nf
+.ta 4n 20n 35n
+struct sockaddr_ll
+{
+unsigned short sll_family; /* 总是 AF_PACKET */
+unsigned short sll_protocol; /* 物理层的协议 */
+int sll_ifindex; /* 接口号 */
+unsigned short sll_hatype; /* 报头类型 */
+unsigned char sll_pkttype; /* 分组类型 */
+unsigned char sll_halen; /* 地址长度 */
+unsigned char sll_addr[8]; /* 物理层地址 */
+};
+.ta
+.fi
+.RE
+
+sll_protocol 是在 linux/if_ether.h 头文件中定义的按网络层排
+序的标准的以太桢协议类型。sll_ifindex 是接口的索引号(参见
+netdevice(2))；0 匹配所有的接口(当然只有合法的才用于绑定)。
+sll_hatype 是在 linux/if_arp.h 中定义的 ARP 硬件地址类型。
+sll_pkttype 包含分组类型。有效的分组类型是：目标地址是本地
+主机的分组用的 PACKET_HOST，物理层广播分组用的 PACKET_BROADCAST
+，发送到一个物理层多路广播地址的分组用的 PACKET_MULTICAST，
+在混杂(promiscuous)模式下的设备驱动器发向其他主机的分组用的
+PACKET_OTHERHOST，本源于本地主机的分组被环回到分组套接口用
+的 PACKET_OUTGOING。这些类型只对接收到的分组有意义。sll_addr
+和 sll_halen 包括物理层(例如 IEEE 802.3)地址和地址长度。精确
+的解释依赖于设备。
+
+译注： 
+(1) 对于以太网(ethernet) OSI 模型不完全适用，以太桢定义包
+括物理层和链路层的基本内容, 所谓的以太桢协议类型标识的是网络
+层的协议。IEEE 802 委员会为与 OSI 相一致，把以太桢定义称为 
+MAC(medium access control)层，在 MAC 层与网络层之间加入 LLC
+(logical link control)层，补充上了 OSI 标准的链路层。但在BSD
+TCP/IP 中是为了兼容官方标准才被实现的。对于 TCP/IP 协议族
+OSI 模型也不完全适用，TCP/IP 没定义链路层，只能用 UNIX 的设
+备驱动程序去对应链路层。无论如何这是既成事实，在本手册页中物
+理层、链路层、设备层指的都是以太网的 MAC 层。余以为不必严格
+按层次划分去理解问题，现在这个协议栈是优胜劣汰的结果，不是委
+员会讨论出来的。
+(2) 以太网地址分为三类，物理地址(最高位为0)，多路广播地址
+(最高位为1)，广播地址(全是1)。以 DP8390 为例，它的接收配置
+寄存器的 D2 位用来指定 NIC 是否接受广播桢，D3 位用来指定 NIC
+是否对多路广播桢进行过滤，D4 位用来指定 NIC是否接受所有的物
+理地址桢。混杂(Promiscuous)模式就是接收所有物理地址桢。
+
+.SH SOCKET OPTIONS 套接口选项
+
+分组套接口可被用来配置物理层的多路广播和混杂模式。配置通过调用
+setsockopt(2)实现，套接口参数是一个分组套接口、层次参数为
+SOL_PACKET 、选项参数中的 PACKET_ADD_MEMBERSHIP 用于增加一
+个绑定，选项参数中的 PACKET_DROP_MEMBERSHIP 用于删除一个绑
+定。两个选项都需要作为参数的 packet_mreq 结构：
+
+.RS
+.nf
+.ta 4n 20n 35n
+struct packet_mreq
+{
+int mr_ifindex; /* 接口索引号 */
+unsigned short mr_type; /* 动作 */
+unsigned short mr_alen; /* 地址长度 */
+unsigned char mr_address[8]; /* 物理层地址 */
+};
+.ta
+.fi
+.RE 
+
+mr_ifindex 包括接口的接口索引号，mr_ifindex 的状态是可以改
+变的。mr_type 参数指定完成那个动作。PACKET_MR_PROMISC 允许
+接收在共享介质上的所有分组，这种接受状态常被称为混杂模式；
+PACKET_MR_MULTICAST 把套接口绑定到由mr_address 和 mr_alen
+指定的物理层多路广播组上；PACKET_MR_ALLMULTI 设置套接口接
+收所有的来到接口的多路广播分组。
+
+
+除此之外传统的 ioctls 如 SIOCSIFFLAGS, SIOCADDMULTI, 
+SIOCDELMULTI 也能用于实现同样的目的。
+
+.SH IOCTLS 输入输出控制
+SIOCGSTAMP 用来接收最新收到的分组的时间戳。它的参数是
+timeval 结构。
+
+除此之外，所有的在 netdevice(7) 和 socket(7) 中定义的标准
+的 ioctl 在分组套接口上均有效。
+
+.SH ERROR HANDLING 错误处理
+分组套接只对传送分组到设备驱动程序时发生的错误做错误处理，
+其他不做错误处理。这里没有等待解决的错误的概念。
+
+.SH COMPATIBILITY 兼容性
+在 Linux 2.0 中，得到分组套接口的唯一方法是调用 
+socket(PF_INET, SOCK_PACKET, protocol)。它仍被支持但变得
+没有价值。两种方法的主要不同在于 SOCK_PACKET 使用老的 
+sockaddr_pkt 结构来指定一个接口，没有提供物理层接口无关性。
+(依赖于物理设备)
+
+.RS
+.nf
+.ta 4n 20n 35n
+struct sockaddr_pkt
+{
+unsigned short spkt_family;
+unsigned char spkt_device[14];
+unsigned short spkt_protocol;
+};
+.ta
+.fi
+.RE
+
+
+spkt_family 包括设备类型，spkt_protocol 是在
+中定义的 IEEE 802.3 协议类型，spkt_device 是表示设备名的 null
+终结的字符串，例如 eth0。
+
+译注: "who is nntp" 就是一个以 null ('\0')终结的字符串。
+
+
+这个结构已经被废弃，不应在新的代码中使用。
+
+
+.SH NOTES 注意
+
+不建议对要求可移植的程序通过 pcap(3) 使用 PF_PACKET 协议族；
+它只覆盖了 PF_PACKET 特征的一个子集。 
+
+译注：该函数库可在 ftp://ftp.ee.lbl.gov/libpcap.tar.Z 得到。 
+
+
+SOCK_DGRAM 分组套接口对 IEEE 802.3 桢不做生成或分析 IEEE 
+802.2 LLC 报头的尝试。当在套接口中指定了 ETH_P_802_3 协议，
+告知内核生成 802.3 桢，并填写了长度字段；用户必须提供提供
+LLC 报头来产生符合标准的分组。到来的 802.3 分组不在协议
+字段 DSAP/SSAP 上实现多路复用；而是故意的把 ETH_P_802_2
+协议的 LLC 报头提供给用户。所以不可能绑定到 ETH_P_802_3；
+而可以绑定到 ETH_P_802_2 并自己做多路复用。缺省的发送的是
+标准的以太网 DIX 封装并填写协议字段。 
+
+译注: 长度字段和协议字段其实都是以太桢的第四字段，这个字段
+的值在小于 1518 时表示此以太桢是 IEEE 802.3 桢，在大于1536
+时表示此以太桢是 DIX 桢。DIX 中的 D 代表 DEC，I 代表 Intel，
+X 代表 Xerox。 
+
+
+分组套接口不是输入或输出防火墙的系列主题。
+
+
+
+.SH ERRORS 错误信息
+.TP
+.B ENETDOWN
+接口未启动。
+
+.TP
+.B ENOTCONN
+未传递接口地址。
+
+.TP
+.B ENODEV 
+在接口地址中指定了未知的设备名或接口索引。
+
+.TP
+.B EMSGSIZE
+分组比接口的 MTU(最大传输单元)大。
+
+.TP
+.B ENOBUFS
+没有足够的内存分配给分组。
+
+.TP
+.B EFAULT 
+用户传递了无效的地址。
+
+.TP
+.B EINVAL 
+无效参数。
+
+.TP
+.B ENXIO
+接口地址包含非法接口索引号。
+
+.TP
+.B EPERM
+用户没有足够的权限来执行这个操作。
+
+.TP
+.B EADDRNOTAVAIL
+传递了未知的多路广播组地址。 
+
+.TP
+.B ENOENT
+未收到分组。
+
+除此之外，底层的驱动程序可能产生其他的错误信息。
+
+.SH VERSIONS 版本
+PF_PACKET 是 Linux 2.2 的新特征。Linux 的早期版本只支持
+SOCK_PACKET。
+
+.SH BUGS 缺陷
+glibc 2.1 没有定义 SOL_PACKET。建议的补救是使用
+.RS
+.nf
+#ifndef SOL_PACKET
+#define SOL_PACKET 263
+#endif
+.fi
+.RE
+在此以后的 glibc 版本中更正了错误并且在 libc5 系统上不会发生。
+
+没有对 IEEE 802.2/803.3 LLC 的处理被认为是缺陷。
+
+套接口过滤器未归入文档。
+
+.SH CREDITS 贡献者
+本手册页是 Andi Kleen 写的，他得到了 Matthew Wilcox 的帮助。
+在 Linux 2.2 中的 PF_PACKET 是 Alexey Kuznetsov 实现的，他
+的实现是以 Alan Cox 和其他人的代码为基础的。
+
+.SH SEE ALSO 参见
+
+.BR ip(7), socket(7), socket(2), raw(7), pcap(3).
+.BR RFC 894 - IP 数据报的 Ethernet 桢封装标准。
+.BR RFC 1700 - IP 数据报的 IEEE 802.3 桢封装标准。
+.BR 头文件 linux/if_ether.h 包含物理层协议。
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

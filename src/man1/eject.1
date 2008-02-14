@@ -1,0 +1,183 @@
+.\" 本文件版权所有(C) 1994-1999 Jeff Tranter
+.\" (tranter@pobox.com)
+.\" 它可在GNU出版许可版本2或更高版本下发布.参见 GNU 出版许可的 COPYING 章节以
+.\" 获知该文件可以重新发布的条件.
+.TH EJECT 1  1999年1月21日  Linux  User Commands(用户命令)
+.SH NAME (名称)
+eject \- 弹出可移动介质
+.SH SYNOPSIS(总览)
+eject -h.breject [-vnrsfq] [<name>]
+.br 
+eject [-vn] -d.breject [-vn] -a on|off|1|0 [<name>]
+.br 
+eject [-vn] -c slot [<name>]
+.br 
+eject [-vn] -t [<name>]
+.SH DESCRIPTION(描述)
+.B Eject
+允许可移动介质(典型是 CD-ROM，软盘，磁带，或者 JAZ 以及 ZIP 磁盘)
+在软件控制下弹出．该命令也可以控制一些多盘片 CD-ROM 控制器，
+控制一些设备支持的自动弹出功能，以及控制一些 CD-ROM 驱动器磁盘托盘的关闭．
+与 name 相应的设备将被弹出．name 可以为设备文件或者其挂载点，
+也可以为完整路径或者省略前面的 /dev 或者 /mnt 设备文件名．
+如果没有指定 name，缺省使用 cdrom．有四种不同的弹出的方法，
+具体要看设备是 CD-ROM， SCSI设备， 可移动软盘， 还是磁带而定．
+默认的弹出会依次尝试所有四种方法， 直到成功为止． 
+如果设备当前是挂载上来的， 那么在弹出前要先卸载．
+.PP
+.SH COMMAND\-LINE OPTIONS (命令\-行选项)
+.TP 0.5i
+.B -h
+该选项使得
+.B eject
+显示关于命令选项的简要描述．
+.TP 0.5i
+.B -v
+令
+.B eject
+在冗长模式下运行； 显示更多的关于命令作什么用的信息．
+.TP 0.5i
+.B -d
+如果调用了这个选项，
+.B eject
+会显示默认的设备名．
+.TP 0.5i
+.B -a on|1|off|0
+该选项控制一些设备支持的自动弹出模式． 当激活时， 驱动器自动在设备关闭时弹出．
+.TP 0.5i.
+B -c <slot>
+有了这个选项， 可由 ATAPI/IDE CD-ROM 控制器选择一个 CD 槽．
+Linux 2.0 或者更高版本要求使用该功能．CD-ROM 驱动器不能在正使用时
+(已挂载数据 CD 或者在播放音乐 CD)响应工作改变请求．
+还要注意控制器的第一个槽设为 0，而不是 1．
+.TP 0.5i
+.B -t
+有了这个选项， 会发一个关闭 CD-ROM 托盘的命令给驱动器．
+不是所有的设备都支持该命令．
+.TP 0.5i
+.B -n
+有了这个选项， 显示选定的设备， 但是不执行任何动作．
+.TP 0.5i
+.B -r
+该选项指定了使用 CDROM 弹出命令应被弹出的驱动器．
+.TP 0.5i
+.B -s
+该选项指定了使用 SCSI 命令应被弹出的驱动器．
+.TP 0.5i
+.B -f
+该选项指定了使用可移动软盘弹出命令应被弹出的驱动器．
+.TP 0.5i.
+B -q
+该选项指定了使用磁带驱动器离线命令应被弹出的驱动器．
+.SH LONG OPTIONS(长选项)
+所有选项与以下列出的长名字相关． 只要长名字缩写唯一， 它就可以缩写．
+.br -h --help
+.br -v --verbose
+.br -d --default
+.br -a --auto
+.br -c --changerslot
+.br -t --trayclose
+.br -n --noop
+.br -r --cdrom
+.br -s --scsi
+.br -f --floppy
+.br -q --tape
+.br
+.SH EXAMPLES(示例)
+.PP 弹出默认设备:
+.IP
+eject
+.PP
+弹出名字为 cdrom 的设备或者挂载点：
+.IP
+eject cdrom
+.PP
+使用设备名来弹出：
+.IP
+eject /dev/cdrom
+.PP
+使用挂载点来弹出：
+.IP
+eject /mnt/cdrom/
+.PP 弹出第四个 IDE 设备：
+.IP
+eject hdd
+.PP
+弹出第一个 SCSI 设备：
+.IP
+eject sda
+.PP
+使用 SCSI 分区名(例如 ZIP 设备)来弹出
+:.IP
+eject sda4
+.PP
+在多盘片控制器上选择第五个磁盘：
+.IP
+eject -v -c5 /dev/cdrom
+.PP
+在 SoundBlaster CD-ROM 驱动器上开启自动弹出功能：
+.IP
+eject -a on /dev/sdpcd
+.SH EXIT STATUS(退出状态)
+.PP
+如果操作成功， 返回 0， 如果操作失败或者命令语法无效， 则返回 1．
+.SH NOTES(备注)
+.PP
+.B Eject
+只对支持四种弹出方式其中之一或更多的设备起作用．
+这些设备包括大多数的 CD-ROM 驱动器 (IDE, SCSI 和专有接口的)，
+一些 SCSI 磁带驱动器， JAZ 驱动器， ZIP 驱动器(并口， SCSI 以及 IDE 版本接口的)，
+以及 LS120 可移动软盘． 用户已经报告过在 Sun SPARC 和 Apple Macintosh 
+系统上的软盘驱动器也成功了． 如果
+.B eject
+不起作用， 最可能的原因是由于设备的内核驱动的限制， 而并非
+.B eject
+程序本身的问题． -r， -s， -f 和 -q 选项可以控制弹出的方式．
+可指定一种以上的方式． 如果没有指定任何这些选项， 
+它会尝试所有四种方式(这在多数情况下工作很好)．
+.B Eject
+不一定总是能判断设备是否已经挂载(例如， 如果设备有多个名字)．
+如果设备名是一个符号链接，
+.B eject
+会跟随该链接并使用其指向的设备．
+
+如果
+.B eject
+判断设备能有多个分区， 它会尝试在弹出前卸载所有该设备已挂载的分区．
+如果卸载失败， 程序不会尝试弹出该介质．
+
+你可以弹出音频 CD．
+如果驱动器为空， 一些 CD-ROM 驱动器会拒绝打开其托盘． 
+一些设备不支持托盘关闭的命令． 如果激活了自动弹出的功能．
+那么驱动器总会在运行该命令后弹出． 不是所有的 Linux 内核 CD-ROM
+驱动程序都支持自动弹出模式．
+
+你需要适当的特权以访问设备文件． 在弹出一些设备(例如， SCSI 设备)时，
+要求以 root 或者 setuid root 的身份运行．
+
+用来找到给定名字的设备的搜索方法如下． 如果名字以标记斜线结束，
+它将被移去(这是为了支持使用 shell 文件名补全所生成的文件名）．
+如果名字以 '.' 或 '/' 开头， 它会试图以设备文件名或者挂载点打开它．
+如果那样失败了， 它会尝试在名字前面补加 '/dev/'， '/mnt'，
+'/dev/rdsk/'， '/dev/dsk/' 以及 './'， 
+直到找到的设备文件名或者能够打开挂载点为止．
+程序检查 /etc/mtab 以获知已挂载的设备． 如果那样也失败了，
+它还会检查 /etc/fstab 以获知当前未挂载设备的挂载点．
+推荐创建如 /dev/cdrom 或者 /dev/zip 之类的符号链接，这样
+.B eject
+可以使用易记的名字决定合适的设备． 为了节约输出，
+你可以创建一个适合于你的特定配置的针对 eject 选项的 shell 别名．
+.SH AUTHOR(作者)
+.B Eject
+由 Jeff Tranter (tranter@pobox.com) 写成， 并在 GNU 通用出版许可的条例下发布．
+参看源文件中的文件 COPYING 和注释以获知详情．
+.SH 又见
+mount(2), umount(2), mount(8), umount(8)
+.br /usr/src/linux/Documentation/cdrom/
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

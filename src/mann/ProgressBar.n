@@ -1,0 +1,55 @@
+.TH ProgressBar "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B ProgressBar - 进度指示器组件
+
+.SH 创建 CREATION
+.B ProgressBar pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+ProgressBar 组件向用户指示一个冗长的操作的进度。它通常用于 MainFrame 和 ProgressDlg。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+
+.TP
+-height  
+为进度指示器指定想要的高度。 
+
+.TP
+-maximum  
+指定变量的最大值。 
+
+.TP
+-type  
+指定 ProgressBar 的类型。必须是 normal、incremental 或 infinite 之一。
+
+如果 type 是 normal，则在每次设置变量的时候，按变量值和 maximum 选项来成比例的绘制进度指示器。 
+
+如果 type 是 incremental，则在内部维护进度指示器的值，并在每次设置变量值的时候增加内部值。按内部值和 maximum 选项来成比例的绘制进度指示器。
+
+如果 type 是 infinite， 则在内部维护进度指示器的值，并在每次设置变量值的时候增加内部值。 如果内部值(以 maximum 为模)小于 maximum/2 则进度指示器从左至右增长，并且如果内部值大于  maximum/2 则从右至左增长。 它的值的特殊情况请参见 -variable 选项。 
+
+.TP
+-variable 
+指定联系(attach)到进度指示器上的变量。在这个变量的值变化的时候更新进度指示器。如果这个变量的值是负数，则不显示进度指示器(用 background 色绘平(draw flat)它 - 用于 ProgressDlg 使它不可见)。如果它的值是 0，则重新初始化进度指示器。 
+
+.TP
+-width 
+为进度指示器指定想要的宽度。
+
+.SH 组件命令
+
+.TP
+pathName cget option  
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。 
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/05/12
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

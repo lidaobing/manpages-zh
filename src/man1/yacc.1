@@ -1,0 +1,124 @@
+.\" %W% %R% (Berkeley) %E%
+.\"
+
+.TH YACC 1 "July\ 15,\ 1990"
+.UC 6
+
+.SH NAME
+Yacc \- 一个生成 LALR(1) 文法分析器的程序
+
+.SH SYNOPSIS 总览
+.B yacc [ -dlrtv ] [ -b
+.I file_prefix
+.B ] [ -p
+.I symbol_prefix
+.B ]
+.I filename
+
+.SH DESCRIPTION 描述
+Yacc 从 filename 所指定的文件中读出文法(grammar)定义，并为之生成
+一个 LR(1) 分析器。分析器是由一系列 LALR(1)分析表和用 C 语言写的
+驱动例程组成。通常把分析表和驱动例程写到文件 y.tab.c 中。
+
+译注：余在翻译有关编译原理的东西时，总是区别语法(Syntax)和文法
+(grammar)。驱动例程指的是自动生成的 yyparse 函数和相关函数的源代
+码。Yacc和 Lex 自动生成的常量、变量、结构，函数等的名称通常以 yy
+为前缀，目的是不与用户自己的 C 程序定义的名称冲突。LALR(1)文法的
+分析是通过在堆栈上通过移进(shift)和归约(reduce)实现的，任何经过良
+好设计的语言(例如 Lisp,C,Perl,C++,Java)，用LALR(1)实现起来是容易，
+高效和可靠的。
+
+.PP
+可得到下面的参数：
+.RS
+
+.TP
+\fB-b \fIfile_prefix\fR
+-b 选项改变的是为输出的文件名准备的前缀，这个字符串用 file_prefix
+指定，缺省的前缀是 y.。
+
+.TP
+.B -d
+\fB-d\fR 
+-d 选项导致多写一个 y.tab.h 头文件。(包含一些词法定义)
+
+.TP
+.B -l
+如果没有指定 -l 选项，则 yacc 将在生成的代码中插入 #line 宏命令
+(directive)。 #line 宏命令用于让 C 编译器把在生成的 C 代码中的
+错误与用户的原始 yacc 代码联系起来。如果指定了 -l 选项，yacc 将
+不插入 #line 宏命令。用户指定的 #line 宏命令还是将被保留的。
+
+.TP
+\fB-p \fIsymbol_prefix\fR
+-p 选项改变的是为 Yacc生成的符号(symbols)准备的前缀，这个字符串用
+symbol_prefix 指定，缺省的前缀是 yy。
+
+.TP
+.B -r
+-r 选项导致 yacc 生成生成分开的代码和表文件。代码文件名是 y.code.c，
+表文件名是 y.tab.c。
+
+.TP
+.B -t
+-t 选项更改 Yacc 生成的预处理宏命令，这样调试语句就会被结合到编译后的
+代码中。
+
+.TP
+.B -v
+-v 选项导致在文件 y.output 中写出可被人阅读的对生成的分析器的描述。
+
+.RE
+.PP
+如果设置了环境变量TMPDIR，TMPDIR 所指定的字符串将被用作生成临时文件
+的路径名。
+
+.SH FILES 相关文件
+.IR y.code.c
+.br
+.IR y.tab.c
+.br
+.IR y.tab.h
+.br
+.IR y.output
+.br
+.IR /tmp/yacc.aXXXXXX
+.br
+.IR /tmp/yacc.tXXXXXX
+.br
+.IR /tmp/yacc.uXXXXXX
+
+.SH DIAGNOSTICS 诊断
+如果有些规则永不归约，在标准错误输出上报告这些规则的数目。
+如果有任何 LALR(1) 冲突，在标准错误输出上报告这些冲突的数目。
+
+译注：规则永不归约通常出现在文法有二义性规则的时候，术语叫
+归约-归约冲突。LALR(1) 冲突术语上叫移进-归约冲突，解决的方法
+一种是 Lisp 风格的语言的括号总动员，一种是 C 风格的语言的优先
+级排座次，还有一种是结构化的解决方法例如 Fortran77 的IF...ENDIF
+及 Algol68 的if...fi。C 风格语言的一个标志就是至少有一个
+从 Algol60 至今死不改悔的移进-归约冲突--都是else(悬挂)惹的祸。
+只要你清楚并让用户知道，有移进-归约冲突可以是正常的，不象
+归约-归约冲突那样必须避免。
+
+.SH [中文版维护人]
+.B mhss
+.PP
+推荐：
+编译原理及实践/(美)Kenneth C. Louden著. -北京: 机械工业出版社,
+2000.3 ￥39。
+实践出真知，无有捷径。读 byacc 的源程序是艰苦的事情, 但能澄清
+一些似是而非的认识, 亲历编程的精真妙明的境界, 虽无大的实际利益,
+毕竟是聊胜于无。在娑婆世界中, 一个完整的美梦是十分珍贵的。
+仁者, 何妨一试。
+.PP
+推荐： 
+编译原理/吕映芝等著. -北京: 清华大学出版社,1998.1 ￥21。
+余见到 LL(2) 感到很欣慰。余以为是改进消除左递归和提取左因子的
+算法就可以解决的事情，故不应是学术问题。余不懂学术，若妄言之，
+大人有大量，请海涵了。
+
+.SH [中文版最新更新]
+2000/11/13
+.SH "《中国Linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,41 @@
+.\" Copyright 1993 Rickard E. Faith (faith@cs.unc.edu)
+.\" Public domain: may be freely distributed.
+.TH ARCH 1 "4 July 1997" "Linux 2.0" "Linux Programmer's Manual"
+.SH NAME
+arch \- 显示机器的体系结构
+.SH "总览 (SYNOPSIS)"
+.B arch
+.SH "描述 (DESCRIPTION)"
+.B arch
+等同于
+.BR "uname -m" .
+
+目前的 Linux 系统上,
+.B arch
+显示 的 数据 有 "i386", "i486", "i586", "alpha", "sparc",
+"arm", "m68k", "mips", "ppc".
+.SH "另见 (SEE ALSO)"
+.BR uname (1),
+.BR uname (2)
+.\"
+.\" Details:
+.\" arch prints the machine part of the system_utsname struct
+.\" This struct is defined in version.c, and this field is
+.\" initialized with UTS_MACHINE, which is defined as $ARCH
+.\" in the main Makefile.
+.\" That gives the possibilities 
+.\" alpha    arm      i386     m68k     mips     ppc      sparc    sparc64
+.\"
+.\" If Makefile is not edited, ARCH is guessed by
+.\" ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/)
+.\" Then how come we get these i586 values?
+.\" Well, the routine check_bugs() does system_utsname.machine[1] = '0' + x86;
+.\" (called in init/main.c, defined in ./include/asm-i386/bugs.h)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/10
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

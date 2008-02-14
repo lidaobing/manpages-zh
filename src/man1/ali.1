@@ -1,0 +1,74 @@
+.\"
+.\" THIS FILE HAS BEEN AUTOMATICALLY GENERATED.  DO NOT EDIT.
+.\"
+.\" 包含mh宏文件
+.\"
+.TH ALI 1 MH.6.8 [nmh-1.0.3]
+.SH NAME
+ali \- list mail aliases
+.SH 总览
+.in +.5i
+.ti -.5i
+ali
+\%[\-alias\ aliasfile]
+\%[\-list] \%[\-nolist]
+\%[\-normalize]
+.br
+\%[\-nonormalize]
+\%[\-user] \%[\-nouser]
+\%[aliases\ ...]
+.br
+\%[\-version]
+\%[\-help] 
+.in -.5i
+.SH 描述
+\fIAli\fR对每个给出的\fIaliases\fR查找已命名的邮件别名文件。
+为那些\fIaliases\fR建立一份地址列表，并把列表写到标准输出上。
+如未给出参数，fIali\fR会输出所有别名项目。
+
+缺省情况下，当一个别名对应到多个地址时，这些地址是用逗号分
+隔并尽可能少占行数。如果指定`\-list'选项的话，那么当一个地
+址对应到多个地址时，每个地址将单独占用一行。
+
+`\-user'开关说明让\fIali\fR反向执行处理：不列出每个给定别
+名所对应的地址，相反，\fIali\fR将列出每个给定地址所对应的
+别名来。如果给出`\-normalize'开关的话，\fIali\fR将追踪地
+址的正式主机名。
+
+程序会读取由配置项\*(lqAliasfile:\*(rq指定的文件以及任何由
+`\-alias aliasfile'开关给出的附加别名。每个\fIalias\fR都会按
+\fImh\-alias\fR\0(5)所描述的那样进行处理。
+
+.Fi
+^$HOME/\&.mh\(ruprofile~^用户配置
+^/etc/passwd~^用户列表
+^/etc/group~^组列表
+.Pr
+^Path:~^用来决定用户的nmh目录
+.Ps
+^Aliasfile:~^一个缺省别名文件
+.Sa
+mh\-alias(5)
+.De
+`\-alias /etc/nmh/MailAliases'
+.Ds
+`\-nolist'
+.Ds
+`\-nonormalize'
+.Ds
+`\-nouser'
+.Co
+None
+.Bu
+
+带有`\-nonormalize'的`\-user'选项并不是完全准确的，因为它
+无法用站点的正式名称来替换那些本地昵称。
+.En
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.BR 2001/03/26
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

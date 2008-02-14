@@ -1,0 +1,60 @@
+.\" Copyright 1993 David Metcalfe (david@prism.demon.co.uk)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" References consulted:
+.\"     Linux libc source code
+.\"     Lewine's _POSIX Programmer's Guide_ (O'Reilly & Associates, 1991)
+.\"     386BSD man pages
+.\" Modified Sat Jul 24 21:28:17 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Tue Oct 22 23:49:37 1996 by Eric S. Raymond <esr@thyrsus.com>
+.TH BZERO 3  1993-04-09 "GNU" "Linux Programmer's Manual"
+
+.SH NAME
+bzero \- 向字符串写入零
+
+.SH "总览 (SYNOPSIS)"
+.nf
+.B #include <string.h>
+.sp
+.BI "void bzero(void *" s ", size_t " n );
+.fi
+
+.SH "描述 (DESCRIPTION)"
+\fBbzero()\fP 函数 把 字符串 \fIs\fP 的 前 \fIn\fP 个 字节 置成 零.
+
+.SH "返回值 (RETURN VALUE)"
+\fBbzero()\fP 函数 无 返回值.
+
+.SH "遵循 (CONFORMING TO)"
+4.3BSD.  建议 不要 用 这个 函数 -- 请 在 新的 程序中 用
+.BR memset
+函数.
+
+.SH "参见 (SEE ALSO)"
+.BR memset "(3), " swab (3)
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2002/1/28
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,59 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Chinese version Copyright Surran of www.linuxforum.net
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH MKDIR 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+mkdir \-建立目录
+.SH 总览
+.BI "mkdir [" 选项 "] " 目录...
+.sp
+POSIX 选项：
+.B "[-p] [-m mode]"
+.SH GNU 选项（缩写）：
+.B "[-p] [-m mode] [--verbose] [--help] [--version] [--]"
+.sh 描述
+mkdir 用指定的名字建立目录。
+缺省时，新建立的目录模式为0777，即不加保护地对所有人
+都可读、可写、可执行。
+.SH 选项
+.TP
+.BI "-m mode, --mode=mode"
+为新建立的目录设定模式，就象应用命令chmod一样，以后仍
+然使用缺省模式建立新目录。
+.TP
+.BI "-p, --parents"
+为所给出的目录建立丢失了的父目录。所建立的父目录的模式
+相当于用命令 umask 进行了 'u+wx' 的设置。忽略参数对已存
+在的目录的覆盖。（例如：已存在目录/a，当用到命令
+'mkdir /a'时报错，而'mkdir -p /a'则不会。）
+.TP
+.BI "--verbose"
+打印出新建立的每一个目录名。与--parents联合使用最有效。
+.SH GNU 标准选项
+.TP
+.BI "-help"
+在标准输出上显示使用信息并顺利退出。
+.TP
+.BI "-version"
+在标准输出上显示版本信息并顺利退出
+.TP
+.BI "--"
+终端选项列表.
+.SH 环境变量
+变量LANG，LC_ALL，LC_CTYPE，LC_MESSAGES按常规定义。
+.SH 遵循 
+POSIX 1003.2
+.SH 注意
+本文出自 fileutils－4.0，其他版本肯会有微小差别。任
+何添加或纠错意见请寄：aeb@cwi.nl，程序Bugs请告知：
+fileutils-bugs@gnu.ai.mit.edu
+
+.SH "[中文版维护人]"
+.B Surran  <email>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

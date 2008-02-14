@@ -1,0 +1,108 @@
+.\" 版权所有(c) 1997 Martin Schulze (joey@infodrom.north.de)
+.\" 中文版版权所有 riser,www.linuxforum.net 2000
+.\"
+.\" 这是免费的文档; 
+.\" 你可以遵照自由软件基金会出版的 GNU 通用出版许可版本 2
+.\" 或者更高版本的条例来重新发布和/或修改它.
+.\"
+.\" GNU通用出版许可中涉及到的"目标代码 (object code) "和" 可执行程序
+.\" (executables)"可解释为任意文档格式化的输出或者排版系统,
+.\" 包括中间的和已输出的结果.
+.\"
+.\" 该文档的发布寄望于能够实用,但并不做任何担保;
+.\" 甚至也不提供隐含的商品性的保证或者针对特殊目的适用性.
+.\" 参见GNU通用版权许可以获知详情.
+.\"
+.\" 你应该接收到与本文档一同发布的GNU通用版权许可的副本;
+.\" 如果没有,请写信到自由软件基金会
+.\" (Free Software Foundation), Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\" 
+.\" 许多文本复制于resolv+(8)的手册页.
+.TH HOST.CONF 5 "1997年2月2日" "Debian/GNU Linux" "(Linux系统管理)"
+.SH NAME (名称)
+host.conf \- 解析配置文件
+.SH DESCRIPTION (描述)
+文件
+.I /etc/host.conf
+包含了为解析库声明的配置信息. 它应该每行含一个配置关键字,
+其后跟着合适的配置信息. 系统识别的关键字有:
+.IR order ", " trim ", " multi ", " nospoof "和 " reorder.
+每个关键字在下面将分别进行介绍:
+
+.TP
+.I order
+这个关键字确定了主机查询是如何执行的.
+它后面应该跟随一个或者更多的查询方式,
+这些查询方式用逗号分隔. 有效的方式有:
+.IR bind ", " hosts "和 " nis .
+.TP
+.I trim
+这个关键字可以多次出现. 每次出现其后应该跟随单个的以句点开头的域名.
+如果设置了它, resolv+ 库会自动截去任何通过 DNS 解析出来的主机名后面的域名.
+这个选项用于本地主机和域. (相关信息: trim 对于通过 NIS 或者 hosts 
+文件获取的主机名无效. 需要注意的是要确保在 hosts 文件中的每条记录的
+第一个主机名是全名或者非全名, 以适合于本地安装.)
+.TP
+.I multi
+有效的值为:
+.IR on "和 "off .
+如果设置为
+.IR on ,
+resolv+ 库会返回一台主机在
+.I /etc/hosts
+文件中出现的的所有有效地址, 而不只是第一个. 默认情况下设为
+.I off ,
+否则可能会导致拥有庞大 hosts 文件的站点潜在的性能损失.
+.TP
+.I nospoof
+有效的值为:
+.IR on " 和 "off .
+如果设置为
+.IR on ,
+resolv+ 库会尝试阻止主机名欺骗以提高使用
+.BR rlogin " 和 "rsh
+的安全性. 它是如下这样工作的:
+在执行了一个主机地址的查询之后, resolv+ 会对该地址执行一次主机名的查询.
+如果两者不匹配, 查询即失败.
+.TP
+.I spoofalert
+如果该选项设为
+.I on
+同时也设置了
+.I nospoof
+选项, resolv+ 会通过 syslog 设施记录错误报警信息. 默认的值为
+.IR off .
+.TP
+.I reorder
+有效的值为
+.IR on " 和 "off .
+如果设置为
+.IR on ,
+resolv+ 会试图重新排列主机地址, 以便执行
+.BR gethostbyname (3)
+时, 首先列出本地地址(即在同一子网中的地址).
+重新排序适合于所有查询方式. 默认的值为
+.IR off .
+.SH FILES(相关文件)
+.TP
+.I /etc/host.conf
+解析配置文件
+.TP
+.I /etc/resolv.conf
+解析配置文件
+.TP
+.I /etc/hosts
+本地主机数据库
+.SH SEE ALSO(又见)
+.BR gethostbyname (3),
+.BR hostname (7),
+.BR resolv+ (8),
+.BR named (8)
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.B 2000/11/26
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net
+

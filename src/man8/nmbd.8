@@ -1,0 +1,180 @@
+.de Sh \" Subsection
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp \" Vertical space (when we can't use .PP)
+.if t .sp .5v
+.if n .sp
+..
+.de Ip \" List item
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.TH "NMBD" 8 "" "" ""
+.SH NAME
+nmbd \- 向客户端提供构造在IP之上的NetBIOS名字服务的NetBIOS名字服务器
+.SH "总览 SYNOPSIS"
+
+\fBnmbd\fR [-D] [-F] [-S] [-a] [-i] [-o] [-h] [-V][-d <debug level>] [-H <lmhosts file>] [-l <log directory>][-n <primary netbios name>] [-p <port number>] [-s <configuration file>]
+    
+
+.SH "描述 DESCRIPTION"
+
+.PP
+此程序是 \fBSamba\fR(7) 套件的一部分。
+
+.PP
+\fBnmbd\fR 是一个回应构造于IP之上的NetBIOS名字服务请求的服务器，这些请求由SMBD/CIFS
+客户(如Windows 95/98、NT和LanManager客户)产生。当然它也参与构造Windows的"网
+络邻居”查看的浏览协议。
+
+.PP
+当SMB/CIFS客户机启动时，会试图查找一个SMB/CIFS服务器。说得更精确些就是它们要知道
+正在使用的主机对应的IP地址。
+
+.PP
+在其它的服务中，\fBnmbd\fR 将监听这样的请求，如果客户自身的NetBIOS名字已被指定的话就用正
+在运行的主机IP地址回复它。这个“自身的NetBIOS名字”在默认情况下将是正在运行的主机在
+DNS中的名字，但可以用 \fB-n\fR 参数(查看后面关于OPTIONS的描述)越过它。从而\fBnmbd\fR 将用它自已的名字来回应广播查询。要让 \fBnmbd\fR 回应额外名字的话可以在\fBsmb.conf\fR(5)配置文件中通过参数来设定。
+
+.PP
+\fBnmbd\fR 也可用作一个WINS(Windows互联网名称服务)服务器。它作为WINS数据库服务器运作时，用名字注册请求来建立一个数据库以接收和回应客户对这些名字的查询。
+
+.PP
+另外，\fBnmbd\fR 也可以作WINS代理，转发用户不能直接以WINS协议和WINS服务器交谈的广播查询。
+
+.SH "选项 OPTIONS"
+
+.TP
+-D
+如果指定这个参数的话，将使 \fBnmbd\fR 作为一个后台守护程序运行。这样，它分配本身的进程在后台运行，并监视适当的端口请求。在默认情况下， \fBnmbd\fR 通常以命令行方式启动，后台运行。 \fBnmbd\fR 也能通过\fBinetd\fR 这个超级守护程序来启动，但不推荐这样做。 
+
+.TP
+-F
+If specified, this parameter causes the main \fBnmbd\fR process to not daemonize, i\&.e\&. double-fork and disassociate with the terminal\&. Child processes are still created as normal to service each connection request, but the main process does not exit\&. This operation mode is suitable for running \fBnmbd\fR under process supervisors such as \fBsupervise\fR and \fBsvscan\fR from Daniel J\&. Bernstein's \fBdaemontools\fR package, or the AIX process monitor\&.
+
+
+.TP
+-S
+If specified, this parameter causes \fBnmbd\fR to log to standard output rather than a file\&.
+
+
+.TP
+-i
+If this parameter is specified it causes the server to run "interactively", not as a daemon, even if the server is executed on the command line of a shell\&. Setting this parameter negates the implicit daemon mode when run from the command line\&. \fBnmbd\fR also logs to standard output, as if the \fB-S\fR parameter had been given\&.
+
+
+.TP
+-h|--help
+Print a summary of command line options\&.
+
+
+.TP
+-H <filename>
+指定NetBIOS的lmhosts文件。  NetBIOS的lmhosts文件是一份NetBIOS名字到IP地址对应关系的列表， nmbd服务器将会通过在\fBsmb.conf\fR (5)文件中\fIname resolve order\fR描述的名字解析机制来装入和使用这个文件，以便让服务器解析可能的NetBIOS名字查询。注意到nmbd并\fB不\fR用这个文件的内容来回答可能的名字查询。在这个文件中添加内容只会影响本计算机的NetBIOS名字解析。
+
+这个文件的默认存放路径已被作为编译处理的一部分加入到samba中了。通常默认路径是
+ \fI/usr/local/samba/lib/lmhosts\fR, \fI/usr/samba/lib/lmhosts\fR 或是 \fI/etc/samba/lmhosts\fR。 在\fBlmhosts\fR (5)手册页中查找描述此文件的详细内容。
+
+.TP
+-V
+打印出nmbd的版本信息。
+
+
+.TP
+-s <configuration file>
+The file specified contains the configuration details required by the server\&. The information in this file includes server-specific information such as what printcap file to use, as well as descriptions of all the services that the server is to provide\&. See \fIsmb\&.conf\fR for more information\&. The default configuration file name is determined at compile time\&.
+
+
+.TP
+-d|--debug=debuglevel
+\fIdebuglevel\fR 是一个从0到10的整数。如果没有指定此参数则默认的值是0。
+
+如果这个值越高，越多关于服务器的详细活动信息将被记录到文件中。在0调试级时，只记录紧急错误
+和严重警告。对于日以即日地运行服务，1调试级是个合理的等级，它只产生一定数量的关于执行操作
+的信息。
+
+
+1以上的调试级将产生相当多的记录数据，并且只在研究问题时才有用。3以上的调试级只被设计为让开
+发者使用并会产生极大数量的记录数据，而且其中很多部分非常难以理解。
+
+
+注意在此使用这个参数将越过在\fIsmb\&.conf\fR 文件中的\fIlog level\fR 参数。
+
+.TP
+-l|--logfile=logbasename
+用参数-l可以指定一个带路径的文件名作为记录文件，并会在你给出的名称后自动加上
+\fB".client"\fR的扩展名。The log file is never removed by the client.
+
+.TP
+-p <UDP port number>
+UDP端口号是一个正整数。 这个选项来改变\fBnmbd\fR响应查询的默认UDP端口号(通常它是 137) 。除非你是位这方面的专家，否则请不要用这个选项改变它。
+
+.SH "文件 FILES"
+
+.TP
+\fI/etc/inetd\&.conf\fR
+如果你用 \fBinetd\fR 这个超级守护程序来运行nmbd服务器，那么必须在这个文件中包含适当的启动参数和信息。 
+
+.TP
+\fI/etc/rc\fR
+(也可以是你的系统所用的其它初始化脚本)
+
+如果将nmbd当作服务，在启动时运行，这个文件必须包含合适的服务启动顺序。
+
+.TP
+\fI/etc/services\fR
+If running the server via the meta-daemon \fBinetd\fR, this file must contain a mapping of service name (e.g., netbios-ssn) to service port (e.g., 139) and protocol type (e.g., tcp).
+
+.TP
+\fI/usr/local/samba/lib/smb.conf\fR
+这是服务器配置文件 \fBsmb.conf\fR(5) 默认的存放位置。 系统安装配置文件通常的一些其它位置也可能是 \fI/usr/samba/lib/smb\&.conf\fR 和 \fI/etc/samba/smb\&.conf\fR。
+
+当nmbd被用作WINS服务器时(参见 \fBsmb.conf\fR(5) 手册页中对 \fIwins support\fR 参数的描述)， \fBnmbd\fR 将会把WINS数据库文件\fIwins.dat\fR写到 \fIvar/locks\fR 目录下。
+
+如果 \fBnmbd\fR 作为 \fB 主浏览器\fR (参见\fBsmb.conf\fR (5)手册页中对\fIlocal master\fR参数的描述)，\fBnmbd\fR将会把浏览数据库\fIbrowse.dat \fR写到\fIvar/locks\fR目录下。
+
+.SH "信号 SIGNALS"
+
+.PP
+我们 \fB不\fR 推荐你使用SIGKILL (-9)来终止\fBnmbd\fR进程除非这是最后的方法，因为这样做可能导致名字数据库不一致。正确的方法是发送SIGTERM (-15)信号并等待程序自行结束。
+
+.PP
+\fBnmbd\fR 可以接受SIGHUP信号，这样程序将把名字清单写入位于\fI/usr/local/samba/var/locks\fR (或是\fIvar/locks\fR)目录下的\fInamelist.debug\fR文件，同时这个信号也将导致程序把服务器的数据库写入\fIlog.nmb\fR文件。
+
+.PP
+另外，nmbd程序的调试记录等级也可以通过\fBsmbcontrol\fR(1) 调高或者调低。(向程序发送一个SIGUSR1信号(kill -USR1 <nmbd-pid>)或SIGUSR2信号(kill -USR2 <nmbd-pid>)的方法在Samba2.2 中已经不再使用。) 通过使用这样的方法可以诊断一些暂时的问题，同时仍然可以在一个正常的并且较低的记录等级来运行。
+
+.SH "版本 VERSION"
+
+.PP
+此手册页是针对samba套件版本3.0的。
+
+.SH "参见 SEE ALSO"
+
+.PP
+\fBinetd\fR(8), \fBsmbd\fR(8), \fBsmb.conf\fR(5), \fBsmbclient\fR(1), \fBtestparm\fR(1), \fBtestprns\fR(1)还有互联网草案 \fIrfc1001.txt\fR, \fIrfc1002.txt\fR. 另外，CIFS (从前的 SMB) 规约可以在 http://samba.org/cifs/网页上找到链接。
+
+.SH "作者 AUTHOR"
+
+.PP
+samba软件和相关工具最初由Andrew Tridgell创建。samba现在由Samba Team 作为开源软件来发展，类似linux内核的开发方式。
+
+.PP
+最初的samba手册页是 Karl Auer写的。
+手册页源码已经转换为YODL格式(另一种很好的开源软件，可以在ftp://ftp.ice.rug.nl/pub/unix找到)，由Jeremy Sllison 更新到Samba2.0 版本。
+Gerald Carter 在Samba2.2中将它转化为DocBook 格式。
+Alexander Bokovoy 在Samba 3.0中实现了DocBook XML4.2 格式的转换。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

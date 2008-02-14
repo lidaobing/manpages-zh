@@ -1,0 +1,132 @@
+.TH TZFILE 5
+.SH NAME
+tzfile \- 时区信息
+.SH SYNOPSIS
+.B
+#include <tzfile.h>
+.SH DESCRIPTION
+时区信息文件被
+.IR tzset(3)
+使用, 其开头为特征字符"TZif", 以此
+标示该文件为时区信息文件, 随后六个字节保留未用. 接下来是六
+个"标准"字节顺序(高位在前)的四字节
+.BR long
+类型值, 按顺序描述
+如下:
+.TP
+.I tzh_ttisgmtcnt
+保存在文件中的UTC/local指示器数目. 
+.TP
+.I tzh_ttisstdcnt
+保存在文件中的standard/wall指示器数目. 
+.TP
+.I tzh_leapcnt
+其值保存在文件中的leap second的数目
+.TP
+.I tzh_timecnt
+其值保存在文件中的"变化时间"数目
+.TP
+.I tzh_typecnt
+其值保存在文件中的"本地时间类型"数目(非零!)
+.TP
+.I tzh_charcnt
+保存在文件中的"时区简写符"数目
+
+.PP
+跟在上面这些头部后的是
+.I tzh_timecnt
+个"标准"字节顺序的四字
+节
+.BR long
+类型值, 以升序排序. 每个值均作为一个变化时间(就像
+.IR time (2)
+的返回), 系统依赖这些值来计算本地时间变化. 而在此
+之后的是
+.I tzh_timecnt
+个
+.BR "unsigned char"
+类型的一字节值, 这些
+值指出了文件中描述的多种"本地时间"类型中哪一个与具有相同索
+引的变化时间相关. 这些值可作为
+.I ttinfo
+结构数组的索引. 而
+.I ttinfo
+结构在文件中随后就有定义, 描述如下:
+.in +.5i
+.sp
+.nf
+.ta .5i +\w'unsigned int\0\0'u
+struct ttinfo {
+	long	tt_gmtoff;
+	int	tt_isdst;
+	unsigned int	tt_abbrind;
+};
+.in -.5i
+.fi
+.sp
+结构包括一个"标准"字节顺序的四字节
+.BR long
+类型值
+.I tt_gmtoff, 
+以及一个一字节的
+.I tt_isdst
+和一个一字节的
+.IR tt_abbrind.
+在每
+个结构里,
+.I tt_gmtoff
+给出了要被加到UTC的时间, 以秒为单位, 
+.I tt_isdst
+表明
+.I tm_isdst
+是否可通过
+.I localtime (3)
+设置, 而
+.I tt_abbrind
+可作为时区简写符的数组索引, 该数组在文件中跟在
+.I ttinfo
+结构后面.
+
+.PP
+这样就有
+.I tzh_leapcnt
+个标准字节顺序的四字节对, 每个四字节
+对的第一个值给出一个leap second发生的时间, 就如
+.IR time(2)
+的返回; 每个四字节对的第二个值给出给定时间之后所实现的总的
+leap second数. 四字节对按时间的升序排序.
+
+.PP
+同样有
+.I tzh_ttisstdcnt
+个standard/wall指示器, 每个保存了一
+个一字节值; 这些指示器指出了变化时间(与本地时间类型相关)是
+否被说明为standard time或者wall clock time, 以及当一个时区
+文件被用于处理POSIX 格式时区环境变量时是否使用变化时间.
+
+.PP
+最后, 有
+.I tzh_ttisgmtcnt
+个UTC/local指示器, 每个保存了一个
+一字节值; 这些指示器指出了变化时间(与本地时间类型相关)是否
+被说明为UTC 或者local time, 以及当一个时区文件被用于处理
+POSIX格式时区环境变量时是否使用变化时间.
+
+.PP
+如果
+.I tzh_timecnt
+等于零或者时间参数比文件记录的第一个变化
+时间小的话, 
+.I Localtime
+就使用文件中的第一个标准时间
+.I ttinfo,
+或者在没有标准时间结构是就直接使用第一个
+.I ttinfo
+结构. 
+.SH SEE ALSO
+newctime(3)
+.\" @(#)tzfile.5	7.11
+.\" This file is in the public domain, so clarified as of
+.\" 1996-06-05 by Arthur David Olson (arthur_david_olson@nih.gov).
+
+.\" 中文版维护请mailto: mapping@263.net

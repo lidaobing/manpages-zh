@@ -1,0 +1,116 @@
+.TH SUBST 1 local
+.DA 25 Feb 1990
+.SH NAME
+subst \- 替换文件中的定义
+
+.SH "总览 (SYNOPSIS)"
+.B subst
+[
+.B \-e
+editor
+]
+.B \-f
+substitutions
+victim ...
+
+.SH "描述 (DESCRIPTION)"
+.I Subst
+能够 替换 文件 的 内容, 适用于 针对 本地情况 定制 软件. 它 根据
+.I substitutions
+的 内容, 修改 每一个
+.I victim
+文件.
+.PP
+在
+.I substitutions
+文件 中, 每个 替换说明(substitution) 占用 一行. 每一行 包含 两个域, 用 
+一个或多个 tab 符 隔开.
+第一个 域 是 替换说明 的 \fI名字(name)\fP, 第二个 域 是 它的 \fI值(value)\fP.
+两者 均不应该 包含 ``#'' 字符; 而使用 文本编辑器 的 转义符, 如 ``&'' 和 ``\e'',
+也是 不明智地; 名字 最好 限制在 字母和数字 中; 以 ``#' 开始 的 行 是 注释,
+将被 忽略.
+.PP
+在 \fIvictim\fP 文件 中, 每一个 需要 替换 的 行 (\fI目标行\fP) 必须 跟在
+\fI原形行(prototype line)\fP 后面. 原形行 应该 有 这样 的 限制: 将来 其他 程序
+处理 这个文件 的 时候, 它 被视为 注释. 原形行 必须 包含 目标行 的 "原形", 该
+"原形" 用 ``=(\&)<'' 和 ``>(\&)='' 括起来, 这一行 的 其他内容 都被 忽略掉.
+.I Subst
+将 分析 这个原形, 寻找 替换说明 中 名字域 的 所有 实例, 名字实例 是用 
+``@\&<'' 和 ``>\&@'' 括起来的, 把 它们 改变成 对应的值, 然后 用这个 结果 替换
+目标行.
+
+.SH "选项 (OPTIONS)"
+.TP
+.B \-e
+替换 操作 由
+.IR sed (1)
+编辑器 完成, 它 必须 放在
+.I /bin
+或
+.I /usr/bin
+目录 下面. 用 ``\-e'' 开关 可以 指定 一个 不同位置 的 执行程序.
+
+.SH "示例 (EXAMPLE)"
+.PP
+如果 \fIsubstitutions\fP 文件内容 是
+.PP
+.RS
+.nf
+.ta \w'SECOND'u+4n
+FIRST	111
+SECOND	222
+.fi
+.RE
+.PP
+而 \fIvictim\fP 文件 是
+.PP
+.RS
+.nf
+x = 2;
+/* =(\&)<y = @\&<FIRST>\&@ + @\&<SECOND>\&@;>(\&)= */
+y = 88 + 99;
+z = 5;
+.fi
+.RE
+.PP
+那么 ``\fBsubst \-f \fP\fIsubstitutions victim\fP'' 命令 把 \fIvictim\fP 改变成:
+.PP
+.RS
+.nf
+x = 2;
+/* =(\&)<y = @\&<FIRST>\&@ + @\&<SECOND>\&@;>(\&)= */
+y = 111 + 222;
+z = 5;
+.fi
+.RE
+.SH "文件 (FILES)"
+.ta \w'\fIvictimdir\fP/substtmp.old'u+4n
+\fIvictimdir\fP/substtmp.new	建立出来的新版本文件
+.br
+\fIvictimdir\fP/substtmp.old	经过改名的老版本文件
+
+.SH "另见 (SEE ALSO)"
+sed(1)
+
+.SH "诊断 (DIAGNOSTICS)"
+如果 subst 无法 创建 临时文件, 或者 临时文件 已经 存在, 程序 中止 并 报错.
+
+.SH "历史 (HISTORY)"
+Henry Spencer 写于 U of Toronto.
+.PP
+Rich $alz 在 1991 年 7 月 增加了 ``\-e'' 选项.
+
+.SH BUGS
+当 创建 准备 用 \fIsubst\fP 处理的 文件 时, 很容易 忘记 在 原形行 后面 插入
+一个 要命的 目标行; 如果 你 忘了 目标行, \fIsubst\fP 最终 会 删掉 原形行 
+下面一行, 不管 那行 是 什么.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2004/02/28
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net
+
+
+

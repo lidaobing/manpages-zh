@@ -1,0 +1,147 @@
+.TH inetd  8  "" "UNIX系统管理员手册" ""
+
+.SH NAME
+\fBinetd\fR - 因特网“超级服务”
+.SH "总览"
+\fBinetd\fR - [ -d ] [ -q 队列长度 ] [ 配置文件名 ]
+.SH "描述"
+inetd通常在系统启动时由/etc/rc.local引导。inetd会监听指定internet端口是否有连接要求。当发现有某个端口有连接要求时，inetd将决定由哪个服务器进程来响应该连接要求，并调用该服务器程序。当程序运行结束后，inetd会继续对该端口进行监听（除了以下所涉及的原因）。从本质上讲，inetd可以只运行一个守护进程，该守护进程可以在需要时调用其它服务进程，从而减轻系统负担。
+.SH 选项
+.LP
+inetd的可用选项：
+.TP
+-d
+打开调试功能。
+
+.TP
+-q
+队列长度
+设置端口监听队列的长度值，默认值为128。
+
+.SH 说明
+.LP
+在运行时，inetd会读取它的配置文件，默认为/etc/inetd.conf。该配置文件的每一个栏都有一个条目，栏中每一项由空格或制表符进行分隔。以井号开头的是注释文本。其格式如下所示：
+.TP
+
+service name
+服务名
+
+.TP
+
+socket type
+接口类型
+
+.TP
+protocol
+协议名
+
+.TP
+
+wait/nowait[.max]
+等待/不等待
+
+.TP
+
+user[.group]
+用户/组
+
+.TP
+
+server program
+服务器程序
+
+.TP
+
+server program arguments
+服务器程序参数
+
+.LP
+如果定义的是基于Sun-RPC的服务，则将包含有以下内容：
+
+.TP
+
+service name/version
+服务名
+
+.TP
+
+socket type
+接口类型
+
+.TP
+
+rpc/protocol
+协议名
+
+.TP
+
+wait/nowait[.max]
+等待/不等待
+
+.TP
+
+user[.group]
+用户/组
+
+.TP
+
+server program
+服务器程序
+
+.TP
+
+server program arguments
+服务器程序参数
+
+.LP
+
+服务名指的是一个在文件/etc/services中有定义的合法服务。相对局域网而言（下面讨论），服务名须为该服务的官方名称（即，处于文件 /etc/services中的第一行）。当定义一个基于Sun-RPC的服务时，此栏内容须是一个在文件/etc/rpc中有定义的合法服务名。在斜械右侧的是RPC的版本号。此版本号可以是一个单一数字，也可以是一个从低到高的版本范围，如：“rusers/1-3”。
+
+.LP
+
+接口类型则是“stream”、“dgram”、“raw”、“rdm”或“seqpacket”中的一个，这取决于其数据的类型是什么。
+
+.LP
+协议名须是在文件/etc/protocols中有定义的合法协议。例如：“tcp”或“udp”。基于RPC的服务可以定义为：“rpc/tcp”或“rpc/udp”。
+
+.LP
+等待/不等待栏仅当定义接口类型为datagram时有效（其它接口在这里都使用“不等待”）。如果希望一个数据包到达它的同侪后，服务器立刻释放端口，使inetd可以继续监听此端口，即称为“多线程服务”，此时该栏须设为“不等待”。如果服务器都在一个端口传输数据包而且不会将此端口释放，则称此为“单一线程”，此时应设此栏为“等待”。Comsat(8)和talkd(8)是后一种数据类型的应用。Tftpd(8)则是一个例外，此数据服务建立的是一个虚拟的连接，为了避免竞争，此处应设为“等待”。服务器读在取第一个数据包后，重新建立一个新的接口供inetd继续提供监听使用，而旧的接口将在处理完该任务后将自动中断。可选项后缀“max”（与“等待”可“不等待”用逗号分隔）定义inetd在60秒内提供服务的最大进程数，缺省值为 40。
+
+.LP
+用户栏应包含可以使用该服务程序用户的用户名。此选项充许赋于inetd服务器程序低于root的权限。可以在用户名后用逗号分隔加上组名称，此选项可以使inetd在运行时以所定义的组身份运行而非/etc/password文件中定义的身份。如果在此定义了组名而所定义的用户名不是root 时，该用户所在组的名字将自动附加到此处。
+
+.LP
+服务器程序栏应包含全路径的服务器程序名，inetd在监听到某套接字上有请求时会调过该服务器程序。如果某服务由inetd内部提供，则此处应填“internal”。
+
+.PP
+
+
+服务器程序参数栏中应包含所有服务器程序运行时必须的各参数。如果服务程序由inetd内部提供，则此处应填“internal”。
+
+.PP
+
+
+inetd通过内部常规工作，自身也提供一些小的服务。这些服务有 “echo”、“discard”、“chargen”、“daytime”（人类语言）和“time”（以秒为单位的机器语言，从1900年1月1日零时开始计时）。所有这些服务都是基于tcp的。如想更深一步了解这些服务，可以从网上获得相关RFC文档。
+
+.PP
+
+
+inetd在接收到SIGHUP挂起信号后会重新读取其配置文件。在重读配置文件后，可能增加、减少或改变已有的服务。inetd在运行时会创建一个/var/run/inetd.pid的文件用来存放它的进程号。
+
+.SH 另见 SEE ALSO
+
+.PP
+
+comsat(8), fingerd(8), ftpd(8), rexecd(8), rlogind(8), rshd(8), lnetd(8), tftpd(8)
+
+
+.SH 历史 HISTORY
+
+\fBinetd\fR 命令最早出现在4.3BSD中。对基于Sun-RPC的服务支持从SunOS 4.1开始。
+
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.BR 2000/11/21
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,179 @@
+.\" 本man页版权所有(C)1996 Austin Donnelly <and1000@cam.ac.uk>,
+.\" 附加资源版权(c)1995 Martin Schulze <joey@infodrom.north.de>.
+.\"
+.\" 在保留了版权通告和该使用权限通告的前提下,可以授权生成和发布
+.\" 该手册的复制版本
+.\" 
+.\" 在所有最终工作是按照与本篇中一致的权限通告的条例来发布并提供
+.\" 了逐字复制的前提下,可以授权复制发布该手册的修改版本.
+.\"
+.\" 因为Linux内核和库经常改变,该手册页可能会不正确或者过时.作者
+.\" (们)对这些错误、遗漏或者因使用其中的信息而导致的损害不承担任
+.\" 何责任.作者(们)在编写该免费许可的手册时,可能不是基于同样水平
+.\" 的考虑,但在专业化工作时他们会这样做的.
+.\"
+.\" 该手册的格式化或者处理过的版本,如果没有包括源文件,则必须承认
+.\" 其版权以及这篇作品的作者.
+.\" 本man页合并了两个独立编写的man页,一个由Martin Schulze(1995年
+.\" 10月18日)完成,另一个由Austin Donnelly(1996年1月9日)完成.
+.\" 
+.\" 1996年1月11日星期四12:14:41 Austin Donnelly <and1000@cam.ac.uk>
+.\"    * 合并两个services(5)man页
+.TH SERVICES 5 "1996年1月11日" "Linux 程序员手册"
+.SH NAME(名称)
+services \- Internet 网络服务列表
+.SH DESCRIPTION(描述)
+.B services
+是一个普通的 ASCII 码文件, 它在 internet 服务的友好原文名以及这些服务预先分配的
+端口和协议类型之间提供了映射. 每个联网程序必须查找该文件以获取
+其服务的端口号(和协议).
+C 库例程
+.BR getservent (3),
+.BR getservbyname (3),
+.BR getservbyport (3),
+.BR setservent (3),
+和
+.BR endservent (3)
+支持由程序查询该文件.
+
+端口号由 IANA(Internet Assigned Numbers Authority) 分配, 
+他们当前的工作是分配端口号时, 指定 TCP 和 UDP 协议.
+这样, 大多数记录会包括两条子记录, 即使只是 TCP 的服务也是如此
+
+端口号在 1024 之下的(也称作'低编码'端口)只能由 root (参见
+.BR bind (2),  tcp (7), 和  udp (7).)
+绑定.
+这样连接到低编码端口的客户可信任运行在该端口上的服务是标准的实现,
+而不是由某台机器的用户运行的无聊的服务.由 IANA 确定的众所周知的端口号通常只在
+root 的控制范围之内 
+
+在
+.B services
+文件中出现的一条服务记录并不表示该服务当前在机器上运行.参见
+.BR inetd.conf (5)
+以获知提供的Internet服务的配置.注意不是所有联网服务都由
+.BR inetd (8) 
+启动,因而也不会出现在
+.BR inetd.conf (5) 
+之中.
+特别地,news (NNTP)和mail (SMTP)服务程序通常由系统引导脚本初始化.
+
+.B services
+文件所存放的位置由
+.IR /usr/include/netdb.h 
+中的
+.B _PATH_SERVICES
+定义.
+它通常设为
+.IR /etc/services .
+
+每行描述了一个服务,其格式如下:
+.IP
+\f2服务名\ \ \ 端口\f3/\f2协议\ \ \ \f1[\f2别名 ...\f1]
+这里的
+.TP 10
+.I 服务名
+是给服务所起的可供查找的友好的名字.它是区分大小写的.通常,客户端程序都以
+.IR 服务名
+命名.
+.TP
+.I 端口
+为该服务所用的端口号(十进制格式).
+.TP
+.I 协议
+为所使用的协议类型.该字段应与
+.BR protocols (5)
+文件中的一条记录相匹配.典型的值包括
+.B tcp
+和
+.BR udp .
+.TP
+.I 别名
+可以空缺,或者是以tab分隔的该服务的其他名字的列表(不过请查看下面的BUGS章节).同样,
+这些名字也是区分大小写的.
+.PP
+
+可以使用空格或者tab分隔这些字段.
+
+注释以hash标识(#)开头,一直到该行末结束.空行可跳过.
+
+.I 服务名
+必须是该文件的第一列,因为其前面的空格不会删去.
+.I 服务名
+可以为任何可打印的字符,包括空格和tab,但是,应该使用字符的保守选择来最低限度地减少
+操作中的问题.例如:a-z,0-9,和连字符(\-)看上去就是一个合理的选择.
+
+不匹配该格式的行不应该在该文件中出现.(当前情况下,
+.BR getservent (3),  getservbyname (3), 和  getservbyport (3)
+可以忽略它们.不过,不应该依靠这种方法.)
+
+为了向后兼容,在
+.I 端口
+号和
+.I 协议
+名之间的斜杠(/)实际可以为斜杠或者是逗号(,).在现代的安装中使用逗号是落后的.
+
+该文件也可以通过使用网络级命名服务如黄页/NIS(Yellow Pages/NIS)或BIND/Hesiod来在一
+个网络中发布.
+
+一个
+.B services
+的样本文件看上去如下:
+.RS
+.nf
+.sp
+.ta 3i
+netstat         15/tcp
+qotd            17/tcp          quote
+msp             18/tcp          # message send protocol
+msp             18/udp          # message send protocol
+chargen         19/tcp          ttytst source
+chargen         19/udp          ttytst source
+ftp             21/tcp
+# 22 - unassigned
+telnet          23/tcp
+.sp
+.fi
+.RE
+.SH BUGS
+最大只能有35个别名,这是由
+.BR getservent (3)
+代码的写入方式决定的.
+
+比
+.B BUFSIZ
+(当前为1024)个字符更长的行,
+.BR getservent (3),  getservbyname (3), and  getservbyport (3)
+会忽略掉.
+不过,这也会导致错过下一行.
+.SH FILES(相关文件)
+.TP
+.I /etc/services
+Internet网络服务列表
+.TP
+.I /usr/include/netdb.h
+.B _PATH_SERVICES
+的定义
+.SH SEE ALSO(另见)
+.BR getservent (3),
+.BR getservbyname (3),
+.BR getservbyport (3),
+.BR setservent (3),
+.BR endservent (3),
+.BR protocols (5),
+.BR listen (2),
+.BR inetd.conf (5),
+.BR inetd (8).
+
+分配号码RFC,最新的RFC 1700,(AKA STD0002)
+
+黄页服务的指南
+
+BIND/Hesiod服务的指南
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.B 2000/11/01
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

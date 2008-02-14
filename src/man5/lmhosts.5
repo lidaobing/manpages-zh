@@ -1,0 +1,67 @@
+.TH LMHOSTS 5 "11 Nov 1999" "lmhosts 2.0.6"
+.SH NAME
+lmhosts \- samba的NetBIOS主机列表文件
+.SH 总览
+lmhosts是一个samba的NetBIOS名字到IP地址映射文件。
+.SH 描述
+此文件是samba套件的一部分。
+.PP
+lmhosts是一个samba的NetBIOS名字到IP地址映射文件。
+它与/etc/hosts文件的格式非常相似，除了主机名部分必须符合NetBIOS名字格式。
+.SH 文件格式
+这是一个在一行之内包含NetBIOS名字的ASCII文件。每行有两个字段用空格互相隔开。
+任何以#号开始的条目将被忽略。这个文件的每一行都包含了以下的信息：
+.TP
+.B IP 
+地址 \- 点分十进制格式。 
+.TP
+.B NetBIOS
+名字 \- 名字格式最大用十五个字符，后面可以跟以#号起头的两位十六进制值用于指出
+NetBIOS名字类型。
+
+如果后跟的#被忽略，那么所给出的IP地址将返回所有与给出的名字相匹配的机器名，而不管查找
+的是何种NetBIOS名字类型。 
+.PP 
+下面有个例子：
+.PP 
+# 
+.br 
+# Sample Samba lmhosts file\&. 
+.br 
+# 
+.br 
+192\&.9\&.200\&.1	TESTPC 
+.br 
+192\&.9\&.200\&.20	NTSERVER#20 
+.br 
+192\&.9\&.200\&.21	SAMBASERVER 
+.br 
+.PP 
+这里包含了三个IP地址到NetBIOS名字的映射。第一和第三个将返回名字分别为"TESTPC"和
+"SAMBASERVER"的任何查询结果，而不管所需的是何种类型NetBIOS名字成份。
+.PP
+第二个映射将只返回当被查询的"NTSERVER"名字类型为"0x20"的值。任何其它的名字类型
+将不会被解释。
+.PP
+lmhosts文件的默认保存位置与smb.conf文件的目录相同。
+.SH 版本
+此手册页是针对samba套件版本2.0的。
+.SH 另见
+smb.conf (5), smbclient (1), smbpasswd (8), samba (7). 
+.SH 作者
+samba软件和相关工具最初由Andrew Tridgell 
+samba-bugs@samba.org创建。samba现在由开发组作为类似Linux内核开发采用的开放源代
+码计划方式来发展。
+.PP
+samba手册页最初由Karl 
+Auer撰写。它的源码已被转换成YODL(一种极好的开放源代码软件，可以在
+ftp://ftp.icce.rug.nl/pub/unix/处获得)格式并已由Jeremy Allison更新到samba2.0版本。
+.PP
+请参见samba (7)查找如何获得一份完整的维护者列表以及如何提交错误报告及注解等等。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,43 @@
+.TH STAT 1u UNSUP
+.UC 4
+.SH NAME
+stat \- 打印信息节点(inode)内容
+.SH SYNOPSIS(总览)
+.B stat
+.I filename
+.I [filenames ... ]
+.SH DESCRIPTION(描述)
+.PP
+.I stat
+打印出一个信息节点的内容,它们显示为对人可读的格式的\fIstat(2)\fR.
+.PP
+下面是\fIstat\fR的一个示例输出:
+.nf
+File: \*(lq/\*(rq
+Size: 1024         Allocated Blocks: 2            Filetype: Directory
+Mode: (0755/drwxr-xr-x)         Uid: (    0/    root)  Gid: (    0/  system)
+Device:  0,0   Inode: 2         Links: 20   
+Access: Wed Jan  8 12:40:16 1986(00000.00:00:01)
+Modify: Wed Dec 18 09:32:09 1985(00021.03:08:08)
+Change: Wed Dec 18 09:32:09 1985(00021.03:08:08)
+.fi
+.PP
+.SH DIAGNOSTICS(诊断)
+\*(lqCan't stat file\*(rq or \*(lqCan't lstat file\*(rq 通常意味着它不存在.
+\*(lqCan't readlink file\*(rq 暗示符号链接有错误.
+.SH SEE ALSO(另见)
+stat(2),ls(1)
+.SH AUTHOR(作者)
+Rich Kulawiec, Purdue University
+.SH BUGS
+输出不是完全都可理解.
+.sp 1.5
+.ce
+NOT SUPPORTED BY PUCC
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

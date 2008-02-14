@@ -1,0 +1,651 @@
+.\" (C) Copyright 1992-1999 Rickard E. Faith and David A. Wheeler
+.\" (faith@cs.unc.edu and dwheeler@ida.org)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified Sun Jul 25 11:06:05 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Sat Jun  8 00:39:52 1996 by aeb
+.\" Modified Wed Jun 16 23:00:00 1999 by David A. Wheeler (dwheeler@ida.org)
+.\" Modified Thu Jul 15 12:43:28 1999 by aeb
+.\"  [todo: split this into man.7 describing the macros
+.\"   and manpage.7 describing the Linux man page conventions]
+.\"
+.TH MAN 7 1999-06-16 "Linux" "Linux Programmer's Manual"
+.SH NAME
+man \- 格式化手册页的宏
+.SH "总览 SYNOPSIS"
+.B groff \-Tascii \-man
+.I file
+\&...
+.LP
+.B groff \-Tps \-man
+.I file
+\&...
+.LP
+.B man
+.RI [ section ]
+.I title
+.SH "描述 DESCRIPTION"
+此手册页解释了
+.B "groff tmac.man"
+宏包 (通常叫做
+.B man
+宏包) 以及相关的创建手册页的惯例。
+开发者可以使用这个宏包来为 linux 书写或移植手册文档。
+它与其他版本的这个宏包一般是兼容的，因此移植不是一个大问题
+(但是 NET-2 BSD 发布中使用了一个完全不同的宏包叫做 mdoc，参见
+.BR mdoc (7)).
+.PP
+注意 NET-2 BSD mdoc 手册页也可以使用
+.B groff
+处理，只要指定
+.B \-mdoc
+选项而不是
+.B \-man
+选项。推荐使用
+.B \-mandoc
+选项，因为这样会自动判断应当使用哪一个。
+.SH "导言 PREAMBLE"
+一篇手册页的第一个命令 (注释行之后) 应当是
+.RS
+.sp
+.B \&.TH
+.IR "title section date source manual" ,
+.sp
+.RE
+这里：
+.RS
+.TP 10
+.I title
+手册页的标题 (例如，
+.IR MAN ).
+.TP
+.I section
+手册页的章节号应当放在这里 (例如，
+.IR 7 ).
+.TP
+.I date
+最后修改日期 -- 记住要在每次修改过此手册页之后修改它，
+这样可以方便地进行版本控制
+.TP
+.I source
+命令的来源
+.sp
+对于二进制文件，使用这样的表述：
+.IR GNU ", " NET-2 ", " "SLS Distribution" ", " "MCC Distribution" .
+.sp
+对于系统调用，使用它适用的内核版本来表述：
+.IR "Linux 0.99.11" .
+.sp
+对于库调用，使用函数的来源来表述：
+.IR GNU ", " "BSD 4.3" ", " "Linux DLL 4.4.1" .
+.TP
+.I manual
+手册的标题 (例如：
+.IR "Linux Programmer's Manual" ).
+.RE
+.PP
+注意 BSD mdoc 格式的手册页以
+.B Dd
+命令开始，而不是
+.B TH
+命令
+.PP
+手册章节传统上如下定义：
+.RS
+.TP 10
+.B 1 Commands
+用户可从 shell 运行的命令
+.TP
+.B 2 System calls
+必须由内核完成的功能
+.TP
+.B 3 Library calls
+大多数
+.I libc
+函数，例如
+.BR qsort (3))
+.TP
+.B 4 Special files
+.IR /dev )
+目录中的文件
+.TP
+.B 5 File formats and conventions
+.I /etc/passwd
+等人类可读的文件的格式说明
+.TP
+.B 6 Games
+.TP
+.B 7 Macro packages and conventions
+文件系统标准描述，网络协议，ASCII 和其他字符集，还有你眼前这份文档以及其他东西
+.TP
+.B 8 System management commands
+类似
+.BR mount (8)
+等命令，大部分只能由
+.I root
+执行
+.TP
+.B 9 Kernel routines
+这是废弃的章节。
+原来曾想把一些关于核心的文件放在这里，
+但是实际上只有极少数可以写成文件放在这里，而且它们也很快过时了。
+核心开发者可以找到其他更好的资源。
+.RE
+.SH "段 SECTIONS"
+段以
+.B \&.SH
+开始，后跟标题名。如果标题包含空格并且和
+.BR \&.SH 
+在同一行，则需在标题上加双引号。
+传统的或建议的标题包括：
+NAME, 总览 SYNOPSIS, 描述 DESCRIPTION, 返回值 RETURN VALUE,
+退出状态 EXIT STATUS, 错误处理 ERROR HANDLING, 错误 ERRORS,
+选项 OPTIONS, 用法 USAGE, 示例 EXAMPLES, 文件 FILES, 
+环境 ENVIRONMENT, 诊断 DIAGNOSTICS, 安全 SECURITY,
+遵循 CONFORMING TO, 注意 NOTES,
+BUGS, 作者 AUTHOR, 和 参见 SEE ALSO.
+在适合使用约定标题的地方，请使用它；
+这样做可以使文章更易读、易懂。
+不过，只要您的标题能够增加易懂性，请放心使用。
+唯一必须的标题是
+.IR NAME ,
+他应是手册页的第一段，后面应紧跟对该命令的简单描述。比如：
+.RS
+.sp
+\&.SH NAME
+.br
+chess \\- the game of chess
+.sp
+.RE
+请一定要按照这个格式来写，注意在短横线 (dash `-') 前要有个斜杠 (slash `\').
+这种语法结构在
+.BR makewhatis (8)
+程序为
+.BR whatis (1)
+和
+.BR apropos (1)
+命令建立简短命令描述时要用到。
+.PP
+其他约定段的内容应为：
+.TP 14
+.B 总览 SYNOPSIS
+简要描述命令或函数接口。
+对命令，显示他的命令和参数（包括各种选项）；黑体表示各种参数，
+下划线（或斜体字）表示可以替换的选项；
+方括号[]中的是可选项，竖线 | 用于把几个选项间隔开，
+小括号()中的部分可以自动重复。
+对函数，显示需要的数据声明或需
+.B #include
+包含的项目，后跟函数声明。
+.TP
+.B 描述 DESCRIPTION
+解释命令、函数或格式的用途。
+说明其如何与文件及标准输入交互，他们的标准输出及标准错误。
+必须要指明的细节。描述一般情况。
+选项和参数信息放在 OPTIONS（选项）段。
+如果有语法说明和一些复杂的设定，
+建议把它们放到 USAGE（用法）段（本段中最好只写一个概要）。
+.TP
+.B 返回值 RETURN VALUE
+列出程序或函数会返回的值，指出引发返回值的条件或原因。
+.TP
+.B 退出状态 EXIT STATUS
+列出可能的退出状态的值，指出引起返回的程序或原因。
+.TP
+.B 选项 OPTIONS
+指出程序可用的选项，及其作用。
+.TP
+.B 用法 USAGE
+描述程序的较高级的使用方法。
+.TP
+.B 示例 EXAMPLES
+provides one or more examples describing how this function, file or
+command is used.
+.TP
+.B 文件 FILES
+列出程序或函数使用到的文件，
+比如配置文件、启动文件和程序直接操作的文件。
+给出文件的绝对路径，
+使用安装程序调整这些路径以使其与用户的实际情况相符。
+对大多数程序来说，缺省的安装路径是 /usr/local，
+所以你的文件要与此一致。
+.TP
+.B 环境 ENVIRONMENT
+列出影响你的程序的所有环境变量，并说明影响的原因。
+.TP
+.B 诊断 DIAGNOSTICS
+写出常会出现的错误概述，并说明解决的办法。
+你无需解释系统错误信息或信号，
+除非它们会影响到您的程序。
+.TP
+.B 安全 SECURITY
+讨论安全问题和相关话题。对应予避免的配置和环境，
+可能有安全隐患的命令等等给出警告，
+特别是当它们不是很明显时。
+单独用一段来讨论安全并不必要；如果比较好理解的话，把它放在其他段中
+（比如 描述 或 用法 段）。但是，最好加上它。
+.TP
+.B 遵循 CONFORMING TO
+描述它实现的任何标准或约定
+.TP
+.B 注意 NOTES
+提供杂项注意事项
+.TP
+.B BUGS
+列出局限、已知的缺点或不便之处，还有其他可能存在的问题。
+.TP
+.B 作者 AUTHOR
+列出程序或文件作者，联系办法等。
+.TP
+.B 参见 SEE ALSO
+以字母顺序列出相关的手册页（man pages)。通常来讲，这是一个手册页的最后一段。
+.SH 字体 FONTS
+虽然在 UNIX 世界中有各种对手册页（man pages)的不同约定，
+但在 linux 系统下存在一个字体的标准：
+.IP
+对函数，其参数通常用下划线（或斜体），
+.IR "在总览（SYNOPSIS)中也是这样"
+，其他部分用黑体。
+例如
+.RS
+.BI "int myfunction(int " argc ", char **" argv );
+.RE
+.IP
+文件名用下划线（或斜体），例如，.IR "/usr/include/stdio.h" ),
+但在总览（SYNOPSIS)中，包含的文件用黑体，例如
+.BR "#include <stdio.h>" ).
+.IP
+专用宏，一般大写表示，用黑体（如：
+.BR MAXINT ).
+.IP
+列举错误代号时，代号用黑体（这种列举通常使用
+.B \&.TP
+宏命令）。
+.IP
+对其他手册页的引用（或本页中某主体的引用）用黑体。
+手册章节号用普通体（如： 
+.BR man (7)).
+设置字体的宏命令如下：
+.TP 4
+.B \&.B
+黑体
+.TP
+.B \&.BI
+黑体和下划线（或斜体）交替（描述函数时非常有用）
+.TP
+.B \&.BR
+黑体和普通体交替（描述引用时非常有用）
+.TP
+.B \&.I
+下划线（或斜体）
+.TP
+.B \&.IB
+下划线（或斜体）和黑体交替
+.TP
+.B \&.IR
+普通体和下划线（或斜体）交替
+.TP
+.B \&.RB
+普通体和下划线（或斜体）交替
+.TP
+.B \&.RI
+小号字和黑体交替
+.TP
+.B \&.SB
+小号字和黑体交替
+.TP
+.B \&.SM
+小号字（用于缩写）
+.LP
+按照惯例，每个命令最多可以有六个小节的参数，
+但是 GNU 去除了这个限制。小节之间以空格隔开。
+如果某小节含有空格，则需要给其加上双引号。
+各小节在显示时无间隔，所以 
+.B \&.BR
+命令可以指定一个黑体的词，
+后跟一个普通体的标点。如果命令后无参数，则命令作用于下一行。 
+.SH "其他宏命令和字符串 OTHER MACROS AND STRINGS"
+.PP
+下面是其他一些相关的宏和预定义的字符串。
+除非指明，否则所有的宏在本行文本结束时终止。
+多数宏使用“流行缩进”（prevailing indent)方式。
+“流行缩进”的值由紧跟着宏命令的 
+.I i 
+值指定，如果不指定，那就会使用当前的“流行缩进”值。
+这样，连续的缩进段就可使用相同的缩进值而不需要重新指定。
+普通段（不缩进）将“流行缩进”值重值为缺省值（0.5 英寸）。
+缺省时，缩进是有规则的 en(s)：用 en(s) 或者 em(s) 作为缩进的单位，
+因为它们会自动地调整字体的大小。
+(注：度量距离有不同的单位，当请求需要用到不同的距离时，可以使用默认
+类型来修饰数字，度量单位是英寸，厘米，pica,en,em,点，unit和垂直行距。
+1pica等于1/6英寸，1em等于字母m的宽度，默认宽度取决于troff中使用
+的字体。En是em的一半。)
+其他宏命令定义如下：
+.SS "普通段（无缩进） Normal Paragraphs"
+.TP 9m
+.B \&.LP
+与
+.B \&.PP
+相同（开始一个新段）
+.TP
+.B \&.P
+与
+.B \&.PP
+相同（开始一个新段）
+.TP
+.B \&.PP
+开始一个新段，重置“流行缩进”值。
+.SS "相对缩进 Relative Margin Indent"
+.TP 9m
+.BI \&.RS " i"
+开始相对缩进 -- 把左边界右移 
+.I i
+ (如果不指定 
+.I i 
+值，则使用“流行缩进”值 ）。
+同时设定“流行缩进”值为 0.5 英寸。
+直到使用
+.BR \&.RE
+结束这些设定。
+.TP
+.B \&.RE
+结束相对缩进同时把“流行缩进”恢复原值。
+.SS "缩进 Indented Paragraph Macros"
+.TP 9m
+.BI \&.HP " i"
+开始悬挂式缩进（段的第一行从左边揭开时，其余缩进显示）
+.TP
+.BI \&.IP " x i"
+在段上标签 
+.I x
+。如果不指定 
+.I x 
+，则整个段缩进 
+.I i
+。如果指定了 
+.I x 
+，则 
+.I x 
+之前的段不缩进，之后的段缩进（有些象 
+.B \&.TP
+，不过 
+.I x 
+是跟在命令后面而不是在下一行）。
+如果 
+.I x 
+太长，后面的文本会挪到下一行（文本不会丢 失或割断）。
+.PP
+做公告列表，可以用 \e(bu (bullet) 或 \e(em (em dash). 
+要用数字或字母列表, 可以用\&.IP 1. 或 \&.IP A. 这样转换成其他 格式就简单了。
+.TP
+.BI \&.TP " i"
+在段上悬挂标签。标签在下一行指定，但是结果和 
+.B \&.IP
+相像。
+.SS "超文本链接宏 Hypertext Link Macros"
+.TP 9m
+.BI \&.UR " u"
+建立一个超文本链接到 URI (URL)
+.IR u ;
+并以
+.B UE
+结束。当转换为 HTML 格式时，他会转换为
+\fB<A HREF="\fP\fIu\fP\fB">\fP.
+有个例外：如果 
+.I u
+是特殊字符 “ ：”，则之后不能建立任何超级链接，直到以
+.B UE
+结束（这用来在不需要超级链接时禁止他）。
+.UR ":"
+LALR(1)
+.UE
+这个宏比较新，很多程序可能并不对他进行处理。但是由于很多工具 (包括 troff) 简单地忽略未定义宏
+(或者最坏的将它们插入到文本中), 插入它们是安全的
+.TP
+.BI \&.UE
+结束相应的
+.B UR
+超级链接。转换为HTML后是
+\fB</A>\fP.
+.TP
+.BI \&.UN " u"
+给超级联接指定名称为
+.IR u ;
+不需要以
+.B UE
+UE 结束。转换为 HTML 后为： 
+\fB<A NAME="\fP\fIu\fP\fB" id="\fP\fIu\fP\fB">&nbsp;</A>\fP
+(the &nbsp; is optional if support for Mosaic is unneeded).
+.SS "杂项宏 Miscellaneous Macros"
+.TP 9m
+.B \&.DT
+重置 tab 值为缺省(每一个0.5英寸)。不引起中断。
+.TP
+.BI \&.IX " \&... "
+插入索引信息（方便搜索系统工作，或打印索引列表）。
+在页中索引信息不能正常显示。
+如果只有一个参数，
+参数作为独立的索引项指向手册页的内容。
+如果有两个参数，他可能是 Perl 手册页格式；
+第一个参数指定类型名
+（命令名，标题 ，题头，子段货源素之一），
+第二个参数指明自己的索引名。
+另外，长索引形式：每个参数是一个索引项，
+次级索引项，再次级索引项，等等直到以空参数结束，
+然后是程序名参数，\em，还有一小段描述。
+还可能在跟上一个空参数，有可能是页控制信息
+（如： PAGE START)。举例如下：
+"programmingtools""make""""\fLmake\fP\(em build programs".
+.TP
+.BI \&.PD " d"
+在段中间垂直距离空开 d (如果不指定，则缺省为 d=0.4v)，不引起中断。
+.TP
+.BI \&.SS " t"
+子标题 
+.I t
+象是 
+.BR \&.SH ,
+但是作为段中的字标题使用）
+.SS "预定义字符串 Predefined Strings"
+.B man
+预定义了下列字符串
+.IP \e*R
+注册符号: \*R
+.IP \e*S
+改变成缺省字体大小
+.IP \e*(Tm
+商标符号: \*(Tm
+.IP \e*(lq
+左双引号: \*(lq
+.IP \e*(rq
+右双引号: \*(rq
+.SH "安全子集 SAFE SUBSET"
+理论上
+.B man
+是一个 troff 宏命令包，实际上很多工具程序没有支持所有的 man 宏命令。
+因此，为了这些程序可以正常工作最好忽略 troff 的一些比较另类的宏。
+避免使用各种不同的 troff 预处理程序
+（如果必须的话，用 
+.BR tbl (1)
+吧，
+但是在建立双列表时请使用 
+.B IP 
+和 
+.B TP 
+命令）。避免使用计算；大多数其他程序不能处理他。
+使用简单的命令比较容易转换为其他格式。
+下面的宏命令一般认为是安全的（虽然多数时候他们都被忽略了）：
+.BR \e" ,
+.BR . ,
+.BR ad ,
+.BR bp ,
+.BR br ,
+.BR ce ,
+.BR de ,
+.BR ds ,
+.BR el ,
+.BR ie ,
+.BR if ,
+.BR fi ,
+.BR ft ,
+.BR hy ,
+.BR ig ,
+.BR in ,
+.BR na ,
+.BR ne ,
+.BR nf ,
+.BR nh ,
+.BR ps ,
+.BR so ,
+.BR sp ,
+.BR ti ,
+.BR tr .
+.PP
+你还可能使用 troff 转义字符（这些转移符号以 \e 开始）。
+但你要在文本中显示反斜线时，用\ee。
+其他转义字符包括：
+.BR \e' ,
+.BR \e` ,
+.BR \e- ,
+.BR \e. ,
+.BR \e" ,
+.BR \e% ,
+.BR \e*x ,
+.BR \e*(xx ,
+.BR \e(xx ,
+.BR \e$N ,
+.BR \enx ,
+.BR \en(xx ,
+.BR \efx ,
+和
+.BR \ef(xx .
+其中 x、xx 是任意字符，N 是任意数字不要使用转义字符来画图。
+.PP
+不要随意使用 
+.B bp
+（break page(中断页））。
+.B sp
+（vertical space(垂直距离）只应使用正值。
+不要用
+.RB ( de )
+（define（定义）定义与现有的宏同名的宏（无论 man 或 mdoc)；
+这种重新定义可能会被忽略。
+每个正缩进
+.RB ( in )
+应对应一个负缩进（即使在使用 RS 和 RE 是也不例外）。
+The condition test
+.RB ( if,ie )
+should only have 't' or 'n' as the condition.
+可以使用的只有可忽略的转换
+.RB ( tr ) .
+改变字体命令
+.RB ( ft
+和 \fB\ef\fP  转义序列) 只能带如下参数： 1, 2, 3, 4, R, I, B, P, or CW
+(ft 命令也可以不带参数)。
+.PP
+如果你是用更多的功能，用各种程序仔细察看一下结果。
+如果你肯定某功能是安全的，请告诉我们，以便把他增加到这个列表中。
+.SH "注意 NOTES"
+.PP
+尽量在文本中包含完整的 URL（或URIs）；
+一些工具软件（如：
+.BR man2html (1)
+）能够自动把它们转换为超级链接。
+您也可用 
+.B UR 
+命令指定链接到相关信息。
+输入完整的 URL(如：<http://www.kernel-notes.org> )。 
+.PP
+Tools processing these files should open the file and examine the first
+non-whitespace character.
+以(.)或（')开始一行，表明是基于 troff 的文件（如： man 或 mdoc)。
+如果是（<）表明基于 SGML/XML (如：HTML 或 Docbook)．
+其他可能是纯文本。(例如 "catman" 的结果)
+.PP
+有些 man 以'\e"和空格再加字符列开始，表示他的预处理方法。
+为了 troff 翻译器程序处理起来简单一些，
+您仅应使用 
+.BR tbl (1),
+而不是其他什么东东，Linux 可以检测到这一点。
+不过，你或许想要包含这些信息以使其可以在其他系统得到处理。
+下面是预处理调用的定义：
+.TP 3
+.B e
+eqn(1)
+.TP
+.B g
+grap(1)
+.TP
+.B p
+pic(1)
+.TP
+.B r
+refer(1)
+.TP
+.B t
+tbl(1)
+.TP
+.B v
+vgrind(1)
+.SH "文件 FILES"
+.IR /usr/share/groff/ [*/] tmac/tmac.an
+.br
+.I /usr/man/whatis
+.SH BUGS
+.PP
+大多数宏命令描述的是格式（比如：字体和空格）而不是内容描述（比如： 这段文字指向另外一页），
+与 mdoc 和 DocBook 正好相反（HTML 也有比较多的内容描述）。
+这使得 
+.B man 
+难以转换为其他形式，不容易与其他文件组合或自动插入交叉引用。
+遵照以上的安全说明，就比较容易在将来把他转换为其他格式。
+.LP
+The Sun macro
+.B TX
+下不能用。 
+.SH "作者 AUTHOR"S
+.IP \(em 3m
+James Clark (jjc@jclark.com) wrote the implementation of the macro package.
+.IP \(em
+Rickard E. Faith (faith@cs.unc.edu) wrote the initial version of
+this manual page.
+.IP \(em
+Jens Schweikhardt (schweikh@noc.fdn.de) wrote the Linux Man-Page Mini-HOWTO
+(which influenced this manual page).
+.IP \(em
+David A. Wheeler (dwheeler@ida.org) heavily modified this
+manual page, such as adding detailed information on sections and macros.
+.SH "参见 SEE ALSO"
+.BR apropos (1),
+.BR groff (1),
+.BR man (1),
+.BR man2html (1),
+.BR mdoc (7),
+.BR mdoc.samples (7),
+.BR whatis (1)
+
+.SH "[中文版维护人]"
+.B RedCandle <redcandle51@chinaren.com>
+.SH "[中文版最新更新]"
+.BR 2003.11.25
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

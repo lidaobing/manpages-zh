@@ -1,0 +1,45 @@
+.\" 中文版 Copyright (c) 2000 mhss 和 www.linuxforum.net
+
+.TH TZSELECT 8
+.SH NAME
+tzselect \- 选择一个时区
+.SH 总览
+.B tzselect
+.SH 描述
+.B tzselect
+程序向用户询问当前位置的信息，把时区描述作为结果输出到标准输出。
+此结果适合作为环境变量 TZ 的值。
+.PP
+所有与用户的交互是通过标准输入和标准错误输出完成的。
+.SH "环境变量"
+.TP
+\f3AWK\fP
+一个 Posix 兼容的
+.I awk
+程序的名字(缺省:
+.BR awk ).
+.TP
+\f3TZDIR\fP
+包含时区数据文件的目录的名字 (缺省:
+.BR /usr/local/etc/zoneinfo ).
+.SH 文件
+.TP
+\f2TZDIR\fP\f3/iso3166.tab\fP
+包含国家(地区)编码和名称的 ISO 3166 2-字母表。
+.TP
+\f2TZDIR\fP\f3/zone.tab\fP
+国家(地区)代码表，包含经度和纬度，TZ(时区)值，描述性的注释。
+.TP
+\f2TZDIR\fP\f3/\fP\f2TZ\fP
+关于时区的时区数据文件 \f2TZ\fP.
+.SH "退出状态"
+若从用户获得了正确的时区退出状态返回 0，否则非 0。
+.SH "参见"
+newctime(3), tzfile(5), zdump(8), zic(8)
+
+.SH "[中文版维护人]"
+mhss  <jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+2000/10/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

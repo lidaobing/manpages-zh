@@ -1,0 +1,71 @@
+.TH WHO "1" "August 1999" "GNU sh-utils 2.0" FSF
+.SH NAME
+who \- 显示已经登录的用户
+.SH "总览 (SYNOPSIS)"
+.B who
+[\fIOPTION\fR]... [\fI FILE | ARG1 ARG2 \fR]
+.SH "描述 (DESCRIPTION)"
+.PP
+.\" Add any additional description here
+.TP
+\fB\-H\fR, \fB\-\-heading\fR
+显示 栏目行
+.TP
+\fB\-i\fR, \fB\-u\fR, \fB\-\-idle\fR
+增加 显示 用户的 空闲时间, 格式是 HOURS:MINUTES, . 或 old
+.TP
+\fB\-l\fR, \fB\-\-lookup\fR
+试图 通过 DNS 规范 主机名
+.TP
+\fB\-m\fR
+仅显示 和 stdin 关联 的 主机名 和 用户
+.TP
+\fB\-q\fR, \fB\-\-count\fR
+显示 全部的 登录名 和 登录数
+.TP
+\fB\-s\fR
+(忽略)
+.TP
+\fB\-T\fR, \fB\-w\fR, \fB\-\-mesg\fR
+用 +, - 或 ? 表示 用户的 消息(message) 状态.
+.TP
+\fB\-\-message\fR
+同 \fB\-T\fR
+.TP
+\fB\-\-writable\fR
+同 \fB\-T\fR
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+如果 没有 指定 FILE, 缺省 使用 /var/run/utmp.  /var/log/wtmp 是 比较
+常用的 FILE. 如果 给出 ARG1 ARG2, who 设定 \fB\-m\fR 有效:
+他们 通常 是 `am i' 或 `mom likes'.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-sh-utils@gnu.org>.
+.SH "另见 (SEE ALSO)"
+.B who
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B who
+程序, 使用 命令
+.IP
+.B info who
+.PP
+能够 访问到 完整 的 手册.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,14 @@
+#!/bin/sh
+# bbbush <bbbush@163.com> 20031123
+# you need to set LC_ALL to zh_CN.GB18030 before you use this script
+# to process GB encoded man pages.
+
+man2html="/usr/bin/groff -Thtml -mandoc"
+if [ ! $# -le "1" ] ;then
+	echo "Error! $0 Need exactly 1 arguments and act as a pipe"
+	exit
+elif [ $# -eq 1 ] ;then
+	$man2html $1 2>/dev/null
+else
+	$man2html - 2>/dev/null
+fi

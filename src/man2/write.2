@@ -1,0 +1,121 @@
+.\" Hey Emacs! This file is -*- nroff -*- source.
+.\"
+.\" This manpage is Copyright (C) 1992 Drew Eckhardt;
+.\"                               1993 Michael Haardt, Ian Jackson.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" Modified Sat Jul 24 13:35:59 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Sun Nov 28 17:19:01 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Sat Jan 13 12:58:08 1996 by Michael Haardt
+.\"   <michael@cantor.informatik.rwth-aachen.de>
+.\" Modified Sun Jul 21 18:59:33 1996 by Andries Brouwer <aeb@cwi.nl>
+.\" 中文版版权所有 byeyear AND www.linuxforum.net 2002
+.\"
+.TH WRITE 2 "13 January 1996" "Linux 2.0.32" "Linux Programmer's Manual"
+.SH NAME
+write \-在一个文件描述符上执行写操作
+.SH 概述
+.B #include <unistd.h>
+.sp
+.BI "ssize_t write(int " fd ", const void *" buf ", size_t " count );
+.SH 描述
+.B write
+向文件描述符
+.I fd
+所引用的文件中写入
+从
+.I buf
+开始的缓冲区中
+.I count
+字节的数据.
+POSIX规定,当使用了\fBwrite()\fP之后再使用
+\fBread()\fP,那么读取到的应该是更新后的数据.
+但请注意并不是所有的文件系统都是
+POSIX兼容的.
+.SH "返回值"
+成功时返回所写入的字节数(若为零则表示没有写入数据).
+错误时返回\-1,并置\fIerrno\fP为相应值.
+若\fIcount\fP为零,对于普通文件无任何影响,但对特殊文件
+将产生不可预料的后果.
+.SH 错误代码
+.TP
+.B EBADF
+.I fd
+不是一个合法的文件描述符或者没有以写方式打开.
+.TP
+.B EINVAL
+.I fd
+所指向的对象不可写.
+.TP
+.B EFAULT
+.I buf
+不在用户可访问地址空间内.
+.TP
+.B EPIPE
+.I fd
+连接到一个管道,或者套接字的读方向一端已关闭.此时写进程
+将接收到
+.B SIGPIPE
+信号;如果此信号被捕获,阻塞或忽略,那么将返回错误
+.B EPIPE.
+.TP
+.B EAGAIN
+读操作阻塞,但使用
+.B O_NONBLOCK
+指定了非阻塞式输入输出.
+.TP
+.B EINTR
+在写数据以前调用被信号中断.
+.TP
+.B ENOSPC
+.I fd
+指向的文件所在的设备无可用空间.
+.TP
+.B EIO
+当编辑一个节点时发生了底层输入输出错误.
+.PP
+可能发生了其他错误,取决于
+.IR fd
+所连接的对象.
+.SH "兼容于"
+SVr4, SVID, POSIX, X/OPEN, 4.3BSD.
+SVr4文档添加了以下错误代码:
+EDEADLK, EFBIG, ENOLCK, ENOLNK, ENOSR,
+ENXIO, EPIPE,或者ERANGE.
+对于SVr4有可能在写入部分数据时发生中断并返回EINTR. 
+.SH "参见"
+.BR open (2),
+.BR read (2),
+.BR fcntl (2),
+.BR close (2),
+.BR lseek (2),
+.BR select (2),
+.BR ioctl (2),
+.BR fsync (2),
+.BR fwrite (3)
+
+.SH "[中文版维护人]"
+.B byeyear <love_my_love@263.net >
+.SH "[中文版最新更新]"
+.B 2002.02.07
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

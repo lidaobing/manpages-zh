@@ -1,0 +1,147 @@
+.\" Copyright (c) 1993 Free Software Foundation
+.\" See section COPYING for conditions for redistribution
+.TH strings 1 "25 June 1993" "cygnus support" "GNU Development Tools"
+.de BP
+.sp
+.ti \-.2i
+\(**
+..
+
+.SH NAME
+strings \- 显示文件中的可打印字符
+
+.SH "总览 (SYNOPSIS)"
+.hy 0
+.na
+.TP
+.B strings
+.RB "[\|" \-a | \-\c
+.RB | \-\-all "\|]" 
+.RB "[\|" \-f | \-\-print\-file\-name "\|]"
+.RB "[\|" \-o "\|]" 
+.RB "[\|" \-\-help "\|]" 
+.RB "[\|" \-v | \-\-version "\|]"  
+.RB "[\|" \-n
+.I min\-len\c
+.RI | \-min\-len\c
+.RB | "\-\-bytes="\c
+.I min\-len\c
+\&\|]
+.RB "[\|" \-t
+.I {o,x,d}\c
+.RB "[\|" "\-\-target=\fIbfdname" "\|]"
+.RB | "\-\-radix="\c
+.I {o,x,d}\c
+\&\|]
+.I file\c
+.ad b
+.hy 1
+
+.SH "描述 (DESCRIPTION)"
+For each
+.I file
+given, 
+GNU \c
+.B strings
+显示 每个 指定的
+.I file
+文件里 包含的 所有 有 4个 (或者 用 选项 指定 的 数字) 以上 连续 可打印 字符 的
+字符串, 在 之后 紧跟着 一个 不可 打印 的 字符. 默认 情况 下, 它 只显示 目标
+文件 初始化 和 装载 段 的 字符串; 对于 其它 类型 的 文件 它 显示 整个 文件 里
+包含 的 所有 字符串.
+.PP
+.B strings
+一般 用来 查看 非 文本 文件 的 内容.
+
+.SH "选项 (OPTIONS)"
+在 这里 并列 的 长选项 和 短选项 都是 等价的.
+.TP
+.B \-a
+.TP
+.B \-\-all
+.TP
+.B \-
+不 只是 扫描 目标 文件 初始化 和 装载 段, 而是 扫描 整个 文件.
+.TP
+.B \-f
+.TP
+.B \-\-print\-file\-name
+在 显示 字符串 之前 先 显示 文件名.
+.TP
+.B \-\-help
+在 标准 输出 打印
+.B strings
+命令 的 选项 
+
+列表
+
+
+然后 退出.
+.TP
+.B \-v
+.TP
+.B \-\-version
+在 标准 输出 打印
+.B strings
+命令 的 版本号 然后 退出.
+.TP
+.B "\-n \fImin\-len\fP"
+.TP
+.B "\-\fImin\-len\fP"
+.TP
+.B "\-bytes=\fImin\-len\fP"
+打印 至少
+.I min\-len
+字符 长 的 字符串. 默认的 是 4.
+.TP
+.BR "\-t " {o,x,d}
+.TP
+.BR "\-\-radix=" {o,x,d}
+在 字符串 前面 显示 其在 文件 中 的 偏移量. 选项 中 的 单个 字符 指定 偏移量
+的 进制 是 八进制, 十六进制 还是 十进制.
+.TP
+.BI "\-\-target=" "bfdname"
+指定 一种 目标 代码 格式 来 代替 你的 系统的 默认 格式. 关于 可用的 目标 代码
+格式 请 参见
+.BR objdump ( 1 ).
+.TP
+.B \-o
+同
+.BR "\-t o" .
+.PP
+
+.SH "参见 (SEE ALSO)"
+.B
+info\c
+\&; 
+.I
+The GNU Binary Utilities\c
+\&, Roland H. Pesch (October 1991)
+里的
+.RB "`\|" binutils "\|'"
+节点.
+.BR ar ( 1 ),
+.BR nm ( 1 ),
+.BR objdump ( 1 ),
+.BR ranlib ( 1 ).
+
+.SH "版权 (COPYING)"
+版权所有 \(co 1993 自由软件基金会
+.PP
+我们 允许 对本手册的 完全 复制, 前提 是 在所有 副本中 保留 本版权声明 和
+本权益声明.
+.PP
+我们 允许 对本手册的 修改版本 进行 复制 和 再分发, 前提是 遵守 上面 逐字复制的
+条款, 以及 确保 因此 所衍生出 成果 也是 使用 和这里 声明的 所有条款 相同的 版权
+和/或 权限声明 发布的.
+.PP
+我们 允许 复制 和 分发 本手册的 其它语言的 译文版本, 前提是 遵守 上面 修改版本
+的条款, 区别 是可以 使用 由自由 软件 基金会 批准的 本版权 和/或 权限 条款的
+译文版 代替 其英文 原文．
+
+.SH "[中文版维护人]"
+.B 唐友 \<tony_ty@263.net\>
+.SH "[中文版最新更新]"
+.BR 2001/10/31
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,300 @@
+'\"
+'\" Copyright (c) 1990-1994 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: selection.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: selection.n,v 1.2 2003/11/24 05:10:00 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH selection n 8.1 Tk "Tk Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+selection \- 操纵 X 选择
+.SH "总览 SYNOPSIS"
+\fBselection \fIoption\fR ?\fIarg arg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令提供到 X 选择机制的一个 Tcl 接口并实现了在 X 
+客户间通信协定手册(ICCCM)中描述全部选择功能。
+.PP
+给 \fBselection\fR 的第一个参数决定余下的参数的格式和命令的行为。当前支持下列形式:
+.PP
+.TP
+\fBselection clear\fR ?\fB\-displayof\fR \fIwindow\fR? ?\fB\-selection\fR \fIselection\fR?
+如果 \fIselection\fR 存在于 \fIwindow \fR的显示器上的某个地方，则清除它这样就没有任何窗口拥有这个选择了。\fISelection\fR     指定应该清除的 X 选择，并且应当是一个原子的名字如 PRIMARY 或 CLIPBOARD；详情请参见 X 客户间通信协定手册。\fISelection\fR  缺省为 PRIMARY 而 \fIwindow\fR 缺省为“.”。返回一个空串。
+.TP
+\fBselection get\fR ?\fB\-displayof\fR \fIwindow\fR? ?\fB\-selection\fR \fIselection\fR? ?\fB\-type\fR \fItype\fR?
+从 \fIwindow \fR的显示器取回 \fIselection\fR 的值并把它作为结果返回。\fISelection\fR 缺省为 PRIMARY 而 \fIwindow\fR  缺省为“.”。\fIType\fR 指定返回选择用的形式(用 ICCCM 术语是想要的转换的“目标”)，并且应当是一个原子的名字如 STRING 或 FILE_NAME； 详情请参见 X 客户间通信协定手册。\fIType\fR  缺省为 STRING。选择拥有者可以在多种不同的表示格式中挑选返回选择(的格式)，比如 STRING、ATOM、INTEGER 等。(这个格式不同与选择类型，如有混淆请参见 ICCCM)。如果以非字符串格式返回选择。比如 INTEGER 或 ATOM，\fBselection\fR  命令把它转换字符串格式，即一组用空格分隔的字段:  把原子转换成他们的文字名字，把其他任何东西都转换成十六进制整数。
+.TP
+\fBselection handle\fR ?\fB\-selection\fR \fIselection\fR? ?\fB\-type\fR \fItype\fR? ?\fB\-format\fR \fIformat\fR? \fIwindow command\fR
+为选择请求建立一个处理器(handler)，这样当 \fIwindow\fR 拥有 \fIselection\fR 并且有人尝试以用 \fItype\fR (比方说在 \fBselection get\fR 命令中指定了 \fItype\fR)给出的形式取回它的时候，则执行 \fIcommand\fR 。\fISelection\fR 缺省为 PRIMARY，\fItype\fR 缺省为STRING，而 \fIformat\fR 缺省为 STRING。如果 \fIcommand\fR 是一个空串，则删除针对 \fIwindow\fR、\fItype\fR 和 \fIselection\fR 的所有处理器。
+.RS
+.PP
+在要求 \fIselection\fR 的时候，\fIwindow\fR  是选择的所有者，而 \fItype\fR 是要求的类型，把 \fIcommand\fR 作为一个 Tcl 脚本来执行，并向它添加了两个补充的数(带有空格分隔符)。这两个补充的数
+.VS
+是 \fIoffset\fR 和 \fImaxChars\fR: \fIoffset\fR 指定在选择中的开始位置而 \fImaxChars\fR 给出要取回的字符的最大数目。这个命令应该返回一个值，它由选择的最多 \fImaxChars\fR 字符组成，开始于位置 \fIoffset\fR。对于非常大的选择(大于 \fImaxChars\fR)，使用递增 \fIoffset\fR 值的多次 \fIcommand\fR  调用来取回选择。如果 \fIcommand\fR 返回其长度小于 \fImaxChars\fR  的一个字符串，则假定返回值包含选择的全部余下部分；如果  \fIcommand\fR 的结果的长度等于 \fImaxChars\fR 则将再次调用 \fIcommand\fR ，知道最终返回小于 \fImaxChars\fR 的一个结果。\fImaxChars\fR 总是相对的大(成千个字符)。
+.VE
+.PP
+如果 \fIcommand\fR 返回一个错误，则丢弃取回的选择，如同选择根本不存在。
+.PP
+\fIformat\fR 参数指定用来把选择传输(transmit)到请求者的表示法(ICCCM 的表 2 的第二列)，并且缺省为 STRING。如果 \fIformat\fR 是 STRING，则把选择传输为 8-bit ASCII 字符。如果 \fIformat\fR 是 ATOM，则把 \fIdata\fR 分割为用白空格分隔的字段；把每个字段转换成它的原子值，传输 32-bit 原子值而不是原子的名字。对于任何其他的 \fIformat\fR，把 \fIdata\fR 分割为用白空格分隔的字段；把每个字段转换成一个 32-bit 整数；向选择的请求者传输一个整数的数组。
+.PP
+\fIformat\fR 参数只在与不使用 Tk 的请求者相兼容时需要。如果使用 Tk 工具箱来取回 CLIPBOARD 选择，则在请求端把这个值转换回一个字符串，所以 \fIformat\fR 是无关的(irrelevant)。
+.RE
+.TP
+\fBselection own\fR ?\fB\-displayof\fR \fIwindow\fR? ?\fB\-selection\fR \fIselection\fR?
+.TP
+\fBselection own\fR ?\fB\-command\fR \fIcommand\fR? ?\fB\-selection\fR \fIselection\fR? \fIwindow\fR
+第一种形式的 \fBselection own\fR 返回在这个应用中的一个窗口路径名字的名字，这个窗口拥有在容纳 \fIwindow \fR的显示器上的 \fIselection\fR，如果在这个应用种没有窗口拥有这个选择就返回一个空串。\fISelection\fR   defaults to PRIMARY and \fIwindow\fR defaults to ``.''.
+.PP
+\fBselection own\fR 的第二种形式导致 \fIwindow\fR 成为在 \fIwindow \fR的显示器上的 \fIselection\fR 的新拥有者，它返回一个空串作为结果。通知现存的拥有者(如果有的话)它已经失去了这个选择。如果指定了\fIcommand\fR，在其他一些窗口向 \fIwindow \fR索取(claim)这个选择的所有权的时候，执行这个Tcl 脚本。\fISelection\fR 缺省为 PRIMARY。
+
+.SH "关键字 KEYWORDS"
+clear, format, handler, ICCCM, own, selection, target, type
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2002/05/27
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

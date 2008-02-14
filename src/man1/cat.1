@@ -1,0 +1,75 @@
+.TH CAT  1   December 1999   GNU textutils 2.0a  FSF
+
+.SH NAME
+cat \- 连接文件并在标准输出上输出
+
+.SH SYNOPSIS 总览
+.B cat
+[\fI选项列表\fR] [\fI文件列表\fR]...
+
+.SH DESCRIPTION 描述
+.\"  Add any additional description here
+.PP
+将文件列表中的文件或标准输入连接到标准输出。
+.TP
+\fB\-A\fR, \fB\-\-show\-all\fR
+等价于 \fB\-vET\fR 。
+.TP
+\fB\-b\fR, \fB\-\-number\-nonblank\fR
+给非空输出行编号。
+.TP
+\fB\-e\fR
+等价于 \fB\-vE\fR 。
+.TP
+\fB\-E\fR, \fB\-\-show\-ends\fR
+在每行结束显示 $ 。
+.TP
+\fB\-n\fR, \fB\-\-number\fR
+给所有输出行编号。
+.TP
+\fB\-s\fR, \fB\-\-squeeze\-blank\fR
+将所有的连续的多个空行替换为一个空行。
+.TP
+\fB\-t\fR
+等价于 \fB\-vT\fR 。
+.TP
+\fB\-T\fR, \fB\-\-show\-tabs\fR
+把 TAB 字符显示为 ^I 。
+.TP
+\fB\-u\fR
+(被忽略的选项)
+.TP
+\fB\-v\fR, \fB\-\-show\-nonprinting\fR
+除了 LFD 和 TAB 之外所有控制符用 ^ 和 M- 记方式显示。
+.TP
+\fB\-\-help\fR
+显示帮助并退出。
+.TP
+\fB\-\-version\fR
+显示版本信息并退出。
+.PP
+没有指定文件或指定的文件是 -，则从标准输入读取。
+
+.SH AUTHOR 作者
+由 Torbjorn Granlund 和 Richard M. Stallman 完成。
+
+.SH  REPORTING BUGS 报告缺陷 
+向 &lt;bug-textutils@gnu.org&gt; 报告缺陷。
+
+.SH COPYRIGHT 版权
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH  SEE ALSO 又见 
+完整的 cat 文档是以 Texinfo 手册的形式维护的，如果 info 和 cat 在你的机器上
+被正确的安装了，使用命令 info cat 就访问完整的文档了。
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+.BR 2001/01/31
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net
+

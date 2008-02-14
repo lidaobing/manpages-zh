@@ -1,0 +1,108 @@
+.TH TAIL "1" "1999年12月" "GNU textutils 2.0a" FSF
+.SH NAME(名称)
+tail \- 输出文件的末尾部分
+.SH SYNOPSIS(总览)
+.B ../src/tail
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION(描述)
+.\" Add any additional description here
+.PP
+在标准输出上显示每个FILE的最后10行.
+如果多于一个FILE,会一个接一个地显示,
+并在每个文件显示的首部给出文件名.
+如果没有FILE,或者FILE是-,那么就从标准输入上读取.
+.TP
+\fB\-\-retry\fR
+即使tail开始时就不能访问
+或者在tail运行后不能访问,也仍然不停地尝试打开文件.
+\fB\-\-\fR
+只与\fB\-f\fR合用时有用.
+.TP
+\fB\-c\fR, \fB\-\-bytes\fR=\fIN\fR
+输出最后N个字节
+.TP
+\fB\-f\fR, \fB\-\-follow[=\fR{name|descriptor}]
+当文件增长时,输出后续添加的数据;
+\fB\-f\fR, \fB\-\-follow\fR以及
+\fB\-\-follow\fR=\fIdescriptor\fR
+都是相同的意思
+.TP
+\fB\-n\fR, \fB\-\-lines\fR=\fIN\fR
+输出最后N行,而非默认的最后10行
+.TP
+\fB\-\-max\-unchanged\-stats\fR=\fIN\fR
+参看texinfo文档(默认为5)
+.TP
+\fB\-\-max\-consecutive\-size\-changes\fR=\fIN\fR
+参看texinfo文档(默认为200)
+.TP
+\fB\-\-pid\fR=\fIPID\fR
+与\fB\-f\fR合用,表示在进程ID,PID死掉之后结束.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR, \fB\-\-silent\fR
+从不输出给出文件名的首部
+.TP
+\fB\-s\fR, \fB\-\-sleep\-interval\fR=\fIS\fR
+与\fB\-f\fR合用,表示在每次反复的间隔休眠S秒
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+总是输出给出文件名的首部
+.TP
+\fB\-\-help\fR
+显示帮助信息后退出
+.TP
+\fB\-\-version\fR
+输出版本信息后退出
+.PP
+如果N(字节或者行数)的第一个字符为`+',
+那么从每个文件的开头算起的第N项开始显示,
+否则,
+显示该文件的最后N项.
+N可以有一个倍数前缀:
+b表示512,k表示1024,m表示1048576(1兆).
+第一个选项
+\fB\-VALUE\fR
+或+VALUE
+以\fB\-n\fR VALUE或\fB\-n\fR +VALUE
+方式看待,除非VALUE含有[bkm]后缀倍数
+中的一个,在这种情况下,它被看作
+\fB\-c\fR VALUE
+或者\fB\-c\fR +VALUE
+.PP
+使用\fB\-\-follow\fR (-f)时,tail默认后接文件描述符,
+这意味着即使tail显示的文件改名了,tail仍然可以
+追踪到其末尾部分.
+如果你确实希望查询文件的实际名而非文件描述符
+(例如,日志轮转时),
+这种默认的操作就不是你所期望的了.
+在这种情况下应使用\fB\-\-follow\fR=\fIname\fR.
+这将导致tail通过周期性地重新打开所指定的文件来
+追踪其是否被删除了,或者被其他程序重新创建了.
+.SH AUTHOR(作者)
+Paul Rubin, David MacKenzie, Ian Lance Taylor和Jim Meyering.
+.SH "REPORTING BUGS"(报告BUGS)
+请报告bugs到<bug-textutils@gnu.org>.
+.SH COPYRIGHT(版权)
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"(另见)
+.B tail
+的完整文档是以Texinfo手册形式维护的.
+如果
+.B info
+和
+.B tail
+程序在你那儿都已经安装好了,那么命令
+.IP
+.B info tail
+.PP
+应该会让你访问到整篇手册.
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

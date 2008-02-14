@@ -1,0 +1,53 @@
+.\" You can view this file with:
+.\" nroff -man [filename]
+.\"
+.TH svnserve 8
+.SH NAME
+svnserve \- 使用 `svn' 访问仓库时的服务器
+.SH "SYNOPSIS 总览"
+.TP
+\fBsvnserve\fP [\fIoptions\fP]
+.SH "DESCRIPTION 描述"
+\fBsvnserve\fP 允许使用 svn 网络协议访问 Subversion 仓库。它可以运行为独立的服务器进程，也可以在 xinetd 控制下运行。在启动 \fBsvnserver\fP 时，必须选择操作的模式。下列选项也被识别：
+.PP
+.TP 5
+\fB\-d\fP, \fB\-\-daemon\fP
+使得 \fBsvnserve\fP 以守护进程方式运行。\fBsvnserve\fP 使自身运行在后台，在 svn 端口 (默认是 3690) 监听并提供服务。
+.PP
+.TP 5
+\fB\-\-listen-port\fP=\fIport\fP
+使得 \fBsvnserve\fP 在以守护进程方式运行时监听 \fIport\fP 端口。
+.PP
+.TP 5
+\fB\-\-listen-host\fP=\fIhost\fP
+使得 \fBsvnserver\fP 监听 \fIhost\fP 指定的接口，可以是一个主机名或是一个 IP 地址。
+.PP
+.TP 5
+\fB\-\-foreground\fP
+当与 \fB\-d\fP 一同使用时，这个选项使得 \fBsvnserve\fP 在前台运行。这个选项主要用于调试。
+.PP
+.TP 5
+\fB\-i\fP, \fB\-\-inetd\fP
+使得 \fBsvnserve\fP 使用标准输入/标准输出文件描述符，当它在 xinetd 控制下运行时应该这样做。
+.PP
+.TP 5
+\fB\-h\fP, \fB\-\-help\fP
+显示用法信息，然后退出。
+.PP
+.TP 5
+\fB\-r\fP \fIroot\fP, \fB\-\-root\fP=\fIroot\fP
+为它提供服务的所有仓库设置虚根目录。客户端给出的 URL 中的路径名将被解释为相对于此 “根” 目录的路径，不允许超出根目录的范围。
+.PP
+.TP 5
+\fB\-t\fP, \fB\-\-tunnel\fP
+使得 \fBsvnserver\fP 运行于隧道模式，操作与 xinetd 模式类似 (在标准输入/标准输出提供一个连接)，但是将连接视为已认证的，认证用户就是当前的 uid。这个选项是在客户端运行于一个隧道代理上时使用。
+.PP
+.TP 5
+\fB\-T\fP, \fB\-\-threads\fP
+当运行在守护进程模式时，使得 \fBsvnserve\fP 为每个连接产生新线程而不是新进程。\fBsvnserve\fP 进程在启动时仍然将自身放到后台。
+.PP
+.TP 5
+\fB\-X\fP, \fB\-\-listen\-once\fP
+使得 \fBsvnserve\fP 接受 svn 端口的一个连接，提供服务，然后退出。这个选项主要用于调试。
+.PP
+一旦客户端通过传递 URL 选择了一个仓库，\fBsnvserve\fP 读取这个仓库中名为 \fBconf/svnserve.conf\fP 的文件，判断特定于仓库的设置信息，例如使用什么认证数据库，接受什么样的认证规则。参见 \fBsvnserve.conf\fP(5) 来查看文件格式的详细信息。

@@ -1,0 +1,117 @@
+.TH NoteBook "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B NoteBook - 笔记本管理器组件
+
+.SH 创建 CREATION
+.B NoteBook pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+NoteBook 组件管理一组页面并显示其中一个。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+.TP
+-height  
+为页面指定想要的高度。如果这个选项等于零(缺省的)，则这个窗口根本不要求任何大小。在这种情况下，用户可以调用 NoteBook::compute_size 来使 NoteBook 足够大得包含最大的页面。
+
+.TP
+-homogeneous  
+指定页面的标签是否有相同的宽度。
+
+.TP
+-side (read-only)  
+指定靠那边放置页面的标签。必须是 top 或 bottom 之一。目前只实现了 top。
+
+.TP
+-width  
+为页面指定想要的宽度。如果这个选项等于零(缺省的)，则这个窗口根本不要求任何大小。在这种情况下，用户可以调用 NoteBook::compute_size 来使 NoteBook 足够大得包含最大的页面。 
+
+.SH 组件命令
+
+.TP
+pathName bindtabs event script  
+这个命令把在用 event 给出的时间序列发生时要执行的一个命令关联到一个标贴(tab)上。把在它的上面发生事件的页面的标识符添加到这个命令上。 
+
+.TP
+pathName cget option  
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。 
+
+.TP
+pathName compute_size  
+调用这个命令使笔记本足够大得包含最大的页。注意如果所有的页面都使用了 -createcmd，则它们没有要求的大小。 
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。 
+
+.TP
+pathName delete page ?destroyframe? 
+删除这个页面。如果 destroyframe 是 1 (缺省的)，销毁与 page 相关的框架。如果 destroyframe 是 0，则不销毁这个框架，以便将来用 insert 调用重新使用同一个的 page。 
+
+.TP
+pathName getframe page  
+返回页面 page 的路径名。 
+
+.TP
+pathName index page  
+返回对应于这个项目的数值索引。 
+
+.TP
+pathName insert index page ?option value...? 
+在页面列表中位置 index 上插入用 page 标识的一个新页面。index 必须是数值或 end。返回这个新页面的路径名。
+
+-createcmd 
+指定在第一次提升(raise)这个页面的时候调用的命令。 
+
+-image 
+为这个页面指定在标签的左面显示的图象。 
+
+-leavecmd 
+指定在要离开(leave)一个页面的时候调用的一个命令。如果这个页面可以离开则这个命令必须返回 0，如果可以离开则返回 1。 
+
+-raisecmd 
+指定在每次提升这个页面的时候调用的命令。 
+
+-state 
+指定这个页面的状态。必须是 normal 或 disabled. 
+
+-text 
+为这个页面指定要显示的一个标签。 
+
+.TP
+pathName itemcget page option 
+返回这个项目的一个配置选项的当前值。Option 可以是这个项目建立命令能接受的任何值。 
+
+.TP
+pathName itemconfigure page ?option? ?value option value ...? 
+这个命令类似于 configure 命令，但是它为单独的项目提供选项，而 configure 为作为整体的组件提供选项。Options 可以是项目建立组件命令可接受的任何值。如果指定了选项，则依据命令的指示修改选项并且命令返回一个空串。如果未指定选项，则返回描述这个项目的当前选项的一个列表。只读选项不能修改。 
+
+.TP
+pathName move page index 
+把 page 的标贴移动到到索引 index。 
+
+.TP
+pathName page first ?last? 
+反对使用它，建议替代为 pages。
+
+如果省略了 last，则返回在索引 first 上的页面，如果 first 引用一个不存在的页面则返回空串。如果指定了 last，则这个命令返回一个列表，它的元素是在 first 和 last 之间(包含二者)的所有页面。first 和 last 二者可以是索引的任何标准形式。 
+
+.TP
+pathName pages ?first? ?last? 
+如果省略了 first 和 last，则返回所有页面的一个列表。如果指定了 first 而省略了 last，则返回在索引 first 上的页面，如果 first 引用一个不存在的元素则返回空串。如果指定了 first 和 last，则这个命令返回一个列表，它的元素是在 first 和 last 之间(包含二者)的所有页面。first 和 last 二者可以是索引的任何标准形式。
+
+.TP
+pathName raise ?page? 
+提升(raise)页面 page，如果省略了 page 则返回突出的(raised)页面。 
+
+.TP
+pathName see page 
+卷绕(scroll)标签来使页面 page 的标签可见。
+
+ 
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/05/11
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

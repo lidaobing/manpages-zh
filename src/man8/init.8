@@ -1,0 +1,264 @@
+.\"; 中文版版权所有 soloman, Laser www.linuxforum.net 2000
+.TH INIT 8 "11 February 2000" "" "Linux 系统管理员手册"
+.SH NAME
+init, telinit \- 进程处理初始化
+.SH 总览
+.B /sbin/init
+.RB [ " -a " ]
+.RB [ " -s " ]
+.RB [ " -b " ]
+.RB [ " -z xxx " ]
+.RB [ " 0123456Ss " ]
+.br
+.B /sbin/telinit
+.RB [ " \-t 秒 " ]
+.RB [ " 0123456sSQqabcUu " ]
+.SH 描述
+.SS Init
+.B Init
+是所有进程的父进程。它的首要任务是从一个存储在文件
+\fB/etc/inittab\fP （参阅 \fIinittab\fP(5)）
+里面的脚本里创建进程。
+这个文件通常有一些令 \fBinit\fP 在每条用户可登录的线上派生 \fBgetty\fP 的记录．
+它同时也控制着各独特系统所要求的独立进程。
+.SH 运行级别
+所谓
+\fI 运行级别 \fP 是一种系统软件环境配置，
+在此特定的环境中只允许某一组选定的进程存在。
+\fBinit\fP 给不同的运行级别派生的进程在 \fB/etc/inittab\fP 
+文件中定义。
+\fBInit\fP 可以启动到8个不同的运行级别上：
+\fB0\(en6\fP 和 \fBS\fP 或 \fBs\fP。运行级别可以由超级用户通过
+\fBtelinit\fP
+命令来转换，此命令可以将转换信号传递给 \fBinit\fP，
+告诉它切换到哪个运行级别。
+.PP
+运行级别 \fB0\fP，\fB1\fP，和 \fB6\fP 为系统保留的专用运行级别。
+运行级别 0 用来关机，运行级别 6 用来重启计算机，
+运行级别 1 用来使计算机进入单用户模式。
+运行级别 \fBS\fP 不是给我们直接使用的，
+更多是为进入运行级别 1 时运行某些可执行脚本时被调用。
+如果想得到更多相关的信息，请参阅手册页 \fBshutdown\fP(8) 和 \fBinittab\fP(5)。
+.PP
+运行级别 7-9 虽然在文档中说明，但也可以使用。
+不使用它们的原因只是因为"传统" Unix 变种不使用这些运行级别。
+另外，运行级别 \fIS\fP 和运行级别 \fIs\fP 实际上是相同的，
+它们只是系统内同一运行级别的两个不同的别名而己。
+.SH 系统引导
+.PP
+当系统内核引导到最后一步时， \fBinit\fP 进程被启动，
+它会自动查找 \fB/etc/inittab\fP 文件，看看是否有类型为
+\fBinitdefault\fP （参阅 \fIinittab\fP(5)）的记录．
+\fBinitdefault\fP 记录决定系统初始运行级别。
+如果没有这条记录（或者根本就没有 \fB/etc/inittab\fP ），
+那么，你必须在系统控制台输入想要进入的运行级别。
+.PP
+运行级别 \fBS\fP 或 \fBs\fP 把系统带入单用户模式，
+此模式不需要 \fB/etc/initttab\fP 文件。单用户模式中，
+\fB/sbin/sulogin\fP 会在  \fB/dev/console\fP 这个设备上打开。
+.PP
+当进入单用户模式后， \fBinit\fP 会从文件 \fB/etc/ioctl.save\fP
+中读取控制台的 \fIioctl\fP(2) 状态。如果该文件不存在，
+\fBinit\fP 则把线路设定为 \fB9600 baud\fP 并且带有 \fBCLOCAL\fP。
+当 \fBinit\fP 退出单用户模式时，
+它会自当前的控制台的 \fIioctl\fP 设置存储到这个文件供下次使用。
+.PP
+当第一次进入多用户模式时，\fBinit\fP 会执行\fBboot\fP 和 \fBbootwait\fP 
+记录以便在用户可以登录之前挂载文件系统。
+然后再执行相应运指定的各进程。
+.PP
+当启动一个新的进程时， \fBinit\fP 会检查是否存在
+\fI/etc/initscript\fP 文件。
+如果存在该文件，则使用该脚本来启动该进程。
+.PP
+如果系统中存在文件 \fB/var/run/utmp\fP 和 \fB/var/log/wtmp\fP，
+那么当每个子进程终止时，\fBinit\fP 会将终止信息和原因记录进这两个文件中。
+.SH 改变运行级别
+.PP
+当 \fBinit\fP 启动了所有指定的子进程后，
+它会不断地侦测系统进程情况，如：它的某个子进程被终止、电源失效、或由
+\fBtelinit\fP 发出的改变运行级别的信号。当它接受到以上的这些信号之一时，
+它会自动重新扫描 \fB/etc/inittab\fP 文件，并执行相应操作。
+所以，新的记录可以随时加入到此文件中。
+并且， \fBinit\fP 仍然等待系统发出了上述信号。
+在更新了各种系统文件后，如果你希望得到即时的更新，
+你可以使用\fBtelinit Q\fP 或 \fBq\fP 命令来唤醒 \fBinit\fP 
+让它即刻重新检测\fB/etc/inittab\fP  文件。
+.PP
+如果 \fBinit\fP 不是在单用户模式并且接收到了一个电源失效信号（SIGPWR），
+它会读取文件 \fB/etc/powerstatus\fP，并执行该文件中指定的各种操作：
+.IP F(AIL)
+电源失效，由 UPS 提供电力。执行 \fBpowerwait\fP 和  \fBpowerfail\fP 记录。
+.IP O(K)
+电源恢复，执行 \fBpowerokwait\fP 记录。
+.IP L(OW)
+电源失效并且 UPS 电压也太低。执行 \fBpowerfailnow\fP 记录。
+.PP
+如果文件 /etc/powrestatus 不存在或其中的内容并不包含有以上所示的字母
+\fBF\fP，\fBO\fP 或 \fBL\fP ，则 init 会当做读到了字母 \fBF\fP。
+.PP
+我们不赞成使用 \fBSIGPWR\fP 和 \fB/etc/powerstatus\fP 。
+有些用户希望与 \fBinit\fP 进行交互，那么可以使用 \fB/dev/initctl\fP
+控制通道。关于此点的描述请参阅 \fBsysvinit\fP 包的源代码。
+.PP
+当 \fBinit\fP 得到更新运行级别的请求，
+init会向所有没有在新运行级别中定义的进程发送一个警告信号 \s-1\fBSIGTERM\fP\s0 。
+在等待 5 秒钟之后，它会发出强制中断所有进程的运行的信号 \s-1\fBSIGKILL\fP\s0 。
+注意， \fBinit\fP 假设所有的这些进程（包括它们的后代）都仍然在
+\fBinit\fP 最初创建它们的同一进程组里。
+如果有任何进程改变了它们的进程组，那么它就收不到这些信号。
+这样的进程，你需要分别进行手工的终止。
+.SH TELINIT
+\fB/sbin/telinit\fP 
+是一个到
+.BI /sbin/init
+的软链接。
+它用一个单字符参数来通知 \fBinit\fP 执行相应的操作。
+下面是相关的参数：
+.IP "\fB0\fP,\fB1\fP,\fB2\fP,\fB3\fP,\fB4\fP,\fB5\fP 或 \fB6\fP" 
+通知 \fBinit\fP 将运行级别切换到指定的运行级别
+.IP \fBa\fP,\fBb\fP,\fBc\fP 
+告诉 \fBinit\fP 只运行那些 \fB/etc/inittab\fP 文件中
+运行级别是 \fBa\fP，\fBb\fP 或 \fBc\fP 的记录
+.IP "\fBQ\fP 或 \fBq\fP"
+通知 \fBinit\fP 重新检测 \fB/etc/inittab\fP 文件
+.IP "\fBS\fP 或 \fBs\fP"
+通知 \fBinit\fP 将运行级别切换到单用户模式下
+.IP "\fBU\fP 或 \fBu\fP"
+通知 \fBinit\fP 自动重启（保留状态），
+此操作不会对文件\fB/etc/inittab\fP 进行重新检测。
+执行此操作时，运行级别必须处在 \fBSs12345\fP 之一，否则，该请求将被忽略
+.PP
+\fBtelinit\fP 还可以告诉 \fBinit\fP 
+两次发送 SIGTERM 和 SIGKILL 信号的时间间隔。
+默认值是 5 秒，你可以通过使用 \fB-t sec\fP 的选项来修改。
+.PP
+\fBtelinit\fP 只能由具有恰当权限的用户执行。
+.PP
+\fBinit\fP 通过检查自己的 \fI 进程号\fP 来判断自己是
+\fBinit\fP 还是 \fBtelinit\fP ；真的 \fBinit\fP 的进程号永远都是 \fB1\fP。
+从这一点来看，我们在调用 \fBtelinit\fP 时也可以只使用 \fBinit\fP 
+来少敲几个键．
+.SH 环境变量
+.PP
+\fBInit\fP 为所有的子进程设定下列环境变量
+.IP \fBPATH\fP
+\fI/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin\fP
+.IP \fBINIT_VERSION\fP
+如名字表示的那样．在决定一个脚本是否直接来自 \fBinit\fP 时很有用
+.IP \fBRUNLEVEL\fP
+当前系统的运行级别
+.IP \fBPREVLEVEL\fP
+前次运行的运行级别（仅当改变运行级别时有用）
+.IP \fBCONSOLE\fP
+系统控制台。此变量是由内核继承而来，如果没有此环境变量的定义，
+\fBinit\fP 会使用 \fB/dev/console\fP 做为默认的控制台
+.SH 启动标志
+在启动系统时可以通过引导管理器（比如，LILO）传递一些启动标志给 \fBinit\fP ，
+\fBInit\fP 接受下面几个：
+.TP 0.5i
+.B -s， S， single
+以单用户模式启动系统。按这种模式启动时， \fI/etc/inittab\fP 需要被检查，
+并在单用户模式 shell 启动之前会执行引导 rc 脚本。
+.PP
+.TP 0.5i
+.B 1-5
+定义需要启动的运行级别
+.PP
+.TP 0.5i		
+.B -b, emergency
+不运行任何启动脚本而直接进入单用户模式 shell
+.PP
+.Tp 0.5i
+.B -a, auto
+如果用缺省命令行从内核引导（没有用户干预），
+LILO 引导管理器向命令行增加了单词 \"auto\"．
+如果是这样的话， \fBinit\fP 把环境变量 \"AUTOBOOT\" 设置为 \"yes\"．
+请注意你不能将这个东西用于任何安全评测 - 用户当然可以在命令行上
+手工输入 \"auto\" 或 \-a ．
+.PP
+.Tp 0.5i
+.B -z xxx
+-z 参数被忽略．你可以用这个选项略微扩展命令行，
+这样它可以在堆栈里获得更多空间．然后 \fBInit\fP 就可以操作命令行，
+好让 \fBps\fP(1) 显示当前运行级别．
+.SH 接口
+init监听 /dev 里的一个 \fIfifo\fP ，\fI/dev/initctl\fP，从中获取信息。
+\fBTelinit\fP 也使用这些和 init 进行通信。
+该界面没有完整的文档。
+如果对 init 有兴趣，则可以学习 \fIsrc/\fP 目录中
+\fBinit\fP 源文件包中的 \fIinitreq.h\fP 文件。
+.SH 信号
+init 对以下信号产生响应
+.TP 0.5i
+.B SIGHUP
+当接收到该信号后，init会对
+.I /etc/initrunlvl
+和
+.I /var/log/inirunlvl
+文件进行检查。如果这两个文件之一存在而且文件中有 ASCII 字符的运行级别，
+init 会转换到相应的新的运行级别。
+\fI 此特性只用于向后兼容! \fP ．
+通常的情况是该文件并不存在，所以 init 执行类似于
+\fB telinit q\fP
+这样的操作。
+.PP
+.TP 0.5i		
+.B SIGUSR1
+当接收到这个信号量，init 会关闭并重新打开它的控制 fifo，\fB/dev/initctl\fP。
+此操作对 /dev 被重新挂载后的启动脚本有用。
+.TP 0.5i
+.B SIGINT
+通常，当用户按了 CTRL-ALT-DEL 键后，内核会向 init 传递此信号。
+它所执行的操作与 \fIctrlaltdel\fP 相同。
+.TP 0.5i
+.B SIGWINCH
+当键盘有 \fIKeyboardSignal\fP 按键按下时，内核向 init 传递此信号，
+它激活 \fIkbrequest\fP 动作．
+.SH 遵循
+\fBInit\fP 与 System V 的 init 相兼容。
+它与\fI/etc/init.d\fP 和 \fI/etc/rc{runlevel}.d\fP
+目录下的脚本紧密地工作在一起。
+如果你的系统使用这种惯例，在 \fI/etc/init.d\fP 目录下应该有一个
+\fIREADME\fP 文件，它可以很好地解释了这些脚本是如何工作的。
+.SH 相关文件
+.nf
+/etc/inittab
+/etc/initscript
+/dev/console
+/etc/ioctl.save
+/var/run/utmp
+/var/log/wtmp
+/dev/initctl
+.fi
+.SH 警告
+\fBInit\fP 假设进程和进程的后代同属于最初创建它们的进程组．
+如果进程改变了它们的进程组，
+\fBinit\fP 就无法中止它们，因此，你可能会有两个进程读取一条终端线．
+.SH 诊断
+如果 \fBinit\fP 发现它的重启次数在最近 2 分钟里超过了 10 次，
+它就会认为程序命令串出错了。在系统控制台输出出错信息，并拒绝重新启动，
+只有等到 5 分钟以后或用户给 init 一个特定的信号，
+它才会重新响应。
+这可以防止由于用户在编辑 \fB/etc/inittab\fP 文件时可能出现的输入错误
+或由于相关程序被无意删除后导致的大量占用系统资源。
+.SH 作者
+Miquel  van Smoorenburg (miquels@cistron.nl)
+原始帮助手册页作者：Michael Haardt  (u31b3hs@pool.informatik.rwthaachen.de).
+.SH 另见
+.BR getty (1),
+.BR login (1),
+.BR sh (1),
+.BR who (1),
+.BR shutdown(8),
+.BR kill (1),
+.BR inittab (5),
+.BR initscript (5),
+.BR utmp (5)
+.PP
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+2000/11/26
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

@@ -1,0 +1,39 @@
+.TH IMAPD 8C "October 12, 1998"
+.UC 5
+.SH NAME
+IMAPd \- Internet 邮件存取协议服务器
+.SH 总览
+.B /usr/etc/imapd
+.SH 描述
+.I imapd
+是个支持
+.B IMAP4rev1
+远程邮件存取协议(由RFC2060定义)的服务器。
+.I imapd
+是由internet服务器(参见
+.IR inetd (8) )来调用的，
+正常情况下监听对
+.B IMAP
+端口的连接请求，该端口在
+.I /etc/services
+文件(参见
+.IR services (5)).
+)中定义。通常它是143。
+.PP
+.I imapd
+也可以由很多基于Unix平台的客户端通过
+.IR rsh (1C)
+进行访问。为此，
+.I imapd
+程序必须具有一个到
+.I /etc/rimapd
+的链接，因为这是系统认为该软件所在的地方。
+.SH "又见"
+rsh(1C) ipopd(8C)
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2001/05/01
+.SH 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net
+

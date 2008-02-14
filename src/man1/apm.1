@@ -1,0 +1,117 @@
+.\" apm.1 -- 
+.\" Created: Wed Jan 10 14:54:03 1996 by r.faith@ieee.org
+.\" Revised: Sun Apr 21 16:37:43 1996 by r.faith@ieee.org
+.\" Copyright 1996 Rickard E. Faith (r.faith@ieee.org)
+.\" 
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\" 
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" 
+.TH APM 1 "10 Jan 1996" "" "Linux Programmer's Manual"
+.SH NAME
+apm \- 查询高级电源管理(APM) BIOS
+.SH 总览
+.B apm
+[ \-
+.I vVmsS
+]
+.SH 描述
+.B apm
+读取
+.B  /proc/apm
+并用人能看懂的格式输出。因为提供了首要的
+电池状态，这个命令在有兼容的
+.B  APM BIOS
+的笔记本电脑上非常有用。
+.B apm
+允许使机器进入等待或挂起模式。
+.SH  选项
+.TP
+.B -V, --version
+输出
+.B  apm
+程序的版本并立即退出。
+.TP
+.B  -v, --verbose
+输出关于
+.B  APM BIOS
+的版本和
+.B  Linux APM
+驱动程序的版本的信息。
+.TP
+.B -m, --minutes
+输出剩余的总共的分钟数而不是
+.I  hh:mm
+格式。
+.TP
+.B -s, --suspend
+如果可能使机器进入挂起模式。
+.TP
+.B -S, --standby
+如果可能使机器进入等待模式。
+.TP
+.B  -i, --ignore
+告诉系统在使用
+.B  AC （交流）
+电源时忽略系统生成的
+.B  APM
+挂起或等待事件。
+对这样的用户有用：拥有膝上型电脑，在用电池为电源
+时希望
+.B  APM 
+事件发生，在使用
+.B  AC （交流）
+电源时不希望
+.B APM
+事件发生。
+.TP
+.B -n, --noignore
+告诉系统在使用
+.B  AC
+电源时不忽略系统生成的
+.B  APM
+挂起或等待事件。
+这是缺省的模式；提供这个选项作为取消的前
+面的 "
+.I apm -i
+" 调用的方法。
+.SH  缺陷
+本程序要求内核在 
+.BI 1.3.57
+以上。除非在老的内核上增加
+.B  APM
+补丁否则不能运行。原因是
+.B  /proc/apm
+的格式被更改得非常迅速。
+.SH 相关文件
+.I /proc/apm
+.br
+.I  linux/drivers/char/apm_bios.c
+.SH  著作者
+本程序是由 Rik Faith (faith@cs.unc.edu)写的，在 GPL 条款下
+可以自由发布。对这个程序绝对没有任何担保。当前的维护者是
+Avery Pennarun (apenwarr@worldvisions.ca)。
+.SH  参见
+xapm(1), apmd(8)
+.SH [中文版维护人]
+mhss
+.SH [中文版最新更新]
+2000/10/31 
+.SH 《中国 Linux 论坛 man 手册页翻译计划》:
+.BI http://cmpp.linuxforum.net

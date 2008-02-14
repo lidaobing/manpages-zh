@@ -1,0 +1,50 @@
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\" 
+.\" Modified Sat Jul 24 17:08:16 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Mon Oct 21 17:47:19 EDT 1996 by Eric S. Raymond <esr@thyrsus.com>
+.TH MOTD 5 "December 29 1992" "Linux" "Linux Programmer's Manual"
+
+.SH NAME
+motd \- 当日消息
+
+.SH "描述 (DESCRIPTION)"
+在 登录 系统 后, 执行 登录 shell 前, 
+.BR login (1)
+显示 \fB/etc/motd\fP 中的 内容.
+
+"motd" 意思是 "message of the day", 他 过去 的确 做 这个事情
+(所需的 磁盘空间 比 对 每个用户 发送 邮件 小的多).
+
+.SH "文件 (FILES)"
+/etc/motd
+
+.SH "另见 (SEE ALSO)"
+.BR login (1)
+.BR issue (5)
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

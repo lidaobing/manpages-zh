@@ -1,0 +1,332 @@
+.\" @(#)tar.1 1.13.14 99/11/09 Bero;
+.TH TAR 1 "09 November 1999"
+.SH NAME
+tar \- tar 档案文件管理程序的 GNU 版本。
+.SH 总览
+.B tar
+[
+.B \-
+]
+.B A --catenate --concatenate \||\| c --create \||\| d --diff --compare \||\| r --append \||\| t --list \||\| u --update \||\| x -extract --get
+[
+.B --atime-preserve
+]
+[
+.B -b, --block-size N
+]
+[
+.B -B, --read-full-blocks
+]
+[
+.B -C, --directory DIR
+]
+[
+.B --checkpoint	
+]
+[
+.B -f, --file [HOSTNAME:]F
+]
+[
+.B --force-local	
+]
+[
+.B -F, --info-script F --new-volume-script F
+]
+[
+.B -G, --incremental
+]
+[
+.B -g, --listed-incremental F
+]
+[
+.B -h, --dereference
+]
+[
+.B -i, --ignore-zeros
+]
+[
+.B -I, --bzip
+]
+[
+.B --ignore-failed-read
+]
+[
+.B -k, --keep-old-files
+]
+[
+.B -K, --starting-file F
+]
+[
+.B -l, --one-file-system
+]
+[
+.B -L, --tape-length N
+]
+[
+.B -m, --modification-time
+]
+[
+.B -M, --multi-volume
+]
+[
+.B -N, --after-date DATE, --newer DATE
+]
+[
+.B -o, --old-archive, --portability
+]
+[
+.B -O, --to-stdout
+]
+[
+.B -p, --same-permissions, --preserve-permissions
+]
+[
+.B -P, --absolute-paths
+]
+[
+.B --preserve	
+]
+[
+.B -R, --record-number
+]
+[
+.B --remove-files
+]
+[
+.B -s, --same-order, --preserve-order
+]
+[
+.B --same-owner
+]
+[
+.B -S, --sparse
+]
+[
+.B -T, --files-from F
+]
+[
+.B --null	
+]
+[
+.B --totals	
+]
+[
+.B -v, --verbose
+]
+[
+.B -V, --label NAME
+]
+[
+.B --version	
+]
+[
+.B -w, --interactive, --confirmation
+]
+[
+.B -W, --verify	
+]
+[
+.B --exclude FILE
+]
+[
+.B -X, --exclude-from FILE
+]
+[
+.B -Z, --compress, --uncompress
+]
+[
+.B -z, --gzip, --ungzip	
+]
+[
+.B --use-compress-program PROG
+]
+[
+.B --block-compress
+]
+[
+.B -[0-7][lmh]	
+]
+.TP
+.I filename1 [ filename2, ... filenameN ] 
+.TP
+.I directory1 [ directory2, ...directoryN ]
+.SH 描述
+tar 程序用于储存或展开 tar 存档文件。存档文件可放在磁盘中 ，也可以存为普通文件。
+tar是需要参数的，可选的参数是A、c、d、r、t、u、x，您在使用tar时必须首先为 tar
+指定至少一个参数；然后，您必须指定要处理的文件或目录。如果指定一个目录则该目录下
+的所有子目录都将被加入存档。
+.SS 应用举例：
+.PP
+1）展开 abc.tar.gz 使用命令： tar xvzf abc.tar.gz
+展开 abc.tar 使用命令： tar xvf abc.tar
+.PP
+2）将当前目录下的 man 目录及其子目录存成存档 man.tar
+tar cf man.tar ./man
+.SH 参数说明
+运行tar时必须要有下列参数中的至少一个才可运行
+.TP
+.B -A, --catenate, --concatenate
+将一存档与已有的存档合并
+.TP
+.B -c, --create	
+建立新的存档
+.TP
+.B -d, --diff, --compare
+比较存档与当前文件的不同之处
+.TP
+.B --delete		
+从存档中删除
+.TP
+.B -r, --append		
+附加到存档结尾
+.TP
+.B -t, --list		
+列出存档中文件的目录
+.TP
+.B -u, --update		
+仅将较新的文件附加到存档中
+.TP
+.B -x, --extract, --get		
+从存档展开文件
+.SH 其他参数
+.TP
+.B --atime-preserve	
+不改变转储文件的存取时间 
+.TP
+.B -b, --block-size N	
+指定块大小为 Nx512 字节（缺省时 N=20)
+.TP
+.B -B, --read-full-blocks	
+\
+读取时重组块（？？？！！！）
+.TP 
+.B -C, --directory DIR	
+转到指定的目录
+.TP 
+.B --checkpoint		
+读取存档时显示目录名
+.TP
+.B -f, --file [HOSTNAME:]F	
+指定存档或设备 (缺省为 /dev/rmt0)
+.TP
+.B --force-local		
+强制使用本地存档，即使存在克隆
+.TP 
+.B -F, --info-script F --new-volume-script F 
+在每个磁盘结尾使用脚本 F （隐含 -M）
+.TP
+.B -G, --incremental	
+建立老 GNU 格式的备份
+.TP
+.B -g, --listed-incremental F 
+建立新 GNU 格式的备份
+.TP 
+.B -h, --dereference	
+不转储动态链接，转储动态链接指向的文件。
+.TP
+.B -i, --ignore-zeros	
+忽略存档中的 0 字节块（通常意味着文件结束）
+.TP
+.B --ignore-failed-read	
+在不可读文件中作 0 标记后再退出？？？
+.TP
+.B -k, --keep-old-files	
+保存现有文件；从存档中展开时不进行覆盖
+.TP
+.B -K, --starting-file F	
+从存档文件 F 开始
+.TP
+.B -l, --one-file-system	
+在本地文件系统中创建存档
+.TP
+.B -L, --tape-length N	
+在写入 N*1024 个字节后暂停，等待更换磁盘
+.TP
+.B -m, --modification-time	
+当从一个档案中恢复文件时，不使用新的时间标签
+.TP
+.B -M, --multi-volume	
+建立多卷存档,以便在几个磁盘中存放
+.TP
+.B -N, --after-date DATE, --newer DATE	
+仅存储时间较新的文件
+.TP
+.B -o, --old-archive, --portability	
+以 V7 格式存档，不用 ANSI 格式
+.TP
+.B -O, --to-stdout		
+将文件展开到标准输出
+.TP
+.B -p, --same-permissions, --preserve-permissions 
+展开所有保护信息
+.TP
+.B -P, --absolute-paths	
+不要从文件名中去除 '/'
+.TP
+.B --preserve		
+like -p -s
+与 -p -s 相似
+.TP
+.B -R, --record-number	
+显示信息时同时显示存档中的记录数
+.TP 
+.B --remove-files		
+建立存档后删除源文件
+.TP
+.B -s, --same-order, --preserve-order	
+？？？
+.TP 
+.B --same-owner
+展开以后使所有文件属于同一所有者
+.TP 
+.B -S, --sparse
+高效处理
+.TP 
+.B -T, --files-from F
+从文件中得到要展开或要创建的文件名
+.TP 
+.B --null
+读取空结束的文件名，使 -C 失效 
+.TP
+.B --totals
+显示用 --create 参数写入的总字节数
+.TP 
+.B -v, --verbose
+详细显示处理的文件
+.TP 
+.B -V, --label NAME
+为存档指定卷标
+.TP 
+.B --version
+显示 tar 程序的版本号
+.TP 
+.B -w, --interactive, --confirmation
+每个操作都要求确认
+.TP 
+.B -W, --verify
+写入存档后进行校验
+.TP 
+.B --exclude FILE
+不把指定文件包含在内
+.TP 
+.B -X, --exclude-from FILE
+从指定文件中读入不想包含的文件的列表
+.TP 
+.B  -y, --bzip2, --bunzip2
+用 bzip2 对存档压缩或解压
+.TP 
+.B -Z, --compress, --uncompress
+用 compress 对存档压缩或解压 
+.TP 
+.B -z, --gzip, --ungzip
+用 gzip 对存档压缩或解压 
+.TP
+.B --use-compress-program PROG
+用 PROG 对存档压缩或解压 ( PROG 需能接受 -d 参数）
+.TP 
+.B --block-compress
+为便于磁盘存储，按块记录存档
+.TP 
+.B -[0-7][lmh]
+指定驱动器和密度[高中低]
+

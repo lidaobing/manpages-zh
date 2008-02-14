@@ -1,0 +1,190 @@
+.\"版权所有:Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\"中文版版权所有 晓寒, www.linuxforum.net
+.\"本文件可在LDP通用公共许可证(LDP GENERAL PUBLIC LICENSE)
+.\"(Version 1, September 1998)所描述的条件下自由拷贝.
+.\"此许可证应与本文件一起发布.
+.\"
+.TH TOUCH 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+touch \- 修改文件的时间戳记.
+.SH 总览
+.B touch
+.BI "[\-acm][\-r " ref_file(参照文件) "|\-t " time(时间值) "] " file(文件名)...
+.sp
+被废弃的版本:
+.br
+.B touch
+.BI "[\-acm][" ugly_time "] " file(文件)...
+.sp
+GNU版本:
+.br
+.B touch
+.BI "[\-acfm] [\-r " file(参照文件) "] [\-t " decimtime(时间值) ]
+.BI "[\-d " time(时间值) "] [\-\-time={atime,access,use,mtime,modify}]"
+.BI "[\-\-date=" time "] [\-\-reference=" file ]
+.BI "[\-\-no\-create] [\-\-help] [\-\-version] [\-\-] " file(文件)...
+.SH 用法描述
+.B touch
+修改每个指定文件
+.IR file
+的存取(access)和／或修改(modification)时间戳记．
+除非使用\-r或\-t选项，这些时间戳记都将修改为当前的时间．
+使用\-r选项时，这些戳记将按照文件
+.IR ref_file
+的时间戳记来修改(即变得和ref_file时间戳记值相同)．
+使用\-t选项，则这些戳记将按照给定的时间值
+.IR time
+进行修改．同时使用或
+同时不使用选项\-a和\-m，存取和修改两个戳记都将被更改．若只使
+用选项\-a，则只修改存取戳记．同样，只使用选项\-m，则只修改修
+改戳记．若要修改戳记的文件尚不存在，除非使用\-c选项，touch
+将创建它(作为空文件，并赋予0666的模式且受umask值的限制)．
+.SH "POSIX标准定义的选项"
+.TP
+.B \-a
+修改文件
+.IR file
+的存取时间．
+.TP
+.B \-c
+不创建文件
+.IR file .
+.TP
+.B \-m
+修改文件
+.IR file
+.IR file
+
+.TP
+.BI "\-r " ref_file
+将参照文件
+.I ref_file
+相应的时间戳记的数值作为指定文件
+.IR file
+时间戳记的新值．
+.TP
+.BI "\-t " time
+使用指定的时间值
+.IR time
+作为指定文件
+.IR file
+相应时间戳记的新值．此处的
+.IR time
+规定为如下形式的十进制数∶
+.br
+.nf
+[[CC]YY]MMDDhhmm[.SS]
+.br
+.fi
+这里，CC为年数中的前两位，即”世纪数”；YY为年数的
+后两位，即某世纪中的年数．如果不给出CC的值，则touch
+将把年数CCYY限定在1969--2068之内．MM为月数，DD为天
+将把年数CCYY限定在1969--2068之内．MM为月数，DD为天
+数，hh为小时数(几点)，mm为分钟数，SS为秒数．此处秒
+的设定范围是0--61，这样可以处理闰秒．这些数字组成
+的时间是环境变量TZ指定的时区中的一个时间．由于系统
+的限制，早于1970年1月1日的时间是错误的．
+.SH "POSIX标准的细节"
+已被废弃的touch版本使用时会出现模棱两可的情况:
+.IR ugly_time
+到底是时间值还是文件名？由于此种版本尚未提供\-r或\-t选项，
+所以使用时至少要有两个命令行参数，作为时间值，
+.IR ugly_time
+必须为第一个参数．这里的
+.IR ugly_time
+是一个形为MMDDhhmm[yy]的八
+位或十位整数．其中，yy是介于69--99之间表示1969--1999之间某
+一年的两位数，如果不给，表示当前这一年．
+.SH "GNU版本的细节"
+如果第一个指定文件
+.I file
+的名子从形式上说是选项
+.B "\-t"
+的有效参
+数，并且没有给出选项
+.BR "\-d" ,
+.BR "\-r"
+或
+.B "\-t"
+.B "\-t"
+
+数，也没有给`\-\-'选项，那么这个文件名将被解释成时间值．
+.PP
+一般情况下，利用
+.B touch
+修改文件的时间戳记时要求用户时该文
+件的所有者．除非只是把文件的存取和修改两种时间戳记修改为当
+前的时刻，这种情况只要求用户拥有对该文件`写'的权利就行了．
+.SH "GNU版本选项用法简介"
+.TP
+.B "\-a, \-\-time=atime, \-\-time=access, \-\-time=use"
+只修改存取时间．
+.TP
+.B "\-c, \-\-no\-create"
+如果要修改的文件不存在，此选项使touch不去创建它．
+.TP
+.BI "\-d, \-\-date=" time
+使用时间值
+.I time
+代替指定文件的戳记值．可以包含月份
+名，时区名以及`am'和
+`pm'等等．
+.TP
+.B "\-f"
+此选项用于兼容BSD版本的
+.BR touch (1).
+.TP
+.TP
+.B "\-m, \-\-time=mtime, \-\-time=modify"
+只修改修改时间．
+.TP
+.BI "\-r " file ", \-\-reference=" file
+使用参照文件
+.I file
+的时间戳记值修改指定文件的时间戳
+记．
+.TP
+.BI "\-t " decimtime
+这里时间值
+.I decimtime
+的格式为MMDDhhmm[[CC]YY][.ss]
+从左至右分别是月份，日期，小时，分钟，可选的世纪和
+年，以及可选的秒．
+.B touch
+将用这组数值修改指定文件的
+时间戳记．请注意，这个格式与POSIX标准所规定的格式并
+不一样．
+.SH "GNU版本通用选项"
+.TP
+.B "\-\-help"
+使程序在标准输出上显示该程序的用法信息．
+.TP
+.B "\-\-version"
+使程序在标准输出上打印其版本信息．
+.TP
+.SH "GNU版本通用选项"
+.TP
+.B "\-\-help"
+使程序在标准输出上显示该程序的用法信息．
+.TP
+.B "\-\-version"
+使程序在标准输出上打印其版本信息．
+.TP
+.B "\-\-"
+用于使程序终止对选项的解析．
+.SH 运行环境
+环境变量TZ一般用来表明所给时刻是哪个时区的．而环境变量LANG,
+LC_ALL, LC_CTYPE 和 LC_MESSAGES还是一般情况下的意义．
+.SH "遵循"
+GNU版touch的\-t选项的参数所用格式并不符合POSIX标准1003.2的描述．
+.SH "用法实例"
+如果文件\fIfoo\fP并不存在，那么命令`\fItouch foo\fP'将创建它，并把最
+后的修改时间改到现在的时刻．这一特点经常用来引导
+.BR make
+的执行．
+.SH 注意
+这篇说明描述了fileutils-4.0程序包中的
+.B touch．
+其它版本的touch可能与此有稍许不同．
+对本文的修正和增补请致信aeb@cwi.nl．
+程序缺陷请向fileutils-bugs@gnu.ai.mit.edu报告

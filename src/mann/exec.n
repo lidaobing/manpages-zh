@@ -1,0 +1,407 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: exec.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: exec.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH exec n 7.6 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+exec \- 调用子进程
+.SH "总览 SYNOPSIS"
+\fBexec \fR?\fIswitches\fR? \fIarg \fR?\fIarg ...\fR?
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+这个命令把它的参数作为对要执行的一个或多个子进程的指定来对待。参数接受标准的 shell 管道的格式(form)，即每个 \fIarg\fR 都变成某个命令的一个字，并且每个不同的命令都变成一个子进程。
+.PP
+如果给 \fBexec\fR的初始的参数以 \fB-\fR 开始，则它们被作为命令行开关而不是管道指定的一部分来对待。当前支持下列开关:   
+.TP 13
+\fB\-keepnewline\fR
+在管道的输出中保持尾随的换行符。通常要删除尾随的换行符。          
+.TP 13
+\fB\-\|\-\fR
+标志开关(部分)的结束。此后的参数即使以\fB-\fR开头仍被作为第一个 \fIarg\fR 来对待。        
+.PP
+如果一个 \fIarg\fR  (或成对的 \fIarg\fR)有象下面描述的格式个某一种，则\fBexec\fR  用它来控制子进程间的输入和输出流(flow)。将不把这样的参数传递给子进程。在象“< \fIfileName\fR”这样的格式中 \fIfileName\fR 可以要么是一个与“<”分离的参数，要么是在同一个参数中而没有间隔的空格(例如          
+“<\fIfileName\fR”)。           
+.TP 15
+|
+分隔在管道中不同的命令。前面的命令的标准输出将被输送给后面命令的标准输入中。 
+.TP 15
+|&
+分隔在管道中不同的命令。前面命令的标准输出和标准错误输出都被输送到后面的标准输入中。这种重定向格式取代象 2>  和 >& 这样的格式。     
+.TP 15
+<\0\fIfileName\fR
+打开由 \fIfileName\fR 指名的文件并作为在管道中的第一个命令的标准输入来使用。       
+.TP 15
+<@\0\fIfileId\fR
+\fIFileId\fR  必须是一个打开了的文件的标识符，比如是从以前的 \fBopen \fR调用的返回值。作为在管道中的第一个命令的标准输入来使用。\fIFileId\fR           
+ 必须用读模式来打开。          
+.TP 15
+<<\0\fIvalue\fR
+\fIValue\fR  被传递给第一个命令来作为它的标准输入。       
+.TP 15
+>\0\fIfileName\fR
+最后的命令的标准输出被重定向到叫 \fIfileName\fR\fI \fR的文件中，覆盖它以前的内容。    
+.TP 15
+2>\0\fIfileName\fR
+把管道中所有命令的标准错误输出重定向到叫 \fIfileName\fR 的文件中，覆盖它以前的内容。          
+.TP 15
+>&\0\fIfileName\fR
+最后的命令的标准输出和所有命令的标准错误输出都被重定向到叫 \fIfileName\fR的文件中，覆盖它以前的内容。         
+.TP 15
+>>\0\fIfileName\fR
+最后的命令的标准输出被重定向到叫 \fIfileName\fR 的文件中，对它进行添加而不是覆盖它。      
+.TP 15
+2>>\0\fIfileName\fR
+在管道中的所有的命令的标准错误输出都被重定向到叫 \fIfileName\fR的文件中，对它进行添加而不是覆盖它。       
+.TP 15
+>>&\0\fIfileName\fR
+最后的命令的标准输出和所有命令的标准错误输出被重定向到叫 \fIfileName\fR 的文件中，对它进行添加而不是覆盖它。         
+.TP 15
+>@\0\fIfileId\fR
+\fIFileId\fR  必须是一个打开了的文件的标识符，比如是从以前的 \fBopen\fR调用的返回值。最后的命令的标准输出被重定向到 \fIfileId\fR(指定)的文件中。文件必须用读模式来打开。          
+.TP 15
+2>@\0\fIfileId\fR
+\fIFileId\fR 必须是一个打开了的文件的标识符，比如是从以前的 \fBopen\fR调用的返回值。在管道中的所有命令的标准错误输出都被重定向到 \fIfileId\fR(指定)的文件中。文件必须用写模式来打开。          
+.TP 15
+>&@\0\fIfileId\fR
+\fIFileId\fR 必须是一个打开了的文件的标识符，比如是从以前的 \fBopen\fR调用的返回值。最后的命令的标准输出和所有命令的标准错误输出被重定向到 \fIfileId\fR(指定)的文件中。文件必须用写模式来打开。          
+.PP
+如果标准输出没有被重定向，则 \fBexec\fR   命令返回在管道中最后的命令的标准输出。如果在管道中的任何命令不正常退出或被杀死或被挂起，则 \fBexec\fR  将返回一个错误和并且错误信息将包含管道的输出和随后的描述不正常终止的错误信息；\fBerrorCode\fR   变量将包括关于最近所遭遇的不正常终止的额外的信息。如果任何命令写它的标准错误文件而这个标准错误未被重定向，则 \fBexec\fR 将返回一个错误；错误消息将包含管道的标准输出，跟着是关于不正常终止的信息(如果有的话)，随后是标准错误输出。
+.PP
+如果结果或错误信息的最后的字符是一个换行符，则这个换行符通常被从结果或错误信息中删除。这是与其他 Tcl 返回值相一致的，它们通常不用换行(作为)结束。但是，如果指定了 \fB\-keepnewline\fR则保持尾随的换行符。
+.PP
+如果标准输入未使用 “<” 、“<<” 或 “<@” 来重定向，则把应用的当前的标准输入作为第一个命令的标准输入。
+.PP
+如果最后的 \fIarg\fR 是“&”，则管道将在后台执行。在这种情况下 \fBexec\fR命令将返回一个列表，列表的元素是在管道中所有子进程的进程标识符。如果在管道中最后的命令的标准输出未被重定向，则输出到应用的标准输出中，并且如果管道中所有的命令的错误输出未被重定向，则错误输出到应用的标准错误中。
+.PP
+每个命令中的第一个字被接受为命令的名字；在它上面进行“~”(tilde)替换，如果结果不包含斜杠，则在 PATH  环境变量中的目录里查找给定名字的可执行文件。如果名字包含斜杠，则它必须参照一个从当前目录可到达的可执行文件。在给命令的参数上不进行通配符 (glob) 扩展或其他的     
+shell 式的替换。           
+
+.VS
+.SH "移植要点 PORTABILITY ISSUES"
+.TP
+\fBWindows\fR (所有版本)
+.
+从/向一个套接口读或写，使用“\fB@ \fR\fIfileId\fR”记号(notation)，不能工作。在从一个套接口读的时候，一个16位 DOS 应用程序将挂起(hang) 而一个32位应用程序将立即返回文件结束(end-of-file)。在任意类型的应用向一个套接口写的时候，如果控制台存在的话，信息转而发送到控制台，否则就丢弃信息。
+.sp
+Tk     
+控制台文本组件不提供真实的标准 IO 功能。在 Tk 下，从标准输入重定向的时候，所有的应用将看到一个立即的文件结束；重定向到标准输出或标准错误输出的信息将被丢弃。
+.sp
+要么是正斜杠要么是反斜杠被接受为给 Tcl 命令的参数的路径分隔符。在执行一个应用的时候，对应用的路径名指定也可以包含正或反斜杠作为路径分隔符。但是必须记住，多数 Windows 应用接受有正斜杠的参数作为选项分界符(delimiter)而反斜杠只在路径中。指定了有正斜杠的一个路径名的给应用的任何参数将不被自动的转换成使用反斜杠字符。如果一个参数包括作为路径分隔符的正斜杠，它可以被识别成路径名，也可以不被识别成路径名，这依赖于(具体)程序。
+.sp
+额外的，在调用一个16位 DOS 或 Windows 3.X 应用时，所有路径名必须使用短的、神秘的(cryptic)的路径格式(例如，使用“applba~1.def”来替代 “applbakery.default”)。
+.sp
+在一个路径中在一行的两个或更多的正或反斜杠参照一个网络路径。例如，根目录\fBc:/\fR  和一个子目录\fB/windows/system\fR的一个简单的连接将产生\fBc://windows/system\fR  (两个斜杠在一起)，这参照的是在叫 \fBwindows\fR  的那台机器上的叫 \fBsystem\fR  的挂装点(而 \fBc:/\fR 被忽略)，这并不等价于 \fBc:/windows/system\fR，它描述的是在当前计算机上的一个目录。应使用 \fBfile join\fR  命令来连接路径的成员。
+.TP
+\fBWindows NT\fR
+.
+在尝试执行一个应用时，\fBexec\fR 首先查找指定的那个名字。接着按 \fB.com\fR、 \fB.exe\fR, 和 \fB.bat\fR  的次序把它们添加到指定的名字的后面并查找这个加长了的名字。如果没有指定一个目录名作为应用(程序)名的一部分，在尝试定位应用(程序)时，依次在下列目录中自动查找:          
+.sp
+.RS
+.RS
+装载 Tcl 可执行文件的目录。  
+.br
+当前目录
+.br
+Windows NT 32位系统目录。          
+.br
+Windows NT 16位系统目录。
+.br
+Windows NT 主目录。     
+.br
+在 path 中列出的目录。          
+.RE
+.sp
+要执行 shell 内置命令象 \fBdir\fR 和 \fBcopy\fR, 调用者必须为想用的命令加上“\fBcmd.exe /c \fR”前导 (prepend)。 
+.sp
+.RE
+.TP
+\fBWindows 95\fR
+.
+在尝试执行一个应用时，\fBexec\fR首先查找指定的那个名字。接着按 \fB.com\fR、 \fB.exe\fR, 和 \fB.bat\fR 的次序把它们添加到指定的名字的后面并查找这个加长了的名字。如果没有指定一个目录名作为应用(程序)名的一部分，在尝试定位应用(程序)时，依次在下列目录中自动查找:         
+.sp
+.RS
+.RS
+装载 Tcl 可执行文件的目录。
+.br
+当前目录。 
+.br
+Windows 95 系统目录。  
+.br
+Windows 95 主目录。      
+.br
+在 path 中列出的目录。 
+.RE
+.sp
+要执行 shell 内置命令象 \fBdir\fR 和 \fBcopy\fR, 调用者必须为想用的命令加上“\fBcommand.exe /c \fR”前导(prepend)。
+.sp
+一旦一个 16位 DOS 应用程序从一个控制台读标准输入接着退出，所以后来运行的 16位 DOS 应用程序将看到标准输入已经被关闭了。32位应用程序没有这个问题并将正确运行，即使在一个 16位 DOS 应用程序认为标准输入已经被关闭之后。此时还没有针对这个缺陷的已知的工作项目(workaround)。
+.sp
+NUL: </B> 设备和一个 16位应用程序之间的重定向不总是工作。在从 \fBNUL: \fR重定向时 一些应用程序可能挂起，另一些将得到永无穷尽(infinite)的“0x01”字节流(stream)，而有一些实际上将正确的得到立即的文件结束；这些行为象是依赖于编译到应用程序自身中的某些东西。在到 \fBNUL:\fR的重定向大于或等于4K 时, 一些应用将挂起(hang)。在32位应用程序中不发生上述问题。
+.sp
+所有 DOS 16位应用程序都是同步运行的。从一个管道到一个 16位 DOS 应用程序的所有标准输入被搜集到一个临时文件中；在这个16位 DOS 应用程序开始执行之前，管道的其他端点(end)必须被关闭。从一个16位 DOS应用程序到一个管道的所有标准输出或错误输出被搜集到一个临时文件中；在临时文件被重定向到管道的下一个阶段之前，这个应用程序必须终止。这源于一个针对 Windows 95在实现管道中的一个缺陷的工作项目，也是标准的 Windows 95 DOS shell  自身处理管道的方式。
+.sp
+特定的应用程序，象 \fBcommand.com\fR ，不应该交互的执行。不从标准输入读和向标准输出写，而是直接访问控制台窗口的应用程序可能会失败，并挂起Tcl，如果它们自己的私有控制台窗口不可使用甚至可能挂起系统。   
+.RE
+.TP
+\fBMacintosh\fR
+在 Macintosh 下 \fBexec\fR  命令未被实现而不存在。   
+.TP
+\fBUnix\fR\0\0\0\0\0\0\0
+ \fBexec\fR  命令是全功能的并象上面描述的那样工作。       
+
+.SH "参见 SEE ALSO"
+error(n), open(n)
+
+.SH "关键字 KEYWORDS"
+execute, pipeline, redirection, subprocess
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/07/11       
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

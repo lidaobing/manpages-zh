@@ -1,0 +1,86 @@
+.\" Copyright (c) 1989, 1990, 1993
+.\"	The Regents of the University of California.  All rights reserved.
+.\" Chinese version Copyright (c) 苏勇  ysu@gnocis.org
+.\"
+.\" This code is derived from software contributed to Berkeley by
+.\" Kim Letkeman.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)cal.1	8.1 (Berkeley) 6/6/93
+.\"
+.Dd June 6, 1993
+.Dt CAL 1
+.Os
+.Sh NAME
+.Nm cal
+.Nd 显示一个日历
+.Sh 总览
+.Nm cal
+.Op Fl mjy
+.Op Ar 月份 Op Ar 年份
+.Sh 描述
+.Nm Cal
+显示一个简单的日历.. 
+如果没有指定参数, 则显示当前月份.
+选项如下所列: 
+.Bl -tag -width Ds
+.It Fl m
+显示星期一作为一周的第一天..
+(缺省为星期日.)
+.It Fl j
+显示儒略历的(Julian)日期 (以 1 为基的天数, 从 1 月 1 日开始计数) .
+.It Fl y
+显示当前年份的日历.. 
+.El
+.Pp
+一个单一的参数指定要显示的年份 (1 \- 9999) ;
+注意年份必须被完全地指定: 
+.Dq Li cal 89
+.Em 不会
+显示1989年的日历. 
+两个参数表示月份 (1 \- 12) 和年份. 
+如果没有指定参数, 则显示当前月份的日历. 
+.Pp
+一年从Jan 1 (1 月 1 日) 开始.
+.Pp
+格里高利历法改革(Gregorian Reformation)被认为发生于 1752 年 9 月 3 日.
+在此之前, 多数国家已经认可这项改革(尽管有一些直到 20 世纪初才认可它).
+那天之后的 10 天在这项改革被略去了, 所以那个月的日历有点不太寻常. 
+.Sh 历史
+一个
+.Nm
+命令出现于第6版 AT&T UNIX. 
+
+.SH "[中文版维护人]"
+.B 苏勇 <ysu@gnocis.org>
+.SH "[中文版最新更新]"
+.B 2001/07/15
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

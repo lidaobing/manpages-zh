@@ -1,0 +1,101 @@
+.\" Copyright (C) 1996 Free Software Foundation, Inc.
+.\" This file is distributed according to the GNU General Public License.
+.\" See the file COPYING in the top level source directory for details.
+.\"
+.TH QUERY_MODULE 2 "26 Dec 1996" "Linux 2.1.17" "Linux Module Support"
+.SH NAME
+query_module \- query the kernel for various bits pertaining to modules.
+.SH SYNOPSIS
+.nf
+.B #include <linux/module.h>
+.sp
+\fBint query_module(const char *\fIname\fB, int \fIwhich\fB,
+void *\fIbuf\fB, size_t \fIbufsize\fB, size_t *\fIret\fB);
+.fi
+.SH DESCRIPTION
+.B query_module
+requests information related to loadable modules from the kernel.  The
+precise nature of the information and its format depends on the \fIwhich\fP
+sub function.  Some functions require \fIname\fP to name a currently
+loaded module, some allow \fIname\fP to be \fBNULL\fP indicating the
+kernel proper.
+
+.SS "VALUES OF WHICH"
+.TP
+.B 0
+Always returns success.  Used to probe for the system call.
+.TP
+.B QM_MODULES
+Returns the names of all loaded modules.  The output buffer format is
+adjacent null-terminated strings; \fIret\fP is set to the number of
+modules.
+.TP
+.B QM_DEPS
+Returns the names of all modules used by the indicated module.  The
+output buffer format is adjacent null-terminated strings; \fIret\fP is
+set to the number of modules.
+.TP
+.B QM_REFS
+Returns the names of all modules using the indicated module.  This is
+the inverse of \fBQM_DEPS\fP.  The output buffer format is adjacent
+null-terminated strings; \fIret\fP is set to the number of modules.
+.TP
+.B QM_SYMBOLS
+Returns the symbols and values exported by the kernel or the indicated
+module.  The buffer format is an array of:
+.RS
+.PP
+.nf
+struct module_symbol
+{
+  unsigned long value;
+  unsigned long name;
+};
+.fi
+.PP
+followed by null-terminated strings.  The value of \fIname\fP is the
+character offset of the string relative to the start of \fIbuf\fP;
+\fIret\fP is set to the number of symbols.
+.RE
+.TP
+.B QM_INFO
+Returns miscellaneous information about the indicated module.  The output
+buffer format is:
+.RS
+.PP
+.nf
+struct module_info
+{
+  unsigned long address;
+  unsigned long size;
+  unsigned long flags;
+};
+.fi
+.PP
+where \fIaddress\fP is the kernel address at which the module resides,
+\fIsize\fP is the size of the module in bytes, and \fIflags\fP is
+a mask of \fBMOD_RUNNING\fP, \fBMOD_AUTOCLEAN\fP, et al that indicates
+the current status of the module.  \fIret\fP is set to the size of
+the \fBmodule_info\fP struct.
+.RE
+.SH "RETURN VALUE"
+On success, zero is returned.  On error, \-1 is returned and \fIerrno\fP
+is set appropriately.
+.SH ERRORS
+.TP
+.B ENOENT
+No module by that \fIname\fP exists.
+.TP
+.B EINVAL
+Invalid \fIwhich\fP, or \fIname\fP indicates the kernel for an
+inappropriate sub function.
+.TP
+.B ENOSPC
+The buffer size provided was too small.  \fIret\fP is set to the
+minimum size needed.
+.TP
+.B EFAULT
+At least one of \fIname\fP, \fIbuf\fP, or \fIret\fP was
+outside the program's accessible address space.
+.SH "SEE ALSO
+.BR create_module "(2), " init_module "(2), " delete_module "(2).

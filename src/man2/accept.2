@@ -1,0 +1,268 @@
+.\" Copyright (c) 1983, 1990, 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\" Modified Sat Jul 24 16:42:42 1993 by Rik Faith <faith@cs.unc.edu>
+.\" Modified Mon Oct 21 23:05:29 EDT 1996 by Eric S. Raymond <esr@thyrsus.com>
+.\" Modified 1998-2000 by Andi Kleen to match Linux 2.2 reality
+.\" 中文版 Copyright (c) 2002 byeyear 和 www.linuxforum.net 
+
+.TH ACCEPT 2 "7 May 1999" "Linux 2.2 Page" "Linux Programmer's Manual"
+.SH NAME 名称
+accept \- 在一个套接字上接收一个连接
+.SH SYNOPSIS 概述
+.B #include <sys/types.h>
+.br
+.B #include <sys/socket.h>
+.sp
+.BI "int accept(int " s ", struct sockaddr *" addr ", socklen_t *" addrlen );
+.SH DESCRIPTION 描述
+
+.B accept
+函数用于基于连接的套接字
+.RB (SOCK_STREAM ,
+.B SOCK_SEQPACKET
+和
+.BR SOCK_RDM).
+它从未完成连接队列中取出第一个连接请求,创建一个和参数
+.IR s
+属性相同的连接套接字,并为这个套接字分配一个文件描述符,
+然后以这个描述符返回.新创建的描述符不再处于倾听状态.原
+套接字
+.I s
+不受此调用的影响.注意任意一个文件描述符标志 (任何可以被
+fcntl以参数
+.B F_SETFL
+设置的值,比如非阻塞式或者异步状态)不会被
+.IR accept.
+所继承.
+.PP
+参数
+.I s
+是以
+.BR socket (2)
+创建,用
+.BR bind (2)
+绑定到一个本地地址,并且在调用了
+.BR listen (2).
+之后正在侦听一个连接的套接字.
+参数
+.I addr
+是一个指向结构sockaddr的指针.这个结构体以连接实体地址填充.
+所谓的连接实体,就是众所周知的网络层.参数
+.I addr
+所传递的真正的地址格式依赖于所使用的套接字族.
+(参见
+.BR socket (2) 
+和各协议自己的手册页).
+.I addrlen
+是一个实时参数:
+它的大小应该能够足以容纳参数
+.IR addr
+所指向的结构体;在函数返回时此参数将以字节数表示出返回地址的
+实际长度.若
+.I addr
+使用NULL作为参数,addrlen将也被置为NULL.
+.PP
+如果队列中没有未完成连接套接字,并且套接字没有标记为非阻塞式,
+.B accept
+将阻塞直到一个连接到达.如果一个套接字被标记为非阻塞式而队列
+中没有未完成连接套接字,
+.B accept
+将返回EAGAIN. 
+.PP
+使用
+.BR select (2)
+或者
+.BR poll (2).
+可以在一个套接字上有连接到来时产生事件.当尝试一个新的连接时
+套接字读就绪,这样我们就可以调用
+.B accept
+为这个连接获得一个新的套接字.此外,你还可以设置套接字在唤醒时
+接收到信号
+.B SIGIO;
+细节请参见
+.BR socket (7)
+.PP
+对于那些需要显式确认的协议,比如
+DECNet,
+.B accept
+可以看作仅仅从队列中取出下一个连接而不做确认.当在这个新的文件
+描述符上进行普通读写操作时暗示了确认,当关闭这个新的套接字时暗
+示了拒绝.目前在Linux上只有DECNet有这样
+的含义. 
+.SH NOTES 注意
+当接收到一个
+.B SIGIO
+信号或者
+.BR select (2)
+或
+.BR poll (2)
+返回读就绪并不总是意味着有新连接在等待,因为连接可能在调用
+.B accept
+之前已经被异步网络错误或者其他线程所移除.如果发生这种情况,
+那么调用将阻塞并等待下一个连接的到来.为确保
+.B accept
+永远不会阻塞,传递的套接字
+.I s
+需要置
+.B O_NONBLOCK
+标志(参见
+.BR socket (7)).
+.SH "RETURN VALUE" "返回值"
+此调用在发生错误时返回\-1.若成功则返回一个非负整数标识这个
+连接套接字.
+.SH ERROR HANDLING 错误处理
+Linux 
+.B accept
+将一个待处理网络错误代码通过 
+.BR accept
+传递给新套接字 . 
+这种处理方式有别于其他的BSD套接字实现.为可靠操作,应用程序
+必须在调用
+.B accept
+之后能够检测这些为协议定义的网络错误,并且以重试解决,就象
+.BR EAGAIN
+一样.对于TCP/IP这些网络错误是
+.BR ENETDOWN,
+.BR EPROTO,
+.BR ENOPROTOOPT,
+.BR EHOSTDOWN,
+.BR ENONET,
+.BR EHOSTUNREACH,
+.BR EOPNOTSUPP,
+以及
+.BR ENETUNREACH.
+.SH ERRORS 错误
+.TP
+.BR EAGAIN或者EWOULDBLOCK
+套接字被标记为非阻塞,且当前没有可接收的连接.
+.TP
+.B EBADF
+描述符非法.
+.TP
+.B ENOTSOCK
+描述符指向一个文件,而不是一个套接字.
+.TP
+.B EOPNOTSUPP
+作为参数的套接字不是
+.BR SOCK_STREAM. 
+类型
+.TP
+.B EFAULT
+参数
+.I addr
+不在用户可写地址空间之内.
+.TP
+.B EPERM
+防火墙规则禁止连接.
+.TP
+.B ENOBUFS,ENOMEM
+没有足够内存.  
+这个错误一般来说意味着内存分配受套接字缓冲区所限,
+而不是没有系统内存.
+.PP
+另外,新套接字和协议中定义的网络错误也可能被返回.
+不同的Linux内核也可能返回下列错误
+.BR EMFILE ,
+.BR EINVAL ,
+.BR ENOSR ,
+.BR ENOBUFS ,
+.BR EPERM ,
+.BR ECONNABORTED ,
+.BR ESOCKTNOSUPPORT ,
+.BR EPROTONOSUPPORT ,
+.BR ETIMEDOUT ,
+.BR ERESTARTSYS .
+.SH "CONFORMING TO" "兼容于"
+SVr4,4.4BSD(
+.B accept
+函数首次出现于BSD 4.2).
+BSD手册页文档定义了五个可能的错误返回值
+(EBADF, ENOTSOCK, EOPNOTSUPP, EWOULDBLOCK, EFAULT).
+SUSv2文档的定义是EAGAIN, EBADF, ECONNABORTED, EFAULT, EINTR,
+EINVAL, EMFILE, ENFILE, ENOBUFS, ENOMEM, ENOSR, ENOTSOCK, EOPNOTSUPP,
+EPROTO, EWOULDBLOCK.
+.LP
+Linux accept不继承象
+.BR O_NONBLOCK
+这样的套接字标志.
+这一点有别于其他的BSD套接字实现.
+因此,程序应该在accept所返回的套接字上设置所有需要的标志.
+.SH NOTE 注意
+函数
+.B accept
+的第三个参数原来被声明为'int *'(在libc4和libc5以及其他很多系统中,
+比如BSD 4.*,SunOS 4, SGI);POSIX 1003.1g草案试图将其改变为
+`size_t *',SunOS 5就是这么做的.
+后来的POSIX草案和Single Unix Specification以及glibc2使用了
+`socklen_t *'.
+Quoting Linus Torvalds:
+引自Linus Torvalds
+(译注:这个家伙就是Linux的创始人,所以我保留了他老人家的原文,
+仅将原文大意附后):
+I fails: only italicizes a single line
+_Any_ sane library _must_ have "socklen_t" be the same size
+as int.  Anything else breaks any BSD socket layer stuff.
+POSIX initially _did_ make it a size_t, and I (and hopefully others, but
+obviously not too many) complained to them very loudly indeed.  Making
+it a size_t is completely broken, exactly because size_t very seldom is
+the same size as "int" on 64-bit architectures, for example.  And it
+_has_ to be the same size as "int" because that's what the BSD socket
+interface is. 
+Anyway, the POSIX people eventually got a clue, and created "socklen_t". 
+They shouldn't have touched it in the first place, but once they did
+they felt it had to have a named type for some unfathomable reason
+(probably somebody didn't like losing face over having done the original
+stupid thing, so they silently just renamed their blunder).
+
+数据类型"socklen_t"和int应该具有相同的长度.否则就会破坏
+BSD套接字层的填充.POSIX开始的时候用的是size_t,
+Linus Torvalds(他希望有更多的人,但显然不是很多)
+努力向他们解释使用size_t是完全错误的,因为在64位结构中
+size_t和int的长度是不一样的,而这个参数(也就是accept函数
+的第三参数)的长度必须和int一致,因为这是BSD套接字接口
+标准.最终POSIX的那帮家伙找到了解决的办法,那就是创造了
+一个新的类型"socklen_t".Linux Torvalds说这是由于他们
+发现了自己的错误但又不好意思向大家伙儿承认,所以另外
+创造了一个新的数据类型.
+.SH "SEE ALSO" "参见"
+.BR bind (2),
+.BR connect (2),
+.BR listen (2),
+.BR select (2),
+.BR socket (2)
+
+.SH "[中文版维护人]"
+.B byeyear <love_my_love@263.net >
+.SH "[中文版最新更新]"
+.B 2002.01.27
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

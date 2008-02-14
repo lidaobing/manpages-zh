@@ -1,0 +1,193 @@
+.\"(c) Copyright 1992 by Panagiotis Tsirigotis
+.\"(c) Sections Copyright 1998-2001 by Rob Braun
+.\"All rights reserved.  The file named COPYRIGHT specifies the terms 
+.\"and conditions for redistribution.
+.\"
+.TH XINETD 8 "14 June 2001"
+.\" *************************** NAME *********************************
+.SH NAME
+xinetd \- the extended Internet services daemon
+.\" *************************** SYNOPSIS *********************************
+.SH SYNOPSIS
+.B xinetd
+[\fIoptions\fP]
+.\" *************************** DESCRIPTION *********************************
+.SH DESCRIPTION
+\fBxinetd\fP performs the same function as \fBinetd\fP: it starts
+programs that provide Internet services.  Instead of having such
+servers started at system initialization time, and be dormant until a
+connection request arrives, \fBxinetd\fP is the only daemon process
+started and it listens on all service ports for the services listed in
+its configuration file. When a request comes in, \fBxinetd\fP starts
+the appropriate server.  Because of the way it operates, \fBxinetd\fP
+(as well as \fBinetd\fP) is also referred to as a super-server.
+.LP
+The services listed in \fBxinetd\fP's configuration file can be
+separated into two groups.  Services in the first group are called
+.I "multi-threaded"
+and they require the forking of a new server process for each new
+connection request.  The new server then handles that connection.  For
+such services, \fBxinetd\fP keeps listening for new requests so that it
+can spawn new servers.  On the other hand, the second group includes
+services for which the service daemon is responsible for handling all
+new connection requests.  Such services are called
+.I "single-threaded"
+and \fBxinetd\fP will stop handling new requests for them until the
+server dies.  Services in this group are usually datagram-based.
+.LP
+So far, the only reason for the existence of a super-server was to
+conserve system resources by avoiding to fork a lot of processes which
+might be dormant for most of their lifetime.  While fulfilling this
+function, \fBxinetd\fP takes advantage of the idea of a super-server to
+provide features such as access control and logging.  Furthermore,
+\fBxinetd\fP is not limited to services listed in
+.I /etc/services.
+Therefore, anybody can use \fBxinetd\fP to start special-purpose
+servers.
+.\" *************************** OPTIONS *********************************
+.SH OPTIONS
+.TP
+.BR \-d
+Enables debug mode. This produces a lot of debugging output, and it
+makes it possible to use a debugger on \fBxinetd\fP.
+.TP
+.BI \-syslog " syslog_facility"
+This option enables syslog logging of \fBxinetd\fP-produced messages
+using the specified syslog facility.
+The following facility names are supported:
+.I daemon,
+.I auth,
+.I user,
+.I "local[0-7]"
+(check \fIsyslog.conf(5)\fP for their meanings).
+This option is ineffective in debug mode since all relevant messages are sent
+to the terminal.
+.TP
+.BI \-filelog " logfile"
+\fBxinetd\fP-produced messages will be placed in the specified file.
+Messages are always appended to the file.
+If the file does not exist, it will be created.
+This option is ineffective in debug mode since all relevant messages are sent
+to the terminal.
+.TP
+.BI \-f " config_file"
+Determines the file that \fBxinetd\fP uses for configuration. The
+default is \fI/etc/xinetd.conf\fP.
+.TP
+.BR \-pidfile " pid_file"
+.br
+The process ID is written to the file. This option is ineffective in debug mode. 
+.TP
+.BI \-dontfork 
+Tells xinetd to stay in the foreground rather than detaching itself, to
+support being run from init or daemontools. This option automatically sets 
+.B \-stayalive
+(see below).
+.TP
+.BI \-stayalive 
+Tells xinetd to stay running even if no services are specified.
+.TP
+.BI \-limit " proc_limit"
+This option places a limit on the number of concurrently running processes
+that can be started by
+.B xinetd.
+Its purpose is to prevent process table overflows.
+.TP
+.BI \-logprocs " limit"
+This option places a limit on the number of concurrently running servers
+for remote userid acquisition.
+.TP
+.BI \-version
+This option causes xinetd to print out its version information.
+.TP
+.BI \-inetd_compat
+This option causes xinetd to read /etc/inetd.conf in addition to the
+standard xinetd config files.  /etc/inetd.conf is read after the
+standard xinetd config files.
+.TP
+.BI \-cc " interval"
+This option instructs
+.B xinetd
+to perform periodic consistency checks on its internal state every
+.I interval
+seconds.
+.LP
+The \fIsyslog\fP and \fIfilelog\fP options are mutually exclusive.
+If none is specified, the default is syslog using the
+.I daemon
+facility.
+You should not confuse \fBxinetd\fP messages with messages related to
+service logging. The latter are logged only if this is specified
+via the configuration file.
+.\" *********************** CONTROLLING XINETD ****************************
+.SH "CONTROLLING XINETD"
+.LP
+\fBxinetd\fP performs certain actions when it receives certain signals.
+The actions associated with the specific signals can be redefined
+by editing \fIconfig.h\fP and recompiling.
+.TP 15
+.B SIGHUP
+causes a hard reconfiguration, which means that \fBxinetd\fP re-reads 
+the configuration file and terminates the servers for services that 
+are no longer available. Access control is performed again on 
+running servers by checking the remote location, access times and 
+server instances. If the number of server instances is lowered, some 
+arbitrarily picked servers will be killed to satisfy the limit; this 
+will happen \fIafter\fP any servers are terminated because of failing 
+the remote location or access time checks.
+Also, if the
+.B INTERCEPT
+flag was clear and is set, any running servers for that service will
+be terminated;
+\fIthe purpose of this is to ensure that after a hard reconfiguration
+there will be no running servers that can accept packets from addresses
+that do not meet the access control criteria\fP.
+.TP
+.B SIGQUIT
+causes program termination.
+.TP
+.B SIGTERM
+terminates all running servers before terminating \fBxinetd\fP.
+.TP
+.B SIGUSR1
+causes an internal state dump (the default dump file is
+\fI/var/run/xinetd.dump\fP;
+to change the filename, edit \fIconfig.h\fP and recompile).
+.TP
+.B SIGIOT
+causes an internal consistency check to verify that the data structures
+used by the program have not been corrupted.
+When the check is completed
+.B xinetd
+will generate a message that says if the check was successful or not.
+.LP
+On reconfiguration the log files are closed and reopened. This allows
+removal of old log files.
+.\" *********************** FILES ****************************
+.SH FILES
+.LP
+.PD .1v
+.TP 20
+.B /etc/xinetd.conf
+default configuration file
+.TP
+.B /var/run/xinetd.dump
+default dump file
+.PD
+.\" *********************** SEE ALSO ****************************
+.SH "SEE ALSO"
+.I "inetd(8),"
+.LP
+.I "xinetd.conf(5),"
+.LP
+.I "xinetd.log(5)"
+.LP
+.I "http://cr.yp.to/daemontools.html"
+.\" *********************** AUTHOR ****************************
+.SH AUTHOR
+Panos Tsirigotis, CS Dept, University of Colorado, Boulder
+Rob Braun
+.\" *********************** PRONUNCIATION ****************************
+.SH PRONUNCIATION
+zy-net-d
+

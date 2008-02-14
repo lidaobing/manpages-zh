@@ -1,0 +1,675 @@
+'\" t
+.ig
+troff.man
+
+Last update : 9 Jan 2002
+
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 1989, 2000, 2001, 2002 Free Software Foundation, Inc.
+
+written by James Clark
+
+modified by Werner Lemberg <wl@gnu.org>
+            Bernd Warken <bwarken@mayn.de>
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this .ig-section and AUTHOR, with no
+Front-Cover Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+..
+.
+.
+.\" --------------------------------------------------------------------
+.\" Setup
+.\" --------------------------------------------------------------------
+.
+.mso www.tmac
+.
+.if n \{\
+.  mso tty-char.tmac
+.  ftr CR R
+.  ftr CI I
+.  ftr CB B
+.\}
+.
+.if '\*[.T]'dvi' \
+.  ftr CB CW
+.
+.de TQ
+.br
+.ns
+.TP \\$1
+..
+.
+.\" Like TP, but if specified indent is more than half
+.\" the current line-length - indent, use the default indent.
+.de Tp
+.ie \\n(.$=0:((0\\$1)*2u>(\\n(.lu-\\n(.iu)) .TP
+.el .TP "\\$1"
+..
+.
+.
+.\" --------------------------------------------------------------------
+.\" Title
+.\" --------------------------------------------------------------------
+.
+.TH TROFF 1 "16 September 2002" "Groff Version 1.18.1"
+.SH NAME
+troff \- groff 文档排版系统的 troff 处理器
+.
+.
+.\" --------------------------------------------------------------------
+.SH "总览 SYNOPSIS"
+.\" --------------------------------------------------------------------
+.
+.nr a \n(.j
+.ad l
+.nr i \n(.i
+.in +\w'\fBtroff 'u
+.ti \niu
+.B troff
+.de OP
+.ie \\n(.$-1 .RI "[\ \fB\\$1\fP" "\\$2" "\ ]"
+.el .RB "[\ " "\\$1" "\ ]"
+..
+.OP \-abcivzCERU
+.OP \-d cs
+.OP \-f fam
+.OP \-F dir
+.OP \-m name
+.OP \-M dir
+.OP \-n num
+.OP \-o list
+.OP \-r cn
+.OP \-T name
+.OP \-w name
+.OP \-W name
+.RI "[\ " files\|.\|.\|. "\ ]"
+.br
+.ad \na
+.P
+在一个命令行选项与其参数之间可以有空格。
+.
+.
+.\" --------------------------------------------------------------------
+.SH "描述 DESCRIPTION"
+.\" --------------------------------------------------------------------
+.
+这份手册页描述了 GNU 版本的
+.BR troff .
+它是 groff 文档排版系统的一部分。
+.
+它与 UNIX troff 的功能兼容，但是有很多的扩展，参见
+.BR \%groff_diff (7).
+通常它应当用
+.BR groff (1)
+命令调用，groff 会以合适的顺序和合适的选项，运行预处理器和后处理器。
+.
+.
+.\" --------------------------------------------------------------------
+.SH "选项 OPTIONS"
+.\" --------------------------------------------------------------------
+.
+.TP \w'\-dname=s'u+2n
+.B \-a
+产生一个排版输出的
+.SM ASCII
+近似结果 (approximation)
+.
+.TP
+.B \-b
+在每条错误或警告消息中打印回溯信息
+.
+此信息可以帮助跟踪错误的原因
+.
+信息中的行号可能有误，因为
+.BR troff 
+中行号的意义与请求类型是
+.B as
+还是
+.B am
+有关
+.
+.TP
+.B \-c
+禁止颜色输出 (兼容模式下总是禁止)
+.
+.TP
+.B \-C
+使用兼容模式
+.
+.TP
+.BI \-d cs
+.TQ
+.BI \-d name = s
+定义
+.I c
+或
+.I name
+是一个字符串
+.IR s ;
+.I c
+必须是单字符的一个名称
+.
+.TP
+.B \-E
+阻止
+.BR troff 
+的错误输出.
+注意这不影响发出
+.B tm
+或
+.B tm1
+请求的宏包发出的错误消息向标准错误输出
+.
+.TP
+.BI \-f fam
+使用
+.I fam
+作为默认字体族
+.
+.TP
+.BI \-F dir
+在目录中 (或目录路径中) 搜索
+.I dir
+子目录
+.BI dev name
+.RI ( name
+是设备的名称) 查找其中的
+.B DESC
+文件和字体文件
+.I dir
+在所有其他字体目录之前查找
+.
+.TP
+.B \-i
+处理完所有输入文件后继续从标准输入读入
+.
+.TP
+.BI \-m name
+读入文件
+.IB name .tmac\fR.
+如果没有找到，则去读
+.BI tmac. name
+.
+它将先在
+.B \-M
+命令行参数给定的目录中搜索，然后是
+.B GROFF_TMAC_PATH
+环境变量中的目录，然后是当前目录 (安全模式不会做这一步)，
+然后是个人目录，/usr/lib/groff/site-tmac, /usr/share/groff/site-tmac
+还有 /usr/share/groff/1.18.1/tmac.
+.
+.TP
+.BI \-M dir
+搜索目录 (或目录路径)
+.I dir
+查找宏文件
+.
+检索在所有其他宏目录之前进行
+.
+.TP
+.BI \-n num
+为第一页编号
+.IR num .
+.
+.TP
+.BI \-o list
+仅输出
+.IR list 
+中指定的页，参数是一个以逗号分隔的页号范围的列表;
+.I n
+意思是打印页面
+.IR n ,
+.IB m \- n
+意思是打印
+.I m
+到
+.IR n 
+之间的所有页面,
+.BI \- n
+意思是打印直到
+.IR n 
+的所有页面,
+.IB n \-
+意思是打印从
+.IR n 
+开始的所有页面，直到结束.
+.B troff
+打印完列表中的最后一页后将退出
+.
+.TP
+.BI \-r cn
+.TQ
+.BI \-r name = n
+设置数字寄存器
+.I c
+或
+.I name
+为
+.IR n ;
+.I c
+必须是单字符的一个名称，
+.I n
+可以是任何 troff 数字表达式
+.
+.TP
+.B \-R
+不读取
+.B troffrc
+和
+.BR troffrc-end .
+.
+.TP
+.BI \-T name
+为设备
+.IR name 
+而不是默认的
+.BR ps
+准备输出
+.
+.TP
+.B \-U
+不全模式
+.
+这将允许下列请求
+.BR open ,
+.BR opena ,
+.BR pso ,
+.BR sy ,
+和
+.BR pi .
+出于安全原因，这些潜在的危险的请求在其他情况下被禁止。
+.
+同时它将当前目录加入宏搜索路径
+.
+.TP
+.B \-v
+打印版本号
+.
+.TP
+.BI \-w name
+允许发出
+.IR  name 
+警告。可能的警告名称在下面的
+.I "警告 WARNINGS"
+章节中详述
+.
+例如，要允许所有警告，使用
+.B \-w
+.BR all .
+允许使用多个
+.B \-w
+选项
+.
+.TP
+.BI \-W name
+禁止发出
+.IR name
+警告。允许使用多个
+.B \-W
+选项
+.
+.TP
+.B \-z
+阻止格式化的输出
+.
+.
+.\" --------------------------------------------------------------------
+.SH "警告 WARNINGS"
+.\" --------------------------------------------------------------------
+.
+.B troff
+可以发出的警告分为下列类别
+.
+每种警告关联的名称在
+.B \-w
+和
+.B \-W
+选项中使用；关联的数字被
+.B warn
+请求和
+.B .warn
+寄存器使用, 它总是 2 的幂，以允许位运算
+.
+.P
+.TS
+tab(@), center, box;
+c c c | c c c
+r rI lB | r rI lB.
+Bit@Code@Warning@Bit@Code@Warning
+_
+0@1@char@10@1024@reg
+1@2@number@11@2048@tab
+2@4@break@12@4096@right-brace
+3@8@delim@13@8192@missing
+4@16@el@14@16384@input
+5@32@scale@15@32768@escape
+6@64@range@16@65536@space
+7@128@syntax@17@131072@font
+8@256@di@18@262144@ig
+9@512@mac@19@524288@color
+.TE
+.
+.P
+.nr x \w'\fBright-brace'+1n+\w'00000'u
+.ta \nxuR
+.
+.TP \nxu+3n
+.BR break "\t4"
+在填充 (fill) 模式下，不可分行的行的长度 比行的长度要小。
+In fill mode, lines which could not be broken so that their length was
+less than the line length.
+.
+此警告是默认允许的
+.
+.TP
+.BR char "\t1"
+不存在的字符。
+.
+此警告是默认允许的
+.
+.TP
+.BR color "\t524288"
+颜色相关的警告
+.
+.TP
+.BR delim "\t8"
+关闭定界符丢失或不匹配
+.
+.TP
+.BR di "\t256"
+没有当前转移 (current diversion) 而使用了不带参数的
+.B di
+或
+.B da
+.
+.TP
+.BR el "\t16"
+使用
+.B el
+请求但是没有相应的
+.B ie
+请求
+.
+.TP
+.BR escape "\t32768"
+不可识别的转义序列。
+.
+当遇到一个不可识别的转义序列时，转义字符被忽略
+.
+.TP
+.BR font "\t131072"
+不存在的字体。
+.
+此警告是默认允许的
+.
+.TP
+.BR ig "\t262144"
+.B ig
+请求忽略的文本中的非法转义。
+.
+如果不是在被忽略的文本中，它们将是错误
+.
+.TP
+.BR input "\t16384"
+非法输入字符
+.
+.TP
+.BR mac "\t512"
+使用未定义的字符串，宏和标号 (diversions) (?).
+.
+当使用一个未定义的字符串，宏或标号 (diversions) 时，字符串被自动定义为空。
+.
+因此，在大多数情况下，每个名字最多会给出一个警告
+.
+.TP
+.BR missing "\t8192"
+请求缺少必要的参数
+.
+.TP
+.BR number "\t2"
+非法数值表达式。
+.
+此警告是默认允许的
+.
+.TP
+.BR range "\t64"
+超出范围的参数
+.
+.TP
+.BR reg "\t1024"
+使用未定义的数字寄存器。
+.
+当使用一个未定义的数字寄存器时，寄存器被自动定义为值 \~0。
+.
+因此，大多数情况下，使用一个特定的名字最多会得到一个警告
+.
+.TP
+.BR right-brace "\t4096"
+在应当使用数字的地方使用了
+.B \[rs]}
+.
+.TP
+.BR scale "\t32"
+无意义的比例指示 (scaling indicators).
+.
+.TP
+.BR space "\t65536"
+在一个请求或宏与其参数之间缺少空格。
+.
+当遇到一个两个字符以上的未定义名字，并且名字的前两个字符是一个已定义的名称时将给出这个警告，
+.
+请求或宏不会执行。
+.
+当给出这个警告时，不会自动定义宏。
+.
+此警告是默认允许的。
+.
+在兼容模式下不会发生这种警告
+.
+.TP
+.BR syntax "\t128"
+数值表达式中语法有歧义
+.
+.TP
+.BR tab "\t2048"
+不合适地使用了 tab 字符。
+在应当使用数字的地方使用了tab字符，或者在一个未用双引号引用的宏参数中使用tab 时会发生
+.
+.P
+也有可以引用一组警告的名称
+.
+.TP
+.B all
+所有的警告，除了
+.BR di ,
+.BR mac ,
+和
+.BR reg .
+它的目的是指代所有在传统的宏包中有用的警告
+.
+.TP
+.B w
+所有警告
+.
+.
+.\" --------------------------------------------------------------------
+.SH "环境 ENVIRONMENT"
+.\" --------------------------------------------------------------------
+.
+.TP
+.SM
+.B GROFF_TMAC_PATH
+一个以冒号分隔的目录的列表，从中搜索宏文件
+.B troff
+将先搜索
+.B \-M
+选项给出的目录，以及标准的路径 ( 当前目录
+(如果是不安全模式)，个人目录
+.BR /usr/lib/groff/site-tmac ,
+.BR /usr/share/groff/site-tmac ,
+.BR /usr/share/groff/1.18.1/tmac )
+最后搜索它
+.
+.TP
+.SM
+.B GROFF_TYPESETTER
+默认设备
+.
+.TP
+.SM
+.B GROFF_FONT_PATH
+一个以冒号分隔的目录的列表，从中搜索
+.BI dev name
+目录。
+.B troff
+将先搜索
+.B \-F
+选项给出的目录，以及标准的路径
+.RB ( /usr/share/groff/site-font ,
+.BR /usr/share/groff/1.18.1/font ,
+.BR /usr/lib/font )
+最后搜索它
+.
+.
+.\" --------------------------------------------------------------------
+.SH "文件 FILES"
+.\" --------------------------------------------------------------------
+.
+.Tp \w'/usr/share/groff/1.18.1/font/devname/DESC'u+3n
+.B /usr/share/groff/1.18.1/tmac/troffrc
+初始化文件 (在任何其他宏包之前调用).
+.
+.TP
+.B /usr/share/groff/1.18.1/tmac/troffrc-end
+初始化文件 (在任何其他宏包之后调用).
+.
+.TP
+.BI /usr/share/groff/1.18.1/tmac/ name .tmac
+.TQ
+.BI /usr/share/groff/1.18.1/tmac/tmac. name
+宏文件
+.
+.TP
+.BI /usr/share/groff/1.18.1/font/dev name /DESC
+设备
+.IR name 
+的设备描述文件.
+.
+.TP
+.BI /usr/share/groff/1.18.1/font/dev name / F
+设备
+.IR name 
+的字体
+.I F
+的字体文件
+.P
+注意默认情况下既不在当前目录也不在个人目录搜索
+.B troffrc
+和
+.B troffrc-end
+，因为安全的原因 (即使给出了
+.B \-U
+选项)。
+.
+如果有必要，使用
+.B \-M
+命令行选项或者
+.B GROFF_TMAC_PATH
+环境变量来将这些路径添加到搜索路径中
+.
+.
+.\" --------------------------------------------------------------------
+.SH "作者 AUTHOR"
+.\" --------------------------------------------------------------------
+.
+Copyright (C) 1989, 2001, 2002 Free Software Foundation, Inc.
+.
+.P
+此文档按照 FDL (GNU Free Documentation License) 1.1 或更新版本的要求发布。
+.
+You should have received a copy of the FDL on your system, it is also
+available on-line at the
+.URL http://www.gnu.org/copyleft/fdl.html "GNU copyleft site" .
+This document was written by James Clark, with modifications from
+.MTO wl@gnu.org "Werner Lemberg"
+和
+.MTO bwarken@mayn.de "Bernd Warken"
+.
+.P
+此文档是
+.IR groff 
+GNU roff 套件的一部分
+.
+.
+.\" --------------------------------------------------------------------
+.SH "参见 SEE ALSO"
+.\" --------------------------------------------------------------------
+.
+.TP
+.BR groff (1)
+.I groff
+系统的主程序，
+.IR troff 
+的包装.
+.
+.TP
+.BR groff (7)
+.I groff
+语言的描述，包括一个虽然短但是完整的手册，内容是所有预定义的
+请求 (request)，寄存器 (register) 和
+.IR groff 
+正文的转义 (escapes of plain groff).
+可以在命令行查看，使用命令
+.RS
+.IP
+.B man 7 groff
+.RE
+.
+.TP
+.BR \%groff_diff (7)
+.I groff
+语言和传统的
+.I classical troff
+语言不同之处。
+.
+当前，这是
+.I groff
+系统最为现实 (actual) 的一篇文档
+.
+.TP
+.BR roff (7)
+对
+.I groff
+和其他
+.I roff
+系统的概述，包括更多相关文档的链接
+.
+.P
+.I groff info
+.IR file ,
+参见 (cf.\&) 
+.BR info (1),
+将所有 groff 文档整合到了单独的一篇文档中
+.
+.
+.\" --------------------------------------------------------------------
+.\" Emacs variables
+.\" --------------------------------------------------------------------
+.
+.\" Local Variables:
+.\" mode: nroff
+.\" End:
+
+.SH "[中文版维护人]"
+.B bbbush <bbbush@163.com>
+.SH "[中文版最新更新]"
+.B 2003.11.25
+.SH "《中国linux论坛man手册翻译计划》:"
+.BI http://cmpp.linuxforum.net 

@@ -1,0 +1,102 @@
+.TH SHOWKEY 1 "09 Oct 1997" "Console tools" "Linux User's Manual"
+
+.SH NAME
+showkey \- 检查来自键盘的扫描码和键盘码
+
+.SH "总览 (SYNOPSIS)"
+.BI "showkey [ -[" hVskm "] | " --help " | " --version " | " --scancodes
+.BI "| " --keycodes " | " --keymap " ] [ " -t " N | " --timeout= "N ]"
+.IX "showkey command" "" "\fLshowkey\fR command"  
+
+.SH "描述 (DESCRIPTION)"
+.PP
+按下/松开 任一个 键 时, 
+.B showkey
+在 标准输出 显示 对应的 扫描码(scan code), 键盘码(keycode), 或者 字符值. 
+如果 连续 10 秒钟 没发生 按下/松开 按键 事件 (该值 可用
+.I --timeout
+或 
+.I -t
+设置), 本程序 自动 结束. 来自 其他进程 的 某些 信号 也可以 结束 程序,
+例如 SIGTERM.
+
+.B showkey
+有 三种 操作模式, 显示 扫描码, 键盘码, 以及 测试 键盘映射(keymap),
+可以 通过 命令行选项 选择 操作模式.
+
+.SH "命令 (COMMAND)"
+.TP
+.I \-h, \-\-help
+.B showkey
+在 标准错误 上 显示 版本号, 简短 的 用法, 然后 结束.
+
+.TP
+.I \-V, \-\-version
+.B showkey
+在 标准错误 上 显示 版本号, 然后 结束.
+
+.TP
+.I \-s, \-\-scancodes
+显示 扫描码.
+
+在 这个模式 下,
+.B showkey
+以 十六进制数 形式 显示 来自 键盘 的 每个 字节. 如果 两个 字节 间隔
+达到 0.1 秒, 或者 接收缓冲 已满, showkey 就 输出 一个 换行符.
+可以 用它 大致 确定 某个键 按下 时, 键盘 输出 什么 字节序列.
+扫描码模式 主要 用来 调试 键盘驱动程序, 或者 其他 类似的 低层 接口.
+终端用户 对它 不太有 兴趣.
+
+.TP
+.I \-k, \-\-keycodes
+显示 键盘码. 这是 缺省模式.
+
+在 这个模式 下,
+.B showkey
+显示 每个键 按下 或 松开 时 对应的 键盘码.
+键盘码 是 内核 分配给 每个 物理 按键 的 数值. 无论 键盘 输出 单个 还是
+多个 扫描码, 每个 按键 只能 对应 一个 键盘码. 使用 这个模式, 当 用户 制作
+自己的 键盘映射文件 时,
+.B showkey
+能够 查出 所需的 数值.
+
+.TP
+.I \-m, \-\-keymap
+显示 键盘映射.
+
+在 这个模式 下,
+.B showkey
+显示 内核 根据 当前 键盘映射表 翻译 出来 的 字符.
+它 可能 对 安装程序 的 作者 有用, 允许 用户 在 确认 安装 前 测试 新的 键盘.
+
+.SH "选项 (OPTION)"
+.TP
+.I \-t N,  \-\-timeout=N
+这个选项 用于 修改 超时值 (单位为秒), 取代 预设的 10 秒.
+
+.SH "作者 (AUTHOR)"
+.B Showkey
+是 Risto Kankkunen 为 kbd-0.81 开发的.
+.PP
+后来 Yann Dirson <dirson@debian.org> 做了 扩展, 使它 能够 支持
+.I --keymap
+命令 和
+.I --timeout
+选项.
+
+.SH BUGS
+.I --keymap
+模式 应该 报告 动作键 (action key) 能够 执行 什么 动作, 而不是
+执行 这些 动作.
+
+.SH "另见 (SEE ALSO)"
+.BR loadkeys (1),
+.BR dumpkeys (1),
+.BR keymaps (5).
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

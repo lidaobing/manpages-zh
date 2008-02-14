@@ -1,0 +1,104 @@
+.\" 版权所有 Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" 中文版版权所有 riser,BitBIRD www.linuxforum.net 2000
+.\" 本文档可在遵照LDP GENERAL PUBLIC LICENSE，Version 1, September 1998
+.\" 中描述的条件下进行复制,且该文件发布时必须包含该文档．
+.\"
+.TH CHOWN 1 "1998年11月" "GNU fileutils 4.0"
+.SH NAME
+chown \- 修改文件所有者和组别
+.SH 总览
+.BI "chown [" options "] " user " [:" group "] " file...
+.sp
+POSIX 选项：
+.B [\-R]
+.sp
+GNU 选项(最短格式):
+.B "[\-cfhvR] [\-\-dereference]"
+.BI [\-\-reference= rfile ]
+.B "[\-\-help] [\-\-version] [\-\-]"
+.SH 描述
+.B chown
+修改每个由第一个非选项参数声明的给定
+.I file(文件)
+的用户和/或组的所有权.如下:
+如果只给出了用户名(或者数字用户标识),那么该用户即成为每个指定
+文件的所有者,而该文件的组别并不改变.如果用户名后面紧跟着冒号和
+组名(或者是数字组标识),并且它们之间没有空格,那么文件的组所有权
+也随之改变.
+.SH "GNU细节"
+GNU版本允许使用一个点来替代冒号(学BSD的).[因为点是有效的用户
+名中的字符,所以这不被POSIX所接纳.]如果有一个冒号或者点,却没有
+组名跟在用户名后,那么该用户即成为文件的所有者,而且文件的组改为
+该用户的登录组.如果给定了冒号或者点,以及组,但是省略了用户名,那
+么只有文件的组被修改;在这种情况下,
+.B chown
+执行的是与
+.BR chgrp 
+相同的功能.
+.SH "POSIX选项"
+.TP
+.B "\-R"
+递归地修改目录及其下面内容的所有权.
+.SH "GNU选项"
+.TP
+.B "\-c, \-\-changes"
+详尽地描述每个
+.I file
+实际改变了哪些所有权.
+.TP
+.B "\-f, \-\-silent, \-\-quiet"
+不打印文件所有权不能修改的报错信息.
+.TP
+.B "\-h, \-\-no\-dereference"
+只作用于其本身的符号链接,而不修改它们所指向的文件.
+这只在提供了
+.B lchown
+系统调用的情况下才可用.
+.TP
+.B "\-v, \-\-verbose"
+详尽地描述对每个
+.IR file
+所执行的操作(或者无操作).
+.TP
+.B "\-R, \-\-recursive"
+递归地修改目录及其下面内容的所有权.
+.TP
+.B \-\-dereference
+修改符号链接目标端的所有权,而非符号链接自身.
+(file\%utils 4.0中实现的新功能.)
+.TP
+.BI "\-\-reference=" "rfile"
+(file\%utils 4.0中实现的新功能.)
+修改
+.I file
+的所有权为
+.IR rfile
+的所有权.
+.SH "GNU标准选项"
+.TP
+.B "\-\-help"
+在标准输出上打印一条用法信息,并以成功状态退出.
+.TP
+.B "\-\-version"
+在标准输出上打印版本信息,然后以成功状态退出.
+.TP
+.B "\-\-"
+终止选项列表.
+.SH 环境变量
+变量LANG, LC_ALL, LC_CTYPE和LC_MESSAGES取其常用义.
+.SH "遵循"
+POSIX 1003.2不允许使用点作为用户名和组名的分隔符.
+.SH 备注
+本页描述了包括在fileutils-4.0包中的
+.B chown;
+其它版本会有细微差别.
+请将您的修正和增补建议发到aeb@cwi.nl.
+程序中的bugs请报告到
+fileutils-bugs@gnu.ai.mit.edu.
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

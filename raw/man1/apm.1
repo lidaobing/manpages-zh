@@ -1,0 +1,86 @@
+.\" apm.1 -- 
+.\" Created: Wed Jan 10 14:54:03 1996 by r.faith@ieee.org
+.\" Revised: Sun Apr 21 16:37:43 1996 by r.faith@ieee.org
+.\" Copyright 1996 Rickard E. Faith (r.faith@ieee.org)
+.\" 
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\" 
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" 
+.TH APM 1 "10 Jan 1996" "" "Linux Programmer's Manual"
+.SH NAME
+apm \- query Advanced Power Management (APM) BIOS
+.SH SYNOPSIS
+.B apm [ \-vVmsS ]
+.SH DESCRIPTION
+.B apm
+reads
+.I /proc/apm
+and presents the output in a human-readable format.  Since primarily
+battery status information is provided, this command is most useful on
+laptops with a compliant APM BIOS.
+.B apm
+also allows the machine to be put into standby or suspend mode.
+.SH OPTIONS
+.TP
+.B \-V, \-\-version
+Print the
+.B apm
+program version and exit immediately.
+.TP
+.B \-v, \-\-verbose
+Print information about the APM BIOS version and Linux APM driver version.
+.TP
+.B \-m, \-\-minutes
+Print total minutes remaining instead of using an hh:mm format.
+.TP
+.B \-s, \-\-suspend
+Put the machine into suspend mode if possible.
+.TP
+.B \-S, \-\-standby
+Put the machine into standby mode if possible.
+.TP
+.B \-i, \-\-ignore
+Tell the system to ignore system-generated APM suspend and standby events
+when on AC power.  This may be useful to users who have laptops and want
+APM events when on battery power, but not when on AC power.
+.TP
+.B \-n, \-\-noignore
+Tell the system 
+.B not 
+to ignore system-generated APM suspend and standby events
+when on AC power.  This is the default mode; this option is provided as a
+way to undo a prior "apm -i" call.
+.TP
+.SH BUGS
+This program requires a post-1.3.57 kernel.  This program will not work
+with older kernels or with the APM patches, since the format for
+.I /proc/apm
+has changed radically.
+.SH FILES
+.I /proc/apm
+.br
+.I linux/drivers/char/apm_bios.c
+.SH AUTHOR
+This program was written by Rik Faith (faith@cs.unc.edu) and may be freely
+distributed under the terms of the GNU General Public License.  There is
+ABSOLUTELY NO WARRANTY for this program.  The current maintainer is Avery
+Pennarun (apenwarr@worldvisions.ca).
+.SH "SEE ALSO"
+.BR xapm "(1), "apmd (8)

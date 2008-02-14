@@ -1,0 +1,86 @@
+.\" Copyright (c) 1996 Free Software Foundation, Inc.
+.\" This program is distributed according to the Gnu General Public License.
+.\" See the file COPYING in the kernel source directory
+.\"
+.TH MODINFO 8 "March 19, 2002" Linux "Linux Module Support"
+.SH NAME
+modinfo \- display information about a kernel module
+.SH SYNOPSIS
+.B modinfo
+[ options ] <module_file>
+.SH DESCRIPTION
+The
+.B modinfo
+utility examines the object file
+.I module_file
+associated with a kernel module and displays any information that it
+can glean.
+.SS OPTIONS
+.TP
+.BR \-a ", " \-\-author
+Display the module's author.
+.TP
+.BR \-d ", " \-\-description
+Display the module's description.
+.TP
+.BI \-f format_string ", \-\-format " format_string
+Let the user specify an arbitrary format string which can extract
+values from the ELF section in
+.I module_file
+which contains the module information.
+Replacements consist of a percent sign followed by a tag name in curly
+braces.
+A tagname of
+.I %{filename}
+is always supported, even if the module has no modinfo section.
+.I %{kernel_version}
+shows the version of the kernel the module was compiled for.
+.I %{using_checksums}
+expands to 1 is the module has versioned symbols and to 0 or <none>
+otherwise.
+
+A tagname of
+.I %{parm}
+is special: the format string line is repeated for each known module
+parameter (which may be zero times) and
+.I %{parm}
+is then replaced by descriptions of module parameters (one parameter
+on each repeated line).
+
+Alternatively,
+.I %a\fR,
+.I %d\fR,
+.I %l\fR,
+.I %n
+and
+.I %p
+can be used instead of
+.I %{author}\fR,
+.I %{description}\fR,
+.I %{filename}\fR,
+.I %{license}
+and
+.I %{parm}\fR,
+respectively.
+.TP
+.BR \-h ", " \-\-help
+Display a summary of options and immediately exit.
+.TP
+.BR \-l ", " \-\-license
+Display the module's license.
+.TP
+.BR \-n ", " \-\-filename
+Display the module's filename.
+.TP
+.BR \-p ", " \-\-parameters
+Display the typed parameters that a module may support.
+.TP
+.BR \-V ", " \-\-version
+Display the version of
+.BR modinfo .
+.PP
+If no options are supplied, the default is filename, description,
+author, license and parameters.
+.SH "SEE ALSO"
+.BR insmod "(8), " modprobe "(8), " depmod "(8), " rmmod "(8), "
+.BR lsmod "(8), " ksyms "(8), " modules "(2) "

@@ -1,0 +1,370 @@
+.TH MAKEDEV 8 "26 June 2001" Linux "Linux Programmer's Manual"
+.SH NAME
+MAKEDEV \- create devices
+.SH SYNOPSIS
+.B "cd dev; ./MAKEDEV -V"
+.br
+.B "cd dev; ./MAKEDEV [ -d directory ] [ -c configdir ] [ -m maxdevices ] [-n] [-v] [-i] [-M] [-S]" " device ..."
+.SH DESCRIPTION
+.B MAKEDEV
+is a program that will create the devices in \fC/dev\fR used to interface
+with drivers in the kernel.
+.PP
+Note that programs giving the error ``ENOENT: No such file or
+directory'' normally means that the device file is missing, whereas
+``ENODEV: No such device'' normally means the kernel does not have the
+driver configured or loaded.
+.SH OPTIONS
+.TP
+.B \-V
+Print out version and exit.
+.TP
+.B \-n
+Do not actually update the devices, just print the actions that would be
+performed.
+.TP
+.B \-M
+Create symlinks, directories, and sockets belonging to the current user,
+and print out the list of devices which would be created in a format
+which is understood by RPM.
+.TP
+.B \-S
+Do not actually update the devices, just print the actions that would be
+performed in a format which can be fed to a shell.
+.TP
+.B \-d directory
+Create the devices under \fBdirectory\fR instead of the default (usually
+\fB/dev\fR).
+.TP
+.B \-v
+Be verbose.  Print out the actions as they are performed.  This is the
+same output as produced by the \fB-n\fR option.
+.TP
+.B \-i
+Ignore errors parsing configuration files.
+.BR
+.SH CUSTOMIZATION
+Since there is currently no standardization in what names are used for
+system users and groups, it is possible that you may need to modify
+\fBMAKEDEV\fR's configuration files to reflect your site's settings.
+.SH DEVICES
+.TP
+Certain devices are required for minimal functionality.  These are:
+.B mem
+\- access to physical memory;
+.B kmem
+\- access to kernel virtual memory;
+.B null
+\- null device (infinite sink);
+.B port
+\- access to I/O ports;
+.B zero
+\- null byte source (infinite source);
+.B core
+\- symlink to \fB/proc/kcore\fR (for kernel debugging);
+.B full
+\- always returns ENOSPACE on write;
+.B ram
+\- ramdisk;
+.B tty
+\- to access the controlling tty of a process.
+.TP 
+.B Virtual Terminals
+.TP
+.I console
+This creates the devices associated with the console.  These are the virtual
+terminals \fBtty\fIx\fR, where \fIx\fR can be from 0 though 63.  The device
+\fItty0\fR is the currently active VT, and is also known as \fCconsole\fR.
+For each VT, there are two devices: \fBvcs\fIx\fR and \fBvcsa\fIx\fR,
+which can be used to generate screen-dumps of the VT (\fBvcs\fIx\fR is just the
+text, and \fBvcsa\fIx\fR includes the attributes).
+.TP
+.B Serial Devices
+.TP
+.I ttyS{0..63}
+Serial ports.
+.TP
+.B Pseudo Terminals
+.TP
+.I pty[p-s]
+Each possible argument will create a bank of 16 master and slave
+pairs.  The current kernel (1.2) is limited to 64 such pairs.
+The master pseudo-terminals are 
+.BR pty[p-s][0-9a-f] ,
+and the slaves are
+.BR tty[p-s][0-9a-f] .
+.TP
+.B Parallel Ports
+.TP
+.I lp
+Standard parallel ports.  The devices are created 
+.BR lp0 , 
+.BR lp1 ,
+and 
+.BR lp2 .
+.TP
+.B Bus Mice
+.TP
+.I busmice
+The various bus mice devices.  This creates the following devices:
+.B logimouse
+(Logitech bus mouse),
+.B psmouse
+(PS/2-style mouse),
+.B msmouse
+(Microsoft Inport bus mouse) and
+.B atimouse
+(ATI XL bus mouse) and
+.B jmouse
+(J-mouse).
+.TP
+.B Joystick Devices
+.TP
+.I js
+Joystick.  Creates 
+.B js0
+and 
+.BR js1 .
+.TP
+.B Disk Devices
+.TP
+.I fd[0-7]
+Floppy disk devices.  The device
+.BI fd x
+is the device which autodetects the format, and the additional devices are
+fixed format (whose size is indicated in the name).
+The other devices are named as
+.BI fd xLn .
+The single letter
+.I L
+identifies the type of floppy disk (d = 5.25" DD, h = 5.25" HD, D = 3.5"
+DD, H = 3.5" HD, E = 3.5" ED).  The number
+.I n
+represents the capacity of that format in K.  Thus the standard formats
+are
+.BI fd x d360 ,
+.BI fd x h1200 ,
+.BI fd x D720 ,
+.BI fd x H1440 ,
+and
+.RI fd x E2880 .
+.IP
+For more information see Alain Knaff's fdutils package.
+.IP
+Devices
+.BI fd0 *
+through
+.BI fd3 *
+are floppy disks on the first controller, and devices
+.BI fd4 *
+through
+.BI fd7 *
+are floppy disks on the second controller.
+.TP
+.I hd[a-d]
+AT hard disks.  The device
+.BI hd x
+provides access to the whole disk, with the partitions being
+.BI hd x [0-20].
+The four primary partitions are
+.BI hd x 1
+through
+.BI hd x 4,
+with the logical partitions being numbered from
+.BI hd x 5
+though
+.BI hd x 20.
+(A primary partition can be made into an extended partition, which can hold
+4 logical partitions).
+By default, only the devices for 4 logical partitions are made.  The
+others can be made by uncommenting them.
+.IP
+Drives hda and hdb are the two on the first controller.  If using the new
+IDE driver (rather than the old HD driver), then hdc and hdd are the two
+drives on the secondary controller.  These devices can also be used to
+acess IDE CDROMs if using the new IDE driver.
+.TP
+.I xd[a-d] 
+XT hard disks.  Partitions are the same as IDE disks.
+.TP
+.I sd[a-z], sd[a-c][a-z], sdd[a-x]
+SCSI hard disks.  The partitions are similar to the IDE disks, but there
+is a limit of 11 logical partitions
+.RI (sd x 5
+through
+.RI sd x 15).
+This is to allow there to be 128 SCSI disks.
+.TP
+.I loop
+Loopback disk devices.  These allow you to use a regular file as a
+block device.  This means that images of filesystems can be mounted,
+and used as normal.  This creates 16 devices loop0 through loop15.
+.TP
+.B Tape Devices
+.TP
+.I st[0-7]
+SCSI tapes.  This creates the rewinding tape device
+.BI st x
+and the non-rewinding tape device
+.BI nst x .
+.TP
+.I qic
+QIC-80 tapes.  The devices created are
+.BR rmt8 ,
+.BR rmt16 ,
+.BR tape-d ,
+and
+.BR tape-reset .
+.TP
+.I ftape
+Floppy driver tapes (QIC-117).  There are 4 methods of access depending on
+the floppy tape drive.  For each of access methods 0, 1, 2 and 3, the
+devices
+.BI rft x
+(rewinding) and
+.BI nrft x
+(non-rewinding) are created.  For compatability, devices
+.B ftape
+and
+.B nftape
+are symlinks to
+.B rft0
+and
+.B nrft0
+respectively.
+.TP
+.B CDROM Devices
+.TP
+.I scd[0-7]
+SCSI CD players.
+.TP
+.I sonycd
+Sony CDU-31A CD player.
+.TP
+.I mcd
+Mitsumi CD player.
+.TP
+.I cdu535
+Sony CDU-535 CD player.
+.TP
+.I lmscd
+LMS/Philips CD player.
+.TP
+.I sbpcd{,1,2,3}
+Sound Blaster CD player.  The kernel is capable of supporting 16 CDROMs,
+each of which is accessed as
+.BR sbpcd[0-9a-f] .
+These are assigned in groups of 4 to each controller.
+.B sbpcd
+is a symlink to
+.BR sbpcd0 .
+.\" .TP
+.\" .I idecd
+.\" NEC CDR-260 (note: this will probably be obsoleted by the new IDE driver).
+.TP
+.B Scanner
+.TP
+.I logiscan
+Logitech ScanMan32 & ScanMan 256.
+.TP
+.I m105scan
+Mustek M105 Handscanner.
+.TP
+.I ac4096
+A4Tek Color Handscanner.
+.TP
+.B Audio
+.TP
+.I sound
+This creates the audio devices used by the sound driver.  These include
+.BR mixer ,
+.BR sequencer ,
+.BR dsp ,
+and
+.BR audio .
+.TP
+.B Miscellaneous
+.TP
+.I sg
+Generic SCSI devices.  The devices created are 
+.B sga
+through
+.B sgh
+and
+.B sg0
+through 
+.BR sg7 .
+These allow arbitary commands to be sent to any SCSI device.  This allows for
+querying information about the device, or controlling SCSI devices that
+are not one of disk, tape or CDROM (e.g. scanner, CD-R, CD-RW).
+.TP
+.I fd
+To allow an arbitary program to be fed input from file descriptor
+.IR x ,
+use
+.BI /dev/fd/ x
+as the file name.  This also creates 
+.BR /dev/stdin ,
+.BR /dev/stdout ,
+and
+.BR /dev/stderr .
+(Note, these are just symlinks into /proc/self/fd).
+.TP
+.I ibcs2
+Devices (and symlinks) needed by the IBCS2 emulation.
+.TP
+.I apm
+Devices for power management.
+.TP
+.B "Network Devices"
+Linux used to have devices in /dev for controlling network devices, but
+that is no longer the case.  To see what network devices are known by the
+kernel, look in /proc/net/dev.
+.TP
+.B "Other Devices"
+Note that the list of devices above is not exhaustive.  MAKEDEV can create
+more devices nodes.  Its aim is to be able to create everything listed in the
+\fBdevices.txt\fR file distributed with Linux 2.4.
+
+.SH CONFIGURATION
+MAKEDEV doesn't actually know anything about devices.  It reads all of the
+information from files stored in \fB/etc/makedev.d\fR.  MAKEDEV will read any
+and all files in the subdirectory, processing lines in them like so:
+.TP
+.B devices
+.B [b|c]
+mode owner group major minor inc count fmt [base]
+.br
+\fIcount\fR devices will be created, with permissions set to \fImode\fR and
+owned by \fIowner\fR and \fIgroup\fR.  The first device will be named \fIfmt\fR,
+and additional devices will be created if \fIcount\fR is larger than 1.
+If \fIfmt\fR contains a C-style formatting string, it will be filled with the
+sum of \fIbase\fR and zero.  Subsequent devices will be filled with the sum of
+\fIbase\fR and \fIn\fR * \fIinc\fR, where \fIn\fR is the order this device is
+being created in.  If the format string did not already include a format
+specifier, a "%d" will automatically be appended to it to make this work.
+.TP
+.B symbolic links
+.B l
+linkname target
+.br
+A symbolic link pointing to \fItarget\fR named \fIlinkname\fR will be created.
+.TP
+.B aliases
+.B a
+alias value
+.br
+Any commands that create devices for \fIalias\fR will also include devices that
+would be crated for \fIvalue\fR.
+
+.SH "SEE ALSO"
+Linux Allocated Devices, maintained by H.\ Peter Anvin,
+<Peter.Anvin@linux.org>.
+.SH BUGS
+Let's hope not.  If we're lucky, any problems we'll find will be confined to
+the configuration files, which were written by examining the devices.txt file.
+.SH AUTHOR
+Nalin Dahyabhai, based largely on work done by
+Nick Holloway
+and
+Michael K. Johnson.

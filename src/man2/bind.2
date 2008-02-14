@@ -1,0 +1,210 @@
+.\" Hey Emacs! This file is -*- nroff -*- source.
+.\"
+.\" Copyright 1993 Rickard E. Faith (faith@cs.unc.edu)
+.\" Portions extracted from /usr/include/sys/socket.h, which does not have
+.\" any authorship information in it.  It is probably available under the GPL.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\"
+.\" Other portions are from the 6.9 (Berkeley) 3/10/91 man page:
+.\"
+.\" Copyright (c) 1983 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"     This product includes software developed by the University of
+.\"     California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\" Modified Mon Oct 21 23:05:29 EDT 1996 by Eric S. Raymond <esr@thyrsus.com>
+.\" Modified 1998 by Andi Kleen
+.TH BIND 2 "3 Oct 1998" "Linux 2.2" "Linux Programmer's Manual"
+.SH NAME 名称
+bind \- 将一个名字和一个套接字绑定到一起(赋一个名字给一个套接字)
+.SH SYNOPSIS 概述
+.B #include <sys/types.h>
+.br
+.B #include <sys/socket.h>
+.sp
+.BI "int bind(int " sockfd ", struct sockaddr *" my_addr ", socklen_t " addrlen );
+.SH DESCRIPTION 描述
+.B bind
+为套接字
+.I sockfd
+指定本地地址
+.IR my_addr .
+.I my_addr
+的长度为
+.I addrlen
+(字节).传统的叫法是给一个套接字分配一个名字.
+当使用
+.BR socket (2),
+函数创建一个套接字时,它存在于一个地址空间(地址族),
+但还没有给它分配一个名字
+.PP
+一般来说在使用
+.B SOCK_STREAM
+套接字建立连接之前总要使用
+.B bind
+为其分配一个本地地址.参见
+.BR accept (2)).
+.SH NOTES 注意
+这条规则用于给每个地址族绑定不同的名称.更多细节请参
+考手册页第7册(man7).
+对于
+.B AF_INET
+参见
+.BR ip (7),
+对于
+.B AF_UNIX
+参见
+.BR unix (7),
+对于
+.B AF_APPLETALK
+参见
+.BR ddp (7),
+对于
+.B AF_PACKET
+参见
+.BR packet (7),
+对于r
+.B AF_X25
+参见
+.BR x25 (7)
+对于
+.B AF_NETLINK
+参见
+.BR netlink (7).
+
+.SH "RETURN VALUE" "返回值"
+函数执行成功返回0,否则返回\-1,
+并设置错误代码.
+.SH ERRORS 错误
+.TP
+.B EBADF
+.I sockfd
+不是一个合法套接字描述符.
+.TP
+.B EINVAL
+套接字已经绑定到一个地址.这一条在以后会有所改变:
+具体参见
+.I linux/unix/sock.c
+.TP
+.B EACCES
+地址受保护,用户不是系统管理员.
+.TP
+.B ENOTSOCK
+参数是文件描述符,不是一个套接字.
+.PP
+下列错误适用于UNIX域 
+.RB ( AF_UNIX ) 
+套接字.
+.TP
+.B EINVAL
+地址长度
+.I addrlen
+错误,或者套接字不在
+.B AF_UNIX
+族.
+.TP
+.B EROFS
+套接字节点位于只读文件系统.
+.TP
+.B EFAULT
+.I my_addr
+指向用户无权访问的地址空间.
+.TP
+.B ENAMETOOLONG
+.I my_addr
+长度超范围.
+.TP
+.B ENOENT
+文件不存在.
+.TP
+.B ENOMEM
+内核存储空间不足.
+.TP
+.B ENOTDIR
+指定路径不是一个目录.
+.TP
+.B EACCES
+指定路径拒绝访问.
+.TP
+.B ELOOP
+在解析
+.IR my_addr
+时发现过多符号连接.
+.SH BUGS 勘误
+透明代理选项没有描述.
+.SH CONFORMING TO 一致性
+SVr4,4.4BSD(函数
+.B bind
+首次出现于BSD 4.2)SVr4文档增加了
+.BR EADDRNOTAVAIL , 
+.BR EADDRINUSE , 
+和
+.B ENOSR 
+一般性错误,
+还增加了
+.BR EIO , 
+.B EISDIR 
+和
+.B EROFS 
+Unix域错误.
+.SH NOTE
+函数
+.B bind
+的第三个参数实际上是int类型(BSD 4.*和libc4以及libc5都是这么做的).
+不知为什么有的POSIX系统目前仍在使用socklen_t.
+目前尚无统一标准,不过glibc2两者都使用.参见
+.BR accept (2).
+.SH "SEE ALSO" "参见"
+.BR accept (2),
+.BR connect (2),
+.BR listen (2),
+.BR socket (2),
+.BR getsockname (2),
+.BR ip (7),
+.BR socket (7)

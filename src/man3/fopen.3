@@ -1,0 +1,210 @@
+.\" Copyright (c) 1990, 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" This code is derived from software contributed to Berkeley by
+.\" Chris Torek and the American National Standards Committee X3,
+.\" on Information Processing Systems.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)fopen.3	6.8 (Berkeley) 6/29/91
+.\"
+.\" Converted for Linux, Mon Nov 29 15:22:01 1993, faith@cs.unc.edu
+.\" Modified, aeb, 960421, 970806
+.\" Modified, joey, aeb, 2002-01-03
+.\"
+.TH FOPEN 3  2002-01-03 "BSD MANPAGE" "Linux Programmer's Manual"
+.SH NAME
+fopen, fdopen, freopen \- 打开流
+.SH "SYNOPSIS 总览"
+.B #include <stdio.h>
+.sp
+.BI "FILE *fopen(const char *" path ", const char *" mode );
+.br
+.BI "FILE *fdopen(int " fildes ", const char *" mode );
+.br
+.BI "FILE *freopen(const char *" path ", const char *" mode ", FILE *" stream );
+.SH "DESCRIPTION 描述"
+函数
+.B fopen
+打开文件名为
+.I path
+指向的字符串的文件，将一个流与它关联。
+.PP
+参数
+.I mode
+指向一个字符串，以下列序列之一开始
+(序列之后可以有附加的字符):
+.TP
+.B r
+打开文本文件，用于读。流被定位于文件的开始。
+.TP
+.B r+
+打开文本文件，用于读写。流被定位于文件的开始。
+.TP
+.B w
+将文件长度截断为零，或者创建文本文件，用于写。流被定位于文件的开始。
+.TP
+.B w+
+打开文件，用于读写。如果文件不存在就创建它，否则将截断它。流被定位于文件的开始。
+.TP
+.B a
+打开文件，用于追加 (在文件尾写)。如果文件不存在就创建它。流被定位于文件的末尾。
+.TP
+.B a+
+打开文件，用于追加 (在文件尾写)。如果文件不存在就创建它。读文件的初始位置是文件的开始，但是输出总是被追加到文件的末尾。
+
+.PP
+字符串
+.I mode
+也可以包含字母 ``b'' 作为最后一个字符，或者插入到上面提到的任何双字符的字符串的两个字符中间。这样只是为了和 ANSI X3.159-1989 (``ANSI C'') 标准严格保持兼容，没有实际的效果；在所有的遵循 POSIX 的系统中，``b'' 都被忽略，包括 Linux。(其他系统可能将文本文件和二进制文件区别对待，如果在进行二进制文件的 I/O，那么添加 ``b'' 是个好主意，因为你的程序可能会被移植到非 Unix 环境中。)
+.PP
+任何新建的文件将具有模式
+.BR S_IRUSR \&| S_IWUSR \&|  S_IRGRP \&|  S_IWGRP \&| S_IROTH \&| S_IWOTH
+(0666)，然后以进程的掩码值 umask 加以修改 (参见
+.BR umask (2))
+。
+.PP
+在读/写流上进行的读和写操作可以以任意的顺序混合使用。注意 ANSI C 要求文件定位函数只能插入在输出和输入之间，除非输入操作遇到了文件结束符。(如果没有遇到这种情况，那么读取总是能返回除了最近写入内容之外的结果。) 因此，最好 (在 Linux 中有时是必须的) 在对这样的流进行的写和读操作之间加入一个
+.B fseek
+或是
+.B fgetpos
+操作。这个操作可以是对显式的定位的调用 (例如在 \fIfseek(..., 0L, SEEK_CUR)\fR 中那样)，利用同时发生的副作用。(?)
+.PP
+以追加方式打开文件 (以 \fBa\fP 作为
+.IR mode
+的第一个字符) 将使得所有后续的对这个流的写操作发生在文件末尾，就好像在写之前调用了
+.RS
+fseek(stream,0,SEEK_END);
+.RE
+一样。
+.PP
+函数
+.B fdopen
+将一个流关联到已存在的文件描述符，
+.IR fildes .
+流的模式
+.I mode
+(取值为 "r", "r+", "w", "w+", "a", "a+" 之一) 必须与文件描述符的模式想匹配。新的流的定位标识被设置为
+.IR fildes
+原有的值，错误和文件结束标记被清除。模式 "w" 或者 "w+" 不会截断文件。文件描述符不会被复制，在关闭由
+.B fdopen
+创建的流时，也不会被关闭。对共享内存对象实施
+.B fdopen
+的结果是未定义的。
+.PP
+函数
+.B freopen
+打开名称为
+.I path
+指向的字符串的文件，将它与
+.I stream
+指向的流关联。初始的流 (如果存在的话) 被关闭。参数
+.I mode
+与在函数
+.B fopen
+中用法一致。函数
+.B freopen
+主要的用处是改变与标准文本流
+.IR "" ( stderr ", " stdin ", 或 " stdout )
+相关联的文件
+.SH "RETURN VALUE 返回值"
+如果成功执行了
+.BR fopen ,
+.B fdopen
+和
+.B freopen
+将返回一个指向文件对象
+.B FILE
+的指针。否则，将返回
+.B NULL
+并将设置全局变量
+.I errno
+的值来指示错误发生。
+.SH ERRORS
+.TP
+.B EINVAL
+为
+.BR fopen ,
+.BR fdopen ,
+或
+.B freopen
+提供的参数
+.I mode
+非法。
+.PP
+函数
+.BR fopen ,
+.B fdopen
+和
+.B freopen
+也有可能失败并置
+.I errno
+为
+.BR malloc (3)
+指定的值。
+.PP
+函数
+.B fopen
+也有可能失败并置
+.I errno
+为
+.BR open (2)
+指定的值。
+.PP
+函数
+.B fdopen
+也有可能失败并置
+.I errno
+为
+.BR fcntl (2)
+指定的值。
+.PP
+函数
+.B freopen
+也有可能失败并置
+.I errno
+为
+.BR open (2),
+.BR fclose (3)
+和
+.BR fflush (3)
+指定的值。
+.SH "CONFORMING TO 标准参考"
+函数
+.B fopen
+和
+.B freopen
+遵循 ANSI X3.159-1989 (``ANSI C'') 标准。函数
+.B fdopen
+遵循 IEEE Std1003.1-1988 (``POSIX.1'') 标准。
+.SH "SEE ALSO 参见"
+.BR open (2),
+.BR fclose (3),
+.BR fileno (3)

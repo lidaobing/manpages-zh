@@ -1,0 +1,62 @@
+.TH SPLIT "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+split \- 分割文件
+.SH "总览 (SYNOPSIS)"
+.B ../src/split
+[\fIOPTION\fR] [\fIINPUT \fR[\fIPREFIX\fR]]
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+把 输入文件 INPUT 按 固定大小 的 文件片 PREFIXaa, PREFIXab, ... 输出; 
+缺省的 PREFIX 是 `x'. 如果 没有 指定 INPUT, 或 INPUT 是 -, 就从 标准输入
+读取 数据.
+.TP
+\fB\-b\fR, \fB\-\-bytes\fR=\fISIZE\fR
+输出文件 大小 定为 SIZE 字节
+.TP
+\fB\-C\fR, \fB\-\-line\-bytes\fR=\fISIZE\fR
+输出文件 大小 定为 最多 SIZE 字节 的 行
+.TP
+\fB\-l\fR, \fB\-\-lines\fR=\fINUMBER\fR
+输出文件 大小 定为 NUMBER 行
+.TP
+\fB\-NUMBER\fR
+同 \fB\-l\fR NUMBER
+.TP
+\fB\-\-verbose\fR
+在 打开 每一个 输出文件 之前, 把 诊断信息 送往 标准错误
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+指定 SIZE 时 可以 使用 倍乘后缀: b 是 512, k 是 1K, m 是 1 Meg.
+.SH "作者 (AUTHOR)"
+Torbjorn Granlund 和 Richard M. Stallman.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B split
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B split
+程序, 使用 命令
+.IP
+.B info split
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

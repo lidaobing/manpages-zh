@@ -1,0 +1,183 @@
+.\" (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\"
+.\" 在包括本版权通告和许可声明的前提下,允许一字不捺地生成和发布本篇的拷贝版本.
+.\"
+.\" 在遵照本许可声明的条款完整地发布了原作品的前提下,允许复制和发布本手册的修改版本.
+.\"
+.\" 因为Linux内核和库经常修改,本手册页可能会出现错误或者过时.作者(们)对文中错误或者行文繁冗不
+.\" 承担责任,对因为使用包含在内的信息而造成的损失也不负责.对于许可免费的本手册,作者(们)可能在创
+.\" 作它时考虑层次各有不同,当工作专业化之后,也许能够达到一致.
+.\"
+.\" 将该手册版式化或者加工处理,如果没有包括原本,则必须公认本作品的版权和作者.
+.\"
+.TH LOCALE 7 "1993年4月24日" "Linux" "Linux Programmer's Manual(Linux程序员手册)"
+.SH NAME(名称)
+locale \- 描述多语言支持
+.SH SYNOPSIS(总览)
+.nf
+.B #include <locale.h>
+.fi
+.SH DESCRIPTION(描述)
+locale 就是一系列语言文化规则.
+它包括如下一些方面: 讯息的语言, 不同字符设置, 文字惯例, 等等.
+程序需要能够判断其 locale 并根据适合于不同文化的要求来运行.
+.PP
+头文件 
+.B <locale.h>
+声明了用于该项作业中的数据类型,函数和宏.
+.PP
+它声明的函数有:
+.B setlocale()
+用来设置当前 locale,
+.B localeconv()
+用来获得数字格式方面的信息.
+.PP
+程序可能需要的本地化信息会有不同的种类; 它们都以宏的方式声明
+把它们当做
+.B setlocale()
+的第一个参数来用, 就可以把其中一个设置为需要的 locale:
+.TP
+.B LC_COLLATE
+这用来修改函数
+.B strcoll()
+和
+.BR strxfrm()
+的执行方式, 其中 strxfrm() 函数用来以本地化字母表进行字符串比较.
+例如,
+德国升半音的 s 排序为 "ss".
+.TP
+.B LC_CTYPE
+修改字符处理分类函数如
+.B isupper()
+和
+.BR toupper() 
+的执行方式,
+还修改多字节字符函数如
+.B mblen()
+或者
+.BR wctomb()
+的执行方式.
+.TP
+.B LC_MONETARY
+修改由
+.B localeconv()
+返回的信息, 这些信息描述了数字, 以及诸如
+小数点和千进位逗号之类输出的常见格式的细节. 这些信息由函数
+.BR strfmon()
+在内部调用.
+.TP
+.B LC_MESSAGES
+修改显示的语言信息以及正值和负值的表达方式.
+GNU C-library包含:
+.B rpmatch()
+函数用于方便地使用这些信息.
+.TP
+.B LC_NUMERIC
+在考虑使用 locale 设置时,修改
+.B printf()
+和
+.B scanf()
+函数族使用的信息.该信息也可以由
+.B localeconv()
+函数读取.
+.TP
+.B LC_TIME
+修改
+.B strftime()
+函数的执行方式以显示适于当地格式的当前时间;
+例如,欧洲的绝大部分地区使用的是 24 小时的时钟,
+而美国则是 12 小时的时钟.
+.TP
+.B LC_ALL
+上述所有的.
+.PP
+如果
+.B setlocale()
+的第二个参数为空,
+则设置
+.BR """""" ,
+为默认的locale,它通过以下几步来确定:
+.IP 1.
+如果有非空的环境变量
+.BR LC_ALL ,
+则使用
+.B LC_ALL
+的值.
+.IP 2.
+如果存在一个与上述列出的种类同名的环境变量并且其不为空, 则使用该分类的值.
+.IP 3.
+如果有非空的环境变量
+.BR LANG ,
+则使用
+.B LANG
+的值.
+.PP
+关于本地数字格式的值用于由
+.B localeconv()
+函数返回的
+.B struct lconv ,
+其有以下声明:
+.nf
+struct lconv
+{
+/* 数码(非货币形式)信息. */
+
+char *decimal_point; /* 小数点字符. */
+char *thousands_sep; /* 千数的分隔符. */
+/* 每个元素就是每组的阿拉伯数字;指数越高的元素在越左边.一个值为CHAR_MAX的元素表示不需继续
+分组了.一个值为0的元素表示前面的字符用于所有更左边的组. */
+char *grouping;
+
+/* 货币信息. */
+
+/* 前三个字符是ISO 4217定义的流通符号.
+第四个字符是分隔符. 第五个字符是'\0'. */
+char *int_curr_symbol;
+char *currency_symbol; /* 当地货币符号. */
+char *mon_decimal_point; /* 小数点字符. */
+char *mon_thousands_sep; /* 千数的分隔符. */
+char *mon_grouping; /* 如前述的'分组'元素. */
+char *positive_sign; /* 正值符号. */
+char *negative_sign; /* 负值符号. */
+char int_frac_digits; /* 国际通用的数字. */
+char frac_digits; /* 本地使用的数字. */
+/* 如果currency_symbol后跟着一个正值则为1,如果顺序相反为0. */
+char p_cs_precedes;
+/* 如果在currency_symbol和正值之间是一个空格则为1. */
+char p_sep_by_space;
+/* 如果currency_symbol后跟着一个负值则为1,如果顺序相反为0. */
+char n_cs_precedes;
+/* 如果在currency_symbol和正值之间是一个空格则为1. */
+char n_sep_by_space;
+/* 正值和负值符号位置:
+数量值和currency_symbol在圆括号内则为0.
+符号字符串先于数量值和currency_symbol则为1.
+符号字符串在数量值和currency_symbol之后则为2.
+符号字符串后紧跟数量值和currency_symbol则为3.
+符号字符串紧跟在数量值和currency_symbol之后则为4. */
+char p_sign_posn;
+char n_sign_posn;
+};
+.fi
+.SH "CONFORMS TO(遵循规则)"
+POSIX.1
+.SH "SEE ALSO(另见)"
+.BR setlocale (3),
+.BR localeconv (3),
+.BR locale (1),
+.BR localedef (1),
+.BR rpmatch (3),
+.BR strfmon (3),
+.BR strcoll (3),
+.BR strxfrm (3),
+.BR strftime (3)
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.\" 中文版版权所有 riser,BitBIRD www.linuxforum.net 2000
+.\" 1993年7月24日由Rik Faith (faith@cs.unc.edu)修改
+.\" 1997年6月1日由Jochen Hein(jochen.hein@delphi.central.de)修改
+.SH "[中文版最新更新]"
+.BR 2001/07/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

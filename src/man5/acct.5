@@ -1,0 +1,51 @@
+.\" Copyright (c) 1995 Dirk Eddelbuettel (Dirk.Eddelbuettel@qed.econ.queensu.ca)
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+.\" USA.
+.\"
+.TH ACCT 5 "1995 October 31" "Debian/GNU Linux"
+
+.SH NAME
+acct \- 执行体(execution)会计文件
+
+.SH "总览 (SYNOPSIS)"
+.B #include <sys/acct.h>
+
+.SH "描述 (DESCRIPTION)"
+内核 对 所有的进程 维护了 一个 会计信息结构 .
+当 一个 进程 结束后, 如果 开启了 进程会计, 内核 就 调用
+.BR acct (2)
+函数 生成 该进程 的 会计记录, 然后 添加到 会计文件 (accounting file) 中.
+文件
+.IR /usr/include/linux/acct.h 
+中 有对 会计结构
+.B "struct  acct"
+的 描述.
+
+.SH "另见 (SEE ALSO)"
+.BR acct (2),
+.BR sa (1).
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

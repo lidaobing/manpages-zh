@@ -1,0 +1,193 @@
+.\" Copyright (c) 1988, 1990 The Regents of the University of California.
+.\" Copyright (c) 1988 Mark Nudleman
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"	@(#)more.1	5.15 (Berkeley) 7/29/91
+.\"
+.\" Revised: Fri Dec 25 15:27:27 1992 by root
+.\" 25Dec92: Extensive changes made by Rik Faith (faith@cs.unc.edu) to
+.\" conform with the more 5.19 currently in use by the Linux community.
+.\"
+.Dd July 29, 1991 (Modified December 25, 1992)
+.Dt MORE 1
+.Os "Linux 0.98"
+.Sh NAME
+.Nm more
+.Nd 在显示器上阅读文件的过滤器
+.Sh "总览 (SYNOPSIS)"
+.Nm more
+.Op Fl dlfpcsu
+.Op Fl num
+.Op +/ pattern
+.Op + linenum
+.Op Ar
+.Sh "描述 (DESCRIPTION)"
+.Nm More
+是 一个 过滤器, 用于 分页 显示 (一次一屏) 文本. 这个 版本 非常 基本.
+用户 应该 知道
+.Xr less 1
+提供了
+.Xr more 1
+的 模拟, 并且 做了 增强.
+.Sh "选项 (OPTION)"
+下面 介绍 命令行选项. 选项 可以 从 环境变量
+.Ev MORE
+中获取 (要 确保 它们 以 短横线 开头 (``-'')), 但是 命令行选项 能够 覆盖 它们.
+.Bl -tag -width flag
+.It Fl num
+这个选项指定屏幕的行数 (以整数表示).
+.It Fl d
+让
+.Nm more
+给 用户 显示 提示信息 "[Press space to continue, 'q' to quit.]", 
+当 用户 按下 其他键 时, 显示 "[Press 'h' for instructions.]",
+而不是 扬声器 鸣笛.
+.It Fl l
+.Nm More
+在 通常情况下 把
+.Ic \&^L
+(form feed) 当做 特殊字符, 遇到 这个字符 就会 暂停.
+.Fl l
+选项 可以 阻止 这种特性.
+.It Fl f
+使
+.Nm more
+计数 逻辑行, 而不是 屏幕行 (就是说, 长行 不会 断到 下一行).
+.It Fl p
+不卷屏, 而是 清除 整个屏幕, 然后 显示 文本.
+.It Fl c
+不卷屏, 而是 从 每一屏的 顶部 开始 显示 文本, 每 显示完 一行, 
+就 清除 这一行的 剩余部分.
+.It Fl s
+把 重复的空行 压缩成 一个 空行.
+.It Fl u
+防止下划线.
+.It Ic +/
+在 显示 每个文件 前, 搜索
+.Ic +/
+选项 指定的 文本串.
+.It Ic +num
+从行号
+.Ic num 
+开始显示.
+.Sh "命令 (COMMAND)"
+.Nm more
+的交互命令基于
+.Xr vi  1  .
+有些命令 以 一个 十进制数字 开始, 在 下面的描述 里 称之为 k. 后面的 描述中,
+^X 指 control-X.
+.Pp
+.Bl -tag -width Ic
+.It Ic h No or Ic ?
+帮助: 显示 这些 命令 的 摘要. 你 如果 忘掉 所有 其他的命令, 请记住这个.
+.It Ic SPACE
+显示 接下来的 k 行文本. 缺省值 是 当前的屏幕大小.
+.It Ic z
+显示 接下来的 k 行文本. 缺省值 是 当前的屏幕大小. 参数 成为 新的缺省值.
+.It Ic RETURN
+显示 接下来的 k 行文本. 缺省值 是 1. 参数 成为 新的缺省值.
+.It Ic d No or Ic \&^D
+卷屏 k 行. 缺省值 是 当前的 卷屏大小, 初始化为 11. 参数 成为 新的缺省值.
+.It Xo
+.Ic q
+.No 或
+.Ic Q
+.No 或
+.Ic INTERRUPT
+.Xc
+退出.
+.It Ic s
+向前跳过 k 行文本. 缺省值 是 1.
+.It Ic f
+向前跳过 k 屏文本. 缺省值 是 1.
+.It Ic b No or Ic \&^B
+向后跳回 k 屏文本. 缺省值 是 1.
+.It Ic '
+跳到 上一次 搜索 开始 的 地方.
+.It Ic =
+显示当前行号.
+.It Ic \&/ Ns Ar pattern
+搜索 第 k 个 符合 正则表达式的 文本串. 缺省值 是 1.
+.It Ic n
+搜索 最后 第 k 个 符合 正则表达式的 文本串. 缺省值 是 1.
+.It Ic !<cmd> No or Ic :!<cmd>
+在子 shell 中执行 <cmd>.
+.It Ic v
+启动 /usr/bin/vi, 指向 当前行.
+.It Ic \&^L
+刷新屏幕.
+.It Ic :n
+跳到 后面 第 k 个 文件.  缺省值 是 1.
+.It Ic :p
+跳到 前面 第 k 个 文件.  缺省值 是 1.
+.It Ic :f
+显示 当前文件名 和 行号.
+.It Ic \&.
+重复上次命令.
+.El
+.Sh "环境 (ENVIRONMENT)"
+.Nm More
+利用 下面的 环境变量 (如果 它们 存在):
+.Bl -tag -width Fl
+.It Ev MORE
+这个变量 设置 你 喜欢的
+.Nm more 
+选项.
+.It Ev SHELL
+当前使用的 shell (一般说来 就是 登录 shell).
+.It Ev TERM
+指定 终端类型, more 用它来 获取 操作屏幕 所需的 终端特性.
+.El
+.Sh "另见 (SEE ALSO)"
+.Xr vi 1
+.Xr less 1
+.Sh "作者 (AUTHOR)"
+Eric Shienbrood, UC Berkeley
+.br
+Modified by Geoff Peck, UCB to add underlining, single spacing
+.br
+Modified by John Foderaro, UCB to add -c and MORE environment variable
+.Sh "历史 (HISTORY)"
+.Nm more
+命令 出现在
+.Bx 3.0 .
+本手册页 描述了
+.Nm more
+version 5.19 (Berkeley 6/29/88), 目前 它 用在 Linux 社团. 
+制作文档时 使用了 其他几个版本 的 手册页, 
+并且 根据 源程序 作了 扩充.
+.Sh "[中文版维护人]"
+徐明 <xuming@users.sourceforge.net>
+.Sh "[中文版最新更新]"
+2003/05/13
+.Sh "《中国Linux论坛man手册页翻译计划》"
+http://cmpp.linuxforum.net
+.br

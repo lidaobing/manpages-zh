@@ -1,0 +1,32 @@
+.TH NTSYSV 8 "Mon Oct 13 1997"
+.UC 4
+.SH NAME
+ntsysv \- 用于配置运行级别的简单接口
+.SH 总览 SYNOPSIS
+\fBntsysv\fR [--back] [--level <levels>]
+.SH 描述 DESCRIPTION
+\fBntsysv\fR 是个用于配置运行级别服务(也可通过 \fBchkconfig\fR 来配置)的简单接口。对于缺省情况，它配置当前的运行级别。 如果用户需要配置其它的运行级别，可以在命令行上用 \fB--levels\fR选项，在其后列出所要配置的那些运行级别，且互相之间不加空格。例如，\fB--levels 016\fR 选项编辑运行级别0、1和6。
+
+如果一项服务是由正被编辑的运行级别中任一级别启动的话，那么它会被考虑在设置的运行级别中启动。
+
+\fBntsysv\fR 窗口通常包含一个\fB取消\fR按钮。如果指定使用\fB--back\fR 选项的话，会出现一个\fB回退\fR按钮作为代替。
+
+.PD
+.SH "返回值 RETURN CODES"
+\fBntsysv\fR 在正常情况下返回0，在出错时返回2，且如果用户取消(或撤回)程序则返回1。
+
+.PD
+.SH "参见 SEE ALSO"
+.BR chkconfig (8),
+.BR serviceconf (8)
+
+.SH 作者 AUTHOR
+Erik Troan <ewt@redhat.com>
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 
+

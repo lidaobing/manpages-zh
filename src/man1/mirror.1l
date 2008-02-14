@@ -1,0 +1,859 @@
+.\"
+.\" 软件教程 之 man mirror 系统篇 软件篇 技巧篇 Linux man篇
+.\" 
+.\" 原始文件：mirror-2.3 - mirror.man
+.\" 档案叙述：映射远端档案的软体
+.\" 文件编号：LRG.LDTP.MANUAL.006
+.\" 翻译日期：1996/03/03
+.\" 翻译维护：asdchen@ms1.hinet.net O
+.\" ---------------------------------------------------------------Ｘ---
+.\" O
+.\" MIRROR(1L) MIRROR(1L)
+.\" 
+.TH mirror 1l
+.SH NAME
+mirror - 映射在远端节点上的档案
+
+.SH "总览 SYNOPSIS"
+mirror [flags] -gsite:pathname
+mirror [flags] [package-files]
+
+.SH "描述 DESCRIPTION"
+Mirror 是以 Perl 所写成的一套在执行它的机器与一台远端主机
+之间使用 ftp 协定复制整个目录架构及其内容的软体。它藉由在
+传输之前比较档案时间(time-stamps) 以及大小来避免拷贝不必要
+的档案。除此之外，它还可以选择性地压缩(compress, gzip)以及
+分割(split)档案。
+.PP
+它是写给档案维护人员使用的但也可以让任何想要经由 ftp 传输
+大量档案的人使用。
+.PP
+无论如何叫用它， mirror 总是执行相同的几个基本步骤。它连线
+到远端节点，在内部建立本地目标目录(target direction)的目录
+列表，为远端目录建立一份目录列表，比较它们，建立任何必须的
+子目录，传输适当的档案（设定它们的档案时间以符合远端节点上
+的档案时间），建立任何符号链结，然後移除任何已不必要的物件
+(objects) 最後并结束连线。
+.PP
+Mirror 可以处理符号链结但并非原本的链结。它不会复制拥有者
+(owner)或是群组(group)的资讯。如果你需要这些选项其中的任何
+一个，使用 rdist(1) 来取代它。
+.PP
+Mirror 系以上面所列语法概述其中的一种方法呼叫执行。
+.PP
+第一种方式是用来将一个远端目录撷取回现行目录。如果你要映射
+的是一个目录，最好是以斜线('/') 来结束路径名称这样一来远端
+递回列表（包含往下子目录的列表）会比较小或者是使用 -r 旗标
+来禁止递回（参阅下面所述的 -g 旗标）。这个方式将不会使用到
+mirror.defaults 档案。
+.PP
+在上面所列语法概述的第二种方式里，至少需要有一份最少数目的
+参数而且 mirror 是由从配置档案（或标准输入）里读取的设定所
+控制。如果可以在 mirror 执行档所在目录或是 PERLLIB 路径里
+找到一个名为 mirror.defaults 档案，那麽它会首先被载入。这
+用来为所有的配置档提供一般化的预设值。
+.PP
+Mirror 本来是为映射远端 Un*x 系统的档案而写，但是它已逐渐
+成长(like topsy)。
+.PP
+.SH "标记 FLAGS"
+.TP
+-d 
+启动侦错。如果下达这个参数超过一次，则侦错层级将会
+递增。目前有用的最大层级是四。
+.TP
+-ppackage
+只映射所给定的档案包裹(package)。 此选项可下达多次
+在这种情形下所有给定的档案包裹都将会映射。没有这个
+选项的话，将映射所有的档案包裹。档案包裹 (package)
+是一个符合相对於 package 变数的正规表示式(regexp)
+.TP
+-R 
+类似 -p 但是跳过所有的档案包裹直到它找到给定的档案
+包裹为止。这对於从 mirror 执行失败而离开的地方重新
+开始执行会有用。
+.TP
+-n 
+除了比较本地以及远端的目录之外不做任何事，不会执行
+任何档案传输。将侦错层级设为二，所以你可以看到对於
+将要执行之动作的追踪。
+.TP
+-F 
+使用暂存的 dbm 档案以储放关於档案的资讯。如果你要
+映射一个非常大的目录这会有用。参阅 use_files 这个
+变数。
+.TP
+-g
+节点:路径
+.PP
+取得给定节点上的所有档案。如果路径符合 .*/.+ 那麽
+它是目录的名称而後面的部份则是所要取得之档案名称的
+样板(pattern)。 如果路径符合 .*/ 则它是目录的名称
+而且其所有的内容都将会被撷取。另一方面路径还是用在
+'/' 的样板。如果你使用 host:/fred 的话，那麽将作出
+一份远端主机上之 / 的完整目录列表。如果所有你想要
+的是目录 /fred 的内容，则指定 host:/fred/ 才是。
+.TP
+-r 
+等於 -krecursive=false
+.TP
+-v 
+印出 mirror 版本资讯细节并结束。
+.TP
+-T 
+强制将任何本地档案的时间重置成与远端档案相同。一般
+仅用於以已存在档案内容之处初始一个映射区域的时候。
+.TP
+-U [档案名称]
+把所有上传的档案记录到所给的档案名称。记得 mirror
+切换到 local_dir 以执行其作业，所以它应该得是完整
+(full)的路径名称。如果没有给任何参数，其预设值为
+`pwd`/upload_log.day.month.year.
+.TP
+-kkey=value
+盖过任何预设关键字的值(key/value) 。
+.TP
+-m 
+等於 -kmode_copy=true
+.TP
+-t 
+等於 -ktext_mode=true
+.TP
+-f 
+等於 -kforce=true
+.TP
+-ssite 
+等於 -ksite=site
+.TP
+-uuser 
+等於 -kremote_user=user 接著会提示你要求密码，并且
+还会关闭本地回应(echo)以兹配合。这个密码是用来设定
+remote_password 用的。
+.TP
+-L 
+只是产生一份输入的美观列表版本。
+.TP
+-G 
+从远端机器取得档案。本地以及远端目录必须在命令列上
+给定。（这个选项已经不再支援。）
+.TP
+-P 
+把档案放上远端机器。本地以及远端目录必须在命令列上
+给定。（这个选项已经不再支援。）
+.TP
+-C filename
+指定配置文件。配合 -P 以及 -G 选项之配置文件之需。
+（这个选项已经不再支援。）
+
+.SH "文件 Package Files"
+.PP
+配置档会被剖析成一系列的叙述。空白行及以杂凑(hash)符号起始
+的行会被忽略。每个叙述的形式都是
+.CS
+关键字=值
+.CE
+或是
+.CS
+关键字+值
+.CE
+.PP
+你可以在关键字以及等号／加号的前面加上空白字元。所有紧跟在
+等号／加号之後的每样事物都是一个值，这包含任何开头或结尾的
+空白字元。等号的版本会将关键字设定为该值，而加号的版本会将
+该值连结到预设值的结尾上。
+.PP
+一个叙述可以在除最後一行以外使用 ampersand('&') 字元作结束
+以连续超过多行。尾随在 ampersand 之後的行，都会以移除所有
+开头空白字元的方式附加到目前所在行的後面。
+.PP
+这里是一份关键字的列表而且它们预设的值放在 square brackets
+里面列出。以星号标出的选项目前还没有实作出来。
+.PP
+虽然有很多关键字可以设定，内建的预设值将可处理大部分的情况
+。一般只需要设定 package, site, remote_dir 以及 local_dir
+即可。
+.SS
+.TP
+package 
+对所要映射的档案包裹而言应该得要是个唯一的
+名称。['']
+.TP
+comment 
+用在报告里。['']
+.TP
+skip 
+设定这个项目会使得该档案包裹被跳过。此值会
+被报告为跳过的原因。（这比 commenting the
+entry out 来得容易。）['']
+.TP
+site 
+远端节点的节点名称或是 IP 位址。['']
+.TP
+remote_dir 
+所要映射的远端目录。参阅 recursed_hard。
+['']
+.TP
+local_dir 
+本地目录。['']
+.TP
+remote_user 
+用在远端节点的使用者名称。[anonymous]
+.TP
+remote_password 
+用在远端节点的密码。[user@localhostname]
+.TP
+get_patt 
+所要撷取之远端路径名称的正规表示式。[.]
+.TP
+exclude_patt 
+所要忽略之远端目录名称的正规表示式。['']
+.TP
+update_local 
+把 get_patt 设为 local_dir/*。这在如果你只
+想要映射远端档案服务处中所选定的子目录时会
+有用。[false]
+.TP
+local_ignore 
+所要忽略之本地路径名称的正规表示式。对用来
+跳过受限(restricted)的本地目录有用。['']
+.TP
+do_deletes 
+如果目的(destination) 档案不存在於来源树中
+(source tree)中则删除之。[false]
+.TP
+delete_patt 
+检查所要删除之本地路径名称的正规表示式。不
+符合的名称不会被检查。所有以此样板所选出的
+档案都会被检查是否符合 delete_excl 选项。
+[.]
+.TP
+delete_get_patt 
+把 delete_patt 设为 get_patt。[false]
+.TP
+delete_excl 
+永不删除之本地路径名称的正规表示式。['']
+.TP
+save_deletes 
+把本地档案储存到 save_dir 里取代将其删除。
+[false]
+.TP
+save_dir 
+当本地档案不存在於远端节点的时候会被转移到
+此处。[Old]
+.TP
+max_delete_files
+如果有超过此数的档案会被删除，则不进行删除
+动作，只发出警告。若此值系以百分比字元作为
+结束的话则此值为取消删除前之档案的百分比。
+[10%]
+.TP
+max_delete_dirs
+如果有超过此数的目录会被删除，则不进行删除
+动作，只发出警告。若此值系以百分比字元作为
+结束的话则此值为取消删除前之档案的百分比。
+[10%]
+.TP
+max_days 
+如果 >0 的话，忽略比此日数更久以前的档案。
+任何被忽略的档案将不会被传输或删除。[0]
+.TP
+split_max 
+如果 >0 而且档案的大小比此值大，该档案会被
+切割以便本地储存（档案名称同时也必须要符合
+split_patt 选项）。[0]
+.TP
+spilt_patt 
+要储存在本地前需先分割之远端路径名称的正规
+表示式。['']
+.TP
+split_chunk 
+档案所要切割成的大小。[102400]
+.TP
+ls_lR_file 
+包含 ls-lR 的远端档案，否则执行远端 ls 以
+取得目录列表。['']
+.TP
+local_ls_lR_file
+包含 ls-lR 的本地档案，否则使用远端节点的
+ls_lR_file 取代。这在第一次映射一个很大的
+档案包裹时有用。['']
+.TP
+recursive 
+执行范围包括子目录。[true]
+.TP
+recuese_hard 
+必须对每一个子目录执行 cwd 以及 ls 以产生
+远端 ls 结果。在这种情形下 remote_dir 必须
+是绝对的（从 / 开始）而非相对的。使用 ftp
+里的 pwd 指令以找出远端档案区域之路径开始
+处。（如果 remote_fs 是 vms 则不可使用。）
+[false]
+.TP
+flags_recursive 
+传送给远端 ls 用以执行递回列出的旗标。
+['-lRat']
+.TP
+flags_nonrecursive
+传送给远端 ls 用以执行非递回列出的旗标。
+['-lat']
+.TP
+remote_fs 
+远端档案储存型态。处理 unix, dls, netware
+vms, dosftp, macos, lsparse 以及 infomac。
+细节参阅下面 FILESTORES 段落。[unix]
+.TP
+vms_keep_version
+映射 vms 档案时，保留版本编号。若为 false
+，会抽离版本而只保留基本的档案名称。[true]
+.TP
+vms_xfer_text 
+要以文字模式(TEXT mode) 传输之 vms 档案的
+样板（忽略大小写）。
+['readme$|info$|listing$|.c$']
+.TP
+name_mappings 
+远端到本地的路径名称对映（一个 perl s 指令
+eg. s:old:new:）。['']
+.TP
+external_mapping
+执行名称对映的外部函式。['']
+.TP
+get_newer 
+如果远端档案的日期比本地的新则取回。[true]
+.TP
+get_size_change 
+如果档案的大小与本地的不同则取回。如果档案
+是在撷取时压缩的，则其大小会自动地忽略掉。
+[true]
+.TP
+compress_patt 
+储存在本地之前要先压缩之档案的正规表示式。
+参阅 get_size_change 选项。['']
+.TP
+compress_excl 
+不压缩之档案的正规表示式（忽略大小写）。
+[\.(z|gz)$]
+.TP
+compress_prog 
+用来压缩档案的程式。如果设为 compress 或是
+gzip 这两个字的话，则将会自动地设定完整的
+路径名称以及正确的 compress_suffix(副档名)
+。使用 gzip 的时候，会使用第九级 (gzip -9)
+压缩。注意到可以在 compress_prog 之後设定
+compress_suffix 将其重设为非标准值。
+[compress]
+.TP
+compress_suffix 
+压缩程式附加到档案後的字元。若压缩程式选项
+compress_prog 为 compress 的话，则此预设值
+为 .Z 。若 compress_prog 为 gzip 的话，则
+此预设值为 .gz。['']
+.TP
+compress_conv_patt
+如果 compress_prog 是 gzip 的话，符合这个
+样板的档案会被解压缩并在本地储存前以 gzip
+重新压缩。压缩转换只对 compress 到 gzip 此
+转换有意义。[(\.Z|\.taz)$]
+.TP
+compress_conv_expr
+把副档名从 compress 转为 gzip 形式的 perl
+表示式。[s/\.Z$/\.gz/;s/\.taz$/\.tgz/]
+.TP
+compress_size_floor
+只压缩比此数值小的档案。[0]
+.TP
+force_times 
+强制要求本地时间符合远端时间。[yes]
+.TP
+retry_call 
+如果初始连线失败，一分钟之後重试一次。这是
+用来处理一些反向找寻(lookup)进入(incoming)
+主机但有时会在第一次尝试时超过时间的节点。
+[yes]
+.TP
+update_log 
+档案名称，系相对於 local_dir 选项之设定值
+，此处会保留一份更新报告。['']
+.TP
+mail_to 
+将一份系统执行工作记录寄给这个以逗点隔开之
+列表上的人。['']
+.TP
+user 
+给予本地路径名称之使用者名称或使用者号码。
+['']
+.TP
+group 
+给予本地路径名称之群组名称或群组号码。['']
+.TP
+file_mode 
+给予本地建立之档案的权限。[0444]
+.TP
+dir_mode 
+给予本地建立之目录的权限。[0755]
+.TP
+timeout 
+在此秒数後结束 ftp 要求。[40]
+.TP
+ftp_port 
+远端 ftp 伺服程式的埠号。[21]
+.TP
+proxy 
+设为 1 以使用代理转接(proxy)式的 ftp 服务
+。[0]
+.TP
+proxy_ftp_port 
+代理服务之 ftp 伺服程式的埠号。[4514]
+.TP
+proxy_gateway 
+代理服务之名称，也可用 INTERNET_HOST 变数
+来提供。[internet-gateway]
+.TP
+mode_copy 
+指出是否需要拷贝模式位元(mode bits) 的旗标
+。[false]
+.TP
+interactive 
+非批次(non-batch) 传输。系以 -g 旗标实作。
+[false]
+.TP
+text_mode 
+如果为 true 的话，档案以文字模式传输。Un*x
+较喜欢以二进位传输所以这是预设值。[false]
+.TP
+force 
+如果为 true 的话，所有档案都将被传输而不去
+理会档案的大小或时间。[false]
+.TP
+get_file 
+以执行 get 而非 put 作为预设。[true]
+.TP
+verbose 
+冗馀讯息。[false]
+.TP
+delete_source 
+一旦传输完成後删除来源档案。（此选项已不再
+支援。）[false]
+.TP
+disconnect 
+档案包裹结束後从远端节点结束连线。[false]
+.TP
+mail_prog 
+呼叫执行以将信件寄送给 mail_to 列表的程式
+。可以传递 mail_subject 参数。预设为 mailx
+Mail, mail 或任何在你的系统上可用的东西。
+['']
+.TP
+mail_subject 
+mirror update ['-s]
+.TP
+hostname Mirror 
+自动地跳过节点名称符合此主机的档案
+包裹。预设为本地主机名称。['']
+.TP
+use_files 
+将 mirroe 所使用的 associative arrays 放到
+暂存档里。[false]
+.TP
+umask 
+预设不允许任何 setuid 的东西通过。[07000]
+.TP
+remote_group 
+如果存在则设定远端 'site group' 。['']
+.TP
+remote_gpass 
+如果存在则设定远端 'site gpass' 。['']
+.TP
+remote_idle 
+如果非空(not null)，则尝试并将远端闲置计时
+(idle timer)设为此值。['']
+.TP
+make_bad_symlinks
+如果为 true 的话，将会把符号链结连到不允许
+（不存在）的路径名称。旧版预设值为 true 。
+[false]
+.TP
+follow_local_symlinks
+应该要跟从档案或是目录所指向处之路径名称的
+正规表示式。这使得 mirror 不能够见到本地的
+符号链结。['']
+.TP
+get_missing 
+确实取回档案。当设为 false 的时候，只执行
+删除以及建立符号链结。用来删除比 max_days
+更旧的过时档案而不必撷取这些旧档案。[true]
+.SE
+.PP
+每一组关键字定义如何映射一份特定的档案包裹而且应该要以一行
+唯一的 package 开始。档案包裹的名称用在产生报告及 -p 参数
+上，所以应使用较具记忆性的名称。定义每个档案包裹所需的最小
+需求是 package, site, remote_dir 以及 local_dir 。一旦找到
+一行 package 叙述，所有的预设值都会重设。
+.PP
+如果 package 的名称是 defaults 的话，则不会连线到任何节点
+去，但是所给任何关键字的预设值都会改变。一般而言所有的预设
+值都在 mirror.defaults 这个将会在任何 package 细节前自动
+载入的档案里。
+.PP
+.CS
+
+# Sample mirror.defaults
+package=defaults
+# The LOCAL hostname - if not the same as `hostname` returns
+# (I advertise the name src.doc.ic.ac.uk but the machine is
+# really puffin.doc.ic.ac.uk.)
+hostname=src.doc.ic.ac.uk
+# Keep all local_dirs relative to here
+local_dir=/public/
+remote_password=ukuug-soft@doc.ic.ac.uk
+
+.CE
+.PP
+如果档案包裹不是 defaults 的话，则 mirror 将会执行下列步骤
+。除非侦测出一个内部错误，任何错误都将会使得目前的档案包裹
+被跳过并且尝试下一个。
+.PP
+如果 mirror 并非已经连上该节点，它将会从任何已经连上的节点
+离线并尝试连线到远端节点的 ftp 伺服程式去。它接著将会使用
+所给的远端使用者名称及密码签入。一旦连上， mirror 开启二进
+位传输模式。接下来它切换到所给的本地目录并扫描之以取得已经
+存在的本地档案的细节。如果必要，将会建立本地目录。一旦这项
+作业完成，会以类似的方式扫描远端目录。 Mirror 系切换到远端
+目录并执行 ftp LIST 指令，然後依据 recursive 选项的值传递
+flags_recursive 选项或 flags_nonrecursive 选项来完成。此外
+也可以撷取一个包含有目录列表的档案。每一个远端路径名称都将
+会执行任何指定的对映(mapping) 以建立本地路径名称。然後任何
+由 exclude_patt, max_days, get_newer 以及 get_size_change
+关键字指定的检验都会施行在档案或符号链结上。只有 exclude-
+patt 检验会施行在子目录上。
+.PP
+上述过程建立一份所有需要的远端档案以及要储存它们之本地路径
+名称的列表。
+.PP
+一旦目录列表完成，所有需要的档案都会从远端节点撷取到它们的
+本地路径名称。作法是把档案撷取到目标目录里的暂存档。如果有
+需要，暂存档会被压缩(compressed, gzip'ed) 或是切割（或者是
+压缩後再切割）。当传输成功後再把暂存档改名。
+
+.SH "档案储放 FILESTORES"
+.PP
+Mirror 使用远端目录列表以找出可以取得哪些档案。 Mirror 本
+来的目标是连线到 unix 的 ftp 伺服程式使用标准的 ls 指令。
+要使用於非标准 ls 的 unix 主机或非 unix 的主机上它必须要设
+remote_fs 变数以符合将会传回(return)的目录列表类型。此变数
+(remote_fs) 与其它变数特别是 flags_recursive, recurse_hard
+以及 get_size_change 之间有些交互作用。下列的节次将会秀些
+在不同档案服务处执行 ftp 的 dir 指令所产生的结果以及相关
+变数的建议。在配合某些设定与众不同的档案服务处的时候你可能
+必须变更此处所建议的变数设定。
+.PP
+.CS
+remote_fs=unix
+total 65
+-rw-r--r-- 1 ukuug ukuug 2245 Jun 28 20:06 README
+-rw-r--r-- 1 ukuug ukuug 61949 Jun 29 19:13 mirror-2.1.tar.gz
+.CE
+.PP
+这是预设值而且你应该不必重设任何其它变数。
+.PP
+.CS
+remote_fs=dls
+00index.txt 189916
+0readme 5793
+1_x/ = OS/2 1.x-specific files
+.CE
+.PP
+这是某些 unix 档案服务处所使用的 ls 变化型。它在列表中提供
+其所知项目的描述。把 flags_recursive 设为 -dtR 即可。
+.PP
+.CS
+remote_fs=netware
+- [R----F--] jrd 1646 May 07 21:43 index
+d [R----F--] jrd 512 Sep 09 10:52 netwire
+d [R----F--] jrd 512 Sep 02 01:31 pktdrvr
+d [RWCE-F--] jrd 512 Sep 04 10:55 incoming
+.CE
+.PP
+这是 Novell 档案服务处所使用的。把 recurse_hard 设为 true
+并且把 flags_recursive 设为空(nothing)的。参阅 remote_dir
+.PP
+.CS
+dosftp
+00-index.txt 6,471 13:54 7/20/93 alabama.txt 1,246 23:29 5/08/92
+alaska.txt 873 23:29 5/08/92 alberta.txt 2,162 23:29 5/08/92
+.CE
+.PP
+dosftp 是在 dos 上执行的一套 ftp 伺服程式。recurse_hard
+设为 true 并且把 flags_recursive 设为空(nothing)的。
+.PP
+.CS
+remote_fs=macos
+-------r-- 0 127 127 Aug 27 13:53 !Gopher Links
+drwxrwxr-x folder 32 Sep 9 16:30 FAQ
+drwxrwx-wx folder 0 Sep 9 09:59 incoming
+.CE
+.PP
+macos 是麦金塔(Macintosh) ftp 伺服程式的一个变化型。虽然此
+输出类似於 unix 但是 unix 这个 remote_fs 型态无法应付它是
+因为每个档案有三个大小。把 recurse_hard 设为 true, flags_
+recursive 设为空(nothing)的，get_size_change 设为 false 并
+将 compress_patt 设为空（最後这个设定是因为此不平常的档案
+名称会扰乱执行压缩的 shell 界面）。参阅 remote_dir 设定。
+.PP
+.CS
+remote_fs=vms
+USERS:[ANONYMOUS.PUBLIC]
+
+1-README.FIRST;13 9 14-JUN-1993 13:09 [ANONYMOUS] (RWE,RWE,RE,RE)
+PALTER.DIR;1 1 18-JAN-1993 11:56 [ANONYMOUS] (RWE,RWE,RE,RE)
+PRESS-RELEASES.DIR;1
+1 11-AUG-1992 20:05 [ANONYMOUS] (RWE,RWE,,)
+.CE
+.PP
+alternatively:
+.PP
+.CS
+[VMSSERV.FILES]ALARM.DIR;1 1/3 5-MAR-1993 18:09
+[VMSSERV.FILES]ALARM.TXT;1 1/3 4-FEB-1993 12:20
+.CE
+.PP
+把 flags_recursive 设为 '[...]' 并将 get_size_change 设为
+false。recurse_hard 在 vms 上不能使用。除此之外还可以参阅
+vms_keep_version 以及 vms_xfer_text 变数。
+.PP
+.SS
+.TP
+remote_fs=infomac
+这个特殊型态仅在处理 sumexaim.stanford.edu info-mac 目录之
+help/all-files 有意义。recurse_hard 应该设为 true。
+.TP
+remote_fs=lsparse
+允许开启高阶除错方式重新剖析由 mirror 产生的列表。这只对於
+mirror wizards 有用。
+.SE
+.SH "范例 EXAMPLES"
+这里是从 src.doc.ic.ac.uk 上来的 mirror.defaults 档案:
+.PP
+.CS
+# This is the default mirror settings used by my site:
+# src.doc.ic.ac.uk (146.169.2.1)
+# This is home of the UKUUG Software Distribution Service
+
+package=defaults
+# The LOCAL hostname - if not the same as `hostname`
+# (I advertise the name src.doc.ic.ac.uk but the machine is
+# really puffin.doc.ic.ac.uk)
+hostname=src.doc.ic.ac.uk
+# Keep all local_dirs relative to here
+local_dir=/public/
+remote_password=ukuug-soft@doc.ic.ac.uk
+mail_to=
+# Don't mirror file modes. Set all dirs/files to these
+dir_mode=0755
+file_mode=0444
+# By default, files are owned by root.zero
+user=0
+group=0
+# # Keep a log file in each updated directory
+# update_log=.mirror
+update_log=
+# Don't overwrite my mirror log with the remote one.
+# Don't retrieve any of their mirror temporary files.
+# Don't touch anything whose name begins with a space!
+# nor any FSP or gopher files...
+exclude_patt=(^|/)(.mirror$|.in..*.$|MIRROR.LOG|#.*#|.FSP|.c
+ache|.zipped|lost+found/| )
+# Try to compress everything
+compress_patt=.
+compress_prog=compress
+# Don't compress information files, files that don't benefit
+from
+# being compressed, files that tell ftpd, gopher, wais... to
+do things,
+# the sources for compression programs...
+# (Note this is the only regexp that is case insensitive.)
+compress_excl+|^.notar$|-z|.taz$|.tar.Z|.arc$|.zip$|.lzh$|.z
+oo$|.exe$|.lha$|.zom$|.gif$|.jpeg$|.jpg$|.mpeg$|.au$|read.*me|index|.message|in
+fo|faq|gzip|compress
+# Don't delete own mirror log or any .notar files (incl in s
+ubdirs)
+delete_excl=(^|/).(mirror|notar)$
+# Ignore any local readme files
+local_ignore=README.doc.ic
+# Automatically delete local copies of files that the
+# remote site has zapped
+do_deletes=true
+.CE
+Here are some sample package descriptions:
+.CS
+package=gnu
+comment=Powerful and free Un*x utilities
+site=prep.ai.mit.edu
+remote_dir=/pub/gnu
+# Local_dir+ causes gnu to be appended to the default local_
+dir
+# so making /public/gnu
+local_dir+gnu
+exclude_patt+|^ListArchives/|^lost+found/|^scheme-7.0/|^.his
+tory
+# I tend to only keep the latest couple of versions of thing
+s
+# this stops mirror from retrieving the older versions I've
+removed
+max_days=30
+do_deletes=false
+
+package=X11R5
+comment=X Windows (windowing graphics system for Un*x)
+site=export.lcs.mit.edu
+remote_dir=/pub/R5
+local_dir+computing/graphics/systems/X11/pub/R5
+# This is a local symlink to the free-for-all contrib area
+# and is mirrored elsewhere
+local_ignore=^contrib$
+# Don't compress a thing. It is already compressed
+# but doesn't look it.
+compress_patt=
+
+package=cnews
+comment=The C News system
+site=ftp.cs.toronto.edu
+remote_dir=/pub/c-news
+local_dir+computing/usenet/software/transport/c
+compress_excl+|patches/PATCHDATES|WhereFrom
+
+# THIS IS JUST A TEST
+package=test vms site
+site=vmsbox.somewhere.ac.uk
+local_dir=/tmp/copy4
+remote_dir=vmsserv/files
+remote_fs=vms
+# Must do these settings for VMS
+flags_recursive=[...]
+get_size_change=false
+
+# and on, and on ...
+.CE
+.SH 提示
+要增加一个新的档案包裹，首先打开 -n 选项检查它。
+.PP
+如果你要增加到一个已经存在档案的地方，那麽通常最好是 force
+本地已经存在的档案时间符合远端的这样将会执行与远端档案之间
+的时间比较。
+.PP
+尝试并将所有从相同节点撷取的档案包裹放在一起。使用这种方式
+的话 mirror 将仅需签入一次。
+.PP
+记得所有的正规表示式都是 Perl 正规表示式。
+.PP
+如果远端节点包含你想展开("flatten out") 到相对应档案的符号
+链结，那麽以改变传送给远端 ls 旗标的方式执行之。
+.CS
+flags_recursive+L
+.CE
+或是
+.CS
+flags_nonrecursive+L
+.CE
+首先以在远端节点的 ftp 指令下尝试 ls -lRatL 的方式来测试
+远端档案服务处是否有任何符号链结回圈。
+.PP
+如果你正要映射一个非常大而不常改变的节点，等它初次映射後在
+设定中加上 max_days=7 选项。以此方式 mirror 在更新的时候仅
+需要注意最近的档案。然後每个礼拜一次，或者是有必要的时候，
+以 -kmax_days=-0 呼叫 mirror 强制执行一次完整的更新。
+.PP
+如果你不想压缩从远端节点取得的任何东西则最简单的方法就是将
+compress_patt 设为空(nothing) 的。
+.PP
+如果你想在映射一份档案包裹後执行某个指令那麽有个有用的技巧
+是将 mail_prog 变数重设为程式的名称并将 mail_to 重设为其
+参数。
+.PP
+对於 netware, dosftp, macos 以及 vms 而言一般你应该得要把
+remote_dir 设为远端 ftp 伺服程式的 home 目录。手动连线并
+在切换到子目录之前使用 pwd 指令找出 home 在哪里。如果你仅
+想要映射整个档案树的一部份那麽应该在开头处给定包含此 home
+目录的完整路径名称。
+.PP
+macos 的名称有时候会包含一些很难让它们通过 un*x shells 的
+字元。因为档案压缩是经由 shell 执行最好设 compress_patt=
+以便关闭压缩。
+.PP
+macos 档案在传输时似乎无论如何其大小都会改变，不管是以二进
+位或是文字模式。所以最好是设 get_size_change=false 较佳。
+.SH "网路观念(NETIQUETTE)"
+如果你要映射一个远端节点，请遵守该节点管理者对於存取开节点
+所设的限制。你通常可以使用标准的 ftp 指令连到该档案服务处
+。任何限制一般会作为签入时的标题或是放在一个（希望是）明显
+的档案里。
+.PP
+这里是，我希望是，一些好的一般原则:
+.PP
+只在本地以及远端节点的工作时间以外映射节点。
+.PP
+尝试每天映射一个远端节点超过一次可能是不友善的。
+.PP
+在映射一个远端节点之前，尝试先从当地的档案服务处寻找该档案
+包裹，因为没有人会高兴你没有必要地占用许多网路频宽。
+.PP
+如果你有一个当地的档案服务处，那麽请告诉别人它的存在让他们
+不必量费频宽以及 CPU 在远端节点上。
+.PP
+要记得在远端节点改变其存取限制时检查你的配置档。
+.PP
+定期检查远端节点是否有新的限制。
+.SH "参阅 SEE ALSO"
+perl(l), ftp(1), mm(1)
+
+.SH "虫虫 BUGS"
+某些网路观念指引应该要强调。
+.PP
+应该要能够如同符号链结一般地应付链结。
+.PP
+Suffers from creeping featurism.
+
+.SH "注意 NOTES"
+在 mirror 里的物件比你所想的还要近!
+
+.SH "作者 AUTHOR"
+Written by Lee McLoughlin . It uses an
+extended version of the ftp.pl package originally by: Alan
+R. Martello which uses the chat2.pl pack-
+age by: Randal L. Schwartz
+
+Special thanks to the following people for patches, com-
+ments and other suggestions that have helped to improve
+mirror. If I have omitted anyone, please contact me.
+
+James Revell
+Chris Myers
+Amos Shapira
+Paul A Vixie
+Jonathan Kamens
+Christian Andretzky
+Kean Stump
+Anita Eijs
+Simon E Sperro
+Aaron Wohl
+Michael Meissner
+Michael Graff
+Bradley Rhoades
+Edwards Reed
+Joachim Schrod
+David Woodgate
+Pieter Immelman
+Jost Krieger
+
+Copyright © 1999 《Best Linux》. All rights reserved. Revised: 99-11-28.
+	
+.SH "[中文版维护人]"
+.B 软件教程
+.PP
+最新的版本是mirror-2.9.7(20031118) 因此您手上这份1996年的原始文档+1999年的翻译也许不能满足您的要求了。请登录
+.BI http://sunsite.org.uk/packages/mirror/mirror.html
+来参看原文。
+.SH "[中文版最新更新]"
+.B 2001/01/01
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

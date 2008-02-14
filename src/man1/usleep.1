@@ -1,0 +1,32 @@
+.TH USLEEP 1 "Red Hat, Inc" \" -*- nroff -*-
+.SH NAME
+usleep \- 睡眠若干微秒
+.SH "总览 (SYNOPSIS)"
+.B usleep
+[\fInumber\fP]
+.SH "描述 (DESCRIPTION)"
+.B usleep
+睡眠 指定的 微秒数. 缺省值 是 1.
+.SH "选项 (OPTIONS)"
+\fI--usage\fP
+显示 简短 的 使用方法.
+.TP
+\fI--help, -?\fP
+显示 帮助信息.
+.TP
+\fI-v, --version\fP
+显示 版本信息.
+.SH BUGS
+在 许多 机器 上, 微秒 计数 不够 精确. 精度 只能 到达 -4 或 -5 (注:10的指数).
+
+.SH "作者 (AUTHOR)"
+Donald Barnes <djb@redhat.com>
+.br
+Erik Troan <ewt@redhat.com>
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

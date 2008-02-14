@@ -1,0 +1,373 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\"
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH Tcl n "8.1" Tcl "Tcl Built-In Commands"
+.BS
+.SH NAME
+Tcl \- 语言语法总结.
+.BE
+
+.SH 描述 DESCRIPTION
+
+.PP
+ 下面的规则定义 Tcl 语言的语法和语义:
+ 
+.IP [1]
+一个 Tcl 脚本是一个包含一个或多个命令的字符串。除了象后面描述的那样被引用(quote)之外，分号(Semi-colon)和换行(newline)是命令分隔符。除了被引用(quote)之外，右方括号(Close bracket)在命令替换期间是命令终结符(见后)。
+
+.IP [2]
+命令的求值分两步。 首先，Tcl 解释器把命令分解成字 (\fIwords\fR) 并按下面描述的那样完成替换。对所有命令都以同样的方式进行替换。第一个字用于定位完成这个命令的一个命令过程，接着命令的所有的字被传递给命令过程。命令过程以它喜欢的任何方式自由的解释命令的字，如一个整数、变量名、列表、或 Tcl 脚本。不同的命令以不同的方式解释它们的字。
+
+.IP [3]
+一个命令的字(word)由白空格(不包括作为命令分隔符的换行)来分隔。
+
+.IP [4]
+如果一个字的第一个字符是双引号 (``"'',double-quote) 则字终结于下一个双引号字符。如果是分号，右方括号，或白空格字符(包括换行)出现在引号之间则被作为普通的字符对待并包含在字里。象下面描述的那样，在引号之间的字符上进行命令替换、变量替换、和反斜杠替换。双引号不作为字的一部分而保留。
+
+.IP [5]
+如果一个字的第一个字符是左花括号 (“{”,open brace) 则字终结于相匹配的右花括号 (“}”,close brace)。花括号在字中嵌套: 对于每个增加的(additional)左花括号都必须有一个增加的右花括号(但是，如果 在一个字中的左括号或右括号被用一个反斜杠引用起来则在匹配右花括号时不计在内)。除了下面描述的反斜杠-换行替换之外，在花括号之间的字符上不进行替换，对分号、换行、右方括号、或白空格不做特殊的解释。字由外侧的花括号之间的字符精确的组成，不包括花括号自身。
+
+.IP [6]
+如果一个字包含一个左方括号 (“[”,open bracket ) 则 Tcl 进行命令替换 (\fIcommand substitution\fR)。为此将递归调用 Tcl 解释器来把左方括号后面的字符作为一个 Tcl 脚本处理。脚本可以包含任意数目的命令并且必须用一个右方括号 (“]”,close bracket) 来终结。脚本的结果(例如，最后的一条命令的结果)将被替换到字中方括号和它们中间所有字符的位置上。在一个单一的字中可以有任意数目的命令替换。在由花括号包起来(enclose)的字上不进行命令替换。
+
+.IP [7]
+如果一个字包含一个美元符(``$'')则 Tcl 进行变量替换 (\fIvariable
+substitution\fR): 字中的美元符号和跟随的字符被一个变量的值所替换。接受下面几种形式(form)的变量替换:
+
+.RS
+
+.TP 15
+\fB$\fIname\fR
+\fIName\fR 是一个标量(scalar)变量的名字；名字终结于任何不是字母、数字、或下划线(underscore)的字符。
+
+.TP 15
+\fB$\fIname\fB(\fIindex\fB)\fR
+\fIName\fR 给出一个数组变量的名字，\fIindex\fR 给出在这个数组中的一个元素的名字. \fIName\fR 只能包含字母、数字、和下划线。\fIindex\fR 的字符将被进行命令替换、变量替换、和反斜杠替换。
+
+.TP 15
+\fB${\fIname\fB}\fR
+\fIName\fR 是一个标量( scalar)变量的名字。它可以包含除了右括号之外的任何字符。
+
+.LP
+一个单一的字中可以有任意数目的变量替换。在由花括号包起来(enclose)的字上不进行命令替换。
+
+.RE
+
+.IP [8]
+如果在一个字中出现一个反斜杠(“\”)则发生反斜杠替换 (\fIbackslash substitution\fR)。除了下面描述的这些情况之外，反斜杠 (backslash)被删除(drop)，跟随的字符被作为普通字符对待。这就允许在字中包含象双引号、右方括号、和美元符号等字符而不触发特殊的处理。下表列出的要特殊处理的反斜杠序列，跟着的是每个序列被替换成的值。
+
+.RS
+
+.TP 7
+\e\fBa\fR
+声音警告 (振铃) (0x7).
+
+.TP 7
+\e\fBb\fR
+退格 (0x8).
+
+.TP 7
+\e\fBf\fR
+换页 (0xc).
+
+.TP 7
+\e\fBn\fR
+换行 (0xa).
+
+.TP 7
+\e\fBr\fR
+回车 (0xd).
+
+.TP 7
+\e\fBt\fR
+跳格(Tab) (0x9).
+
+.TP 7
+\e\fBv\fR
+纵向跳格 (0xb).
+
+.TP 7
+\e\fB<newline>\fIwhiteSpace\fR
+.
+一个单一的空格字符替换反斜杠、换行和在换行后面的所有空格和跳格。这个反斜杠序列是唯一一个在命令被实际分析之前在一次独立的预处理(pre- pass)中被替换的。这意味着即使在花括号之间这个替换也发生，并且不在花括号和引号之间时作为结果的空格被作为一个字分隔符对待。
+
+.TP 7
+\e\e
+反斜杠 (``\'').
+
+.VS 8.1 br
+
+.TP 7
+\e\fIooo\fR 
+.
+数字\fIooo\fR(它们中的一个、两个、或三个)给出一个八进制数，是要插入的 Unicode 字符的八位值。 Unicode 字符的高位(upper)将是 0.
+
+.TP 7
+\e\fBx\fIhh\fR 
+.
+十六进制数 \fIhh\fR 给出要插入的 Unicode 字符的八位值。可以提供任意数目的十六进制数字 ；但除了最后两位之外都被忽略(结果总是一个一字节的数量)。Unicode 字符的高位(upper)将是 0.
+
+.TP 7
+\e\fBu\fIhhhh\fR 
+.
+十六进制数 \fIhhhh\fR (它们中的一个、两个、三个、或四个)给出要插入的 Unicode 字符的十六位值。
+.VE
+.LP
+除了前面描述的反斜杠-换行，在由花括号包起来(enclose)的字上不进行反斜杠替换。
+.RE
+
+.IP [9]
+如果一个升音符 “#” (sharp / hash) 出现在 Tcl 希望是一个命令的第一个字的地方(point),则升音符和其后面跟随的、一直到下一个换行的所有字符，被作为一个注释对待并被忽略。注释字符只有出现在一个命令开始时才有意义(significance)。
+
+.IP [10]
+每个字符作为建立的一个命令的某个字的一部分，被 Tcl 解释器精确的处理一次。例如，如果发生了变量替换则在变量的值上不进行进一步的替换；值被原封不动的(verbatim)插入字中。如果发生了命令替换则嵌套的命令被对 Tcl 解释器的递归调用整个的处理；在做递归调用之前不进行替换并且对嵌套的脚本的结果不进行额外的(additional)替换。
+
+.IP [11]
+替换不影响一个命令的字边界(boundary)。例如，即使变量的值包含空格，在变量替换期间变量的整个的值成为一个单一的字的一部分。
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/21
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

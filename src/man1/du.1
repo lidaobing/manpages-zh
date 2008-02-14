@@ -1,0 +1,147 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\"  Chinese Version Copyright mhss, www.linuxforum.net, 2000
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH DU 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+du \- 报告磁盘空间使用情况
+.SH 总览
+.BI "du [" options "] [" file... ] 
+.sp
+POSIX 选项: 
+.B [\-askx]
+.SH GNU 选项 (最短格式):
+.B "[-abcDhHklLmsSxX]"
+.BI "[--block-size=size] [--exclude=pattern] [--max-depth=n]"
+.B "[--help] [--version] [--]"
+.SH 描述
+du 报告指定的文件已使用的磁盘空间的总量，包括在层次结构中以
+这些以指定文件为根的目录在内。这里的“已使用的磁盘空间”意思
+为指定的文件下的整个文件层次结构所使用的空间。
+.PP
+在没给定参数的情况下，du 报告当前目录所使用的磁盘空间。
+.SH POSIX 细节
+输出结果在缺省时以512字节为计数单位，若给以 -k 选项，则以
+1024字节为计数单位。
+.SH GNU 细节
+(在没有用选项指定计数单位的情况下)输出结果以1024字节为计数
+单位，但不包括由于设置了环境变量POSIXLY_CORRECT而跟从POSIX 
+标准的情况。
+.SH POSIX 选项
+.TP
+.B "\-a"
+显示对涉及到的所有文件的统计，而不只是包含子目录。
+.TP
+.B "\-k"
+用1024字节作为计数单位，替代缺省时512字节的计数单位。
+.TP
+.B "\-x"
+只输出指定参数的实际使用空间，而不包括其下的子目录。
+.TP
+.B "\-s"
+只统计指定参数的在同一设备上所使用的空间。
+
+.SH GNU 选项
+.TP
+.B "\-a, \-\-all"
+显示对所有文件的统计，而不只是包含子目录。
+.TP
+.B "\-b, \-\-bytes"
+输出以字节为单位的大小，替代缺省时1024字节的计数单位。
+.TP
+.BI "\-\-block\-size=" size
+输出以块为单位的大小，块的大小为 size 字节。( file-
+utils-4.0 的新选项)
+.TP
+.B "\-c, \-\-total"
+在处理完所有参数后给出所有这些参数的总计。这个选项被
+用给出指定的一组文件或目录使用的空间的总和。
+.TP
+.B "\-D, \-\-dereference\-args"
+引用命令行参数的符号连接。但不影响其他的符号连接。
+这对找出象 /usr/tmp 这样的目录的磁盘使用量有用，
+/usr/tmp 等通常是符号连接。 
+译住：例如在 /var/tmp 下建立一个目录test, 而/usr/tmp 
+是指向 /var/tmp 的符号连接。du /usr/tmp 返回一项
+/usr/tmp , 而 du - D /usr/tmp 返回两项 /usr/tmp，/usr/tmp/test。 
+.TP
+.BI "\-\-exclude=" pattern
+在递归时，忽略与指定模式相匹配的文件或子目录。模式
+可以是任何 Bourne shell 的文件 glob 模式。( file-
+utils-4.0 的新选项) 
+.TP
+.B "\-h, \-\-human\-readable"
+为每个数附加一个表示大小单位的字母，象用M表示二进制
+的兆字节。
+.TP
+.B "\-H, \-\-si"
+与 -h 参数起同样的作用，只是使用法定的 SI 单位( 用
+1000的幂而不是 1024 的幂，这样 M 代表的就是1000000
+而不是 1048576)。(fileutils-4.0 的新选项)
+.TP
+.B "\-k, \-\-kilobytes"
+输出以1024字节为计数单位的大小。
+.TP
+.B "\-l, \-\-count\-links"
+统计所有文件的大小，包括已经被统计过的(作为一个硬连接)。 
+.TP
+.B "\-L, \-\-dereference"
+引用符号连接(不是显示连接点本身而是连接指向的文件或
+目录所使用的磁盘空间)。
+.TP
+.B "\-m, \-\-megabytes"
+输出以兆字节的块为计数单位的大小(就是 1,048,576 字节)。
+.TP
+.BI "\-\-max\-depth=" n
+只输出命令行参数的小于等于第 n 层的目录的总计。
+--max-depth=0的作用同于-s选项。(fileutils-4.0的新选项)
+.TP
+.B "\-s, \-\-summarize"
+对每个参数只显示总和。
+.TP
+.B "\-S, \-\-separate\-dirs"
+单独报告每一个目录的大小，不包括子目录的大小。
+.TP
+.B "\-x, \-\-one\-file\-system"
+忽略与被处理的参数不在同一个文件系统的目录。
+.TP
+.BI "\-X " "file, " "\-\-exclude\-from=" "file"
+除了从指定的文件中得到模式之外与 --exclude 一样。
+模式以行的形式列出。如果指定的文件是'-',那么从标准输
+入中读出模式。(fileutils-4.0 的新选项)
+GNU 标准选项
+.TP
+.B "\-\-help"
+在标准输出上输出帮助信息后正常退出。
+.TP
+.B "\-\-version"
+在标准输出上输出版本信息后正常退出。
+.TP
+.B "\-\-"
+终结选项列表
+.SH 缺陷
+对于从 HP-UX 系统上以 NFS 方式挂装上的文件，在 BSD 系统上的
+du 报告的大小是正确数值的一半；而对于从 BSD 系统上以 NFS 方
+式挂装上的文件，HP-UX 系统上的 du 报告的大小是正确数值的翻
+倍。这是 HP-UX 的缺陷导致的，这个缺陷也影响HP-UX的 du 程序。
+.SH 变量
+变量 POSIXLY_CORRECT 确定计数单位的选择。如果没有设置此变
+量并且环境变量 BLOCKSIZE 的值以‘HUMAN’为前缀，那么，除了
+-k 或 -m 选项优先生效的情况，计数单位的行为同于 -h 选项。
+变量 LANG、LC_ALL、LC_CTYPE 和 LC_MESSAGES 的意义和字面上
+一样。 
+.SH 遵循的标准
+POSIX 1003.2
+.SH 注意事项
+本页面描述的 du 可在 fileutils-4.0 包中找到,其他版本可能有细
+微的不同。把更正和补充以邮件的形式发送到 aeb@cwi.nl。向 file
+utils-bugs@gnu.ai.mit.edu.报告程序存在的缺陷。
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

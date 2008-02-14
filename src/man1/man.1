@@ -1,0 +1,268 @@
+.\"
+.\" Generated automatically from man.1.in by the
+.\" configure script.
+.\"
+.\" Man page for man (and the former manpath)
+.\"
+.\" Copyright (c) 1990, 1991, John W. Eaton.
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the README file that comes with the man 1.0
+.\" distribution.  
+.\"
+.\" John W. Eaton
+.\" jwe@che.utexas.edu
+.\" Department of Chemical Engineering
+.\" The University of Texas at Austin
+.\" Austin, Texas  78712
+.\"
+.\" Many changes - aeb
+.\"
+.TH man 1 "September 2, 1995"
+.LO 1
+.SH NAME
+man \- 格式化并显示在线帮助手册页
+.br
+manpath \- 定义用户查找man手册页的路径
+.SH 总览
+man  [-acdfFhkKtwW] [-m 系统名] [-p <前处理程序>]
+[-C <配置文件>] [-M <路径>] [-P <浏览方式>] [-S <区段清单>] 
+[区段名称] 帮助主题 ...
+.SH 描述
+.B man
+格式化并显示在线帮助手册页面。此版本支持
+.B MANPATH
+和
+.B （MAN）PAGER
+环境变量，因此，你可以拥有你自己的一系列
+.B man
+手册页并决定使用哪个程序来显示此格式的页面。如果定义了区段，
+.B man
+将只查找在指定区段内的文档。你也可以通过命令行或环境变量来指定查找区段
+的顺序和预定义将要执行的程序。如果主题中有“/”符号，则将其作为文件名的一部分处理
+，也就是说你可以用
+.B "man ./foo.5"
+也可以用
+.B "man /cd/foo/bar.1.gz"来查看各man 文档。
+.SH 选项
+.TP
+.B -C "配置文件"
+定义man.conf供使用；默认使用的是
+.BR /etc/man.config
+。（参见
+.BR man.conf(5)）。
+.TP
+.B -M "路径"
+定义一组查找man手册页的目录。如果没有指定此参数，系统环境变量
+.B MANPATH将被使用。
+如果查无到此环境变量，则按默认
+.BR /etc/man.config
+文件中指定的查找。一个空的
+.B MANPATH
+子字
+符串表示使用默认清单。
+.TP
+.B -P "浏览方式"
+定义浏览的方式。此选项将覆盖
+.B MANPAGER
+环境变量（此变量将覆盖
+.B PAGER
+变量）。若不指定
+此参数，则使用
+.B MANPAGER
+或
+.B PAGER
+环境变量中的设置。此选项的预设的显示方式为
+.BR /usr/bin/less-is。
+.TP
+.B -S "区段清单"
+该清单是一组用冒号分隔的欲查找的手册清单。此选项将覆盖
+.B MANSECT
+环境变量。
+有些指令或程序可能有一个以上的主题，它们位于不同的区段中。因此，要查看较后的区
+段，你可以在此指定
+.B man
+查找区段的顺序。具体区段划分如下所示：
+.RS
+区段1：用户指令
+.br
+区段2：系统调用
+.br
+区段3：程序库调用
+.br
+区段4：设备
+.br
+区段5：文件格式
+.br
+区段6：游戏
+.br
+区段7：杂项
+.br
+区段8：系统指令
+.br
+区段9：内核内部指令
+.br
+区段n：Tcl或Tk指令
+.RE
+.TP
+.B -a
+默认情况下，man在显示完每一个所查到的man手册页时会自动退出程序。而使用此选项
+，则可使man显示所有与此主题相匹配的手册页内容，而不仅仅是第一项。
+.TP
+.B -c
+即使已存在最近已排版过的帮助文件（即以前曾查询过该主题的帮助文档），使用该参
+数后仍会再次执行一次排版操作。此参数适用于已排版过的帮助文件已损坏或屏幕的行列数有
+改变时。
+.TP
+.B -d
+不显示帮助文档的具体内容，只显示调试排错信息。
+.TP
+.B -D
+既显示帮助文档内容，同时又显示调试排错信息。
+.TP
+.B -f
+相当于运行whatis 的操作。即：显示工具指令与工具程序的简单说明。
+.TP
+.B -F" 或 "--preformat
+只进行格式化操作，而不真正的显示出来。
+.TP
+.B -h
+显示man的语法和参数说明，执行完成后退出程序。
+.TP
+.B -k
+查当于使用
+.B apropos
+命令。
+.TP
+.B -K
+在所有的帮助文件中查找包含有指定关键字的帮助文档。此操作可能很慢，所以在使用
+此参数时最好配合-s 的参数来查找指定区段。（这只是一个粗略的概念，在作者本人的机器
+上每分钟可查500个man文档。）
+.TP
+.B -m
+系统名
+定义所要查找的man文档所属的系统名。
+.TP
+.B -p
+字串
+定义在排版帮助文件这前所要执行的预处理程序的次序。不是所有的安装都有完整预处理
+程序组。一般有6个预处理程序，它们是：eqn(e)、grap(g)、pic(p)、tbl(t)、vgrind(v)和
+reger(r)。此参数将覆盖环境变量MANROFFSEQ。
+.TP
+.B -t
+使用
+.B /usr/bin/groff - Tps - mandoc
+来排版man手册页，并输出到标准输出。从
+.B /usr/bin/groff - Tpa - madoc
+输出的内容可能需要某些其它过滤才能真正输出到标准输出打印。
+.TP
+.B -w" 或 "--path
+不显示帮助文档的具体内容而只显示相应帮助主题文件的位置。如果没有给定参数，则将
+在标准输出显示一组由man所查到的相匹配的man 文档所在目录。如果命令manpath是一个到m
+an的链接，那么执行“manpath”就相当于执行“man --path”。
+.TP
+.B -W
+相当于-w参数，但所显示的内容以分行方式显示。此参数方便其它指定或程序对其输出
+做进一步处理，如：
+.ft CW
+.B "man -aW man | xargs ls -l "
+.ft
+.SH CAT页
+Man 会试着对所查的文档进行保存，为的是便于下次使用此帮助页时可节约格式化时间。传
+统上，被格式化的DIR/manX文档会被存储在DIR/catX中，但你可以在
+.BR /etc/man.config
+配置文
+件中指定其它的目录。如果所需的cat目录不存在时，系统就不对格式化后的man文档进行保存
+。
+.PP
+对于使用man命令的人，man命令可能对其进行setuid的操作。因此，如果一个cat目录属于
+man并且其模式是0755（只有man对其有写的权限），而且，cat文件也属于man和其模式是064
+4或0444（只有man对其有写权限或根本就没有写权限），则普通用就不能更改cat文档页，也
+不能在此目录中存放其它文件。而如果man没有执行setuid的操作，那么，为了能使所有用户
+都能存放cat页到cat目录，则必须将这个cat目录设置成0777模式。
+.PP
+参数
+.B -c
+可以强制生成一个新的man页，既使已经有一个cat页存在。
+.SH 环境变量
+.TP
+.B MANPATH
+如果
+.B MANPATH
+有定义，那么它的值将在查找man文档页时做为搜索路径来使用。
+.TP
+.B MANROFFSEQ
+如果
+.B MANROFFSEQ
+有定义，则此变量的值将用来决定在nroff或troff执行前将要执行的预处
+理程序的次序。默认情况下，手册页会在nroff处理前选取进行表格处理。
+.TP
+.B MANSECT
+如果
+.B MANSECT
+有定义，它的值将决定man有搜索时的查找区段。
+.TP
+.B MANWIDTH
+如果MANWIDTH有定义，它的值将决定显示man手册页时的宽度。否则，将是以全屏的方式来
+显示。
+.TP
+.B MANPAGER
+如果
+.B MANPAGER
+有定义，它的值将指定用来显示man文档的程序。如果没有在此指定，那么将
+使用由PAGER变量指定的程序。如果还是没有指定，那么会默认使用/usr/bin/less -is 。
+.TP
+.B LANG
+如果
+.B LANG
+有定义，它的值将指定man在查找文档时首先查找的子目录。因此，命令“LAN
+G=dk man 1 foo”会使man在查找man页时首先查找../dk/man1/foo.1，如果在其中没有找到相
+关文档，则查找../man/foo.1，此目录是由查找路径指定的。
+.TP
+.B "NLAPATH，LC_MESSAGES，LANG"
+环境变量
+.B NLAPATH
+和
+.B LC_MESSAGES
+（或当后一个不存在时使用
+.B LANG
+）充当了定位文档目录的
+角色。（但英文信息是编译进命令的，所以针对英文而言，就没有目录存在）。注意，象col
+(1)这样被man调用的程序也使用象
+.B LC_CTYPE
+这样的变量。
+.TP
+.B PATH
+变量
+.B PATH
+是在解释查找man手册页路径时使用的。
+.TP
+.B SYSTEM
+变量
+.B SYSTEM
+是用来得到默认的系统名（用-m参数可以得到同样的效果）。
+.SH 另见
+apropos(1),whatis(1),less(1),groff(1).
+
+.SH BUGS
+选项
+.B -t
+只能使用在装有类troff程序的环境中。
+如果在你的显示中出现高亮度的\255或<AD>这样的字符而不是连字符，请在你的配置文件中
+写入“LESSCHARSET=latin1”这样的环境变量。
+.SH 技巧
+如果你在你的
+.IR .emacs
+文件中加入(global-set-key[(f1)](lambda()(interactive)(manuale
+ntry(current-word))))这一行，则当你按F1键时会自动跳出当前鼠标指向的相应程序的man手册页。
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.TP 
+译者：
+所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

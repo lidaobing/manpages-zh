@@ -1,0 +1,511 @@
+'\" t
+.\" Don't change the first line, it tells man that we need tbl.
+.\" This man page is Copyright (C) 1999 Andi Kleen .
+.\" and copyright (c) 1999 Matthew Wilcox. 
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.TH SOCKET  7 "7 May 1999" "Linux Man Page" "Linux Programmer's Manual" 
+.SH NAME
+socket \- Linux 套接字
+.SH 总览
+.B #include  <sys/socket.h>
+.br
+.IB mysocket " = socket(int " socket_family ", int " socket_type ", int " protocol );
+
+.SH 描述
+本手册页介绍了 Linux 套接字的用户接口. 这个 BSD 兼容套接字是介于用
+户进程与内核网络协议栈之间的统一接口, 各协议模块属于不同的
+.I 协议族
+,如
+.BR PF_INET ", " PF_IPX ", " PF_PACKET
+和
+.I 套接字类型
+,如
+.B 字节流（SOCK_STREAM）
+或
+.BR 数据报（SOCK_DGRAM）.
+关于协议族和套接字类型请参考
+.BR socket (2) "."
+
+.SH 套接层函数
+用户通过这些套接字函数发送和接收包, 以及其他套接字操作.
+详细说明参看他们各自的手册页.
+
+.BR socket (2)
+创建套接字，
+.PP
+.BR connect (2)
+与远程套接字地址建立连接
+.PP
+.BR bind (2)
+把套接字和一个本地套接字地址绑定在一起（为套接字分配一个本地协议地址）
+.PP
+.BR listen (2)
+通知套接字接受新的连接
+.PP
+.BR accept (2)
+为新的已完成连接获得新的描述字
+.PP
+.BR socketpair (2)
+返回两个连接的匿名套接字（仅在某些本地族中才有实现,如
+.BR PF_UNIX "）"
+.PP
+.BR send (2),
+.PP
+.BR sendto (2),
+和
+.BR sendmsg (2)
+通过套接字发送数据，而
+.BR recv (2),
+.BR recvfrom (2),
+.BR recvmsg (2)
+从套接字接收数据.
+.BR poll (2)
+和
+.PP
+.BR select (2)
+等待数据到来或准备好接收数据. 除此之外, 标准 I/O 操作如
+.BR write (2),
+.BR writev (2),
+.BR sendfile (2),
+.BR read (2),
+和
+.BR readv (2) 
+也可用来读入（接收）和写出（发送）数据.
+.PP
+.BR getsockname (2)
+用于获得本地套接字地址
+.PP
+.BR getpeername (2)
+用于获得远端套接字地址.
+.BR getsockopt (2)
+和
+.BR setsockopt (2)
+用于设置或取得套接字或协议选项. 
+.BR ioctl (2)
+也可以用来设置或读取一些其他选项.
+.PP
+.BR close (2)
+关闭套接字.
+.BR shutdown (2)
+关闭全双工套接字连接的一部分.
+.PP
+套接字不支持搜索，也不支持调用
+.BR pread (2) 
+或
+.BR pwrite (2)
+进行非 0 位置的操作.
+可以用
+.BR fcntl (2).
+设置
+.B O_NONBLOCK
+标志来实现对套接字的非阻塞 I/O 操作
+.B O_NONBLOCK
+是从 accept 继承来的，然后原来所有会阻塞的操作会返回
+.BR EAGAIN .
+.BR connect (2) 
+在此情况下返回
+.B EINPROGRESS
+错误.
+用户可以通过
+.BR poll (2)
+或者
+.BR select (2)
+等待各种事件.
+
+.PP
+.TS
+tab(:) allbox;
+c s s
+l l l.
+I/O 事件
+事件:轮询标志:发生事件
+读:POLLIN:T{
+新数据到达.
+T}
+读:POLLIN:T{
+(对面向连接的套接字)建立连接成功
+T}
+读:POLLHUP:T{
+另一端套接字发出断开连接请求.
+T}
+读:POLLHUP:T{
+(仅对面向连接协议)套接字写的时候连接断开. 同时发送
+.B SIGPIPE.
+T}
+写:POLLOUT:T{
+套接字有充足的发送缓冲区用于写入新数据.
+T}
+读/写:T{
+POLLIN|
+.br
+POLLOUT
+T}:T{
+发出的
+.BR connect (2)
+结束.
+T}
+读/写:POLLERR:产生一个异步错误.
+读/写:POLLHUP:对方已经单向关闭连接.
+例外:POLLPRI:T{
+紧急数据到达.然后发送
+.B SIGURG.
+T}
+.\" XXX not true currently
+.\" It is no I/O event when the connection
+.\" is broken from the local end using 
+.\" .BR shutdown (2)
+.\" or 
+.\" .BR close (2)
+.\" .
+.TE
+
+.PP
+另外一个的 poll/select 方法是让内核用
+.B SIGIO
+信号来通知应用程序. 要这么用的话你必须用
+.BR fcntl (2)
+设置套接字文件描述符的
+.B FASYNC
+标志，并用
+.BR sigaction (2).
+给
+.B SIGIO
+信号设置一个的有效信号处理句柄.参看下面的
+.I SIGNALS
+的讨论.
+.SH 套接字选项
+套接字选项可以用
+.BR setsockopt (2)
+来设置，用
+.BR getsockopt (2)
+读取所有套接字级别设为
+.B SOL_SOCKET 
+的套接字的套接字选项:
+.TP
+.B SO_KEEPALIVE
+允许在面向连接的套接字上发送 keep\-alive 消息的功能.是一个布尔整数.
+.TP
+.B SO_OOBINLINE
+如果打开这个选项，带外（Out\-of\-Band）数据可以直接放入接收数据流。
+否则，只有接收时打开
+.B MSG_OOB 
+标志, 才接收带外数据.
+.\" don't document it because it can do too much harm.
+.\".B SO_NO_CHECK
+.TP
+.BR SO_RCVLOWAT " 和 " SO_SNDLOWAT
+声明在开始向协议
+.RB ( SO_SNDLOWAT ) 
+或正在接收数据的用户
+.RB ( SO_RCVLOWAT ).
+传递数据之前缓冲区内的最小字节数. 在 Linux 中这两个值是不可改变的,
+固定为 1 字节.
+可以用
+.B getsockopt 
+用来读取它们的值; 
+.B setsockopt 
+总是返回
+.BR ENOPROTOOPT .  
+.TP
+.BR SO_RCVTIMEO " 和 " SO_SNDTIMEO
+发送和接收时的超时设定, 并在超时时报错. 在 Linux 中由
+协议指定, 不能被读写. 它们的功能可用
+.BR alarm (2)
+或者
+.BR setitimer (2).
+来模拟.
+.TP
+.B SO_BSDCOMPAT
+允许 BSD 的 bug\-to\-bug 兼容. 这一项只能在 UDP 协议模块中使用而
+且今后将要取消. 如果允许的话, UDP 套接字接收到的 ICMP 错误将不
+会被传送至用户程序. Linux 2.0 中对于原始套接字也允许 BSD 
+bug\-to\-bug 兼容（报头随机改变,省略广播标识）,但在 Linux 2.2
+中取消了这一项. 修改用户程序的方式比较好.
+.TP
+.B SO_PASSCRED
+允许或关闭
+.B SCM_CREDENTIALS
+控制消息的接收.
+更多信息参见
+.BR unix (7). 
+.TP
+.B SO_PEERCRED
+返回连接至此套接字的外部进程的身份验证. 只在 
+.B PF_UNIX 
+套接字中有用.参见 
+.BR unix (7). 
+参数为
+.B ucred 
+结构.只在
+.BR getsockopt .
+中有效.
+.TP
+.B SO_BINDTODEVICE
+将此套接字绑定到一个特定的设备上, 如\(lqeth0\(rq,
+做为指定的接口名字传递. 如果名称是空字符串或此项长度为 0,
+则套接字设备绑定被取消. 过去的选项是一个变长的空零结尾的
+接口名称的字符串, 其最大长度为
+.BR IFNAMSIZ . 
+如果一个套接字被绑定至一接口,
+只有由这个特定接口接收的信息包可以由此套接字处理.
+.TP
+.B SO_DEBUG 
+允许套接字调试.只对有
+.B CAP_NET_ADMIN
+功能或有效用户标识为 0 的进程有效.
+.TP
+.B SO_REUSEADDR
+表示在一个
+.BR bind (2) 
+调用中对提供给它的地址使用的确认规则应该允许重复使用本地地址. 对于
+.B PF_INET
+套接字, 这表示该套接字可以绑定, 除非已有一个活跃的侦听套
+接口绑定到此地址上. 如果这个侦听套接字和一个指定端口绑定为
+.B INADDR_ANY
+时, 它就不能再绑定到任何本地地址的此端口.
+.TP
+.B SO_TYPE
+按整数返回套接字类型（如
+.BR SOCK_STREAM ） 
+只能通过
+.BR getsockopt
+读取. 
+.TP
+.B SO_DONTROUTE
+不通过网关发送, 只能发送给直接连接的主机.可以通过在套接字的
+.BR send (2)
+操作上设置
+.B MSG_DONTROUTE
+标志来实现相同的效果. 其值为布尔型整数的标识.
+.TP
+.B SO_BROADCAST
+设置或获取广播标识. 当选择此选项时, 数据报套接字接收向
+广播地址发送的数据包, 并且可以向广播地址发送数据包. 这一
+选项对于面向流的套接字无效.
+.TP
+.B SO_SNDBUF 
+设置或得到套接字发送缓冲区的最大字节数. 其默认值由 
+.B wmem_default 
+sysctl 设置,最大允许值由
+.B wmem_max
+sysctl 设置.
+.TP
+.B SO_RCVBUF
+设置或得到套接字接收缓冲区的最大字节数。其默认值由 
+.B rmem_default 
+sysctl设置,最大允许值由
+.B rmem_max
+sysctl 设置.
+.TP
+.B SO_LINGER
+设置或获取
+.B SO_LINGER 
+选项的值. 其参数为
+.B linger 
+结构.
+.PP
+.RS
+.nf
+.ta 4n 10n 22n
+struct linger {
+	int	l_onoff;	/* 延时状态（打开/关闭） */
+	int	l_linger;	/* 延时多长时间 */
+};
+.ta
+.fi
+.RE
+.IP
+如果选择此选项,
+.BR close (2)
+或
+.BR shutdown (2)
+将等到所有套接字里排队的消息成功发送或到达延迟时间后
+才会返回. 否则, 调用将立即返回. 而 closing 操作将在后台
+进行. 如果套接字是
+.BR exit (2),
+的一部分关闭时, 它总是在后台延迟进行的.
+.TP
+.B SO_PRIORITY
+设置在此套接字发送的所有包的协议定义优先权.
+Linux 通过这一值来排列网络队列: 根据所选设备排队规则, 
+具有更高优先权的包可以先被处理.对于
+.BR ip (7),
+同时也设置了输出包的 IP 服务类型（TOS）的域.
+.TP
+.B SO_ERROR
+取得并清除未解决的套接字错误. 只有在
+.BR getsockopt .
+时有效. 是一个整数值.
+.SH SIGNALS
+当向一个已关闭（被本地或远程终端）的面向联接的套接字写入时,
+将向该写入进程发送
+.B SIGPIPE
+信号，并返回
+.B EPIPE
+.
+如果写入命令声明了
+.B MSG_NOSIGNAL 
+标识时, 不会发出此信号.
+.PP
+如果与
+.B FIOCSETOWN 
+fcntl 或 
+.B SIOCSPGRP 
+ioctl 一起请求，那么当发生 I/O 事件时发出
+.B SIGIO
+这样我们就可以在信号句柄里使用
+.BR poll (2)
+或
+.BR select (2)
+找出发生事件的套接字.
+另一种选择（在 Linux 2.2 中）是用
+.B F_SETSIG
+fcntl 设置一个实时信号:
+实时信号的处理程序被调用时还会收到它的
+.IR siginfo_t 
+的
+.I si_fd 
+区域中的文件描述符.
+更多信息参见
+.BR fcntl (2)
+.PP
+在某些环境中（例如:多个进程访问单个套接字）,
+引发
+.B SIGIO
+的东西在进程对信号作出反应时可能已经消失了.
+如果这样的话, 进程应该再次等待, 因为 Linux 稍后会重发此信号.
+.\" .SH辅助消息
+.SH SYSCTLS 
+可以通过目录
+.B /proc/sys/net/core/* 
+下的文件或者用
+.BR sysctl (2) 
+系统调用来访问内核套接字的网络系统控制（sysctl）信息.
+.TP
+.B rmem_default
+指明套接字接收缓冲区的默认字节数.
+.TP
+.B rmem_max
+指明套接字接收缓冲区的最大字节数, 用户可以通过使用
+.B SO_RCVBUF
+套接字选项来设置此值.
+.TP
+.B wmem_default
+指明套接字发送缓冲区的默认字节数.
+.TP
+.B wmem_max
+指明发送缓冲区的最大字节数，用户可以通过使用套接字的
+.B SO_SNDBUF
+选项来设置它的值.
+.TP
+.BR message_cost " 和 " message_burst 
+设定记号存储桶过滤器, 在存储桶中保存一定数量的外部网络
+事件导致的警告消息.
+.TP
+.B netdev_max_backlog 
+在全局输入队列中包的最大数目.
+.TP
+.B optmem_max
+每个套接字的象 iovecs 这样的辅助数据和用户控制数据的最大长度.
+.\" netdev_fastroute 没有介绍
+.SH IOCTLS
+以上的 IO 控制值可以通过
+.BR ioctl (2)
+来访问:
+
+.RS
+.nf
+.IB error " = ioctl(" ip_socket ", " ioctl_type ", " &value_result ");"
+.fi
+.RE
+
+.TP
+.B SIOCGSTAMP
+返回
+.B timeval 
+类型的结构，其中包括有发送给用户的最后一个包接收时的时间戳。
+被用来测量精确的 RTT （round trip time） 时间.
+.BR "struct timeval" .
+结构说明请参考
+.BR setitimer (2) 
+.\"
+.TP
+.BR SIOCSPGRP
+在异步 IO 操作结束或者接收到紧急数据时，用来设置进程或进程组，
+向它（它们）发送
+.B SIGIO
+或者
+.B SIGURG
+信号, 参数为指向
+.BR pid_t . 
+类型的指针。如果参数为正，则发送信号到相应的进程。如果参数为
+负，则发送信号到此参数绝对值 id 所属的进程组的所有进程。
+如果它没有
+.B CAP_KILL
+功能或者它的有效 UID 不是 0, 进程只能选择它自己或自己的进程组来
+接收信号.
+.TP
+.B FIOASYNC
+改变
+.B O_ASYNC
+标志来打开或者关闭套接字的异步 IO 模式。异步IO模式指的是：当
+新的 I/O 事件发生时，将发出
+.B SIGIO 
+信号或者用
+.B F_SETSIG
+设置的信号.
+.IP
+参数为整形布尔量. 
+.\"
+.TP
+.BR SIOCGPGRP
+获得当前接收
+.B SIGIO 
+或者
+.B SIGURG
+信号的进程或者进程组, 
+如果两个信号都没有设置, 则为 0.
+.PP
+有效的 fcntl:
+.TP
+.BR FIOCGETOWN 
+与 IO 控制中的 SIOCGPGRP 相同.
+.TP
+.BR FIOCSETOWN
+与 IO 控制中的 SIOCSPGRP 相同.
+.SH 注意
+Linux 假设有一半的发送/接收缓冲区是用来处理内核结构, 因此, 
+系统控制的缓冲区是网络可访问的缓冲区的两倍.
+.SH 缺陷
+.B CONFIG_FILTER 
+没有介绍
+.B SO_ATTACH_FILTER 
+和
+.B SO_DETACH_FILTER 
+套接字选项. 在 libpcap 库有此接口的说明
+.SH VERSIONS 版本
+.B SO_BINDTODEVICE 
+在 Linux 2.0.30 中引入. 
+.B SO_PASSCRED 
+是在 Linux 2.2 中引入的新选项.
+sysctl 是在 Linux 2.2. 中引入的新概念。 
+.SH 作者
+本手册页由 Andi Kleen 编写.
+.PP
+.SH 又见
+.BR socket (2),
+.BR ip (7),
+.BR setsockopt (2),
+.BR getsockopt (2),
+.BR packet (7),
+.BR ddp (7) 
+
+.SH "[中文版维护人]"
+.B liguoping <liguoping_11@sina.com>
+.SH "[中文版最新更新]"
+.BR 2000/11/06
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

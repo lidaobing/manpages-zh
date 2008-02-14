@@ -1,0 +1,306 @@
+.\" This man page is Copyright (C) 1999 Andi Kleen .
+.\" Permission is granted to distribute possibly modified copies
+.\" of this page provided the header is included verbatim,
+.\" and in case of nontrivial modification author and date
+.\" of the modification is added to the header.
+.TH TCP 7 "25 Apr 1999" "Linux Man Page" "Linux Programmer's Manual" 
+.\" 中文版 Copyright (c) 2000 LetBright, Laser 和 www.linuxforum.net
+
+.SH NAME
+tcp \- 传输控制协议 （TCP）
+.SH 总缆 SYNOPSIS
+.B #include <sys/socket.h>
+.br
+.B #include <netinet/in.h>
+.br
+.B tcp_socket = socket(PF_INET, SOCK_STREAM, 0);
+.SH 描述 DESCRIPTION
+本协议是对 RFC973, RFC1122 和 RFC2001 定义的协议
+及其 NewReno 和 SACK 扩充部份实现的。
+它在建立在互联网协议
+.BR ip (7)
+之上的两个套接字之间提供了可靠的面向数据流的全双工连接。
+TCP 协议确保了数据按序到达并在数据包丢失时自动重发。
+它产生和校验每个数据包的校验和 (checksum)
+用以捕捉数据传输时错误。TCP 不保留记录的上下限。
+
+初始的 TCP 接口不包含远端或本地址并且没有规定明确。
+在产生一个出站 (outgoing) TCP 连接时使用
+.BR connect (2)
+来与另个套接字建立一个网络接口。
+在接收一个入站 (incoming) 连接时，套接字使用
+.BR bind (2) 
+先取得本地地址和端口，然后调用
+.BR listen (2)
+使套接字进入侦听状态。
+随后可以用
+.BR accept (2).
+接受为每一个入站 (incoming) 连接建立的新套接字。
+一个已经经过
+.B accept
+或
+.B connect
+成功调用的套接字表示它已完全明确，可以进行数据传送。
+在侦听状态或尚未建立连接的网络接口之间数据传送将不能进行。
+
+Linux 2.2 支持 RFC1323 TCP 高性能扩展。这包括采用大 TCP 数据滑移
+窗以支持高延时或高带宽下的多连接。为实现这些功能，必须增加接
+收与发送的数据缓存区。它们可以使用
+.B net.core.wmem_default
+和
+.B net.core.rmem_default
+sysctl 进行全局设定,或用
+.B SO_SNDBUF 
+和
+.B SO_RCVBUF 
+套接字选项对套接字进行单独设定。
+套接字缓存区的最大尺寸，受到由全局变量
+.B net.core.rmem_max
+和
+.B net.core.wmem_max
+两个 sysctl 限制。详细细节，请参见
+.BR socket (7).
+.PP 
+TCP 支持紧急数据。紧急数据用来通知接收方，在数据流中有需要尽快处理
+的重要信息。发送紧急数据，需在
+.BR send (2).
+中指定
+.B MSG_OOB
+选项。当紧急数据接收后，内核发送
+.B SIGURG
+信号到读进程或者那些用 ioctl 设置了
+.B FIOCSPGRP
+或
+.B FIOCSETOWN 
+套接字的进程或进程组．
+当打开了
+.B SO_OOBINLINE
+套接字选项, 那么紧急数据被放入普通数据流中。
+(可以用
+.B SIOCATMARK
+ioctl 来测试), 否则只有设置了
+.BR sendmsg (2)
+中的
+.B MSG_OOB
+标志时，数据才能被接收。 
+
+.SH 地址格式 ADDRESS FORMATS
+TCP 是建立在 IP 之上(参见
+.BR ip (7)).
+.BR ip (7)
+定义定义的地址格式也适用于 TCP.
+TCP只支持点对点通讯，不支持全局及多址广播。
+.SH 系统控制 SYSCTLS
+可以通过访问
+.B /proc/sys/net/ipv4/* 
+目录下的文件
+或通过
+.BR sysctl (2)
+接口进行访问这些 sysctl.
+此外大多数 IP sysctl 也同样适用于 TCP; 参见
+.BR ip (7). 
+.TP
+.B tcp_window_scaling
+打开 RFC1323 协议中 TCP 滑移数据窗尺寸调整.
+.TP
+.B tcp_sack
+打开 RFC2018 协议中 TCP 选择性确认.
+.TP
+.B tcp_timestamps
+打开 RFC1323 协议中 TCP 时间戳.
+.TP
+.B tcp_fin_timeout
+规定强迫关闭套接字前，等待最后结束数据包的秒数。
+这确实与 TCP 协议中有关规定相违背。
+但这是防止拒绝服务攻击所要求的。
+.TP
+.B tcp_keepalive_probes
+丢弃数据包前，进行最大 TCP 保持连接侦测. 保持连接仅在
+.B SO_KEEPALIVE 
+套接字选项被打开时才被发送.
+.TP
+.B tcp_keepalive_time
+从不再传送数据到向连接上发送保持连接信号之间所需的秒数，
+默认为 10800 秒(3 小时)。
+.TP
+.B tcp_max_ka_probes
+在一定时间发送保持连接时间侦测包的数量。为防止突发信号，此
+值不宜设置太高。
+.TP
+.B tcp_stdurg
+使 TCP 紧急指针字段遵循在 RFC973 协议中的严格解释。缺省情况下，
+紧急指针字段使用与 BSD 相兼容，指针指向紧急数据后的第一个字节。
+在 RFC973 协议中是指向紧急数据后的最后一个字节。打开这一选项
+可能造成操作互换性问题。
+.TP
+.B tcp_syncookies
+打开 TCP 同步标签(syncookie)，内核必须打开了
+.BR CONFIG_SYN_COOKIES
+项进行编译. 同步标签(Syncookie)防止一个套接字在有过多试图连接到
+达时的过载。当使用同步标签(syncookie)时，客户机可能探测不到
+一个超时时间短的过载主机。
+.TP
+.B tcp_max_syn_backlog
+每个接口中待发数据队列 (backlog) 长度。Linux 2.2 中,在
+.BR listen (2)
+中的定义只说明了已建立的套接字中待发数据队列(backlog)长度。
+每个侦测套接字的还未建立的套接字(在
+.B SYN_RECV
+状态中的)的最大队列长度用这个 sysctl 设置。
+当更多的连接请求到达时，Linux
+系统将开始丢弃数据包。当同步标签(syncookie)被设置成打开，
+数据包仍能被回应时，这个值将被忽略。
+.TP
+.B tcp_retries1
+定义放弃回应一个 TCP 连接请求前发送重试信号的次数。
+.TP
+.B tcp_retries2
+定义放弃在已建立通讯状态下一个 TCP 数据包前重发的次数。
+.TP
+.B tcp_syn_retries
+定义在放弃发送初始同步数据包(SYN packet)到远端主机前重试的次数并返回出
+错消息，此值必须小于255。这仅对出站(outgoing)连接超时有效；
+对于进站(incoming)连接重发数由
+.BR tcp_retries1
+定义。
+.TP
+.B tcp_retrans_collapse
+在重发时试图发送全尺寸数据包。
+用来解决一些堆栈中的 TCP 缺陷(BUG)。
+.\" tcp_rfc1337 并未列入文档因为它过含糊和混乱。
+.SH 接口选项 SOCKET OPTIONS
+设置或取得 TCP 接口选项，调用
+.BR getsockopt (2)
+进行读操作或调用
+.BR setsockopt (2)
+将接口系列选项参数传送到
+.BR SOL_TCP
+中去.另外，大多数
+.B SOL_IP 
+接口
+选项对 TCP 接口也适用。更多资料，请参见
+.BR ip (7).
+.TP
+.B TCP_NODELAY
+关闭 Nagle 算法。这意味着数据包将尽可能快地被发送而没有因有网
+络中更多的数据包造成的延时，期待一个整数表示的布尔标志。
+.TP
+.B TCP_MAXSEG 
+设置或接收最大出站 TCP 数据段尺寸。如果这个选项在建立连接前的
+设置，它将改变发送到另一端初始信息包中的 MSS 值。这个值大于
+MTU 接口值将被忽略而不起作用。
+.TP
+.B TCP_CORK
+设置此项将不发送部份帧。所有排队的部份帧只在此项清除后，
+才能发送。在调用
+.BR sendfile (2)
+前准备数据报头或对网络吞吐量进行优化有用处。
+此选项不能与
+.BR TCP_NODELAY
+联用.
+.SH 输入输出控制字 IOCTLS
+这些 ioctl 可以用
+.BR ioctl (2)
+进行访问。正确调用句法为:
+.PP
+.RS
+.nf
+.BI int " value";
+.IB error " = ioctl(" tcp_socket ", " ioctl_type ", &" value ");"
+.fi
+.RE
+.TP
+.B FIONREAD
+返回接收缓存中排队的未读数据的数量。
+变量参数是指向一个整数的指针。
+.TP
+.B SIOCATMARK
+如果用户程序已经接收了所有紧急数据，此项返回值为 0。它与
+.BR SO_OOBINLINE
+联用。变量参数是对测试结果，指向一个整数的指针。
+.TP
+.B TIOCOUTQ
+返回在接口(socket)发送队列中待发送数据数，
+该指针返回是一个整数数值。
+.SH 出错处理 ERROR HANDLING
+当网络发生错误时，TCP 协议将尝试重新发送数据包，
+当重发一定失败次数后，产生超时错
+.B ETIMEDOUT 
+或报告在此连接上最后出错消息。
+.PP
+有时程序需要更快地侦测到出错状态。这可以通过打开
+.B SOL_IP
+级别的
+.B IP_RECVERR
+接口选项。当此项打开后，所有入站 (incoming) 错误
+被立即送到用户程序中。小心使用该选项\-它使 TCP 协议对路由的改
+变和其他正常网络状态变化的容错性下降。
+.SH 附注 NOTES
+当建立一个连接时发生错误引发一个对
+.B SIGPIPE
+接口写操作，此操作
+仅当
+.B SO_KEEPOPEN
+接口选项被设置时才能进行。
+.PP
+TCP 并不具有真正的额外频带(out-of-band)数据; 虽然它可以有紧
+急数据。在 Linux 中这意味着如果有其他端发送紧急数据时，旧的紧
+急数据将被当作普通数据插入数据流中。(即使
+.B SO_OOBINLINE
+值没有被设置).这与基于 BSD 堆栈定义不同.
+
+.PP
+缺省状态下，Linux 使用与 BSD 兼容的紧急数据指针字段。这与 RFC1122
+协议相违背, 但这是与其他堆栈协议相互操作性所要求。它可以用
+.B tcp_stdurg
+sysctl 加以改变.
+
+.SH 已知错误 ERRORS
+.TP
+.B EPIPE
+另一端意外关闭了套接字连接或对一个关闭了的套接字进行读操作。
+.TP
+.B ETIMEDOUT
+一段时间后，另一端不确认重发数据。
+.TP
+.B EAFNOTSUPPORT
+在
+.I sin_family
+传递套接字地址类型而不是在
+.BR AF_INET 中的。
+.PP
+任何定义为
+.BR ip (7)
+出错或普通套接字出错可能返回为 TCP 出错.
+.PP
+
+.SH 不足之处 BUGS
+不是所有的错误都列入了文档。
+.PP 没有描述有关 IPv6 的东西。
+.PP
+没有描述有关透明代理的选项
+.SH 版本 VERSIONS
+有关 sysctl 是在 Linux 2.2 中新增的。 
+.B IP_RECVERR 
+是 Linux 2.2 中的新特性。
+.B TCP_CORK 
+在 2.2 中是新的内容.
+.SH 又见 SEE ALSO
+.BR socket (7),
+.BR socket (2),
+.BR ip (7),
+.BR sendmsg (2),
+.BR recvmsg (2).
+.br
+RFC793 协议中对 TCP 有关描述.
+.br
+RFC1122 协议中对 TCP 要求和一份关于 Nagle 算法描述。
+.br
+RFC2001 协议中一些 TCP 算法。
+
+.SH "[中文版维护人]"
+.B LetBright <letbright@netease.com>
+.SH "[中文版最新更新]"
+.B 2000/10/21
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

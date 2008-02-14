@@ -1,0 +1,198 @@
+.\" From Henry Spencer's regex package (as found in the apache
+.\" distribution). The package carries the following copyright:
+.\"
+.\"  Copyright 1992, 1993, 1994 Henry Spencer.  All rights reserved.
+.\"  This software is not subject to any license of the American Telephone
+.\"  and Telegraph Company or of the Regents of the University of California.
+.\"  
+.\"  Permission is granted to anyone to use this software for any purpose
+.\"  on any computer system, and to alter it and redistribute it, subject
+.\"  to the following restrictions:
+.\"  
+.\"  1. The author is not responsible for the consequences of use of this
+.\"     software, no matter how awful, even if they arise from flaws in it.
+.\"  
+.\"  2. The origin of this software must not be misrepresented, either by
+.\"     explicit claim or by omission.  Since few users ever read sources,
+.\"     credits must appear in the documentation.
+.\"  
+.\"  3. Altered versions must be plainly marked as such, and must not be
+.\"     misrepresented as being the original software.  Since few users
+.\"     ever read sources, credits must appear in the documentation.
+.\"  
+.\"  4. This notice may not be removed or altered.
+.\" 
+.\" In order to comply with `credits must appear in the documentation'
+.\" I added an AUTHOR paragraph below - aeb.
+.\"
+.\" In the default nroff environment there is no dagger \(dg.
+.ie t .ds dg \(dg
+.el .ds dg (!)
+.TH REGEX 7 1994-02-07 
+.SH NAME
+regex \- POSIX 1003.2 正则表达式
+.SH DESCRIPTION
+正则表达式 (``RE''s),
+在 POSIX 1003.2 中定义，包含两种类型：
+新式 REs (基本上指的是
+.IR egrep 
+使用的那些，1003.2 称其为 ``extended'' REs
+也就是“扩展的REs”)
+和旧式 REs (指的是
+.BR ed (1)
+中的那些，1003.2 称之为 ``basic'' REs
+也就是“基本的REs”).
+旧式 REs 的存在仅仅是为了向后和一些旧程序保持兼容；在最后将加以讨论。
+1003.2 对 RE 语法和语义的某些方面没有做强制规定；
+`\*(dg' 记号标示了这些内容，它们可能不能完全移植到其他 1003.2 实现当中。
+.PP
+一个(新式的) RE 正则表达式是一个\*(dg 或多个非空\*(dg \fIbranches\fR 分支，以 `|' 分隔。
+它匹配任何匹配其中一个分支的符号串。
+.PP
+一个 branch 分支是一个\*(dg 或多个 \fIpieces\fR 片段连结而成。
+符号串首先要匹配它的第一个片段，接下来剩余部分再匹配第二个片段，以此类推。
+.PP
+一个 piece 片段是一个 \fIatom\fR 原子，其后可能包含一个\*(dg `*', `+', `?', 或者 \fIbound\fR 量词。
+一个原子加上 `*' 匹配零个或多个这个原子的匹配构成的序列。
+一个原子加上 `+' 匹配一个或多个这个原子的匹配构成的序列。
+一个原子加上 `?' 匹配零个或一个这个原子的匹配。
+.PP
+一个 \fIbound\fR 量词是 `{' 后面跟一个无符号十进制整数，可能还会跟一个 `,'，
+可能还会再跟一个无符号十进制整数，然后以 `}' 结束。
+整数的大小必须在 0 和 RE_DUP_MAX (255\*(dg) 之间(包含边界值)。
+如果给出了两个数字，那么第一个决不能比第二个大。
+一个原子的量词中如果只有一个数字而没有逗号的话，就匹配 
+\fIi\fR 个这个原子的匹配构成的序列。
+一个原子的量词中如果只有一个数字并且有逗号的话，就匹配
+\fIi\fR 个或多个这个原子的匹配构成的序列。
+一个原子的量词中如果包含两个数字 \fIi\fR 和 \fIj\fR 的话，就匹配
+\fIi\fR 到 \fIj\fR 个这个原子的匹配构成的序列。
+.PP
+一个原子是一个包含在 `()' 中的正则表达式 (这将匹配这个正则表达式匹配的符号串)，
+一个空的 `()' (匹配空串)，
+一个 \fIbracket expression\fR (方括号表达式，参见下面)，
+`.' (匹配任何字符)，
+`^' (匹配行首的空字符串)，
+`$' (匹配行尾的空字符串)，
+一个 `\e' 加上下列字符之一
+`^.[$()|*+?{\e' (匹配这个字符，忽略它的任何特殊意义)，
+一个 `\e' (加上任何其他字符\*(dg 匹配那个字符，忽略它的任何特殊意义，就好像 `\e' 不存在\*(dg)，
+或者是一个字符，没有特殊意义 (匹配它本身)。
+一个 `{' 后面是一个非数字的字符时，是一个普通的字符而不是量词的开始\*(dg。
+以 `\e' 来结束一个 RE 是非法的。
+.PP
+一个 \fIbracket expression\fR 方括号表达式是一个字符的列表，包含在 `[]' 当中。
+它一般匹配列表中的任何一个字符 (有特殊情况)。
+如果这个列表以 `^' 开始，它将匹配 \fI不在\fR 列表中的任何字符 (下面还会讲到特殊情况)。
+如果列表中的两个字符以 `\-' 分隔，可以表示字母表中这两个字符之间(包括这两个字符)所有的字符。
+例如，ASCII 字符表中 `[0\-9]' 匹配任何数字。
+不能\*(dg 用一个字符作为定义两个字符范围的端点，就像这样 `a-c-e'。
+字符范围是与字母表顺序相关的，可移植的程序不应使用它们。
+.PP
+要在列表中包含一个字面的(没有特殊含义的) `]'，可以把它放在首位(后面可能要加上一个`^')。
+要在列表中包含一个字面的 `\-'，可以把它放在首位或末尾，或者让它作为一个字符范围的末端点。
+要以一个字面的 `\-' 作为字符范围的起始，可以将它放在 `[.' 和 `.]' 当中，
+使得它成为一个 collating element (归并元素，参见下面)。
+特殊情况除了这些，还有使用 `[' 的组合(参见下一段)。所有其他特殊字符，包括 `\e'
+在内，在方括号表达式中都失去了它们的特殊含义。
+.PP
+方括号表达式中，一个包含在 `[.' 和 `.]' 中的归并元素 (collating element，一个字符，一个视为一体的字符序列，
+或者一个代表着上述两类的归并序列名称) 代表着这个归并元素所包含的字符序列。
+这个序列被视为方括号表达式的一个元素。
+因此一个包含着多字符归并元素的方括号表达式可以匹配多于一个的字符。
+例如，如果这个归并序列包含一个归并元素 `ch'，那么
+正则表达式 `[[.ch.]]'*c' 可以匹配 `chchcc' 的前五个字符。
+.PP
+方括号表达式中，一个包含在 `[=' 和 `=]' 中的归并元素是一个等价类，代表着
+等价于它的所有归并元素 (也包括它自身)包含的字符的序列。
+(如果没有其他等价的归并元素，就把它与括号分隔符是 `[.' 和 `.]' 时同样看待。)
+例如，如果 o 和 \o'o^' 是一个等价类的成员，那么 `[[=o=]]'，`[[=\o'o^'=]]' 还有 `[o\o'o^']' 都是同义词。
+一个等价类不能\*(dg 是一个字符范围的末端点。
+.PP
+方括号表达式中，包含在 `[:' 和 `:]' 中的一个 \fIcharacter class\fR(字符类) 代表着这个
+字符类中的所有字符的列表。
+标准的字符类名称是：
+.PP
+.RS
+.nf
+.ta 3c 6c 9c
+alnum	digit	punct
+alpha	graph	space
+blank	lower	upper
+cntrl	print	xdigit
+.fi
+.RE
+.PP
+它们代表着
+.BR wctype (3)
+定义的字符类。
+一个 locale(语言环境) 可能会提供其他字符类。
+一个字符类不能用作一个字符范围的末端点。
+.PP
+方括号表达式还有两种特殊的情况\*(dg ：
+方括号表达式 `[[:<:]]' 和 `[[:>:]]' 分别匹配一个词的开始和结尾的空字符串。
+一个 word (词)是一个 word character (成词字符) 的序列，并且前后都没有成词字符。
+一个 word character (成词字符) 是一个
+.I alnum
+字符 (在
+.BR wctype (3) 
+中有定义) 或者是一个下划线。
+这是一个扩展，与 POSIX 1003.2 兼容但没有写入正文，在需要移植到其他系统中的软件中应当小心使用。
+.PP
+如果一个 RE 可以匹配一个字符串的多个不同的字串时，RE 选择匹配最前面的一个。
+如果这个 RE 匹配的子串有相同的起始点，RE 选择匹配最长的一个。
+子表达式也匹配最长的字串，使得整个匹配的字串最长，RE 中前面
+的子表达式比后面的子表达式优先级高。
+注意高级的子表达式比组成它的子表达式优先级要高。
+.PP
+匹配长度以字符来计算，而不是归并元素。
+空字符串被认为比没有匹配要长。例如，`bb*' 匹配 `abbbc' 的中间三个字符；
+`(wee|week)(knights|nights)' 匹配 `weeknights' 的全部十个字符；
+`(.*).*' 匹配 `abc'，其中括号中的子表达式匹配所有这三个字符；
+`(a*)*' 来和 `bc' 匹配时，括号中的子表达式和整个 RE 都匹配空字符串。
+.PP
+如果指定了 case-indepentent 忽略大小写的匹配，效果是字母表中的大小写区别似乎都消失了。
+如果一个字母可能以两种情况出现，假如它出现在方括号表达式之外，实际上被替换成了一个包含
+所有情况的方括号表达式，例如 `x' 成为了 `[xX]'；如果它出现在方括号表达式之内，
+那么它的所有形式都被加入到这个方括号表达式之内，因此例如 `[x]' 等同于
+`[xX]'，还有 `[^x]' 成为了 `[^xX]'。
+.PP
+对 RE 的长度没有强制的限制。需要可移植的程序不应当使用长于256字节的正则表达式，
+因为特定的实现可以不接受这种 RE，但是仍然是 POSIX 兼容的。
+.PP
+过时的 (``basic'') 正则表达式在很多地方有不同之处。`|'，`+' 和 `?' 是普通的字符，
+并且没有和它们等价的功能。量词的分隔符是 `\e{' 和 `\e}'，`{' 和 `}' 本身是普通的字符。
+嵌套的子表达式使用的括号是 `\e(' 和 `\e)'，`(' 和 `)' 本身是普通的字符。
+`^' 是一个普通的字符，除非是 RE 的第一个字符，或者\*(dg 一个括号中的子表达式的第一个字符。
+`$' 是一个普通的字符，除非是 RE 的最后一个字符，或者\*(dg 一个括号中的子表达式的最后一个字符。
+`*' 是一个普通的字符，如果它出现在 RE 的开始，或者一个括号中的子表达式的开始(其后一般是一个 `^')。
+最后，还有一类 atom 原子，一个 \fIback reference\fR(向后引用)：`\e' 其后跟一个非零十进制整数 \fId\fR，
+匹配与第 \fId\fR 个括号中的子表达式的匹配相同的内容(子表达式的编号是根据它们的左括号而来，从左到右)。
+因此(例如)，`\e([bc]\e)\e1' 匹配 `bb' 或 `cc' 但是不匹配 `bc'。
+.SH "SEE ALSO 参见"
+.BR regex (3)
+.PP
+POSIX 1003.2, section 2.8 (Regular Expression Notation).
+.SH BUGS
+同时使用两种 REs 是不明智的。
+.PP
+目前的 1003.2 规约称，如果右括号 `)' 没有对应的 `(' 那么视为普通字符；这个规定是一个笔误，将来会改正。
+避免使用它。
+.PP
+向后引用是糟糕的设计，是高效的实现中要面对的主要问题。
+另外还会产生晦涩的语法
+(？`a\e(\e(b\e)*\e2\e)*d' 可以匹配 `abbbd' 吗？)。
+避免使用它们。
+.PP
+1003.2 对于忽略大小写的匹配的规定也不明确。
+上面给出的定义 ``one case implies all cases'' 是当前各实现者的共识，被当作正确的语法。
+.PP
+词边界的语法丑陋得让人难以接受。
+.SH "AUTHOR 作者"
+This page was taken from Henry Spencer's regex package.
+.SH "[中文版维护人]"
+.B 袁乙钧 <bbbush@163.com>
+.SH "[中文版最新更新]"
+.BR 2004.02.24
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

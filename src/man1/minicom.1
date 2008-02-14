@@ -1,0 +1,540 @@
+.\" This file Copyright 1992,93 Michael K. Johnson (johnsonm@stolaf.edu)
+.\" Copyright 1995,1996 Miquel van Smoorenburg <miquels@cistron.nl>
+.\" Copyright 1997-2000 Jukka Lahtinen <walker@clinet.fi>
+.\" It may be distributed under the GNU Public License, version 2, or
+.\" any higher version.  See section COPYING of the GNU Public license
+.\" for conditions under which this file may be redistributed.
+.TH MINICOM 1 "2003/11/24 05:09:58" "User's Manual"
+.SH NAME
+minicom \- 友好易用的串口通信程序
+.SH "总览 SYNOPSIS"
+.B minicom
+.RI "[-somMlwz8] [-c on|off] [-S script] [-d entry]"
+.br
+.in 15
+.RI "[-a on|off] [-t term] [-p pty] [-C capturefile] [" configuration ]
+.SH "描述"
+.B minicom
+是个通信程序，有点象共享软件 TELIX，但其源码可以自由获得，并能够运行于多数Unix系统。 它包括以下特性：自动重拨号的拨号目录， 对串行设备UUCP格式的lock文件的支持，独立的脚本语言解释器，文件捕获，多用户单独配置，等等。
+.SH "命令行参数 COMMAND-LINE"
+.TP 0.5i
+.B -s
+.BR 设置。
+root 使用此选项在/etc/minirc.dfl中编辑系统范围的缺省值。
+使用此参数后，minicom 将
+.I 不
+进行初始化， 而是直接进入配置菜单。如果因为你的系统被改变，或者第一次运行minicom时，minicom不能启动，这个参数就会很有用。对于多数系统，已经内定了比较合适的缺省值。
+.TP 0.5i
+.B -o
+不进行初始化。minicom 将跳过初始化代码。如果你未复位(reset)就退出了minicom，又想重启一次会话(session)， 那么用这个选项就比较爽(不会再有错误提示：modem is locked ---- 注)。但是也有潜在的危险：由于未对lock文件等进行检查，因此一般用户可能会与uucp之类的东东发生冲突......也许以后这个参数会被去掉。现在姑且假定，使用modem的用户对自己的行为足够负责。
+.TP 0.5i
+.B -m
+用Meta或Alt键重载命令键。在1.80版中这是缺省值，也可以在minicom 菜单中配置这个选项。不过若你一直使用不同的终端，其中有些没有Meta或Alt键，那么方便的做法还是把缺省的命令键设置为Ctrl-A，当你有了支持Meta或Alt键的键盘时再使用此选项。Minicom假定你的Meta键发送ESC前缀，而不是设置字符最高位的那一种(见下)。
+.TP 0.5i
+.B -M
+跟“-m”一样，但是假定你的Meta键设置字符高端的第八位(发送128+字符代码)。
+.TP 0.5i
+.B -z
+使用终端状态行。仅当终端支持，并且在其termcap或terminfo数据库入口中有相关信息时才可用。
+.TP 0.5i
+.B -l
+.BR 逐字翻译
+高位被置位的字符。使用此标志， minicom将不再尝试将IBM行字符翻译为ASCII码，而是将其直接传送。许多PC-Unix克隆不经翻译也能正确显示它们(Linux使用专门的模式：Coherent和Sco)。
+.TP 0.5i
+.B -w
+Turns linewrap on at startup by default.
+.TP 0.5i
+.B -a
+.BR 特性使用。
+有些终端，特别是televideo终端， 有个很讨厌的特性处理(串行而非并行)。minicom缺省使用‘-a on’，但若你在用这样的
+
+终端，你就可以(必须!)加上选项‘-a off’。尾字‘on’或‘off’需要加上。
+.TP 0.5i
+.B -t
+.BR 终端类型。 
+使用此标志， 你可以重载环境变量TERM， 这在环境变量MINICOM 中使用很方便； 你可以创建一个专门的 termcap 入口以备minicom 在控制台上使用，它将屏幕初始化为raw模式， 这样， 连同‘-f’标志一起，就可以不经翻译而显示IBM行字符。
+.TP 0.5i
+.B -c
+.BR 颜色
+使用。有些终端(如Linux控制台)支持标准ANSI转义序列色彩。由于termcap显然没有对于色彩的支持，因而minicom硬性内置了这些转义序列的代码。所以此选项缺省为off。使用‘-c on’可以打开此项。把这个标志，还有‘-m’放入MINICOM环境变量中是个不错的选择。
+.TP 0.5i
+.B -S 
+.BR 脚本。
+启动时执行给定名字的脚本。到目前为止，还不支持将用户名和口令传送给启动脚本。如果你还使用了‘-d’选项，以在启动时开始拨号，此脚本将在拨号之前运行，拨号项目入口由‘-d’指明。
+.TP 0.5i
+.B -d
+.BR D ial
+an entry from the dialing directory on startup. You can specify an
+index number, but also a substring of the name of the entry. If you 
+specify a name that has multiple entries in the directory, they are all
+tagged for dialing. You can also specify multiple names or index numbers
+by separating them with commas. The dialing will start from the first 
+entry specified after all other program initialization procedures are 
+completed.
+.TP 0.5i
+.B -p
+.BR 要使用的伪终端。
+它超载配置文件中定义的终端端口，但仅当其为伪tty设备。提供的文件名必须采用这样的形式：(/dev/)tty[p-z][0-f]
+.TP 0.5i
+.B -C
+.BR 文件名。
+启动时打开捕获文件。
+.TP 0.5i
+.B -8
+不经修改地传送8位字符。“连续”意指未对地点/特性进行真正改变，就不插入地点/特性控制序列。此模式用于显示8位多字节字符，比如日本字(TMD！应该是中国字!!)。不是8位字符的语言都需要(例如显示芬兰文字就不需要这个)。
+.PP
+.RS 0.5i
+.B minicom
+启动时，它首先搜索用于命令行参数的MINICOM环境变量----这些参数可在命令行上超载。例如：若你进行了如下设置：
+.PP
+.RS 0.5i
+.PD 0
+MINICOM='-m -c on'
+.PP
+export MINICOM
+.PP
+.PD 1
+.PP
+.RE
+或者其它等效的设置，然后启动minicom，minicom 会假定你的终端有Meat键或Alt键，并且支持彩色。如果你从一个不支持彩色的终端登录，并在你的启动文件(.profile或等效文件)中设置了MINICOM，而且你又不想重置你的环境变量，那么你就可以键入‘minicom -c off’,来运行这次没有色彩支持的会话。
+.RE
+.TP 0.5i
+.B 配置
+The
+.I 配置
+参数更有趣。通常，minicom从文件“minirc.dfl”中获取其缺省值。不过，若你给minicom一个参数，它将尝试从文件“minirc.configuration”中获取缺省值。因此，为不同端口、不同用户等创建多个配置文件是可能的。最好使用设备名，如：tty1，tty64，sio2等。如果用户创建了自己的配置文件，那么该文件将以“.minirc.dfl”为名出现在他的home目录中。
+.SH "使用 USE"
+Minicom是基于窗口的。要弹出所需功能的窗口，可按下Ctrl-A (以下使用C-A来表示Ctrl-A),然后再按各功能键(a-z或A-Z)。先按C-A，再按'z'，将出现一个帮助窗口，提供了所有命令的简述。配置minicom(-s 选项，或者C-A、O)时，可以改变这个转义键，不过现在我们还是用Ctrl-A吧。
+.PP
+.PD 0
+以下键在所有菜单中都可用：
+.TP 0.75i
+.B UP
+arrow-up 或 'k'
+.TP 0.75i
+.B DOWN
+arrow-down 或 'j'
+.TP 0.75i
+.B LEFT
+arrow-left 或 'h'
+.TP 0.75i
+.B RIGHT
+arrow-right 或 'l'
+.TP 0.75i
+.B CHOOSE
+Enter
+.TP 0.75i
+.B CANCEL
+ESCape.
+.PD 1
+.PP
+屏幕分为两部分：上部24行为终端模拟器的屏幕。 ANSI或VT100转义序列在此窗口中被解释。若底部还剩有一行，那么状态行就放在这儿；否则，每次按C-A时状态行出现。 在那些有专门状态行的终端上将会使用这一行，如果termcap信息完整且加了-k标志的话。
+.PP
+.PD 0
+下面按字母顺序列出可用的命令：
+.TP 0.5i
+.B C-A
+两次按下C-A将发送一个C-A命令到远程系统。如果你把“转义字符”换成了C-A以外的什么字符，则对该字符的工作方式也类似。
+.TP 0.5i
+.B A
+切换“Add Linefeed”为on/off。若为on，则每上回车键在屏幕上显示之前，都要加上一个linefeed。
+.TP 0.5i
+.B B
+为你提供一个回卷(scroll back)的缓冲区。可以按u上卷，按d下卷，按b上翻一页，按f下翻一页。也可用箭头键和翻页键。可用s或S键(大小写敏感)在缓冲区中查找文字串，按N键查找该串的下一次出现。按c进入引用模式，出现文字光标，你就可以按Enter键指定起始行。然后回卷模式将会结束，带有前缀'>'的内容将被发送。
+.TP 0.5i
+.B C
+清屏。
+.TP 0.5i
+.B D
+拨一个号，或转向拨号目录。
+.TP 0.5i
+.B E
+切换本地回显为on/off (若你的minicom版本支持)。
+.TP 0.5i
+.B F
+将break信号送modem。
+.TP 0.5i
+.B G
+运行脚本(Go)。运行一个登录脚本。
+.TP 0.5i
+.B H
+挂断。
+.TP 0.5i
+.B I
+切换光标键在普通和应用模式间发送的转义序列的类型(另参下面 关于状态行的注释)。
+.TP 0.5i
+.B J
+跳至shell。返回时，整个屏幕将被刷新(redrawn)。
+.TP 0.5i
+.B K
+清屏，运行kermit,返回时刷新屏幕。
+.TP 0.5i
+.B L
+文件捕获开关。打开时，所有到屏幕的输出也将被捕获到文件中。
+.TP 0.5i
+.B M
+发送modem初始化串。若你online，且DCD线设为on，则modem被初始化前将要求你进行确认。
+.TP 0.5i
+.B O
+配置minicom。转到配置菜单。
+.TP 0.5i
+.B P
+通信参数。允许你改变bps速率，奇偶校验和位数。 
+.TP 0.5i
+.B Q
+不复位modem就退出minicom。如果改变了macros，而且未存盘，会提供你一个save的机会。
+.TP 0.5i
+.B R
+接收文件。从各种协议(外部)中进行选择。若filename选择窗口和下载目录提示可用，会出现一个要求选择下载目录的窗口。否则将使用Filenames and Paths菜单中定义的下载目录。
+.TP 0.5i
+.B S
+发送文件。选择你在接收命令中使用的协议。如果你未使文件名选择窗口可用(在File Transfer Protocols菜单中设置)，你将只能在一个对话框窗口中写文件名。若将其设为可用，将弹出一个窗口，显示你的上传目录中的文件名。可用空格键为文件名加上或取消标记，用光标键或j/k键上下移动光标。被选的文件名将高亮显示。 目录名在方括号中显示，两次按下空格键可以在目录树中上下移动。最后，按Enter发送文件，或按ESC键退出。
+.TP 0.5i
+.B T
+选择终端模拟：ANSI(彩色)或VT100。此处还可改变退格键，打开或关闭状态行。
+.TP 0.5i
+.B W
+切换linewrap为on/off。
+.TP 0.5i
+.B X
+退出minicom，复位modem。如果改变了macros，而且未存盘，会提供 你一个save的机会。
+.TP 0.5i
+.B Z
+弹出help屏幕。
+.PD 1
+.SH "拨号目录 DIALING DIRECTORY"
+按下Ctrl-A、D，会进入拨号目录。可以增减、删除或修改各个项目。选择“dial”，则会拨打标记项目的电话号码，或者当未作任何标记时高亮显示的项目号码。modem拨号时，可按ESC取消；任何其它按键将关闭拨号窗口，但并不取消拨号。拨号目录将保存在你的home目录下的“.dialdir” 文件中。 可用箭头键可以上下卷动， 但也可用PageUp或PageDown键卷动整页。若没有这些键，可用Ctrl-B(向后)，以及Ctrl-F(向前)。可用空格键标记多个项目，若minicom不能建立一个连接，它将在此列表中循环进行拨号。目录中标记项目的名字前将显示一个‘>’符号。
+.PP
+"edit" 菜单不言自明，但这里还是简要介绍一下。
+.PD 0
+.TP 1.0i
+.B A - Name 
+项目名
+.TP 1.0i
+.B B - Number
+电话号码
+.TP 1.0i
+.B C - Dial string #
+指出用于连接的拨号串。在Modem and dialing菜单中有三种不同的拨号串(前缀和后缀)可以进行设置。
+.TP 1.0i
+.B D - Local echo
+可为on或off（若你的minicom版本支持）
+.TP 1.0i
+.B E - Script 
+成功建立连接后必须执行的脚本(参runscript手册)
+.TP 1.0i
+.B F - Username
+传给runscript程序的用户名。在环境串"$LOGIN"中传送。
+.TP 1.0i
+.B G - Password
+传送为"$PASS"的口令。
+.TP 1.0i
+.B H - Terminal Emulation
+使用ANSI或VT100模拟。
+.TP 1.0i
+.B I - Backspace key sends
+退格键发送的代码(Backspace或Delete)。
+.TP 1.0i
+.B J - Linewrap
+可为on或off。
+.TP 1.0i
+.B K - Line settings
+本次连接的bps速率，位数和奇偶设置。速率可选当前值，这样就能用当时正在使用的任何速率值(当你有多个modem时，这玩儿很有用)。
+.TP 1.0i
+.B L - Conversion table
+可以指定运行login脚本前，此拨号项目应答的任何时候要装入的字符转换表。若此域为空，则转换表保持不变。
+.PP 
+.PD 1
+edit 菜单还显示了你最近一次呼叫此项的日期和时间，及呼叫该项的总次数。但并不允许你改变这些值。当你进行连接时，它们会自动更新。
+.PD 1
+.PP
+The moVe command lets you move the highlighted entry up or down in the
+dialing directory with the up/down arrow keys or the k and j keys. Press
+Enter or ESC to end moving the entry. 
+.PP
+.SH "配置 CONFIGURATION"
+按Ctrl-A、O，进入setup菜单。人人都可以改变其中的多数设置，但有些仅限于root。在此，那些特权设置用星号(*)标记。
+.PP
+.PD 0
+.B "Filenames and paths"
+.PP
+.RS 0.25i
+此菜单定义你的缺省目录。
+.TP 0.5i
+.B A - Download directory
+下载的文件的存放位置
+.TP 0.5i
+.B B - Upload directory
+从此处读取上传的文件
+.TP 0.5i
+.B C - Script directory
+存放login脚本的位置
+.TP 0.5i
+.B D - Script program
+作为脚本解释器的程序。缺省是“runscript”，也可用其它的东东(如: /bin/sh 或 "expect")。Stdin和Stdout连接到modem，Stderr连接到屏幕。
+.RS 0.5i
+若用相对路径（即不以'/'开头），则是相对于你的home目录，除了脚本解释器以外。
+.RE
+.TP 0.5i
+.B E - Kermit program
+为kermit寻找可执行程序和参数的位置。命令行上可用一些简单的宏：‘%1’扩展为拨出设备的完整文件名，‘%b’扩展为当前波特率。
+.TP 0.5i
+.B F - Logging options
+Options to configure the logfile writing.
+.RS 0.5i
+.PD 1
+.TP 0.5i
+.B A - File name
+Here you can enter the name of the logfile. The file will be written in
+your home directory, and the default value is "minicom.log". 
+If you blank the name, all logging is turned off.
+.TP 0.5i
+.B B - Log connects and hangups
+This option defines whether or not the logfile is written when the remote
+end answers the call or hangs up. Or when you give the hangup command
+yourself or leave minicom without hangup while online.
+.TP 0.5i
+.B C - Log file transfers
+Do you want log entries of receiving and sending files.
+.RE
+The 'log' command in the scripts is not affected by logging options B and C.
+It is always executed, if you just have the name of the log file defined.
+.RE
+.PD 1
+.PP
+.B "File Transfer Protocols"
+.PD 0
+.PP
+.RS 0.25i
+此处规定的协议将在按下Ctrl-A、s/r时显示。行首的“Name”为将要显示在菜单中的名字。“Program”为协议路径，其后的“Name”则确定了程序是否需要参数，如要传送的文件。“U/D”确定了该项要否在“upload/download”菜单中出现。“Fullscr”确定要否全屏运行，否则mincom将仅在一个窗口中显示其标准输出。 “IO-Red” 确定minicom要否将程序的标准io连接到modem端口。“Multi”告诉文件名选择窗口协议能否用一个命令发送多上文件。它对于下载协议无效；如果你不用文件名选择窗口，那么上传协议也会忽略它。老版本的sz和rz非全屏，并且设置了IO-Red。但是，有些基于curses的版本，至少是rz，不希望其stdin和stdout被改向， 以及全屏运行。 所有文件传输协议都以用户的UID运行，但并不是总有UID=root。对于kermit，命令行上可用'%l' 和 '%b'。在此菜单内，你还能规定当提示文件要上传时，要否文件选择窗口，以及每次自动下载开始时要否提示下载目录。如果禁止下载目录提示，将使用file and directory菜单中规定的下载目录。
+.RE
+.PD 1
+.PP
+.B "串口设置 erial port setup"
+.RS 0.25i
+.PD 0
+.TP 0.5i
+.B *A - 串行设备
+多数人用 /dev/tty1 或 /dev/ttfS1。Linux 下仍然可以使用/dev/cua<n>，但是不推荐这样作，因为这些借口都过时了，使用2.2.x 或 更新的内核的系统中没有它们，可以使用 /dev/ttyS<n> 来代替。你也可以使 /dev/modem 成为一个指向实际设备的链接。
+.br
+如果你有多个modem连接到两个或以上的串口，可以在这儿列表指定，用空格、逗号或者分号作为分隔符。minicom启动时，检查此列表直至发现有可用的modem，并使用之。（不过，你不能为它们指定不同的初始化串....至少现在不能）
+.TP 0.5i
+.B *B - Lock 文件位置
+多数系统上，这应该是 /usr/spool/uucp。Linux系统则使用var/lock。若此目录不存在，minicom将不会试图使用lock 文件。
+.TP 0.5i
+.B *C - Callin program
+若你的串口上有uugetty设备或别的什么，可能你就需要运行某个程序以把modem的cq端口切换到dialin/dialout模式。这就是进入dialin模式所需的程序。
+.TP 0.5i
+.B *D - Callout program
+这是进入dialout模式所用的程序。
+.TP 0.5i
+.B E - Bps/Par/Bits
+启动时的缺省参数。
+.PD 1
+.PP  
+如果其中某一项为空，它就不会被使用。因此若你并不在意locking，你的modemline上也没有getty在运行，项目 B - D 就应该空着。注意！有效用户ID "root"(也就是 0 )才能运行callin和callout。
+.RE
+.PP
+.B "Modem and Dialing"
+.PD 0
+.PP
+.RS 0.25i
+modem的参数在此处定义。我不再进一步解释了，因为缺省是用于genericHayes modems，这应该总能正常工作的。这个文件可不是Hayes的学习指导:-)唯一值得注意的是，控制字符可以用加前缀‘^’的方式发送，其中‘^^’指‘^’本身，‘\’字符必须双写为‘\\’，因为反斜线在宏定义中有特殊意义。不过有些选项，跟modem没多大关系，倒是与minicom自己的行为关系不少：
+.PP
+.TP 0.5i
+.B M - Dial time
+当未建立连接，minicom超时前的秒数。
+.TP 0.5i
+.B N - Delay before redial
+若未建立连接，minicom将重新拨号，不过先要等待一段时间。
+.TP 0.5i
+.B O - Number of tries
+minicom试图拨号的最大次数。
+.TP 0.5i
+.B P - Drop DTR time
+此项设为0时，minicom通过发送一个Hayes类型的hanup序列进行挂断。若设为非0值，则通过放弃DTR line来挂断。该值指定了结束DTR要经历的秒数。
+.TP 0.5i
+.B Q - Auto bps detect
+设为on时，minicom尝试匹配被呼叫方的速度。但多数现代的modem并不需要这个选项，因为modem对数据进行了缓冲，转换了速度。
+.TP 0.5i
+.B R - Modem has DCD line
+如果你的modem和操作系统灰支持DCD line(建立连接后它就升“高”了)，那么minicom就会使用它。 When you have this option on, minicom will also NOT start dialing while you are already online.
+.TP 0.5i
+.B S - Status line shows DTE speed / line speed
+你可以切换状态行或者显示DTE速度（minicom与你的modem通信的速度）或者显示线速度（你的modem与其它modem在线上通信的速度），注意连接期间线速度可能会变化，但你将仍然只能看到modem启动连接时的初始速度。这是因为modem并不告诉程序速度有否改变。而且，要看到线速度，你需要在连接字串中进行设置，以使modem显示它。否则，你将只能看到一个值为0的线速度。
+.TP 0.5i
+.B T - Multi-line untag
+You can toggle the feature to untag entries from the dialing directory when
+a connection is established to a multi-line BBS. All the tagged entries that
+have the same name are untagged.
+.PD 1
+.PP
+.RE
+.RS 0.5i
+.B 注意此菜单还是个特例：每个用户都可在此改变参数，但它们不会被保存。
+.RE
+.PP
+.B "Screen and keyboard"
+.RS 0.25i
+.PD 0
+.TP 0.5i
+.B A - Command key is
+进入命令模式的热键。若将其设为‘Alt’或‘Meta’键，你就可以直接用Alt-key调用命令，而不是用HotKey-key。
+.TP 0.5i
+.B B - Backspace key sends
+仍然有些系统需要VT100来发送DEL而非BS。使用此选项，你就能干那件蠢事了。（我倒！甚至缺省值就是on!）
+.TP 0.5i
+.B C - Status line is
+打开或关闭。一些慢的终端（如X-terminals）在卷动的时候，会使状态行“上蹿下跳”，所以需要时可以将状态行关闭。命令模式下仍会被显示。
+.TP 0.5i
+.B D - Alarm sound
+若打开，minicom会在成功连接，以及上传/下载完成后发出报警声。
+.TP 0.5i
+.B E - Foreground Color (menu)
+指定所有的minicom配置窗口使用的前景色。
+.TP 0.5i
+.B F - Background Color (menu)
+指定所有的minicom配置窗口使用的背景色。注意：minicom不允许你将前/背景色设为相同值。
+.TP 0.5i
+.B G - Foreground Color (term)
+指定在终端窗口中使用的前景色。
+.TP 0.5i
+.B H - Background Color (term)
+指定在终端窗口中使用的背景色。注意：minicom不允许你将前/背景色设为相同值。
+.TP 0.5i
+.B I - Foreground Color (stat)
+指定在状态行中使用的前景色。
+.TP 0.5i
+.B J - Background Color (stat)
+指定在状态行中使用的背景色。注意：minicom允许你将状态行的前/背景色设为相同值。这实际上会隐藏状态行，不过如果你有意这样是做，可以参考这个选项。
+.TP 0.5i
+.B K - History buffer size
+历史缓冲区中保存的行数（用于回卷）。
+.TP 0.5i
+.B L - Macros file
+保存有macros的文件的完整路径。macros允许你定义当按下某一个键时被发送的字符串。minicom中，可定义F1到F10，发送多达256个字符。（这在编译时被确定了）。 一按下Enter，就会检验你指定的文件名。 若你无权建立指定的文件，会有个错误信息为你指出，然后将你不得不重新编辑文件名。若可以建立该文件，minicom会去检查它是否已经存在， 若存在，就假定它是个macro文件并读入；否则，哈，那是你的问题了:-) 如果此文件不存在，就接受此文件名。
+.TP 0.5i
+.B M - Edit Macros
+打开一个新窗口，允许你在此编辑F1到F10的宏。
+.TP 0.5i
+.B N - Macros enabled
+是/否。若允许macro，则F1-F10键将发送VT100/VT200的功能键转义序列。
+.TP 0.5i
+.B O - Character conversion
+在此显示激活的转换表文件名，若看不到，则表明尚未有活动的转换表。按下0,可以看到转换表编辑菜单。
+.RS 0.5i
+.PD 1
+.TP 0.25i
+.B "Edit Macros"
+F1到F10的宏在此定义。窗口底部以图例显示有特殊意义的字符组合。允许以‘^’为前缀加普通文本的方式输入控制字符，其中‘^^’表示‘^’自身。可用‘^~’代码发送1秒的延迟。当你ftp或telnet某地址后，试图login时，它很有用。还可以从拨号目录中加上你的当前用户名和口令，分别用‘\u’和‘\p’表示。若需要在macro中用反斜线字符，应双写为‘\\’。要编辑一个macro，按下相应数字(或字母如F10)，则光标移到macro的末尾。编辑该行时，可用左右箭头，Home和End键，Del和BackSpace键，以及ESC和回车键。ESC取消所做的任何修改，回车则接受之。
+.PD 1
+.TP 0.25i
+.B "Character conversion"
+此处可编辑字符转换表。如果你不是美国人，你该知道，许多语言中的字符并不包括在ASCII字符集中，过去也许是用它们替换了ASCII表中不太重要的字符，现在则常常用大于127的字符代码表示。其实有许多表示这些字符的方法。这儿正是为那些使用不同于你的计算机字符集的系统编辑转换表的地方，
+.TP 0.5i
+.B A - Load table
+你可能已经猜出来了。此命令从磁盘中装入转换表。将询问你表的文件名。预定义的表.mciso，.mcpc8及.mcsf7应包含在程序中。表.mciso 并不进行转换， .mcpc8用于连接使用8位pc字符集的系统，.mcsf7 则用于兼容很老式的7位编码的系统， 这种7位码用芬兰语和瑞典语的区分字符置换了字符{|}[]\。
+.TP 0.5i
+.B B - Save table
+以指定文件名保存活动的转换表。
+.TP 0.5i
+.B C - edit char
+这里可对现存的表自行修改。首先将询问你要修改的转换的字符值(十进制)；接着你要指出从外部接收的字符在屏幕上显示为何者。然后询问你当按下键盘上的那个键时，你要发送什么。
+.TP 0.5i
+.B D - 下一屏
+.TP 0.5i
+.B E - 前一屏
+不错，可能你注意到了这一屏显示了活动转换的种类。屏幕(通常)太小了，没法用一种简单易懂的格式来一次显示整个表。你可以用此来做右卷动转换表。
+.TP 0.5i
+.B F - convert capture
+切换当写入捕获文件时是否使用转换表。
+.RE
+.RE
+.PD 1
+.TP 0.25i
+.B "Save setup as dfl"
+保存参数，作为下一次启动程序时的缺省值。除了dfl，其它参数名都会出现，这取决于下次启动程序时会用哪一个。
+.TP 0.25i
+.B "Save setup as.."
+以指定名字保存参数。只要以此名为参项启动minicom，它就会用这些参数。当然只有root有使用这个选项的特权。
+.TP 0.25i
+.B "Exit"
+不保存退出此菜单。也可按ESC键。
+.TP 0.25i
+.B "Exit from minicom"
+只有root才会看到这个菜单项 ---- 如果启动 minicom 时用了选项‘-s’的话。这样，就可以在实际上并未运行minicom的情况下，修改其配置。
+.PD 1
+.SH "状态行 STATUS LINE"
+状态行上有好几个指示器，其意义不言自明。可能需要解释一下奇怪的APP和NOR指示器。VT100的光标键可有两种模式：应用模式和光标模式。这由一个转义序列来控制。当你用minicom登录后，如果发现光标键不能工作，比如在vi中，这时你就可以用此指示器来查看光标键是在应用模式中，还是在光标模式中。可以用Ctrl-A、I来切换。如果那这时光标键能工作，可能是远程系统的termcap初始化串发生了错误。
+.PD 1
+.SH "本地化 LOCALES"
+现在minicom已经支持本地语言。这就是说，你可以通过设置环境变量LANG，把多数的英文消息及其它字串转变为其它语言。到1998年7月，已经支持巴西葡萄牙语、芬兰语和日本语。对土耳其语的支持在建。
+.PD 1
+.SH "安全问题 SECURITY ISSUES"
+由于minicom在一些计算机上以root运行，可能你要限制对它的使用。可以通过在缺省文件目录中使用一个叫“minicom.users”的配置文件来实现。该文件的句法如下：
+.PP
+.RS 0.5i
+<username> <configuration> [configuration...]
+.RE
+.PP
+为了允许用户‘miquels’使用缺省配置，可在“minicom.users”中输入下行：
+.PP
+.RS 0.5i
+miquels dfl
+.RE
+.PP
+如果你想让用户使用比缺省值更多的配置，那么在用户名下面加上那些配置的名字即可。若用户名后未给出配置，则minicom假定该用户可以使用所有配置。
+.PD 1
+.SH "杂项 MISC"
+若 minicom 被挂起，则可用 SIGTERM 来 kill之（即kill -15，或者，既然sigterm为缺省值，干脆“kill 在复位等动作后安全退出 minicom 。 还可以不挂断线路， 用带命令“! killall -9 minicom”的脚本来kill minicom。若没有使用参数-9，则minicom会先挂断，再退出。
+.PP
+因为许多转义序列以ESC开头（上箭头为ESC[A），所以minicom无法知道它获得的ESC字符是你按下的ESC键，还是某一转义序列的一部分。
+.PP
+minicom的一个老版本，V1.2，以一种相当拙劣的方式解决此问题：要获得ESC键，你得把它按
+.IR 两次。
+.PP
+这在1.3版中就好一点儿了：现在内置了1秒超时，象在vi中的一样。在有select()系统调用的系统中，超时为0.5秒。而且....奇怪吧：还加了一个Linux相关的专用hack :-) 现在，minicom可以区分ESC键和转义序列了。要知其中猫腻，请参wkeys.c。不过它干得确实不错！
+.SH "文件 FILES"
+minicom将其配置文件保存在一个目录中，通常是：/var/lib/minicom, /usr/local/etc或者/etc。要想知道minicom编译时内定的缺省目录，可用命令“minicom -h”，在那儿你可能还会找到runscript(1)的demo文件, and the examples of character conversion tables either there or in the subdirectories of /usr/doc/minicom*. The conversion tables are named something like mc.* in that directory, but you probably want to copy the ones you need in your home directory as something beginning with a dot.
+.sp 1
+.nf
+minicom.users
+minirc.*
+$HOME/.minirc.*
+$HOME/.dialdir
+$HOME/minicom.log
+/usr/share/locale/*/LC_MESSAGES/minicom.mo
+.fi
+.SH "版本 VERSION"
+Minicom is now up to version 2.00.0.
+.SH "作者 AUTHOR"S
+minicom 原创作者为 Miquel van Smoorenburg (miquels@cistron.nl).
+He wrote versions up to 1.75.
+.br
+Jukka Lahtinen (walker@clinet.fi, walker@megabaud.fi)
+负责1.78以上的新版本，由以下人士协助：
+.br
+filipg@paranoia.com 为V1.79编写历史缓冲区搜索程序。
+.br
+Arnaldo Carvalho de Melo (acme@conectiva.com.br) 完成国际化和巴西葡萄牙语的翻译。
+.br
+Jim Seymour (jseymour@jimsun.LinxNet.com) 编写多modem支持，以及V1.80版以来使用的文件名选择窗口。
+.br
+Tomohiro Kubota (kubota@debian.or.jp) 编写日文翻译及引用程序，并进行了一些更正。
+.br
+Gael Queri (gqueri@mail.dotcom.fr) 编写法语翻译。
+.br
+Arkadiusz Miskiewicz (misiek@pld.org.pl) wrote the Polish translations.
+.br
+Kim Soyoung (nexti@chollian.net) wrote the Korean translations.
+.PP
+本man page中的内容多拷贝自minicom的原始README，作了几处更正。其中有些内容及更正由Michael K.Johnson (johnsonm@stolaf.edu) 完成。
+.PP
+Jukka Lahtinen (walker@clinet.fi) 加上了1.75版以后的一些变动信息。
+
+.SH "[中文版维护人]"
+.B 范逊
+.SH "[中文版最新更新]"
+.B 2000.2.28
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

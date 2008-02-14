@@ -1,0 +1,33 @@
+.TH while n
+.SH NAME
+.B while - 在条件满足时重复的执行脚本
+.SH 总览
+.B while test body
+.SH 描述
+while 命令把 test 作为一个表达式来求值(用与 expr 求它的参数的值相同的方式)。这个表达式的值必须是一个正确的 boolean 值；如果它是真值则把 body 传递给 Tcl 解释器来执行它。一旦执行了 body 则再次求值 test ，并重复处理直到最终 test 求值出一个假 boolean 值。可以在 body 中执行 Continue 命令来终止这个循环的当前重复操作(iteration)，并可以在 body 中执行 break 命令来导致 while 命令立即终止。while 命令总是返回一个空串。
+
+注意: test 应该总是包围在花括号中。如果不是，在 while 命令开始执行之前将进行变量替换，这意味着循环体所做的变量变更将不考虑在这个表达式中。这将很可能导致无限循环。如果 test 被包围在花括号中，变量替换被推迟到求值这个表达式的时候(在每次循环重复操作之前)，所以变量的变化将是可见的。例如，尝试下列脚本并在 $x<10 两边分别加上和不加花括号:
+
+.nf
+set x 0
+while {$x<10} {
+	puts "x is $x"
+	incr x
+}
+.fi
+
+.SH 关键字
+boolean 值, 循环, 测试, while
+
+.SH 作者
+.nf
+Copyright © 1993 The Regents of the University of California.
+Copyright © 1994-1997 Sun Microsystems, Inc.
+Copyright © 1995-1997 Roger E. Critchlow Jr.
+.fi
+.SH [中文版维护人]
+.B 寒蝉退士
+.SH [中文版最新更新]
+.B 2001/11/20
+.SH 《中国 Linux 论坛 man 手册页翻译计划》:
+.BI http://cmpp.linuxforum.net

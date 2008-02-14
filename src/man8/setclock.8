@@ -1,0 +1,27 @@
+.\'
+.TH SETCLOCK 8 "1996年11月12日 sun"  
+.UC 4
+.SH NAME
+\fBsetclock \- 用系统时间来设置硬件时间 \fR 
+.SH 总览
+\fBsetclock\fR
+.SH 描述
+\fBsetclock\fR 用当前系统时钟存储的时间设置系统的硬件时间.
+它先读取 \fI/etc/sysconfig/clock\fR 的时间格式, 时间存储前应该转化成这种格式. 
+Red Hat 的标准启动脚本和 \fBtimeconfig(8)\fR 也是用的这种方法 .
+
+.SH 相关文件
+.PD 0
+.TP 25
+\fI/etc/sysconfig/clock\fR 
+用来配置时间的格式. 
+
+.PD
+.SH "另见"
+.BR clock (8),
+.BR timeconfig (8)
+.SH 作者
+.nf
+Erik Troan <ewt@redhat.com>
+.fi
+ 

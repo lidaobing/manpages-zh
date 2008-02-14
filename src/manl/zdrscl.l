@@ -1,0 +1,47 @@
+.TH ZDRSCL l "15 June 2000" "LAPACK version 3.0"
+.SH NAME
+ZDRSCL - 使用实数量 1/a 乘一个 n 维复向量
+.SH "总览 SYNOPSIS"
+.TP 19
+SUBROUTINE ZDRSCL(
+N, SA, SX, INCX )
+.TP 19
+.ti +4
+INTEGER
+INCX, N
+.TP 19
+.ti +4
+DOUBLE
+PRECISION SA
+.TP 19
+.ti +4
+COMPLEX*16
+SX( * )
+.SH "目的 PURPOSE"
+ZDRSCL 使实数量 1/a 与 n 维复向量相乘。只要最终结果 x/a 不会上溢或下溢，那么这个函数也不会。
+.br
+
+.SH "参数 ARGUMENTS"
+.TP 8
+N       (输入) 整型
+向量 x 的分量个数
+.TP 8
+SA      (输入) 双精度
+数量 a，用来除 x 的每个分量。SA 必须大于0，否则这个子过程将除以零
+.TP 8
+SX      (输入/输出) 16个复数的阵列 (COMPLEX*16 array)，dimension
+(1+(N-1)*abs(INCX))
+The n-element vector x.
+.TP 8
+INCX    (输入) 整型
+向量 SX 连续值间的步进
+> 0:  SX(1) = X(1) 且 SX(1+(i-1)*INCX) = x(i),     1< i<= n
+
+.SH "[中文版维护人]"
+.B bbbush <bbbush@163.com>
+.br
+不会翻译这些非常专业的 manl 文档，看样子不会继续了
+.SH "[中文版最新更新]"
+.B 2003.11.22
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

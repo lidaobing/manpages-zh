@@ -1,0 +1,64 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" Chinese version Copyright Surran,  www.linuxforum.net
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+
+.TH RMDIR 1 "24 July 1993" "Linux" "Linux Programmer's Manual"
+.SH NAME
+rmdir \－删除空目录
+.SH 总览
+.BI rmdir [ options ]  directory...
+.sp 
+POSIX 选项：
+.B "[\-p]"
+.sp
+.SH "GNU 选项（缩写）"：
+.B "[-p] [--ignore-fail-on-non-empty] [--help] [--version] [--]"
+.SH 描述
+.B rmdir
+删除空目录。如果所给出的目录不为空，则报错
+.SH POSIX 选项
+.TP
+.B "\-p"
+如果目录由多个路径名组成，从最后一个路径名开始依次删除，
+直到所有的路径名都被删完。例如：命令'rmdir -p a/b/c'按
+照'rmdir /a/b/c'; 'rmdir a/b'; 'rmdir a'的顺序删除目录。
+.SH GNU 选项
+.TP
+.B "\-\-ignore\-fail\-on\-non\-empty"
+通常，rmdir拒绝删除非空目录。
+这个选项将使命令忽略非空目录而进行删除操作。
+（更新见fileutils-4.0）
+.TP
+.B "\-p, \-\-parents"
+同上。
+.SH GNU 标准选项
+.TP
+.B "\-\-help"
+在标准输出上显示使用信息并顺利退出。
+.TP
+.B "\-\-version"
+在标准输出上显示版本信息并顺利退出
+.TP
+.B "\-\-"
+终端选项列表。
+.SH 环境变量
+变量LANG，LC_ALL，LC_CTYPE，LC_MESSAGES按常规定义。
+.SH 遵循
+POSIX 1003.2
+.SH 应用举例
+命令'rmdir foo'将删除空目录foo。要删除一个非空目录，
+并且包括其下属所有内容，可以使用命令'rm -rfoo'。
+.SH 注意
+本文出自 fileutils－4.0，其他版本肯会有微小差别。任
+何添加或纠错意见请寄：aeb@cwi.nl，程序Bugs
+请告知：fileutils-bugs@gnu.ai.mit.edu
+
+.SH "[中文版维护人]"
+.B Surran <email>
+.SH "[中文版最新更新]"
+2000/10/19
+.SH "[中国Linux论坛man手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

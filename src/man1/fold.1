@@ -1,0 +1,54 @@
+.TH FOLD "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+fold \- 折叠输入行, 使其适合指定的宽度
+.SH "总览 (SYNOPSIS)"
+.B ../src/fold
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+折叠(wrap) 每个 文件 FILE 中 的 输入行 (缺省为 标准输入), 结果 写到 标准输出.
+.TP
+\fB\-b\fR, \fB\-\-bytes\fR
+计数 字节 而不是 列 (column)
+.TP
+\fB\-s\fR, \fB\-\-spaces\fR
+在 空格 处 断开
+.TP
+\fB\-w\fR, \fB\-\-width\fR=\fIWIDTH\fR
+使用 WIDTH 取代 80 列
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.SH "作者 (AUTHOR)"
+David MacKenzie.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B fold
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B fold
+程序, 使用 命令
+.IP
+.B info fold
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/17
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net
+

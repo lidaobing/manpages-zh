@@ -1,0 +1,257 @@
+.\"
+.\" Memory.man
+.\"
+.\" Extended Tcl memory leak locator.
+.\"----------------------------------------------------------------------------
+.\" Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
+.\"
+.\" Permission to use, copy, modify, and distribute this software and its
+.\" documentation for any purpose and without fee is hereby granted, provided
+.\" that the above copyright notice appear in all copies.  Karl Lehenbauer and
+.\" Mark Diekhans make no representations about the suitability of this
+.\" software for any purpose.  It is provided "as is" without express or
+.\" implied warranty.
+.\"----------------------------------------------------------------------------
+.\" $Id: memory.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+.\"----------------------------------------------------------------------------
+.\"
+.TH "Memory" TCL "" "Tcl"
+.BS
+.SH NAME
+ckalloc, memory, ckfree, Tcl_DisplayMemory, Tcl_InitMemory, Tcl_ValidateAllMemory - 合法的内存分配接口
+.SH "总览 SYNOPSIS"
+.nf
+.B memory \fBinfo\fR
+
+.B memory \fBtrace\fR [\fBon|off\fR]
+
+.B memory \fBvalidate\fR [\fBon|off\fR]
+
+.B memory \fBtrace_on_at_malloc\fR \fInnn\fR
+
+.B memory \fBbreak_on_malloc\fR \fInnn\fR
+
+.B memory \fBdisplay\fR \fIfile\fR
+
+.sp 2
+.ft CW
+#include <tcl.h>
+.sp
+char *
+ckalloc (unsigned size)
+.sp
+void
+ckfree (char *ptr)
+.sp
+int
+Tcl_DumpActiveMemory (char *fileName);
+.sp
+void
+Tcl_ValidateAllMemory (char *file,
+                       int   line)
+
+void
+Tcl_InitMemory (interp)
+.ft R
+'
+.SH ARGUMENTS
+.AS Tcl_Interp *fileName
+.AP uint size in
+
+.AP char *ptr in
+.AP Tcl_Interp *interp in
+A pointer to the Tcl interpreter.
+.AP char *file in
+The filename of the caller of Tcl_ValidateAllMemory.
+.AP int line in
+The line number of the caller of Tcl_ValidateAllMemory.
+.AP char *fileName in
+File to display list of active memory.
+.BE
+
+.SH "描述 DESCRIPTION"
+.SS ckalloc
+.PP
+This macro allocates memory, in the same manner as \fBmalloc\fR, with the
+following differences: One, \fBckalloc\fR checks the value returned from
+\fBmalloc\fR (it calls \fBmalloc\fR for you) and panics if the allocation
+request fails.  Two, if enabled at compile time, a version of \fBckalloc\fR
+with special memory debugging capabilities replaces the normal version of
+\fBckalloc\fR, which aids in detecting memory overwrites and leaks (repeated
+allocations not matched by corresponding frees).
+.PP
+Parameters:
+.RS 2
+\fBo \fIsize\fR - The size of the memory block to be allocated.
+.RE
+.PP
+Returns:
+.RS 2
+A pointer to the allocated memory block.
+.RE
+'
+.SS ckfree
+.PP
+This macro frees memory allocated by \fBckalloc\fR.  Like \fBckalloc\fR,
+when memory debugging is enabled, \fBckfree\fR has enhanced capabilities
+for detecting memory overwrites and leaks.
+.PP
+It is very important that you use \fBckalloc\fR when you need to allocate
+memory, and that you use \fBckfree\fR to free it.  Should you use \fBmalloc\fR
+to allocate and \fBckfree\fR to free, spurious memory validation errors will
+occur when memory debugging is enabled.  Should you use \fBfree\fR to free
+memory allocated by \fBckalloc\fR, memory corruption will occur when memory
+debugging is enabled.  Any memory that is to be become the property of the Tcl
+interpreter, such as result space, must be allocated with \fBckalloc\fR.  If
+it is absolutely necessary for an application to pass back \fBmalloc\fRed
+memory to Tcl, it will work only if Tcl is complied with the
+\fBTCL_MEM_DEBUG\fR flag turned off.  If you convert your application to use
+this facility, it will help you find memory over runs and lost memory.  Note
+that memory allocated by a C library routine requiring freeing should still be
+freed with \fBfree\fR, since it calls \fBmalloc\fR rather than \fBckalloc\fR
+to do the allocation.
+.PP
+Parmeters:
+.RS 2
+\fBo \fIptr\fR - The address of a block to free, as returned by ckalloc.
+.RE
+.sp
+'
+.SS Tcl_DumpActiveMemory
+.PP 
+This function will output a list of all currently allocated memory to the
+specified file.  The following information is outputted for each allocated
+block of memory: starting and ending addresses (excluding guard zone), size,
+source file where \fBckalloc\fR was called to allocate the block and line
+number in that file.  It is especially useful to call
+\fBTcl_DumpActiveMemory\fR after the Tcl interpreter has been deleted.
+.PP
+Parameters:
+.RS 2
+\fBo \fIfileName\fR - The name of the file to output the memory list to.
+.RE
+'
+.SS Tcl_ValidateAllMemory
+.PP
+Forces a validation of the guard zones of all currently allocated blocks
+of memory.  Normally validation of a block occurs when its freed, unless
+full validation is enabled, in which case validation of all blocks
+occurs when \fBckalloc\fR and \fBckfree\fR are called.  This function forces
+the validation to occur at any point.
+.PP
+Parameters:
+.RS 2
+\fBo \fIfile\fR - The file that this routine is being called from, normally
+\fB__FILE__\fR.
+.br
+\fBo \fIline\fR - The line that this routine is being called from, normally
+\fB__LINE__\fR.
+.RE
+'
+.SH ENABLING MEMORY DEBUGGING
+.PP
+To enable memory debugging, Tcl should be recompiled from scratch with
+\fBTCL_MEM_DEBUG\fR defined.  This will also compile in
+a non-stub version of \fBTcl_InitMemory\fR
+to add the \fBmemory\fR command to Tcl.
+.PP
+\fBTCL_MEM_DEBUG\fR must be either left defined for all modules or undefined
+for all modules that are going to be linked together.  If they are not, link
+errors will occur, with either \fBTclDbCkfree\fR and \fBTcl_DbCkalloc\fR or
+\fBTcl_Ckalloc\fR and \fBTcl_Ckfree\fR being undefined.
+'
+.SH GUARD ZONES
+.PP
+When memory debugging is enabled, whenever a call to \fBckalloc\fR is
+made, slightly more memory than requested is allocated so the memory debugging
+code can keep track
+of the allocated memory, and also 
+eight-byte ``guard zones'' are placed in front of and behind the space that 
+will be returned to the caller.  (The size of the guard zone is defined
+by the C #define \fBGUARD_SIZE\fR in \fIbaseline/src/ckalloc.c\fR -- it
+can be extended if you suspect large overwrite problems, at some cost in
+performance.)  A known pattern is written into the guard zones and,
+on a call to \fBckfree\fR, the guard zones of the space being freed
+are checked to see if either zone has been modified in any way.
+If one has been, the guard bytes and their new contents are identified,
+and a ``low guard failed'' or ``high guard failed'' message is issued.
+The ``guard failed'' message includes the address of the memory packet 
+and the file name and line number of the code that called \fBckfree\fR.
+This allows you to detect the common sorts of one-off problems, where
+not enough space was allocated to contain the data written, for example.
+'
+.SH THE MEMORY COMMAND
+'@help: debug/memory
+'@brief: display and debug memory problems
+'
+.TP
+.B memory \fIoptions\fR
+.br
+The Tcl \fBmemory\fR command gives the Tcl developer control of Tcl's memory
+debugging capabilities.  The memory command has several suboptions, which are
+described below.  It is only available when Tcl has been compiled with memory
+debugging enabled.
+'
+.TP
+.B memory \fBinfo\fR
+.br
+生成一个报告，包含自从 Tcl 启动以来分配和释放的(内存)总数，当前分配的包(未遇到相应的到 \fBckfree \fR的调用的到 \fBckalloc\fR  的调用的当前数目)的数目，当前分配的字节数，和已分配的包和字节的最大的数目。
+'
+.TP
+.B memory \fBtrace\fR [\fBon|off\fR]
+.br
+使内存跟踪开启或关闭。在开启内存跟踪的时候，对 \fBckalloc\fR    的每次调用都导致向      \fIstderr \fR写一行跟踪信息，其组成有字 \fIckalloc\fR，随后是返回的地址，分配的内存总数，和进行分配的 C 文件名和代码的行数。例如:...
+.sp
+   \fBckalloc 40e478 98 tclProc.c 1406\fR
+.sp
+Calls to \fBckfree\fR are traced in the same manner, except that the
+word \fIckalloc\fR is replaced by the word \fIckfree\fR.
+'
+.TP
+.B memory \fBvalidate\fR [\fBon|off\fR]
+.br
+使内存生效(validation)开启或关闭。在开启内存生效的时候，在对\fBckalloc\fR 或 \fBckfree \fR的每次调用上，检查用 \fBckalloc \fR分配的每块现存的内存的守卫区(guard zone)。这有很大的性能影响而只在强烈怀疑有覆写(overwrite)问题的时候才使用。开启内存生效的益处是在覆写发生之后第一次调用 \fBckalloc\fR   或 \fBckfree\fR   的时候就能检测到守卫区覆写，而不是在释放有覆写守卫区的内存的时候，释放可能在内存覆写发生之后才发生。
+'
+.TP
+.B memory \fBtrace_on_at_malloc\fR \fInnn\fR
+.br
+在进行了 \fIcount\fR\fI \fR数目 \fBckalloc \fR之后启用内存跟踪。例如，如果你键入了 \fBmemory trace_on_at_malloc 100\fR，在第   100 次调用 \fBckalloc \fR之后，将对所有分配和释放的内存显示内存跟踪信息。因为在一个问题发生之前可能有许多内存活动，如果你能在问题出现( sets in)之前标识出一定数目的分配，决定(judicious)使用这个选项可以减轻跟踪导致的速度变慢(和生成的跟踪信息总数)。在发生一个守卫区错误时，输出自从 Tcl  启动以来发生的内存分配的当前数目。     
+.TP
+.B memory \fBbreak_on_malloc\fR \fInnn\fR
+.br
+在进行了 \fB\fIcount\fR\fR  数目的 \fBckalloc\fR  分配之后，输出一个(中断)消息，表示它现在想进入 C 调试器。  Tcl  将向自身发出一个 \fISIGINT\fR  信号。如果你在一个 C  调试器下运行 Tcl，它将接着进入调试器命令模式。     
+'
+.TP
+.B memory \fBdisplay\fR \fIfile\fR
+.br
+向指定文件写当前所有分配的内存的一个列表。
+'@endhelp
+'
+.SH DEBUGGING DIFFICULT MEMORY CORRUPTION PROBLEMS
+.PP
+Normally, Tcl compiled with memory debugging enabled will make it easy to isolate
+a corruption problem.  Turning on memory validation with the memory command
+can help isolate difficult problems.
+If you suspect (or know) that corruption is 
+occurring before the Tcl interpreter comes up far enough for you to
+issue commands, you can set \fBMEM_VALIDATE\fR define, recompile 
+tclCkalloc.c and rebuild Tcl.  This will enable memory validation
+from the first call to \fBckalloc\fR, again, at a large performance impact.
+.PP
+If you are desperate and validating memory on every call to \fBckalloc\fR
+and \fBckfree\fR isn't enough, you can explicitly call
+\fBTcl_ValidateAllMemory\fR directly at any point.  It takes a \fIchar *\fR
+and an \fIint\fR which are normally the filename and line number of the
+caller, but they can actually be anything you want.  Remember to remove
+the calls after you find the problem.
+'
+.SH "关键字 KEYWORDS"
+ckalloc, ckfree, free, memory, malloc
+
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/09/28
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

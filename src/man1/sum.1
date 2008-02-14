@@ -1,0 +1,52 @@
+.TH SUM "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+sum \- 计算文件的校验和,以及文件占用的块数
+.SH "总览 (SYNOPSIS)"
+.B ../src/sum
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+显示 每个 文件 FILE  的 校验和, 以及 他们 占用的 块数.
+.TP
+\fB\-r\fR
+取代 \fB\-s\fR, 使用 BSD sum 算法, 块 大小 为 1K
+.TP
+\fB\-s\fR, \fB\-\-sysv\fR
+使用 System V sum 算法, 块 大小 为 512 字节
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+如果 没有 指定 FILE, 或 FILE 是 -, 就从 标准输入
+读取 数据.
+.SH "作者 (AUTHOR)"
+Kayvan Aghaiepour 和 David MacKenzie.
+.SH "报告 BUGS"
+发现的 bug 送往  <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "另见 (SEE ALSO)"
+.B sum
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B sum
+程序, 使用 命令
+.IP
+.B info sum
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

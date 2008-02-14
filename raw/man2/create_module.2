@@ -1,0 +1,41 @@
+.\" Copyright (C) 1996 Free Software Foundation, Inc.
+.\" This file is distributed according to the GNU General Public License.
+.\" See the file COPYING in the top level source directory for details.
+.\"
+.TH CREATE_MODULE 2 "26 Dec 1996" Linux "Linux Module Support"
+.SH NAME
+create_module \- create a loadable module entry
+.SH SYNOPSIS
+.nf
+.B #include <linux/module.h>
+.sp
+.BI "caddr_t create_module(const char *" name ", size_t " size );
+.fi
+.SH DESCRIPTION
+.B create_module
+attempts to create a loadable module entry and reserve the kernel memory
+that will be needed to hold the module.  This system call is only open
+to the superuser.
+.SH "RETURN VALUE"
+On success, returns the kernel address at which the module will reside.
+On error \-1 is returned and \fIerrno\fP is set appropriately.
+.SH ERRORS
+.TP
+.B EPERM
+The user is not the superuser.
+.TP
+.B EEXIST
+A module by that name already exists.
+.TP
+.B EINVAL
+The requested size is too small even for the module header information.
+.TP
+.B ENOMEM
+The kernel could not allocate a contiguous block of memory large
+enough for the module.
+.TP
+.B EFAULT
+.I name
+is outside the program's accessible address space.
+.SH "SEE ALSO
+.BR init_module "(2), " delete_module "(2), " query_module "(2)."

@@ -1,0 +1,92 @@
+.TH LOSETUP 8 "Nov 24 1993" "Linux" "MAINTENANCE COMMANDS"
+.SH NAME
+losetup \- 设 定 与 控 制 环回设备
+.SH "总览 SYNOPSIS"
+.ad l
+.B losetup
+[
+.B \-e
+.I encryption
+] [
+.B \-o
+.I offset
+]
+.I loop_device file
+.br
+.B losetup
+[
+.B \-d
+]
+.I loop_device
+.ad b
+.SH "描述"
+.B losetup
+用 来 将 loop device 与 档 案 或 block device 联 结 、 分 离 . 以 及 查 询 loop device 目 前 的 状 况 , 如 只 给 定 \fIloop_device\fR 的 参 数 . 则 秀 出 loop device 目 前 的 状 况 .
+.SH "选项 OPTIONS"
+.IP \fB\-d\fP
+将 某 个 档 案 或 装 制 与 loop 装 置 分 离
+.IP "\fB\-e \fIencryption\fP"
+.RS
+启 动 资 料 编 码 . 下 列 为 可 用 的 选 项 参 数 :启 动 资 料 编 码 . 下 列 为 可 用 的 选 项 参 数 :
+.IP \fBNONE\fP
+不 编 码 ( 定 义 值 ) .
+.PD 0
+.IP \fBXOR\fP
+使 用 简 易 的 XOR 编 码
+.IP \fBDES\fP
+使 用 DES 编 码 . DES 编 码 须 在 kernel 上 加 上 DES 编 码 功 能 . DES 编 码 是 利 用 启 始 值 做 为 密 码 保 护 来 防 止 他 人 用 字 典 功 击 法 破 解 .
+.PD
+.RE
+.IP "\fB\-o \fIoffset\fP"
+资 料 开 启 时 资 料 平移(offset) 几 个 bytes 来 与 档 案 或 装 置 联 接 
+.SH "返回值 RETURN VALUE"
+.B losetup
+returns 0 on success, nonzero on failure. When
+.B losetup
+displays the status of a loop device, it returns 1 if the device
+is not configured and 2 if an error occurred which prevented
+.B losetup
+from determining the status of the device.
+
+.SH "文件 FILES"
+.nf
+/dev/loop0,/dev/loop1,...   loop devices (major=7)
+.fi
+.SH "范例 EXAMPLE"
+如 核 心 使 用 模 组 , 须 先 使 用 下 列 命 令 将 模 组 载 入 .
+.IP
+# insmod loop.o
+.LP
+下 列 为 使 用 loop 装 置 的 简 单 范 例 .
+.nf
+.IP
+dd if=/dev/zero of=/file bs=1k count=100
+losetup -e des /dev/loop0 /file
+Password:
+Init (up to 16 hex digits):
+mkfs -t ext2 /dev/loop0 100
+mount -t ext2 /dev/loop0 /mnt
+ ...
+umount /dev/loop0
+losetup -d /dev/loop0
+.fi
+.LP
+核 心 使 用 模 组 , 须 利 用 下 列 命 令 移 除 loop 模 组 .
+.IP
+# rmmod loop
+.LP
+.fi
+.SH "限制 RESTRICTION"
+DES 编 码 十 分 慢 , 而 使 用 XOR 却 十 分 脆 弱 .
+.SH "作者 AUTHOR"S
+.nf
+Original version: Theodore Ts'o <tytso@athena.mit.edu>
+Original DES by: Eric Young <eay@psych.psy.uq.oz.au>
+.fi
+
+.SH "[中文版维护人]"
+.B 软件教程之Linux Man
+.SH "[中文版最新更新]"
+.B 1989.01.01
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

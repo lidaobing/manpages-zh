@@ -1,0 +1,126 @@
+.\" Copyright (c) 1990 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" This code is derived from software contributed to Berkeley by
+.\" Michael Rendell.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     @(#)col.1	6.8 (Berkeley) 6/17/91
+.\"
+.TH col 1
+.Dd 1991年6月17日
+.Dt COL 1
+.Os
+.Sh NAME(名称)
+.Nm col
+.Nd 过滤掉输入中的反向换行符
+.Sh SYNOPSIS(总览)
+.Nm col
+.Op Fl bfx
+.OP Fl l Ar num
+.Sh DESCRIPTION(描述)
+.Nm Col
+过滤掉反向(以及半反向)换行符(LF: line feed or NL: new line),
+这样输出按正常顺序，即只包括正向和半正向换行符,
+而且在可能的地方使用tab替换白空格.这对
+.Xr nroff 1
+和
+.Xr tbl  1
+的输出处理很有用处.
+.Pp
+.Nm col
+从标准输出读入,并写出到标准输出上.
+.Pp
+选项如下:
+.Bl -tag -width "-lnum"
+.It Fl b
+不输出任何退格符,在每列的位置上只打印最后写的那个字符.
+.It Fl f
+允许正向半换行符(``fine''模式).
+通常,处于半行分界线上的字符打印在下一行.
+.It Fl x
+输出多个空格以替换tab.
+.It Fl l Ns Ar num
+在内存中至少缓冲
+.Ar num
+行.
+默认情况下,缓冲128行.
+.El
+.Pp
+.Nm col
+所能理解的用于回车操作的控制序列以及它们的十进制值都列在下面的表中:
+.Pp
+.Bl -tag -width "carriage return" -compact
+.It ESC\-7
+反向换行符(escape后接7)
+.It ESC\-8
+反向半换行符(escape后接8)
+.It ESC\-9
+正向半换行符(escape后接9)
+.It backspace
+反向移动一列(8);在第一列则忽略.
+.It carriage return
+(13)
+.It newline
+正向换行符(10);同时执行回车(carriage return)操作
+.It shift in
+转到正常字符集(15)
+.It shift out
+转到备选的字符集(14)
+.It space
+正向移动一列(32)
+.It tab
+正向移动到下一个tab(9)
+.It vertical tab
+反向换行符(11)
+.El
+.Pp
+丢弃所有不被承认的控制字符和escape序列.
+.Pp
+当读取字符时,
+.Nm Col
+保持着与字符集的联系,而且在输出时确保字符集是正确的.
+.Pp
+如果输入设备试图回复到最近被刷新的行,
+.Nm col
+会显示一条警告消息.
+.Sh SEE ALSO(另见)
+.Xr expand 1 ,
+.Xr nroff 1 ,
+.Xr tbl 1
+.Sh HISTORY(历史)
+.Nm col
+命令出现于AT&T UNIX版本6.
+.Sh "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.Sh "[中文版最新更新]" 
+2000/12/6
+.Sh 《中国Linux论坛man手册页翻译计划》:
+.B http://cmpp.linuxforum.net

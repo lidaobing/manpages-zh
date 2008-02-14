@@ -1,0 +1,91 @@
+.TH PRINTF "1" "August 1999" "GNU sh-utils 2.0" FSF
+.SH NAME
+printf \- 格式化并显示数据
+.SH "总览 (SYNOPSIS)"
+.B printf
+\fIFORMAT \fR[\fIARGUMENT\fR]...
+.br
+.B printf
+\fIOPTION\fR
+.SH "描述 (DESCRIPTION)"
+.PP
+.\" Add any additional description here
+.PP
+根据 FORMAT 显示 ARGUMENT(s) .
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+FORMAT 就象 C 的 printf 函数中 一样 控制 输出数据, 转译 序列 有:
+.TP
+双引号 (double quote)
+.TP
+"\\0NNN"
+八进制数字 NNN (0 到 3 个 数字) 表示的 字符
+.TP
+\\\\
+反斜杠 (backslash)
+.TP
+"\\a"
+报警 (BEL)
+.TP
+"\\b"
+退格 (backspace)
+.TP
+"\\c"
+不再产生输出
+.TP
+"\\f"
+走纸 (form feed)
+.TP
+"\\n"
+换行 (new line)
+.TP
+"\\r"
+回车 (carriage return)
+.TP
+"\\t"
+水平 tab
+.TP
+"\\v"
+垂直 tab
+.TP
+"\\xNNN"
+十六进制数字 NNN (1 到 3 个 数字) 表示的 字符
+.TP
+%%
+单个 %
+.TP
+%b
+把 ARGUMENT 视为 翻译了 `\\' escape 序列 的 字符串
+.PP
+而且 所有 C 的 格式命令, 如 diouxXfeEgGcs, 首先 结合 ARGUMENT
+转换为 正确 的 类型. printf 能够 处理 变量宽度.
+.SH "报告 BUGS"
+发现的 bug 送往  <bug-sh-utils@gnu.org>.
+.SH "另见 (SEE ALSO)"
+.B printf
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B printf
+程序, 使用 命令
+.IP
+.B info printf
+.PP
+能够 访问到 完整 的 手册.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

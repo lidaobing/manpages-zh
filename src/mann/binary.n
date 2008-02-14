@@ -1,0 +1,569 @@
+'\"
+'\" Copyright (c) 1997 by Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: binary.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\" 
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: binary.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH binary n 8.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+binary \- 从(向)二进制串插入和提取字段
+.SH 总览 SYNOPSIS
+\fBbinary format \fIformatString \fR?\fIarg arg ...\fR?
+.br
+\fBbinary scan \fIstring formatString \fR?\fIvarName varName ...\fR?
+.BE
+
+.SH 描述 DESCRIPTION
+.PP
+ 这个命令提供操纵二进制数据的设施。第一种形式是 \fBbinary format\fR，从普通的 Tcl 值来建立一个二进制串。例如，给出值 16 和 22，可以产生一个8字节的二进制串，由两个4字节的整数组成。第二种形式是 \fBbinary scan\fR，做相反的事: 从一个二进制串中提取出数据并作为通常的 Tcl 字符串值而返回。
+
+.SH "二进制化 BINARY FORMAT"
+.PP
+\fBbinary format\fR 命令生成一个二进制串，其格式由 \fIformatString\fR 指定，它的内容来(自在后面)增添的参数。返回结果二进制值。
+.PP
+\fIformatString\fR 由零个或多个字段说明符(specifier)的序列组成，用零个或多个空格分隔。每个说明符都是一个单独的类型字符，跟随着一个可选的数值 \fIcount\fR。多数字段说明符消耗(consume)一个参数来获取被格式化的值。类型字符指定如何格式化值。\fIcount\fR 典型的指示从值中接受了多少个指定类型的单项(item)。如果\fIcount\fR 存在，则是一个非负十进制整数或 \fB*\fR，星号通常指示使用在值中所有的单项。如果参数的个数不匹配在消耗参数的这些格式串中的字段的个数，则产生一个错误。
+.PP
+每个类型-数目(type-count)对在二进制串上移动一个假想的游标，在当前的位置上存储一些字节并且游标前进到最近存储的字节的紧后面。游标初始在位置 0 也就是在数据的开始(端)。类型可以是下列字符中的任意一个:
+.IP \fBa\fR 5
+在输出串中存储长度是 \fIcount\fR 的一个字符串。如果 \fIarg\fR 比 \fIcount\fR 的字节数少，则有增补的零字节来填充字段。如果 \fIarg\fR 比指定长度多，忽略额外的字符。如果 \fIcount\fR 是 \fB*\fR, 则格式化在 \fIarg\fR 中的所有字节。如果省略了 \fIcount\fR ，则格式化一个字符。例如，
+.RS
+.CS
+\fBbinary format a7a*a alpha bravo charlie\fR
+.CE
+将返回等价于 \fBalpha\\000\\000bravoc\fR的一个串。
+.RE
+.IP \fBA\fR 5
+除了使用空格而不是空字符来填充之外，这种形式同于 \fBa\fR。例如，
+.RS
+.CS
+\fBbinary format A6A*A alpha bravo charlie\fR
+.CE
+将返回 \fBalpha bravoc\fR.
+.RE
+.IP \fBb\fR 5
+在输出串中存储 \fIcount\fR 个二进制数字的一个串，并且在每个字节中以从低到高的次序(来排序)。\fIArg\fR 必须包含一个 \fB1\fR 和 \fB0\fR 字符的一个序列。以从最先到最后的次序散布(emit)结果字节，并且以在每个字节中以从低到高的次序格式化每位。如果 \fIarg\fR 比 \fIcount\fR 的位数少，则剩余的位使用零。如果 \fIarg\fR 比指定的位数多，忽略额外的位。如果 \fIcount\fR 是 \fB*\fR, 则格式化在 \fIarg\fR 中所有的位。如果省略了 \fIcount\fR，则格式化一位。如果如果格式化的位数不结束在字节边界上，最后的字节的剩余的位将是零。例如，
+.RS
+.CS
+\fBbinary format b5b* 11100 111000011010\fR
+.CE
+将返回等价于 \fB\\x07\\x87\\x05\fR的一个串。
+.RE
+.IP \fBB\fR 5
+除了在每个字节中以从高到低的次序(来排序)之外，这种形式同于 \fBb\fR。例如，
+.RS
+.CS
+\fBbinary format B5B* 11100 111000011010\fR
+.CE
+将返回等价于 \fB\\xe0\\xe1\\xa0\fR的一个串。
+.RE
+.IP \fBh\fR 5
+在输出串中存储 \fIcount\fR 个十六进制的数字的一个串，并且在每个字节中以从低到高的次序(来排序)。\fIArg\fR  必须包含在“0123456789abcdefABCDEF”(字符)集中的字符的一个序列。以从最先到最后的次序散布(emit)结果字节，并且在每个字节中以从低到高的次序格式化十六进制数字。如果 \fIarg\fR 比 \fIcount\fR 的数字个数少，则剩余的数字使用零。如果 \fIarg\fR 比指定的数字的个数多，忽略额外的数字。如果 \fIcount\fR 是 \fB*\fR，则格式化在 \fIarg\fR 中所有的数字。如果省略了 \fIcount\fR ，则格式化一个数字。如果格式化的数字的个数不结束在一个字节的边界上，最后的字节的剩余的位将是零。例如，
+.RS
+.CS
+\fBbinary format h3h* AB def\fR
+.CE
+将返回等价于 \fB\\xba\\x00\\xed\\x0f\fR的一个串。
+.RE
+.IP \fBH\fR 5
+除了在每个字节中以从高到低的次序(来排序)之外，这种形式同于 \fBh\fR 。例如，
+.RS
+.CS
+\fBbinary format H3H* ab DEF\fR
+.CE
+将返回等价于 \fB\\xab\\x00\\xde\\xf0\fR的一个串。
+.RE
+.IP \fBc\fR 5
+在输出串中存储一个或多个8位整数值。如果未指定 \fIcount\fR，则 \fIarg\fR 必须包含一个整数值；否则 \fIarg\fR 必须包含至少有一个整数元素的一个列表。在当前的位置上把每个整数的低位(low-order)的 8 位存储成一个一字节的值。如果 \fIcount\fR 是 \fB*\fR，则格式化在列表中所有的整数。如果在列表中的元素的个数比 \fIcount\fR 少，则产生一个错误。 如果在列表中的元素的个数比 \fIcount\fR 多，则忽略额外的元素。例如，
+.RS
+.CS
+\fBbinary format c3cc* {3 -3 128 1} 260 {2 5}\fR
+.CE
+将返回等价于 \fB\\x03\\xfd\\x80\\x04\\x02\\x05\fR 的一个串。而
+.CS
+\fBbinary format c {2 5}\fR
+.CE
+将产生一个错误。
+.RE
+.IP \fBs\fR 5
+除了以小端(little-endian)字节序在输出串中存储一个或多个16位整数之外，这种形式同于 \fBc\fR。在当前位置上把每个整数的低位的16位存储成一个两字节的值，并且首先存储最低有效(significant)字节。例如，
+.RS
+.CS
+\fBbinary format s3 {3 -3 258 1}\fR
+.CE
+将返回等价于 \fB\\x03\\x00\\xfd\\xff\\x02\\x01\fR 的一个字串。
+.RE
+.IP \fBS\fR 5
+除了以大端(big-endian)字节序在输出串中存储一个或多个16位整数之外，这种形式同于 \fBs\fR 。例如，
+.RS
+.CS
+\fBbinary format S3 {3 -3 258 1}\fR
+.CE
+将返回等价于 \fB\\x00\\x03\\xff\\xfd\\x01\\x02\fR 的一个串。
+.RE
+.IP \fBi\fR 5
+ 除了以小端(little-endian)字节序在输出串中存储一个或多个32位整数之外，这种形式同于 \fBc\fR。在当前位置上把每个整数的低位的32位存储成一个四字节的值，并且首先存储最低有效字节。例如，
+.RS
+.CS
+\fBbinary format i3 {3 -3 65536 1}\fR
+.CE
+将返回等价于 \fB\\x03\\x00\\x00\\x00\\xfd\\xff\\xff\\xff\\x00\\x00\\x01\\x00\fR 的一个串。
+.RE
+.IP \fBI\fR 5
+除了以大端(big-endian)字节序在输出串中存储一个或多个32位整数之外，这种形式同于 \fBi\fR。例如，
+.RS
+.CS
+\fBbinary format I3 {3 -3 65536 1}\fR
+.CE
+将返回等价于 \fB\\x00\\x00\\x00\\x03\\xff\\xff\\xff\\xfd\\x00\\x01\\x00\\x00\fR 的一个串。
+.RE
+.IP \fBf\fR 5
+除了以机器的本地表示在输出串中存储一个或多个单精度浮点数之外，这种形式同于 \fBc\fR。这种表示是不能跨体系移植的，所以不应用于在网络上交流浮点数。浮点数的大小在体系间可能不同，所以生成的字节数也可能不同。如果值溢出了机器的本地表示，则使用系统定义的 FLT_MAX 的值。因为 Tcl 在内部使用双精度浮点数，在转换成单精度时可能损失些精度。例如，运行在 Intel Pentium 处理器的一个 Windows 系统上，
+.RS
+.CS
+\fBbinary format f2 {1.6 3.4}\fR
+.CE
+将返回等价于 \fB\\xcd\\xcc\\xcc\\x3f\\x9a\\x99\\x59\\x40\fR 的一个串。
+.RE
+.IP \fBd\fR 5
+除了以机器的本地表示在输出串中存储一个或多个双精度浮点数之外，这种形式同于 \fBf\fR。例如，运行在 Intel Pentium 处理器的一个 Windows 系统上，
+.RS
+.CS
+\fBbinary format d1 {1.6}\fR
+.CE
+将返回等价于 \fB\\x9a\\x99\\x99\\x99\\x99\\x99\\xf9\\x3f\fR 的一个串。
+.RE
+.IP \fBx\fR 5
+Stores \fIcount\fR null bytes in the output string.  If \fIcount\fR is
+not specified, stores one null byte.  If \fIcount\fR is \fB*\fR,
+generates an error.  This type does not consume an argument.  For
+example,
+.RS
+.CS
+\fBbinary format a3xa3x2a3 abc def ghi\fR
+.CE
+将返回等价于 \fBabc\\000def\\000\\000ghi\fR 的一个串。
+.RE
+.IP \fBX\fR 5
+在输出串中反向移动游标 \fIcount\fR 字节。如果 \fIcount\fR 是 \fB*\fR 或比当前游标位置大，则游标定位到位置 0，这样下个存储的字节将是结果串中的第一个字节。如果省略了\fIcount\fR，则游标反向移动一字节。 这种形式不使用参数。例如，
+.RS
+.CS
+\fBbinary format a3X*a3X2a3 abc def ghi\fR
+.CE
+将返回 \fBdghi\fR.
+.RE
+.IP \fB@\fR 5
+在输出串中把游标移动到由 \fIcount\fR 指定的绝对位置上。位置 0 参照在输出串中的第一个字节。如果 \fIcount\fR 参照的位置超出至今所存储的最后的字节，则在空挡的(unitialized ?)位置上放置空字节并把游标放置到指定位置。如果 \fIcount\fR 是 \fB*\fR，则游标将被移动到输出串的末端。如果省略了 \fIcount\fR，则产生一个错误。这种类型不使用参数。例如，
+.RS
+.CS
+\fBbinary format a5@2a1@*a3@10a1 abcde f ghi j\fR
+.CE
+将返回 \fBabfdeghi\\000\\000j\fR.
+.RE
+
+.SH "二进制检索 BINARY SCAN"
+.PP
+\fBbinary scan\fR 命令从一个二进制串分析字段、返回完成的转换的数目。\fIString\fR 给出要被分析的输入而 \fIformatString\fR 指示如何分析它。每个 \fIvarName\fR 给出一个变量的名字；当从 \fIstring\fR 检索出一个字段时，结果被赋给相应的变量。
+.PP
+如同 \fBbinary format\fR 那样，\fIformatString\fR 由零个或多个字段说明符(specifier)的序列组成，用零个或多个空格分隔。每个说明符都是一个单独的类型字符，跟随着一个可选的数值 \fIcount\fR。多数字段说明符消耗(consume)一个参数来获取检索出的值要放置在其中的那个变量。类型字符指定如何解释二进制串。\fIcount\fR 典型的指定从数据中接受指定类型的多少个单项(item)。如果存在，\fIcount\fR 是一个非负数的十进制整数或 \fB*\fR，星号通常指示要用到在数据中所有的剩余的单项。如果在满足当前字段说明符的当前位置之后没有剩下足够的字节，则相应的变量保持不动(untouch)而 \fBbinary scan\fR 立即返回设置了的变量的个数。如果没有足够的参数给所有这些消耗参数的格式串中的字段，则产生一个错误。
+.PP
+着重 (\fBimportant\fR) 注意 \fBc\fR, \fBs\fR 和 \fBS\fR(还有在64位系统上的 \fBi\fR 和 \fBI\fRI)将被检索成一个长整型 (long) 大小的值。在这种情况下，(最)高位设置(为1)的值(对于char 是 0x80，对于 short 是 0x8000，对于 int 是 0x80000000)，将被符号扩展。所以下列情况将发生:
+.CS
+\fBset signShort [binary format s1 0x8000]\fR
+\fBbinary scan $signShort s1 val; \fI# val == 0xFFFF8000\fR
+.CE
+如果你打算生成一个无符号值，那么你可以把返回值屏蔽(mask)成需要的大小。例如，要生成一个无符号  short 值:
+.CS
+\fBset val [expr {$val & 0xFFFF}]; \fI# val == 0x8000\fR
+.CE
+.PP
+每个类型-数目(type-count)对在二进制串上移动一个假想的游标，从当前的位置上读一些字节。游标的初始在位置 0 也就是数据的开始(端)。类型可以是下列字符中的任意一个:
+.IP \fBa\fR 5
+数据是长度是 \fIcount\fR 的一个字符串。如果 \fIcount\fR 是 \fB*\fR，则在 string 中所有的剩余的字节将被检索到变量中。如果省略了 \fIcount\fR，则将检索一个字符。例如，
+.RS
+.CS
+\fBbinary scan abcde\\000fghi a6a10 var1 var2\fR
+.CE
+将返回 \fB1\fR 并把等价于 \fBabcde\\000\fR 的一个字符串存储到 \fBvar1\fR 而 \fBvar2\fR 保持不变。
+.RE
+.IP \fBA\fR 5
+除了在存储到变量之前从检索到的值中去除(strip)尾随的空白(blank)和空字符(null)之外，这种形式同于 \fBa\fR。例如
+.RS
+.CS
+\fBbinary scan "abc efghi  \\000" A* var1\fR
+.CE
+将返回 \fB1\fR 并把 \fBabc efghi\fR 存储到 \fBvar1\fR。
+.RE
+.IP \fBb\fR 5
+把数据转换成 \fIcount\fR 位二进制数字的一个字符串，以从低到高的次序表示成“1”和“0”字符的一个序列。数据字节按从最先到最后的次序被检索，并且在每个字节中按从低到高的次序接受(每)位。忽略在最后的字节中的任何额外的位。如果 \fIcount\fR 是 \fB*\fR，则检索在串中的所有的剩余的位。 如果省略了 \fIcount\fR，则检索一位。例如，
+.RS
+.CS
+\fBbinary scan \\x07\\x87\\x05 b5b* var1 var2\fR
+.CE
+将返回 \fB2\fR 并把 \fB11100\fR 存储到 \fBvar1\fR 且 \fB1110000110100000\fR 存储到 \fBvar2\fR.
+.RE
+.IP \fBB\fR 5
+除了在每字节中按从高到低的次序接受(每)位之外，这种形式同于 \fBb\fR。例如，
+.RS
+.CS
+\fBbinary scan \\x70\\x87\\x05 B5B* var1 var2\fR
+.CE
+将返回 \fB2\fR 并把 \fB01110\fR 存储到 \fBvar1\fR 且 \fB1000011100000101\fR 存储到 \fBvar2\fR.
+.RE
+.IP \fBh\fR 5
+把数据转换成 \fIcount\fR 个十六进制数字的一个字符串，以从低到高的次序表示成一个在 “0123456789abcdefABCDEF” (字符)集中的字符的一个序列。按从最先到最后的次序检索数据字节，并且在每个字节中以从低到高的次序接受十六进制数字。忽略最后的字节中的任何额外的位。如果 \fIcount\fR 是 \fB*\fR, 则检索在串中所有剩余的十六进制数字。如果省略了 \fIcount\fR，则检索一位十六进制数字。例如，
+.RS
+.CS
+\fBbinary scan \\x07\\x86\\x05 h3h* var1 var2\fR
+.CE
+将返回 \fB2\fR 并把 \fB706\fR 存储到 \fBvar1\fR 且 \fB50\fR 存储到n \fBvar2\fR.
+.RE
+.IP \fBH\fR 5
+除了在每个字节中以从高到低的次序接受数字之外，这种形式同于 \fBh\fR。例如，
+.RS
+.CS
+\fBbinary scan \\x07\\x86\\x05 H3H* var1 var2\fR
+.CE
+将返回 \fB2\fR 并把 \fB078\fR 存储到\fBvar1\fR 且 \fB05\fR 存储到 \fBvar2\fR.
+.RE
+.IP \fBc\fR 5
+把数据转换成 \fIcount\fR 个8位有符号整数并作为一个列表存储到相应的变量中。如果 \fIcount\fR 是 \fB*\fR，则检索在串中所有剩余的字节。如果省略了 \fIcount\fR，则检索一个8位整数。例如，
+.RS
+.CS
+\fBbinary scan \\x07\\x86\\x05 c2c* var1 var2\fR
+.CE
+将返回\fB2\fR 并把 \fB7 -122\fR 存储到 \fBvar1\fR 且 \fB5\fR 存储到 \fBvar2\fR.  注意返回的整数是有符号的，但它们是类似下面这样的表达式来转换成无符号的8位数量(quantity):
+.CS
+\fBexpr ( $num + 0x100 ) % 0x100\fR
+.CE
+.RE
+.IP \fBs\fR 5
+把数据解释成 \fIcount\fR 个表示为小端字节序的16位有符号整数。 整数被作为一个列表存储到相应的变量中。如果 \fIcount\fR 是 \fB*\fR，则检索在串中所有剩余的字节。如果省略了 \fIcount\fR，则检索一个16位整数。例如，
+.RS
+.CS
+\fBbinary scan \\x05\\x00\\x07\\x00\\xf0\\xff s2s* var1 var2\fR
+.CE
+将返回 \fB2\fR 并把 \fB5 7\fR 存储到 \fBvar1\fR 且 \fB-16\fR 存储到 \fBvar2\fR.  注意返回的整数是有符号的，但它们是类似下面这样的表达式来转换成无符号的16位数量(quantity):
+.CS
+\fBexpr ( $num + 0x10000 ) % 0x10000\fR
+.CE
+.RE
+.IP \fBS\fR 5
+除了把数据解释成 \fIcount\fR 个表示为大端字节序的16位有符号整数之外，这种形式同于 \fBs\fR。例如， 
+.RS
+.CS
+\fBbinary scan \\x00\\x05\\x00\\x07\\xff\\xf0 S2S* var1 var2\fR
+.CE
+将返回 \fB2\fR 并把 \fB5 7\fR 存储到 \fBvar1\fR 且 \fB-16\fR 存储到 \fBvar2\fR. 
+.RE
+.IP \fBi\fR 5
+把数据解释成 \fIcount\fR 个表示为小端字节序的32位有符号整数。 整数被作为一个列表存储到相应的变量中。如果 \fIcount\fR 是 \fB*\fR，则检索在串中所有剩余的字节。如果省略了 \fIcount\fR，则检索一个32位整数。例如，
+.RS
+.CS
+\fBbinary scan \\x05\\x00\\x00\\x00\\x07\\x00\\x00\\x00\\xf0\\xff\\xff\\xff i2i* var1 var2\fR
+.CE
+将返回 \fB2\fR ，并把 \fB5 7\fR 存储到 \fBvar1\fR 且 \fB-16\fR 存储到 \fBvar2\fR。注意返回的整数是有符号的并且不能被 Tcl 表示成无符号的值。
+.RE
+.IP \fBI\fR 5
+除了把数据解释成 \fIcount\fR 个表示为大端字节序的32位有符号整数之外，这种形式同于 \fBi\fR。例如，
+.RS
+.CS
+\fBbinary \\x00\\x00\\x00\\x05\\x00\\x00\\x00\\x07\\xff\\xff\\xff\\xf0 I2I* var1 var2\fR
+.CE
+将返回 \fB2\fR  ，并把 \fB5 7\fR 存储到 \fBvar1\fR 且 \fB-16\fR 存储到 \fBvar2\fR。
+.RE
+.IP \fBf\fR 5
+把数据解释成 \fIcount\fR 个机器本地表示的单精度浮点数，把浮点数作为一个列表存储到相应的变量中 。如果 \fIcount\fR 是 \fB*\fR，则检索在串中所有剩余的字节。如果省略了 \fIcount\fR，则检索一个单精度浮点数。 浮点数的大小在体系间可能不同，所以检索的字节数也可能不同。如果数据不表示一个有效的浮点数，结果值是未定义的并且依赖于编译器。例如，运行在 Intel Pentium 处理器的一个 Windows 系统上，
+.RS
+.CS
+\fBbinary scan \\x3f\\xcc\\xcc\\xcd f var1\fR
+.CE
+将返回 \fB1\f ，并把 \fB1.6000000238418579\fR 存储到 \fBvar1\fR。
+.RE
+.IP \fBd\fR 5
+除了把数据解释成 \fIcount\f 个机器本地表示的双精度浮点数之外，这种形式同于 \fBf\fR。例如，运行在 Intel Pentium 处理器的一个 Windows 系统上，
+.RS
+.CS
+\fBbinary scan \\x9a\\x99\\x99\\x99\\x99\\x99\\xf9\\x3f d var1\fR
+.CE
+将返回 \fB1\fR ，并把 \fB1.6000000000000001\fR 存储到 \fBvar1\fR1。
+.RE
+.IP \fBx\fR 5
+在 \fIstring\fR 中正向移动游标 \fIcount\fR 字节。如果 \fIcount\fR 是 \fB*\fR 或比当前游标位置之后的字节数大，则游标定位到位置 \fIstring\fR 中的最后一个字节之后。如果省略了\fIcount\fR，则游标正向移动一字节。 注意 这种形式不消耗参数。例如，
+.RS
+.CS
+\fBbinary scan \\x01\\x02\\x03\\x04 x2H* var1\fR
+.CE
+将返回 \fB1\fR，并把 \fB0304\fR 存储到 \fBvar1\fR。
+.RE
+.IP \fBX\fR 5
+在 \fIstring\fR 中反向移动游标 \fIcount\fR 字节。如果 \fIcount\fR 是 \fB*\fR 或比当前游标位置大，则游标定位到位置 0，这样下个检索的字节将是 \fIstring\fR 中的第一个字节。如果省略了\fIcount\fR，则游标反向移动一字节。 注意这种形式不消耗参数。例如，
+.RS
+.CS
+\fBbinary scan \\x01\\x02\\x03\\x04 c2XH* var1 var2\fR
+.CE
+将返回 \fB2\fR，并把 \fB1 2\fR 存储到 \fBvar1\fR 且 \fB020304\fR 存储到 \fBvar2\fR。
+.RE
+.IP \fB@\fR 5
+在数据串中把游标移动到由 \fIcount\fRt 指定的绝对位置上。位置 0 参照在 \fIstring\fR 中的第一个字节。如果 \fIcount\fR 参照的位置超出 \fIstring\fR 的末端，则把游标定位在最后的字节的后面。如果省略了 \fIcount\fR，则产生一个错误。例如， 　
+.RS
+.CS
+\fBbinary scan \\x01\\x02\\x03\\x04 c2@1H* var1 var2\fR
+.CE
+将返回 2 ，并把 1 2 存储到 var1 且 020304 存储到 var2。
+.RE
+
+.SH "平台相关事宜 PLATFORM ISSUES"
+ 有时希望以机器的本地字节序来格式化或检索整数值。参照 \fBtcl_platform\fR  数组中的 \fBbyteOrder\fR 元素来决定在格式化或检索整数时使用那种类型字符。
+
+.SH "参见 SEE ALSO"
+format(n), scan(n), tclvars(n)
+
+.SH 关键字 KEYWORDS
+binary, format, scan
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/06/21
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

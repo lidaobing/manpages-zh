@@ -1,0 +1,76 @@
+.\"  版权所有 1992 Rickard E. Faith (faith@cs.unc.edu)
+.\" 中文版版权所有 riser,BitBIRD www.linuxforum.net 2000
+.\"  可以在GNU通用出版许可下发布
+.TH KILL 1  1994 年 10 月 14 日   Linux 工具   Linux 程序员手册
+.SH NAME (名称)
+kill \- 终止进程
+.SH SYNOPSIS(总览)
+.BR kill [ \-s signal | \-p ][ -a ]pid ... 
+.br
+.B  kill -l [ signal ] 
+.SH DESCRIPTION (描述)
+.B kill
+给指定进程发送指定信号. 如果没有指定信号, 则发送 TERM 信号.
+TERM 信号会杀死不能俘获该信号的进程.
+对于其他进程, 可能需要使用 KILL (9) 信号, 因为该信号不能够被俘获.
+
+大多数现代的 shell 有一个内嵌的 kill 函数.
+.SH OPTIONS (选项)
+.TP
+.BR  "pid ..."
+给
+.B kill
+指定一个该发信号的进程列表. 每个
+.I pid
+可为下面四种之一.
+.I  "进程名"
+在这种情况下,发信号给所命名的进程.
+.I n
+这里的
+.I n
+大于 0. 将发信号给 pid 为
+.I n
+的进程.
+.I -1
+在这种情况下, 只要发信号的用户能够控制那些进行,
+将发信号给所有从 MAX_INT 到 2 的进程.
+.I -n
+这里的
+.I n
+大于 1, 在这种情况下, 发信号给属于进程组
+.I n
+的进程. 如果给定一个负的参数, 那么信号
+.I 必须
+首先声明, 否则它会被当作信号发送出去.
+.TP
+.BR \-s
+指定发送的信号.
+信号可以以信号名或数字的方式给定.
+.TP
+.BR \-p
+指定
+.B kill
+只打印命名进程的进程标识
+.I (pid) ,
+而不应发送给它信号.
+.TP
+.BR \-l
+打印信号名的列表.这可以在
+.I /usr/include/linux/signal.h
+中找到.
+.SH  SEE ALSO (又见)
+.BR bash (1),
+.BR tcsh (1),
+.BR kill (2),
+.BR sigvec (2)
+.SH AUTHOR (作者)
+引自 BSD 4.4. 翻译进程名为进程标识的功能由
+Salvatore Valente &lt;svalente@mit.edu&gt;
+加入.
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.BR 2001/08/08
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

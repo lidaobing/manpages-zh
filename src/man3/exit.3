@@ -1,0 +1,63 @@
+.\" Copyright (C) 2001 Andries Brouwer <aeb@cwi.nl>.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.TH EXIT 3  2001-11-17 "" "Linux Programmer's Manual"
+.SH NAME
+exit \- 使程序正常中止
+.SH "SYNOPSIS 总览"
+.nf
+.B #include <stdlib.h>
+.sp
+.BI "void exit(int " status );
+.fi
+.SH "DESCRIPTION 描述"
+函数 \fBexit()\fP 使得程序正常中止，\fIstatus & 0377\fP 的值被返回给父进程 (参见
+.BR wait (2))
+。所有用 \fBatexit()\fP 和 \fBon_exit()\fP 注册的函数都以与注册时相反的顺序被依次执行。使用 \fItmpfile()\fP 创建的文件被删除。
+.LP
+C 标准定义了两个值 \fIEXIT_SUCCESS\fP 和 \fIEXIT_FAILURE\fP，可以作为 \fBexit()\fP 的参数，来分别指示是否为成功退出。
+.SH "RETURN VALUE 返回值"
+函数 \fBexit()\fP 不会返回。
+.SH "CONFORMING TO 标准参考"
+SVID 3, POSIX, BSD 4.3, ISO 9899 (``ANSI C'')
+.SH "NOTES 要点"
+在 exit 处理过程中，可能会使用 \fBatexit()\fP 和 \fBon_exit()\fP 注册其他的函数。通常，最后注册的函数被从已注册函数链中摘下来，然后执行。如果在处理过程中，又调用了 \fBexit()\fP 或 \fBlongjmp()\fP，那么发生的行为是未定义的。
+.LP
+相对于使用 0 和非零值 1 或 \-1，使用 EXIT_SUCCESS 和 EXIT_FAILURE 可以稍微增加一些可移植性 (对非 Unix 环境)。特别的，VMS 使用一种不同的约定。
+.LP
+BSD 试图标准化退出代码 - 参见文件
+.IR <sysexits.h>
+。
+.LP
+\fBexit()\fP 之后，退出状态必须传递给父进程。这里有三种情况。如果父进程已设置了 SA_NOCLDWAIT，或者已将 SIGCHLD 的处理句柄设置成了 SIG_IGN，这个状态将被忽略。这时要退出的进程立即消亡。如果父进程没有表示它对退出状态不感兴趣，仅仅是不再等待，那么要退出的程序变成一个僵尸进程 (``zombie''，除了包含一个字节的退出状态外，什么也不是)。这样在父进程后来调用 \fIwait()\fP 函数族之一时，可以得到退出状态。
+.LP
+如果所用实现支持 SIGCHLD 信号，信号将被发送到父进程。如果父进程已设置了 SA_NOCLDWAIT，它被取消定义。(?)
+.LP
+如果进程是一个 session leader，它的控制终端是会话的控制终端，那么这个终端的前台进程组的每个进程都将收到 SIGHUP 信号；终端将与这个会话断开，可以再被一个新的控制进程获得。
+.LP
+如果进程的退出使得一个进程组成为孤儿，并且这个新近成为孤儿的进程组中任何的进程被中止，进程组中所有的进程将依次收到 SIGHUP 和 SIGCONT 信号。
+.SH "SEE ALSO 参见"
+.BR _exit (2),
+.BR wait (2),
+.BR atexit (3),
+.BR on_exit (3),
+.BR tmpfile (3)

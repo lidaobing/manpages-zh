@@ -1,0 +1,25 @@
+.TH DEALLOCVT 1 "1997年10月6日" "控制台工具" "Linux用户手册"
+
+.SH NAME(名称)
+deallocvt \- 释放未使用的虚拟终端
+
+.SH SYNOPSIS(总览)
+.BI "deallocvt [ " "N1 N2" " ... ]"
+
+.SH DESCRIPTION(描述)
+
+如果不指定参数,
+.B deallocvt
+程序会释放所有未使用的虚拟终端的核心内存和数据结构.
+如果给定了参数
+.I Ni
+那么就只释放TTY
+.RI /dev/tty Ni .
+
+如果一个虚拟终端不是前台控制台,而且没有在上面打开进程
+执行读或写操作,又没有在该屏幕上选择文本,那么认为该
+终端是未使用的.
+
+.SH "SEE ALSO"(另见)
+.BR chvt (1),
+.BR openvt (1).

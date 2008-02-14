@@ -1,0 +1,989 @@
+.\" Copyright (c) 1991, 92, 93, 94, 95, 96, 97, 98, 1999 Free Software Foundation
+.\" See section COPYING for conditions for redistribution
+.TH ld 1 "17 August 1992" "cygnus support" "GNU Development Tools"
+.de BP
+.sp
+.ti \-.2i
+\(**
+..
+
+.SH NAME
+ld \- GNU linker (连接器)
+
+.SH "总览 (SYNOPSIS)"
+.hy 0
+.na
+.TP
+.B ld 
+.RB "[\|" \-o "
+.I output\c
+\&\|] \c
+.I objfile\c
+\&.\|.\|.
+.br
+.RB "[\|" \-A\c
+.I architecture\c
+\&\|] 
+.RB "[\|" "\-b\ "\c
+.I input-format\c
+\&\|] 
+.RB "[\|" \-Bstatic "\|]"  
+.RB "[\|" \-Bdynamic "\|]"  
+.RB "[\|" \-Bsymbolic "\|]"  
+.RB "[\|" "\-c\ "\c
+.I commandfile\c
+\&\|] 
+.RB "[\|" \-\-cref "\|]"
+.RB "[\|" \-d | \-dc | \-dp\c
+\|]
+.br
+.RB "[\|" "\-defsym\ "\c
+.I symbol\c
+\& = \c
+.I expression\c
+\&\|]
+.RB "[\|" \-\-demangle "\|]"
+.RB "[\|" \-\-no\-demangle "\|]"
+.RB "[\|" "\-e\ "\c
+.I entry\c
+\&\|] 
+.RB "[\|" \-embedded\-relocs "\|]"
+.RB "[\|" \-E "\|]" 
+.RB "[\|" \-export\-dynamic "\|]"
+.RB "[\|" "\-f\ "\c
+.I name\c
+\&\|]
+.RB "[\|" "\-\-auxiliary\ "\c
+.I name\c
+\&\|]
+.RB "[\|" "\-F\ "\c
+.I name\c
+\&\|]
+.RB "[\|" "\-\-filter\ "\c
+.I name\c
+\&\|]
+.RB "[\|" "\-format\ "\c
+.I input-format\c
+\&\|] 
+.RB "[\|" \-g "\|]" 
+.RB "[\|" \-G
+.I size\c
+\&\|]
+.RB "[\|" "\-h\ "\c
+.I name\c
+\&\|]
+.RB "[\|" "\-soname\ "\c
+.I name\c
+\&\|]
+.RB "[\|" \-\-help "\|]"
+.RB "[\|" \-i "\|]"
+.RB "[\|" \-l\c
+.I ar\c
+\&\|] 
+.RB "[\|" \-L\c
+.I searchdir\c
+\&\|] 
+.RB "[\|" \-M "\|]" 
+.RB "[\|" \-Map
+.I mapfile\c
+\&\|] 
+.RB "[\|" \-m
+.I emulation\c
+\&\|] 
+.RB "[\|" \-n | \-N "\|]" 
+.RB "[\|" \-noinhibit-exec "\|]" 
+.RB "[\|" \-no\-keep\-memory "\|]" 
+.RB "[\|" \-no\-warn\-mismatch "\|]" 
+.RB "[\|" \-O\c
+.I level\c
+\&\|]
+.RB "[\|" "\-oformat\ "\c
+.I output-format\c
+\&\|] 
+.RB "[\|" "\-R\ "\c
+.I filename\c
+\&\|]
+.RB "[\|" \-relax "\|]"
+.RB "[\|" \-r | \-Ur "\|]" 
+.RB "[\|" "\-rpath\ "\c
+.I directory\c
+\&\|]
+.RB "[\|" "\-rpath\-link\ "\c
+.I directory\c
+\&\|]
+.RB "[\|" \-S "\|]" 
+.RB "[\|" \-s "\|]" 
+.RB "[\|" \-shared "\|]" 
+.RB "[\|" \-sort\-common "\|]" 
+.RB "[\|" "\-split\-by\-reloc\ "\c
+.I count\c
+\&\|]
+.RB "[\|" \-split\-by\-file "\|]" 
+.RB "[\|" "\-T\ "\c
+.I commandfile\c
+\&\|]  
+.RB "[\|" "\-Ttext\ "\c
+.I textorg\c
+\&\|] 
+.RB "[\|" "\-Tdata\ "\c
+.I dataorg\c
+\&\|] 
+.RB "[\|" "\-Tbss\ "\c
+.I bssorg\c
+\&\|]
+.RB "[\|" \-t "\|]" 
+.RB "[\|" "\-u\ "\c
+.I sym\c
+\&]
+.RB "[\|" \-V "\|]"
+.RB "[\|" \-v "\|]"
+.RB "[\|" \-\-verbose "\|]"
+.RB "[\|" \-\-version "\|]"
+.RB "[\|" \-warn\-common "\|]" 
+.RB "[\|" \-warn\-constructors "\|]" 
+.RB "[\|" \-warn\-multiple\-gp "\|]" 
+.RB "[\|" \-warn\-once "\|]" 
+.RB "[\|" \-warn\-section\-align "\|]" 
+.RB "[\|" \-\-whole\-archive "\|]" 
+.RB "[\|" \-\-no\-whole\-archive "\|]" 
+.RB "[\|" "\-\-wrap\ "\c
+.I symbol\c
+\&\|]
+.RB "[\|" \-X "\|]" 
+.RB "[\|" \-x "\|]" 
+.ad b
+.hy 1
+.SH "描述 (DESCRIPTION)"
+\c
+.B ld\c
+\& 合并 一组 目标文件(object) 和 库文件(archive), 重定位 数据部分,
+构建 符号引用(symbol reference). 一般说来, 编译 生成 可执行文件 的 
+最后步骤 就是 调用 \c
+.B ld\c
+\&.
+
+\c
+.B ld\c
+\& 可以读取 用 连接器命令语言(Linker Command Language) 编写的 脚本文件, 
+它 能够 对 连接过程 提供 精确 和 全面 的 控制.
+本 手册页 不讨论 命令语言; 可参看 `\|\c
+.B info\c
+\|' 的 `\|\c
+.B ld\c
+\|' 项, 或者 手册
+.I
+ld: the GNU linker
+\&, 里面有 命令语言 的 细节 和 其他 GNU linker 的 内容.
+
+这个版本 的 \c
+.B ld\c
+\& 使用 通用BFD库 操作 目标文件, \c
+.B ld\c
+\& 能够 以 多种格式 读入, 连接 和 输出 目标文件 \(em\&例如 COFF 或 \c
+.B a.out\c
+\&, 能够 把 不同的格式 连接 在一起, 产生 各种 有效 的 目标文件.
+用 `\|\c
+.B objdump \-i\c
+\|' 可以 列出 各种 体系结构 支持 的 格式 列表; 另见
+.BR objdump ( 1 ).
+
+GNU linker 不仅 灵活 强大, 还能够 比 其他 linker 提供 更多 的 诊断信息.
+很多 linker 只要 碰上 一个错误 就 立刻停止 执行; 而
+\c
+.B ld\c
+\& 一有可能 仍然 继续执行, 这样 容易 定位出 其他错误
+(某些情况下, 尽管出了错, 仍然 生成 输出文件).
+
+GNU linker \c
+.B ld\c
+\& 期望 实现 更广泛 的 适用范围, 尽可能 兼容 其他 linker.
+通过 命令行 和 环境变量, 用户 可以 用 ld 执行 多种 操作.
+
+.SH "选项 (OPTIONS)"
+过于丰富的 命令行选项 使人 感到 压抑, 好在 实际使用 中, 多数情况下
+只需要 掌握 其中 一小部分. 例如, 在 一个 标准的, 提供 相应支持 的 Unix 
+系统 中, 常常 用 \c
+.B ld\c
+\& 连接 标准的 Unix 目标文件. 如果要 连接 \c
+.B hello.o\c
+\&:
+.sp
+.br
+$\ ld\ \-o\ output\ /lib/crt0.o\ hello.o\ \-lc
+.br
+.sp
+它 告诉 \c
+.B ld\c
+\& 生成 一个 叫做 \c
+.B output\c
+\& 的 文件 , 其中 连接了 文件 \c
+.B /lib/crt0.o\c
+\& 和 \c
+.B hello.o\c
+\& 以及
+库文件 \c
+.B libc.a\c
+\& (在 标准搜索目录下).
+
+\c
+.B ld\c
+\& 的 命令行选项 可以 任意顺序 出现, 甚至 重复出现. 多数 情况 下, 
+如果 用 不同的 参数 重复 同一种 选项, ld 不会 出现 更多的变化, 也不会 
+覆盖 以前的 参数. (指 命令行 中 左边的参数)
+
+例外情况 \(em\& 某些选项 有 反复使用 的 需要 \(em\& 如
+\c
+.B \-A\c
+\&, \c
+.B \-b\c
+\& (或等同的 \c
+.B \-format\c
+\&), \c
+.B \-defsym\c
+\&,
+\c
+.B \-L\c
+\&, \c
+.B \-l\c
+\&, \c
+.B \-R\c
+\&, 和 \c
+.B \-u\c
+\&.
+
+待连接的 目标文件 列表, 即 总览中的 \c
+.I objfile\c
+\&,
+可以 放在 命令行选项 的 前面, 后面, 或者 混杂其中; 但是 不能 把 \c
+.I objfile\c
+\& 放置于 某个 选项开关 和 它的参数 中间.
+
+一般说来 linker 要求 至少 输入 一个 目标文件, 但是 可以 用 \c
+.B \-l\c
+\&,
+\c
+.B \-R\c
+\& 输入 其他格式 的 二进制文件, 或者 用 命令语言 编写的 脚本文件. 如果 \c
+.I 没有\c
+\& 指定 二进制格式 的 输入文件, linker 就不能 产生 输出文件, 而是 显示
+`\|\c
+.B No input files\c
+\|'.
+
+选项的参数 必须 出现在 代表 选项 的 字母 后面, 可以有 空白符, 也可以 没有.
+
+.TP
+.BI "-A" "architecture"
+在 目前版本 的 \c
+.B ld\c
+\& 中, 这个 选项 仅适用于 Intel 960 体系系列. 在 \c
+.B ld\c
+\& 的 设置 中, \c
+.I architecture\c
+\& 参数 是 960 系列 的 成员 识别名称 之一, 由 两个字母 组成;
+这个选项 指出 期望的 输出目标, 对 输入文件 的 不兼容指令 作出 警告.
+它 能够 改变 linker 对 库文件 的 搜索策略, 以便于 支持 体系相关库, 方法是
+把 体系识别名称 添加在 待搜索 的 文件名 尾部.
+
+例如, 如果 \c
+.B ld\c
+\& 命令行 有 `\|\c
+.B \-ACA\c
+\|' 和 `\|\c
+.B \-ltry\c
+\|', linker 将 搜索 (根据 内置的路径 和 \c
+.B \-L\c
+\& 指定的路径) 以下 名称 的 库文件
+.sp
+.br
+try
+.br
+libtry.a
+.br
+tryca
+.br
+libtryca.a
+.br
+.sp
+
+前两项 是 常规做法; 后两项 源于 `\|\c
+.B \-ACA\c
+\|'.
+
+将来发布的 \c
+.B ld\c
+\& 可能 对 其他 体系结构 提供 类似功能.
+
+可以 在 命令行上 使用 多个 \c
+.B \-A\c
+\& 选项, 只要 该 体系 允许 和 目标体系 相连, 其选项 使 ld 在 搜索 \c
+.B \-l
+指定的库 中, 增加 和 体系结构名称 对应的库.
+
+.TP
+.BI "\-b " "input-format"
+指定 输入目标文件 的 二进制格式, 目标文件 在 命令行 上 给出, 放在
+这个选项 的 后面. 一般 不需要 指定 这个选项, \c
+.B ld\c
+\& 的 缺省输入格式 配置为 各个机器 上 最常用 的 格式. \c
+.I input-format\c
+\& 是 字符串, BFD 库 支持的 格式 名称. 选项 \c
+.B \-format \c
+.I input-format\c
+\&\c
+\& 起 相同的 作用, 脚本命令
+.BR TARGET 
+也是 一样.
+
+连接 某些 不寻常的 二进制文件 时 需要 这个选项. 或者 使用 \c
+.B \-b\c
+\& 选项 强调 格式切换 (连接 不同格式 的 目标文件),
+比如说, 在 每组 特定格式 的 目标文件 前面 使用 \c
+.B \-b \c
+.I input-format\c
+\&\c
+\& 选项.
+
+环境变量
+.B GNUTARGET\c
+\& 用于 指定 缺省格式. 也可以 在 脚本文件 中 用 \c
+.B TARGET\c
+\& 命令 定义 输入格式.
+
+.TP
+.B \-Bstatic 
+禁止 连接 共享库. 这个选项 只在 支持 共享库 的 平台 上 有意义.
+
+.TP
+.B \-Bdynamic
+连接 动态库. 这个选项 只在 支持 共享库 的 平台 上 有意义, 一般说来 它
+是 缺省选项.
+
+.TP
+.B \-Bsymbolic
+当 创建 共享库 的 时候, 只要 有可能, 在 共享库 内 编联(bind reference) 
+全局符号 和 定义(definition). 一般说来, 允许 连接了 某个 共享库 的 程序
+覆盖 共享库内 的 定义. 这个选项 只在 支持 共享库 的 ELF 平台 上 有意义.
+
+.TP
+.BI "\-c " "commandfile"
+告诉 \c
+.B ld\c
+\& 从 文件
+\c
+.I commandfile\c
+\& 中 读取 连接 命令. 这些 命令 彻底的 覆盖 \c
+.B ld\c
+\& 的 缺省 连接 格式 (而不是 添加); \c
+.I commandfile\c
+\& 必须 详尽的 描述 目标格式 的 所有细节.
+
+你 也可以 在 命令行 上 直接嵌入 连接命令, 把 脚本 嵌在 大括弧 `\|\c
+.B {\c
+\|' 和 `\|\c
+.B }\c
+\|' 中间.
+
+.TP
+.B \-\-cref
+输出 交叉引用表(cross reference).  如果 创建了 连接映像(linker map) 文件,
+交叉引用表 就 输出到 映像文件 中, 否则 送往 标准输出.
+
+.TP
+.B \-d 
+.TP
+.B \-dc
+.TP
+.B \-dp
+这 三个选项 是 一回事, 为了 兼容 其他 linker 而 同时提供. 
+即使 已经 指定 \c
+.B ld
+生成 可重定位文件 (\c
+.B \-r\c
+\&), 它们 能为 公共符号(common symbol) 分配 空间.  脚本命令
+\c
+.B FORCE_COMMON_ALLOCATION\c
+\& 起 同样作用.
+
+.TP
+.BI "-defsym " "symbol" "\fR = \fP" expression
+在 输出文件 中 创建 一个 全局符号, 它 含有 \c
+.I expression\c
+\& 给出的 绝对地址. 可以 在 命令行 使用 多个 这样的 选项. 这个 \c
+.I expression\c
+\& 只能 使用 有限的 数学形式: 十六进制常数, 已经存在 的 符号名字.
+或者 使用 \c
+.B +\c
+\& 和 \c
+.B \-\c
+\& 加减 十六进制常数 或 符号. 如果 需要 更复杂的 表达式, 考虑 使用
+命令语言脚本.
+
+.TP
+.B \-\-demangle
+.TP
+.B \-\-no\-demangle
+这些选项 控制 是否在 出错信息 和 其他信息 中, 输出 可读的(demangle) 
+符号名称. 如果 使用了 demangle 选项, linker 尽量使 符号名称 容易理解: 
+去掉 领头的 下划线 (如果 被 目标文件格式 采用); 把 C++ 难懂的 符号名称
+(symbol name) 转换成 可读的 名称. 缺省情况下 linker 输出 可读的 符号名称, 
+除非 设置了 环境变量
+.B COLLECT_NO_DEMANGLE .
+这些选项 能够 覆盖 缺省行为.
+
+.TP
+.BI "-e " "entry"
+使用 \c
+.I entry (入口)\c
+\& 标识符 作为 程序 执行 的 开始端, 而不是 缺省入口. 关于 缺省入口 和 其他
+设置 入口 的 方法 参见 `\|\c
+.B info\c
+\|' 的
+.B ld\c
+\|' 项.
+
+.TP
+.B \-embedded\-relocs
+这个选项 仅用于 连接 MIPS上 嵌入的 PIC 代码, GNU 的 编译器 和 汇编器 用
+.B \-membedded\-pic
+选项 能够 生成 这种代码. 它使 linker 创建 一张 表格, 用于 在 运行的时候,
+重定位 任何 被 静态初始化 为 指针值 的 数据. 详见 testsuite/ld-empic 的 代码.
+
+.TP
+.B \-E
+.TP
+.B \-export\-dynamic
+当 创建 ELF 文件 时, 把 所有 符号 加入 动态符号表.
+一般说来, 动态符号表 只包含 动态目标库(dynamic object) 需要的 符号. 用
+.I dlopen
+的 时候 需要 这个 选项.
+
+.TP
+.BI "-f " "name"
+.TP
+.BI "--auxiliary " "name"
+创建 ELF 共享目标库 时, 把 内部的 DT_AUXILIARY 字段 设置为 
+.I name.
+它 告诉 动态linker, 把 该 共享目标库 的 符号表 用做 共享目标 
+.I name 
+的 符号表 的 辅助过滤器.
+
+.TP
+.BI "-F " "name"
+.TP
+.BI "--filter " "name"
+创建 ELF 共享目标库 时, 把 内部的 DT_FILTER 字段 设置为 
+.I name.
+它 告诉 动态linker, 把 该 共享目标库 的 符号表 用做 共享目标 
+.I name 
+的 符号表 的 辅助过滤器.
+
+.TP
+.BI "\-format " "input\-format"
+等同于 \c
+.B \-b\c
+\& \c
+.I input\-format\c
+\&.
+
+.TP
+.B \-g
+虚设项; 用于 兼容 其他 工具.
+
+.TP
+.BI "\-G " "size"\c
+把 使用 GP 寄存器 优化的 目标(文件) 大小 限制为
+.I size .
+用于 MIPS ECOFF, 对 其他 目标文件格式 无效.
+
+.TP
+.BI "-h " "name"
+.TP
+.BI "-soname " "name"
+创建 ELF 共享目标库 时, 把 内部的 DT_SONAME 字段 设置为 name. 
+如果 某个 可执行文件 连接了 含有 DT_SONAME 字段 的 共享目标库, 
+当 该程序 运行 时, 动态 linker 试图 根据 DT_SONAME 字段 调入 共享的 
+目标库, 而 不使用 提供给 linker 的 文件名.
+
+.TP
+.B \-\-help
+在 标准输出 显示 命令行选项 的 摘要, 然后 结束. 这个选项 和
+.B \-\-version
+选项 使用了 两个 短横线, 不是 一个, 目的是 兼容 其他 GNU 程序.
+只用 一个 短横线 的 选项 是为了 兼容 其他 linker.
+
+.TP
+.B \-i
+执行 增量连接(incremental link), 等同于 \c
+.B \-r\c
+\& 选项.
+
+.TP
+.BI "\-l" "ar"
+在 连接文件 列表 中 增加 归档库文件 \c
+.I ar\c
+\&.  可以 多次 使用 这个选项. 凡指定 一项 \c
+.I ar
+\&, \c
+.B ld\c
+\& 就会 在 路径列表 中 增加 一项 对 \c
+.B lib\c
+.I ar\c
+\&.a\c
+\& 的 搜索.
+
+.TP
+.BI "\-L" "searchdir"
+这个选项 将 路径 \c
+.I searchdir\c
+\& 添加 到 路径列表 中去, \c
+.B ld\c
+\& 在 这个 列表 中 搜索 归档库. 可以 多次 使用 这个选项.
+
+缺省的 搜索路径集 (不使用 \c
+.B \-L\c
+\& 时) 取决于 \c
+.B ld\c
+\& 使用的 模拟模式(emulation) 及其 配置.
+在 连接脚本 中, 可以 用 \c
+.B SEARCH_DIR
+命令 指定 路径.
+
+.TP
+.B \-M 
+在 标准输出 显示  连接映像 \(em\& 有关 \c
+.B ld\c
+\& 把 符号 映射到 何处 的 诊断信息, 以及 全局公共存储器 的 分配 信息.
+
+.TP
+.BI "\-Map " "mapfile"\c
+把 连接映像 输出到 
+.I mapfile
+文件 中 \(em\& 有关 \c
+.B ld\c
+\& 把 符号 映射到 何处 的 诊断信息, 以及 全局公共存储器 的 分配 信息.
+
+.TP
+.BI "\-m " "emulation"\c
+模仿
+.I emulation
+连接器.  可以 用
+.I \-\-verbose
+或
+.I \-V
+选项 列出 有效的 模拟项.  这个选项 覆盖 编译 进去 的 缺省项.
+
+.TP
+.B \-N 
+指定 可读写 的 \c
+.B 正文\c
+\& 和 \c
+.B 数据\c
+\& 节(section). 如果 输出格式 支持 Unix 风格的 幻数(magic number), 
+则 输出文件 标记为 \c
+.B OMAGIC\c
+\&.
+
+当 使用 `\|\c
+.B \-N\c
+\&\|' 选项 时, linker 不做 数据段 的 页对齐(page-align).
+
+.TP
+.B \-n 
+设置 正文段 为 只读, 如果 有可能, \c
+.B NMAGIC\c
+\& 为 可写.
+
+.TP
+.B \-noinhibit\-exec
+一般说来, 如果 连接的 时候 发生 错误, linker 不会 产生 输出文件.
+使用了 这个 标志选项, 只要 不出 致命差错, 仍能够 产生 输出文件.
+
+.TP
+.B \-no\-keep\-memory
+linker 通常 牺牲 内存, 优化 速度, 它 把 输入文件 的 符号表 缓冲在 内存中.
+这个选项 使 linker 必要时 重复读取 符号表, 以便 优化 内存使用. 连接 大型 
+可执行文件 的 时候, linker 有可能 内存 不够, 此时 可以 试试 这个选项.
+
+.TP
+.B \-no\-warn\-mismatch
+一般情况下, 如果 试图 连接 某些 不匹配 的 输入文件, 比如说, 按 不同
+处理器 编译 的, 或者 具有 不同的 字节顺序(endianness), linker 就会 报错.
+这个选项 告诉 linker 默许 这种 错误. 要 小心使用 这个选项, 除非 你
+正在做 某些 特殊 操作, 而且 能够 确定 不需要 linker 报错.
+
+.TP
+.BI "\-o " "output"
+.I output\c
+\& 用来 指定 \c
+.B ld\c
+\& 生成的 程序名; 如果 没有 使用 这个选项, 缺省名字 是 `\|\c
+.B a.out\c
+\|'.  脚本命令 \c
+.B OUTPUT\c
+\& 起 同样 作用.
+
+.TP
+.BI "\-O" "level"
+生成 优化的 输出文件. 这个选项 占用 比较多 的 时间, 因此 仅 常用于
+最终文件 的 生成.
+\c
+.I level\c
+\& 是 数值参数. 任何 大于零 的 参数 意味着 要求 优化.
+
+.TP
+.BI "\-oformat " "output\-format"
+指定 输出目标文件 的 二进制格式. 一般 不需要 指定 这个选项, \c
+.B ld\c
+\& 的 缺省 输出格式 配置为 各个机器 上 最常用 的 格式. \c
+.I output-format\c
+\& 是 一个 字符串, BFD 库 支持的 格式 名称. 脚本命令
+.B OUTPUT_FORMAT
+也可以 指定 输出格式, 但是 这个选项 能够 覆盖 掉 它.
+
+.TP
+.BI "\-R " "filename"
+从 文件 \c
+.I filename\c
+\& 中 读取 符号名称 及其 地址, 但是 不做 重定位, 不传送到 输出端.
+它 可以 使 输出文件 符号引用 其他程序中 定义的 绝对地址.
+
+.TP
+.B \-relax
+这个选项 的 效果 取决于 机器, 目前 只支持 H8/300.
+
+在 某些 平台 上 可以 使用 这个选项 做 全局优化, 它 让 linker 解决 程序中
+的 地址处理, 例如 在 输出目标文件 中 缓和(relax) 地址模式 以及 合成
+(synthesize) 新指令.
+
+其他平台 也接受 `\|\c
+.B \-relax\c
+\&\|' 选项, 但是 不起作用.
+
+.TP
+.B \-r 
+生成 可重定位 输出 \(em\& 就是说, 生成的 输出文件 能够 依次 成为 \c
+.B ld\c
+\& 的 输入, 一般 称之为 \c
+.I 不完全(partial)
+连接\c
+\&. 它 有 一个 副效应, 在 支持 标准 Unix 幻数(magic number) 的 环境 中,
+这个选项 把 输出文件 的 幻数 设置成 \c
+.B OMAGIC\c
+\&. 如果 没有 指定 这个选项, linker 生成 绝对定位 的 文件.
+连接 C++ 程序时, 这个选项 \c
+.I 不会 \c
+\& 解析 出 对 构造子(constructor) 的 引用(reference); 不妨 改用 \c
+.B \-Ur\c
+\& 选项. 
+
+这个选项 的 效果 和 \c
+.B \-i\c
+\& 一样.
+
+.TP
+.B \-rpath\ \fIdirectory
+增加 一条 对 运行时(runtime)库 的 搜索路径. 这个选项 用于 连接 ELF 可执行
+文件 和 共享目标库. 所有
+.B \-rpath
+选项 的 参数 被 合并, 然后 一起 传递 给 运行时 linker, 运行时 linker 在
+运行 的 时候 使用 这些 路径 寻找 共享目标库.
+.B \-rpath
+也可以 用来 定位 共享目标库 引用的 共享目标库; 参见 对
+.B \-rpath\-link
+选项 的 叙述.  如果 连接 ELF 可执行文件 时 没有 指定
+.B \-rpath
+选项, linker 就使用 环境变量
+.B LD_RUN_PATH
+的 内容 \(em\& 只要 这个 环境变量 存在.
+
+.B \-rpath
+选项 能够 用在 SunOS 上, 缺省状况下, linker 可以 根据 给出的
+.B \-L
+选项 形成 运行时 搜索路径.  如果 使用了
+.B \-rpath
+选项, 运行时 搜索路径 从
+.B \-rpath
+中 产生, 而 忽略
+.B \-L
+选项.  这一点 有利于 使用 gcc, 在 NFS 文件系统 上, gcc 可能 产生 许多
+.B \-L
+选项.
+
+.TP
+.B \-rpath\-link\ \fIdirectory
+使用 ELF 或 SunOS 的 时候, 某些 共享库 可能 需要 其他 共享库. 
+这种情况 一般 发生在 某个
+.B ld\ \-shared
+连接 中, 输入文件 包含了 共享库.
+
+如果 linker 遇到 这样的 依赖情况, 当 它 执行 非共享, 不可重定位 的 连接
+时, linker 将 自动 寻找 所需的 共享库, 如果 它们 没有 被 显明 包含, 就
+把 它们 包含到 连接 中. 在 这种情况下,
+.B \-rpath\-link
+选项 指定了 最先 搜索 的 目录集.
+.B \-rpath\-link
+能够 指定 一批 目录, 目录 用 冒号 隔开. 也可以 用 这些 目录名 作为 参数,
+重复 使用 这个 选项.
+
+如果 没有 找到 需要的 共享库, linker 产生 一个 警告, 但是 继续 连接.
+
+.TP
+.B \-S 
+去掉 输出文件 中的 调试符号信息 (但不是 所有符号).
+
+.TP
+.B \-s 
+去掉 输出文件 中的 全部 符号信息.
+
+.TP
+.B \-shared
+创建 一个 共享库. 目前 只支持 ELF 和 SunOS 平台 (在 SunOS 上, 这个选项 不是
+必须的, 如果 没有 使用
+.B \-e
+选项, 而且 存在 不确定 的 符号, linker 将 自动 创建 共享库).
+
+.TP
+.B \-sort\-common
+.B ld
+通常 把 全局公共符号 放到 适当的 输出节, 按照 大小 排序.
+首先是 单字节符号, 然后是 双字节, 接下来是 四字节, 随后是 其他的.
+它的 目的是 防止 符号间 因为 排布限制 出现 间隙. 
+使用 这个选项 可以 禁止 排序.
+
+.TP
+.B \-split\-by\-reloc\ \fIcount
+在 输出文件 中 创建 附加节(extra section), 使得 输出文件 中, 
+没有 某一个 输出节 包含 大于
+.I count
+个 重定位项. 它 用于 产生 大型 可重定位 COFF 目标文件, 可以 插入到
+某些 实时内核 中; 因为 COFF 不能 在 单一节内 存放 65535 以上的 重定位项.
+注意, 有些 目标文件格式 不支持 任意 分节, 此时 这个选项 将会 操作 失败.
+此外, linker 不能够 分割 输入节, 然后 重新分配, 因此 如果 某个 输入节 包含
+.I count
+以上的 重定位项, 相应的 输出节 将 包含 同样多的 重定位项.
+
+.TP
+.B \-split\-by\-file
+类似于
+.B \-split\-by\-reloc ,
+但是 它为 每个 输入文件 建立一个 新的 输出节.
+
+.TP
+.BI "\-Tbss " "org"\c
+.TP
+.BI "\-Tdata " "org"\c
+.TP
+.BI "\-Ttext " "org"\c
+把 \c
+.I org\c
+\& 作为 输出文件 的 段 起始地址 \(em\& 特别是 \(em\& \c
+.B bss\c
+\&, \c
+.B data\c
+\&, 或 \c
+.B text\c
+\& 段.
+\c
+.I org\c
+\& 必须是 十六进制整数.
+
+.TP
+.BI "\-T " "commandfile"
+等同于 \c
+.B \-c \c
+.I commandfile\c
+\&\c
+\&; 用于 兼容 其他工具.  
+
+.TP
+.B \-t 
+在 \c
+.B ld\c
+\& 处理 输入文件 的 时候 显示 文件名.
+
+.TP
+.BI "\-u " "sym"
+把 \c
+.I sym\c
+\& 作为 未定义(undefined) 的 符号 送入 输出文件.
+这样做 可以, 例如, 促使 linker 从 标准库 连接 某个 附加的模块. 
+允许 使用 多个 \c
+.B \-u\c
+\& 选项 输入 多个 未定义 符号.
+
+.TP
+.B \-Ur 
+对于 除 C++ 以外的 任何 程序, 这个选项 等同于
+\c
+.B \-r\c
+\&: 生成 可重定位 的 输出 \(em\& 就是说, 能够 依次 输入 \c
+.B ld\c
+\& 的 输出文件. 连接 C++ 程序 的 时候, \c
+.B \-Ur
+.I 将\c
+\& 解析 对 构造子(constructor) 的 引用(reference), 这一点 和 \c
+.B \-r\c
+\& 不同.
+
+.TP
+.B \-\-verbose
+显示 \c
+.B ld
+的 版本号, 列出 支持的 模拟项(emulation). 显示 哪些 输入文件 能够 打开, 
+哪些 不能,
+
+.TP
+.B \-v, \-V
+显示 \c
+.B ld\c
+\& 的 版本号.
+此外
+.B \-V
+选项 能够 列出 支持的 模拟项.
+
+.TP
+.B \-\-version
+显示 \c
+.B ld
+的 版本号 然后 结束.
+
+.TP
+.B \-warn\-common
+当 公共符号 和 其他 公共符号 合并 时, 或者 和 某个 符号定义 合并 时,
+linker 就发出 警告. Unix 系统的 linker 允许 这种 有些 草率 的 做法, 其他
+操作系统 则 不行. 这个选项 帮助你 在 合并 全局符号 的 时候 发现 潜在问题.
+
+.TP
+.B \-warn\-constructors
+如果 使用了 全局构造子(global constructor), linker 就发出 警告.
+它 只对 某些 目标文件结构 有用, 对于 如 COFF 或 ELF, 此 linker 不能够
+检测 全局构造子 的 使用情况.
+
+.TP
+.B \-warn\-multiple\-gp
+如果 输出文件 需要 多个 全局指针值, linker 就发出 警告. 这个选项 只能
+用于 某些 处理器, 如 Alpha.
+
+.TP
+.B \-warn\-once
+对 每个 未定义符号 只 警告 一次, 而不是 每次 引用 这个符号 都 警告.
+
+.TP
+.B \-warn\-section\-align
+如果 某个 输出节(section) 的 地址 因为 边界对齐 而 发生 改变,
+linker 就发出 警告. 典型情况下 由 输入节 设置 边界, 只有 不做 明确指定
+的 时候 地址 才会 改变; 就是说, SECTIONS 命令 没有 指出 该节 的 开始地址.
+
+.TP
+.B \-\-whole\-archive
+对于 命令行 上
+.B \-\-whole\-archive
+选项 提到的 每个 归档库, 连接时 连入 归档库 的 全部 目标文件, 而不是
+在 归档库 中 搜索 所需的 目标文件. 一般用于 把 归档库文件 转变成 共享库文件,
+迫使 全部 目标文件 进入 共享库.
+
+.TP
+.B \-\-no\-whole\-archive
+关闭
+.B \-\-whole\-archive
+选项 对 归档库 的 影响.
+
+.TP
+.BI "--wrap " "symbol"
+对
+.I symbol
+使用 包装函数(wrapper function). 任何 对
+.I symbol
+未定义 的 引用 (undefined reference) 将 解析为
+.BI "__wrap_" "symbol".
+任何 对
+.BI "__real_" "symbol"
+未定义 的 引用 将 解析为
+.I symbol.
+
+.TP
+.B \-X 
+删除 全部 临时的 局部符号. 大多数 目的文件 中, 这些 局部符号 的 名字 用 `\|\c
+.B L\c
+\|' 做 开头.
+
+.TP
+.B \-x
+删除 全部 局部符号.
+
+.PP
+
+.SH "环境 (ENVIRONMENT)"
+\c
+通过 环境变量 \c
+.B GNUTARGET\c
+\& 可以 改变 
+.B ld\c
+\& 的 行为.
+
+\c
+如果 没有 使用 \c
+.B \-b\c
+\& 选项 (或 相同的 \c
+.B \-format\c
+\&),
+.B GNUTARGET\c
+\& 决定了 输入文件 的 目标格式, 其值 应为 BFD的 名称之一.  如果 没有 \c
+.B GNUTARGET \c
+\& 环境变量, \c
+.B ld\c
+\& 就使用 主机的 本地格式. 如果 \c
+.B GNUTARGET\c
+\& 设置为 \c
+.B default\c
+\&, BFD 通过 检查 输入文件 的 二进制格式 判断 输入格式;
+这个方法 通常 有效, 但 隐含 歧义, 这是因为 没有 办法 保证 标志 目标文件格式
+的 幻数 是 唯一的.
+不过, 各个系统 配置 BFD 的 时候, 会把 系统 约定的格式 放在 搜索列表 的
+前面, 因此 能够 按照 约定 消除 歧义.
+
+.PP
+
+.SH "另见 (SEE ALSO)"
+
+.BR objdump ( 1 )
+.br
+.RB "`\|" ld "\|' 和 `\|" binutils "\|'"
+项 (
+.B info\c
+)
+.br
+.I 
+ld: the GNU linker\c
+, Steve Chamberlain and Roland Pesch;
+.I
+The GNU Binary Utilities\c
+, Roland H. Pesch.
+
+.SH COPYING
+Copyright (c) 1991, 92, 93, 94, 95, 96, 97, 1998 Free Software Foundation, Inc.
+.PP
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+.PP
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+.PP
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in
+translations approved by the Free Software Foundation instead of in
+the original English.
+
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

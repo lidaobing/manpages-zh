@@ -1,0 +1,236 @@
+.TH DUMPKEYS 1 "09 Oct 1997" "Console tools" "Linux User's Manual"
+
+.SH NAME
+dumpkeys \- 转储显示键盘翻译表
+
+.SH "总览 (SYNOPSIS)"
+.B dumpkeys [
+.I \-hilfn1
+.IB \-S shape
+.IB \-c charset
+.I \-\-help \-\-short\-info \-\-long\-info \-\-numeric \-\-full\-table
+.I \-\-separate\-lines 
+.IB \-\-shape= shape
+.I \-\-funcs\-only \-\-keys\-only \-\-compose\-only
+.IB \-\-charset= charset
+.B ]
+
+.SH "描述 (DESCRIPTION)"
+.IX "dumpkeys command" "" "\fLdumpkeys\fR command"  
+
+.B dumpkeys
+以
+.BR keymaps (5)
+中 描述 的 格式, 在 标准输出 显示 键盘驱动程序 翻译表 的 当前内容.
+.PP
+下面 提供了 多种 选项, 可以 控制 输出格式, 也可以 显示 来自 内核 或
+.BR dumpkeys (1)
+和
+.BR loadkeys (1)
+的 其他信息.
+
+.SH "选项 (OPTION)"
+.TP
+.I \-h \-\-help
+在 标准错误 上 显示 版本号 和 简短 的 用法, 然后 结束.
+
+.TP
+.I \-i \-\-short-info
+显示 内核 键盘驱动程序 的 某些 特征:
+
+.RS
+内核 支持的 键值(keycode) 范围:
+.PP
+.RS
+这个特征指, 在 键盘映射文件 中, 
+.B keycode
+关键字 后面 可以 使用 什么值. 有关 这个文件 的 语法 和 其他信息 参看
+.BR keymaps (5).
+.RE
+
+单键 可编联(bind) 的 动作(action) 数:
+.PP
+.RS
+这个特征指, 通过 修饰键 的 组合, 一个键 能够 发生 多少个 不同的 动作.
+例如, 如果 该值是 16, 那么 一个键 结合 修饰键 可以 产生 多达 16 个 动作.
+此时, 内核 大约 知道 存在 四个 修饰键, 你可以 按下 不同的 修饰键 组合 获得 
+所有 定义的 动作.
+.RE
+
+内核 支持的 动作码(action code) 值域(range):
+.PP
+.RS
+这一项 包含 用 十六进制 表示的 动作码 值域. 这些值 能够 
+用在 按键定义 的 右边, 也就是 下面 这行 的 
+.IR vv 
+部分:
+
+.RS
+.B keycode
+.I xx
+=
+.I vv vv vv vv
+.RE
+
+(有关 按键定义行 的 细节 参见
+.BR keymaps (5)
+).
+.BR dumpkeys (1)
+和
+.BR loadkeys (1)
+支持 符号表示法, 它 比 数字表示法 更优越, 内核 和 内核 之间的 动作码 可能
+不一样, 而 符号名字 一般 不变.
+然而, 动作码值域 列表 可以 用来 判断 内核 是否 支持 
+.BR loadkeys (1)
+识别的 全部 符号, 或者 内核 支持的 动作 在
+.BR loadkeys (1)
+中 有没有 对应的 符号名. 你 可以 比较一下 值域列表 和 动作符号表, 参见 下述的
+.I --long-info
+选项.
+.RE
+
+内核 支持的 功能键(function key) 数目:
+.PP
+.RS
+这个特征 指 能够 用来 输出 字符串 的 动作码 数目. 
+这些 动作码 往往 编联 键盘上的 功能键 和 编辑键, 输出 标准 escape 序列.
+然而 你 可以 重定义 这些键, 让 它们 输出 命令行, 电子邮件地址 或者 其他什么.
+特别是 某些 编号 的 功能键 和 编辑键 在 键盘上 不存在, 这样 就有了 "空闲的"
+动作码, 例如, 把 它们 和 AltGr-字母组合 编联, 用来 输出 有用的 字符串.
+详情 参见
+.BR loadkeys (1).
+.RE
+
+功能串(function string):
+.PP
+.RS
+可以 用 下面的 命令 查看 当前 的 功能键 定义
+
+.RS
+.BI dumpkeys \ \-\-funcs\-only
+.RE
+.RE
+.RE
+
+.TP
+.I \-l \-\-long-info
+这个选项 要求
+.B dumpkeys
+显示 较多的 信息. 显示 的 信息 除了
+.I --short-info
+选项 的 内容 外, 增加了
+.BR loadkeys (1)
+和
+.BR dumpkeys (1)
+支持 的 动作 的 符号名 列表, 及 对应的 数值.
+
+.TP
+.I \-n \-\-numeric
+这个选项 阻止
+.B dumpkeys
+把 动作码 翻译成 符号名, 只 显示 十六进制数字.
+
+.TP
+.I \-f \-\-full-table
+这个选项 使
+.B dumpkeys
+跳过 所有 速记形式(short-hand) (参见
+.BR keymaps (5)),
+以 行排格式(canonical) 输出 键值编联. 首先是 keymaps 行, 描述 当前 定义的 
+修饰键 及其 组合. 然后 每个键 显示 一行, 其中 每个 修饰键 的 组合 占 一列.
+例如, 如果 键盘映射表 使用了 七个 修饰键组合, 那么 每行 将显示 七列
+动作码. 这种格式 用于 诸如 对
+.BR dumpkeys 
+输出 的 后处理 等.
+
+.TP
+.I \-1 \-\-separate\-lines
+这个选项 使
+.B dumpkeys
+把 每个 (修饰键,键值)对 用 一行 显示. 前缀 
+.I plain
+表示 没有 使用 修饰键.
+
+.TP
+.IB "\-S \-\-shape=" shape
+这个选项 告诉
+.B dumpkeys
+使用 指定的 表格格式. 允许的 表格格式 有
+.BI 0 :
+缺省格式 (就象 没使用
+.IR \-S 
+一样);
+.BR 1 :
+和 使用 选项
+.IR \-\-full\-table 
+一样;
+.BR 2 :
+和 使用 选项
+.IR \-\-separate\-lines 
+一样;
+.BR 3 :
+每个 键值 占用 一行 (就象 格式
+.BR 1 
+一样), 直到 遇到 第一个 空项(hole), 然后 每个 (修饰键,键值)对 一行
+(就象 格式
+.BR 2 
+一样).
+
+(译注: 空项 位置 可参考 dumpkeys 不带参数时 显示的 第一行, keymaps 行)
+
+.TP
+.I \-\-funcs-only
+这个选项 使
+.B dumpkeys
+只显示 功能键 定义的 字符串. 否则
+.B dumpkeys
+既显示 串定义, 也显示 键值编联.
+
+.TP
+.I \-\-keys-only
+这个选项 使
+.B dumpkeys
+只显示 键值编联. 否则
+.B dumpkeys
+既显示 串定义, 也显示 键值编联.
+
+.TP
+.I \-\-compose-only
+这个选项 使
+.B dumpkeys
+只显示 组合键(compose key) 定义. 它 只对 支持 组合键 的 内核 有效.
+
+.TP
+.IB \-c "charset " \-\-charset= charset
+这个选项 使
+.B dumpkeys
+根据 指定的 字符集 翻译 字符码值. 它 只影响 字符码值 对 符号名 的 翻译. 用
+.I \-\-help
+选项 可以 列出 
+.I charset
+的 有效值. 如果 没有 指定
+.I charset,
+缺省字符集 是
+.B iso-8859-1.
+这个选项 能够 输出 一个 `charset "iso-8859-X"' 行, 告诉 loadkeys 如何 翻译
+键盘映射表. (例如, "division" 在
+.B iso-8859-1
+中 是 0xf7, 但在
+.BR iso-8859-8 
+中 是 0xba).
+
+.SH "文件 (FILE)"
+.I /usr/lib/kbd/keymaps/
+推荐 存放 键盘映射 文件 的 目录.
+
+.SH "另见 (SEE ALSO)"
+.BR loadkeys (1),
+.BR keymaps (5).
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@iname.com>
+.SH "[中文版最新更新]"
+.BR 2001/12/10
+第一版
+.SH "《中国Linux论坛man手册页翻译计划》："
+.BI http://cmpp.linuxforum.net

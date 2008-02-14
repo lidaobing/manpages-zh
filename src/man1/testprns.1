@@ -1,0 +1,72 @@
+.TH TESTPRNS 1 "11 Nov 1999" "testprns 2.0.6"
+.PP 
+NAME
+名字
+testprns \- 为smbd测试合法的打印机名
+.PP
+.SH 总览
+.PP 
+\fBtestprns\fP printername [printcapname]
+.PP 
+.SH 描述
+.PP
+此程序是samba套件的一部分。 
+.PP
+testprns是个非常简单的测试程序，用于检查smbd作为服务提供的打印机名是否合法。
+.PP
+在这里“Valid”的意思就是“在printcap中可以找到该打印机”。实际上总是使用printcap文件
+来指定打印机是非常明智的。
+.PP
+.SH 选项 
+.PP 
+.IP 
+.IP "\fBprintername\fP" 
+要测试的打印机名。 
+.IP
+打印机可以从printcap文件的每个记录首字段中获得，字段中用“|” 号来识别单个的打印机
+名和别名。注意当测试请求的打印机名时并不确认或检查printcap文件的总览。打印假脱机系
+统会比testprns程序更多或更少地放宽printcap文件的总览。但是，如果testprns找到了打印
+机的话smbd会作这样的检查。
+.IP 
+.IP "\fBprintcapname\fP" 
+此参数指定想要对给出的打印机名进行查找的printcap文件名。 
+.IP
+如果此参数没有指定的话，testprns将尝试对编译时指定的printcap文件名。
+.PP
+.SH 相关文件
+.PP 
+\fB/etc/printcap\fP 通常是被扫描的默认printcap文件。请参见
+\fBprintcap (5)\fP\&.
+.PP 
+.SH 诊断
+.PP
+如果发现检测的打印机合法，则显示“Printer name <printername> is valid”这样的信息。
+.PP
+如果发现检测的打印机不合法，则显示“Printer name <printername> is not valid”这样的信息。
+.PP
+所有测试结果信息通常情况下会被记录到当前目录下的test.log文件中。程序运行在调试级3上，所以
+会记录十分详细的信息。如果有出错或警告的话应该仔细检查这个文件。
+.PP
+其它信息是不需加以说明的。
+.PP
+.SH 另见
+.PP 
+\fBprintcap (5)\fP, \fBsmbd (8)\fP, \fBsmbclient
+(1)\fP
+.PP 
+.SH 作者
+.PP
+samba软件和相关工具最初由Andrew Tridgell samba-bugs@samba.org创建。samba现在由开发
+组作为类似Linux内核开发采用的开放源代码计划方式来发展。 
+.PP
+samba手册页最初由Karl Auer撰写。它的源码已被转换成YODL(一种极好的开放源代码软件，可以在
+ftp://ftp.icce.rug.nl/pub/unix/处获得)格式并已由Jeremy Allison更新到samba2.0版本。 
+.PP
+请参见samba (7)查找如何获得一份完整的维护者列表以及如何提交错误报告及注解等等。
+
+.SH "[中文版维护人]"
+.B meaculpa <meaculpa@21cn.com>
+.SH "[中文版最新更新]"
+.B 2000/12/08
+.SH "[中国 Linux 论坛 man 手册页翻译计划]"
+.BI http://cmpp.linuxforum.net

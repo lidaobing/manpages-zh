@@ -1,0 +1,55 @@
+.TH PanedWindow "tcl" "tcllib - BWidget"
+
+.SH NAME
+.B PanedWindow - 平铺布局管理器组件
+
+.SH 创建 CREATION
+.B PanedWindow pathName ?option value...?
+
+.SH 描述 DESCRIPTION
+PanedWindow 是在垂直或水平平铺格局下排布子窗体的一个组件。用户可以调整窗格(pane)的大小，带有在子窗口之间的一个窗格控制窗框(sash)。
+
+.SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
+
+.TP
+-pad (只读)  
+指定在窗框的按钮和子窗口之间的额外的空间。 
+
+.TP
+-side (只读)  
+指定窗框在那边，这暗示着布局: top 或 bottom (水平格局), left 或 right (垂直格局)。 
+
+.TP
+-width (只读)  
+指定窗框的按钮的宽度。 
+
+.SH 组件命令
+
+.TP
+pathName add ?option value...? 
+这个命令增加一个新窗格。对于垂直的布局新窗格被放置到以前的窗格的下面，对于水平布局是右面。这个命令返回用户可以放置它的组件的一个框架。有效的选项有: 
+
+-minsize  
+指定对这个窗格要求的最小大小。详情参见 grid 命令。 
+
+-weight  
+为在窗格之间分配额外空间指定相对权重(weight)。详情参见 grid 命令。 
+
+.TP
+pathName cget option  
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。 
+
+.TP
+pathName configure ?option? ?value option value ...? 
+查询或修改这个组件的配置选项。如果未指定 option ，则返回描述 pathName 的所有可获得的选项的一个列表。如果指定了不带 value 的 option，则这个命令返回描述这个指名的 option 的一个列表(这个列表与未指定 option 所返回的值的相应的子集是一样的)。如果指定了一个或多个选项-值 对，则这个命令把给定的组件选项修改为给定的值；在这种情况下这个命令返回一个空串。Option 可以是能被建立命令接受的任何值。只读选项不可修改。 
+
+.TP
+pathName getframe index  
+返回第 index 次增加的窗格的路径名。
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/05/09
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

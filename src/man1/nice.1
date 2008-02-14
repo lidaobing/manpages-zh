@@ -1,0 +1,49 @@
+.TH NICE "1" "August 1999" "GNU sh-utils 2.0" FSF
+.SH NAME
+nice \- 改变执行程序的优先级
+.SH "总览 (SYNOPSIS)"
+.B nice
+[\fIOPTION\fR]... [\fICOMMAND \fR[\fIARG\fR]...]
+.SH "描述 (DESCRIPTION)"
+.PP
+.\" Add any additional description here
+.PP
+以 调整过的 调度优先级 运行 COMMAND. 如果 没给出 COMMAND, 就 显示 当前的
+优先级. ADJUST 缺省为 10, 范围 从 \fB\-20\fR (最高级) 到 19 (最低级).
+.TP
+\fB\-ADJUST\fR
+优先级 调整到 ADJUST
+.TP
+\fB\-n\fR, \fB\-\-adjustment\fR=\fIADJUST\fR
+和 \fB\-ADJUST\fR 一样
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 退出
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 退出
+.SH "REPORTING BUGS"
+发现的 bug 寄往 <bug-sh-utils@gnu.org>.
+.SH "另见 (SEE ALSO)"
+.B Nice
+的 完整文档 以 Texinfo 手册 形式 维护.  如果 正确 安装了
+.B info
+和
+.B nice
+文件, 用 命令
+.IP
+.B info nice
+.PP
+可以 访问 完整 的 手册.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

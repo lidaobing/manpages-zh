@@ -1,0 +1,134 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH SHUTDOWN 8 "Juli 31, 2001" "" "Linux System Administrator's Manual"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+shutdown \- 关闭系统
+.\"}}}
+.\"{{{  Synopsis
+.SH 总览 SYNOPSIS
+.B /sbin/shutdown
+.RB [ \-t
+.IR sec ]
+.RB [ \-arkhncfF ]
+.I time
+.RI [ warning-message ]
+.\"}}}
+.\"{{{  Description
+.SH 描述 DESCRIPTION
+.B shutdown
+以一种安全的方式关闭系统。所有登陆用户都可以看到关机信息提示，并且 \fBlogin\fP(1) 将被阻塞。可以指定立刻关机，也可以指定系统在一定的延时后关机。所有进程都将接收到 \s-2SIGTERM\s0 信号。这可以使 \fBvi\fP(1) 等程序有时间将处于编辑状态的文件进行存储，邮件和新闻程序进程则可以将所有缓冲池内的数据进行适当的清除等等。
+.B shutdown
+通过通知 \fBinit\fP 进程，要求它改换运行级别来实现。运行级别 \fB0\fP 用来关闭系统，运行级别 \fB6\fP 用来重启系统，运行级别 \fB1\fP 用来使系统进入执行系统管理任务状态，如果没有给出 \fI-h\fP 或 \fI-r\fP 标志时，这是
+.B shutdown
+命令的默认工作状态。具体关机或重启所执行的操作请查阅 \fI/etc/inittab\fP 文件中相应的运行级别栏。
+.\"}}}
+.\"{{{  Options
+.SH 选项 OPTIONS
+.\"{{{  -a
+.IP "\fB\-a\fP
+使用 \fB/etc/shutdown.allow\fP 来验证身份。
+.\"}}}
+.\"{{{  -t sec
+.IP "\fB\-t\fP \fIsec\fP"
+通知 \fBinit\fP(8) 在转换到其它运行级别前，发送警告 (warning) 信号后延时 (\fIsec\fP) 秒数后再发送关闭 (kill) 信号。
+.\"}}}
+.\"{{{  -k
+.IP \fB\-k\fP
+并非真正关机，只向所有人显示警告信息。
+.\"}}}
+.\"{{{  -r
+.IP \fB\-r\fP
+重启。
+.\"}}}
+.\"{{{  -h
+.IP \fB\-h\fP
+停机。
+.\"}}}
+.\"{{{  -n
+.IP \fB\-n\fP
+[DEPRECATED(不应再使用)] 不调用 \fBinit\fP(8) 程序进行关机操作，而由自己进行。不建议用户使用这种关机方式，它的结果一般也不是你希望的那样。
+.\"}}}
+.\"{{{  -f
+.IP \fB\-f\fP
+重启时跳过磁盘检测。
+.\"}}}
+.\"{{{  -F
+.IP \fB\-F\fP
+重启时强制磁盘检测。
+.\"}}}
+.\"{{{  -c
+.IP \fB\-c\fP
+取消运行中的 shutdown 进程。不可能为此选项指定 \fBtime\fP 参数，但你可以在命令行输入一条解释消息来向所有用户说明。(一般的shutdown指令可以用按“+”号来进行中断)
+.\"}}}
+.\"{{{  time
+.IP \fItime\fP
+关机时间。
+.\"}}}
+.\"{{{  warning-message
+.IP \fIwarning-message\fP
+发送给所有用户的消息。
+.\"}}}
+.PP
+ \fItime\fP 参数的格式可以有很多种。首先，可以是 \fIhh:mm\fP 格式的绝对时间，其中 \fIhh\fP 指的是小时（一到二位数），\fImm\fP 指的是分钟（二位数）。第二种是 \fB+\fP\fIm\fP 格式，其中 \fIm\fP 指的是等待的分钟数。 \fBnow\fP 是 \fB+0\fP 的别名。
+.PP
+如果
+.B shutdown
+在调用时使用了延时，它将自动创建一个咨询 (advisory) 文件
+.I /etc/nologin
+，作用是禁止 \fIlogin(1)\fP 允许新用户登陆，除非
+.B shutdown 在向 init 发信号前意外中止 (就是说，它被取消或出了什么问题)。它会在调用 init 改变运行级之前删除这个文件。
+.PP
+\fB\-f\fP 标志意味着 `快速重启'。这将创建一个咨询 (advisory) 文件 \fI/fastboot\fP ，此文件在系统重启时会被检测到。启动脚本 rc 会检测是否存在这样的文件，如果有，就不会再运行 \fBfsck\fP(1)，因为系统是以正常方式关闭的。这之后，启动进程会删除 \fI/fastboot\fP。
+.PP
+\fB\-F\fP 标志意味着 `强制 fsck'。这将创建一个咨询 (advisory) 文件 \fI/forcefsck\fP，此文件在系统重启时会被检测到。启动脚本 rc 会检测是否存在这个文件，如果有，就运行 \fBfsck\fP(1) 并且加上一个特殊的 `force' 标志，以使得即使正常卸载的文件系统也被检查。这之后，启动进程会删除 \fI/forcefsck\fP。
+.PP
+ \fB-n\fP 标志导致 \fBshutdown\fP 不调用 \fBinit\fP 程序进行关机，而是自己关闭所有运行中的进程。\fBshutdown\fP 接下来会关闭配额 (quota)，记账 (accounting) 和交换分区，卸载所有文件系统。
+.\"}}}
+.\"{{{  Files
+.SH 访问控制 ACCESS CONTROL
+如果在 \fI/etc/inittab\fP 文件中有适当的条目，当按下特殊键 \fBCTRL-ALT-DEL\fP 时，\fBshutdown\fP 可以被 \fBinit\fP(8) 调用。这意味着可以物理地接触到终端键盘的任何人都可以关闭系统。要避免这种行为，\fBshutdown\fP 可以检测是否有授权的用户登录到了虚拟终端之一。如果 \fBshutdown\fP 在调用时带有 \fB-a\fP 参数 (可以将它添加到 \fI/etc/inittab\fR 中 shutdown 的执行命令之后)，它将检测是否存在 \fI/etc/shutdown.allow\fP 文件。接下来它比较文件中的登录名与虚拟终端的登录用户列表 (在\fI/var/run/utmp\fP)。只有当授权的用户之一 \fB或者 root\fP 登录了，它才会继续。否则，它会把信息
+.sp 1
+.nf
+\fBshutdown: no authorized users logged in\fP
+.fi
+.sp 1
+写到 (物理的) 系统终端。\fI/etc/shutdown.allow\fP 的格式是每行一个用户名。允许出现空行和注释行 (以 \fB#\fP 开头)。此文件当前有最多 32 个用户的限制。
+.sp 1
+注意，如果 \fI/etc/shutdown.allow\fP 不存在，\fB-a\fP 参数将被忽略。
+.SH 文件 FILES
+.nf
+/fastboot
+/etc/inittab
+/etc/init.d/halt
+/etc/init.d/reboot
+/etc/shutdown.allow
+.fi
+.\"}}}
+.SH 注意 NOTES
+很多用户忘记了传递 \fItime\fP 参数，结果被 \fBshutdown\fP 产生的错误消息所迷惑。\fItime\fP 参数是必须的，90% 的情况下这个参数会是 \fBnow\fP。
+.PP
+Init 只能在终端模式捕获 CTRL-ALT-DEL 并且启动 shutdown。如果系统正在运行 X window System，X 服务器处理所有的按键。一些 X11 环境使得捕获 CTRL-ALT-DEL 成为可能，但是这个事件究竟做了什么依赖于那个环境。
+.PP
+.B Shutdown 没有被设计为使用 setuid。\fI/etc/shutdown.allow\fP 不用来找出谁在执行
+.B shutdown
+，它\fB*只*\fR用来检查当前在终端 (之一) 登录的用户。
+.\"{{{  Author
+.SH 作者 AUTHOR
+Miquel van Smoorenburg, miquels@cistron.nl
+.\"}}}
+.\"{{{  See also
+.SH "参见 SEE ALSO"
+.BR fsck (8),
+.BR init (8),
+.BR halt (8),
+.BR poweroff (8),
+.BR reboot (8)
+.\"}}}
+.SH "[中文版维护人]"
+.B 所罗门 <solomen@email.com.cn>
+.SH "[中文版最新更新]"
+.B Nov 21 2000
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 

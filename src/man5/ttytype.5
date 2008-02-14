@@ -1,0 +1,51 @@
+.\" 版权所有(c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" 这是免费的文档;你可以遵照自由软件基金会出版的GNU通用出版许可版本2或者更高版本的条例来重新发布和/或修改它.
+.\"
+.\" GNU通用出版许可中涉及到的"目标代码(object code)"和"可执行程序(executables)"可解释为任意文档格式化的输出或者排版系统,包括中间的和已输出的结果.
+.\"
+.\" 该文档的发布寄望于能够实用,但并不做任何担保;甚至也不提供隐含的商品性的保证或者针对特殊目的适用性.参见GNU通用版权许可以获知详情.
+.\"
+.\" 你应该接收到与本文档一同发布的GNU通用版权许可的副本;如果没有,请写信到自由软件基金会(Free Software Foundation), Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
+.\" USA.
+.\"
+.\" 于1993年1月24日星期六17:17:50由Rik Faith <faith@cs.unc.edu>修改
+.\" 于1995年10月19日星期四21:25:21 MET由Martin Schulze <joey@infodrom.north.de>修改
+.\" 于1996年10月21日星期一17:47:19 EDT由Eric S. Raymond
+.\" <esr@thyrsus.com>xk修改
+.TH TTYTYPE 5 "1993年7月24日" "Linux" "Linux Programmer's Manual(Linux程序员手册)"
+.SH NAME(名称)
+ttytype \- 终端设备映射的默认终端类型
+.SH DESCRIPTION(描述)
+.I /etc/ttytype
+文件把termcap/terminfo中的终端类型名与tty行关联起来.每行包括一种终端类型,后面跟着空格,然后是tty名(不带
+.IR /dev/ " ) 前缀."
+
+这种关联被
+.BR tset (1)
+程序用来针对用户当前的tty设置环境变量TERM为默认终端名.
+
+这项功能设计是为了Unix微机连接的字符类终端发挥传统分时作业的特色.这在现代的Unix工作站和个人Unix机上很少使用.
+.SH EXAMPLE(示例)
+.I /etc/ttytype
+为:
+.RS
+.sp
+con80x25 tty1
+.br
+vt320 ttys0
+.sp
+.RE
+.SH FILES(相关文件)
+.TP
+.I /etc/ttytype
+tty定义文件.
+.SH "SEE ALSO"(另见)
+.BR getty "(1), " terminfo "(5), " termcap "(5)"
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]"
+.B 2000/11/01
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

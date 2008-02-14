@@ -1,0 +1,86 @@
+.\" -*- nroff -*-
+.TH bdflush 8 "Aug 1994"
+.SH NAME
+bdflush \- 将dirty缓存写回到磁盘的核心守护进程。
+.SH 总览（SYNOPSIS）
+.B bdflush [opt]
+.SH 描述（DESCRIPTION）
+.B bdflush
+被用来启动核心守护进程将内存中的dirty缓存写到磁盘上。真正清洁工作是一个核心程序完成的。
+bdflush实际上只是派生出一个新的进程调用这个永远不会返回的核心程序。
+.PP
+.B bdflush
+实际上也派生出第二个守护进程，这个进程实际上象一个传统的更新程序，除了那些缓存在变化了一个位前
+不会被考虑用来进行写操作。当缓存的dirty位被置位时，时钟开始计时。当经过一定的时间间隔后，缓存将
+会被写回到磁盘上。对于数据缓存和位元数据缓存（比如目录，位图，间接区块等等）来说，时间间隔是不
+同的。当你在运行bdflush时使用了一些命令行参数的时候，当前一些配置会显示在屏幕上。数据缓存刷新间
+隔的默认值是30秒，位元数据是5秒。
+.PP
+在正常情况下，两个守护进程使用/etc/rc下的一个
+.PP
+/sbin/update
+.PP
+命令来执行。
+值得注意的是你需要让这个两个守护进程同时运行，因为每个守护进程都有其作用。同时也要注意这个命令
+需要在任何主I/O设备运行前执行。需要特别说明的是，在对文件系统使用fsck命令检查前或者将文件系统激
+活为读写模式前应该调用update这个命令。
+.PP
+当bdflush被一个没有超级权限的用户执行时，它就会调用flush和sync函数，然后退出。千万不要同时运行20
+个update守护进程……
+.PP
+.SH “命令行选项”（COMMAND\-LINE OPTIONS）
+.TP 0.5i
+.B "-d "
+显示核心参数。使用这个选项可以防止守护进程的运行。
+.TP 0.5i
+.B "-h "
+打印出使用方法（帮助）。
+.TP 0.5i
+.B "-s "
+如果bdflush的默认为以前的update方法，就经常性的调用sync。
+默认值：30秒。
+.TP 0.5i
+.B "-f "
+经常性的调用flush。默认值：5秒。
+.TP 0.5i
+.B "-0 "
+检测dirty缓存区块时使用LRU算法的最大块。
+.TP 0.5i
+.B "-1 "
+bdflush激活时需要写到磁盘上的最大dirty缓存数量。
+.TP 0.5i
+.B "-2 "
+将clean缓存挂到标志着空闲队列的refill_freelist列表上的数字标识。
+.TP 0.5i
+.B "-3 "
+在refill_freelist队列中激活bdflush的dirty区块临界值。
+.TP 0.5i
+.B "-4 "
+查询空闲簇所使用的缓存百分比。
+.TP 0.5i
+.B "-5 "
+数据缓存在刷新前的可更新时间。
+.TP 0.5i
+.B "-6 "
+非数据（目录，位图等等）缓存在刷新前可更新时间。
+.TP 0.5i
+.B "-7 "
+快速缓存调用平均持续时间。
+.TP 0.5i
+.B "-8 "
+LAV比率（用来决定缓存更迭的临界值）
+.SH 作者（AUTHOR）
+.B bdflush
+是由Eric Youngdale <ericy@gnu.ai.mit.edu>编写.
+主要目的是提高核心刷新dirty缓存的灵活性，并且增加了缓存集群技术。
+其他的作者还有Phil Bostley <bostley@cs.colorado.edu> 和
+Daniel Quinlan <quinlan@yggdrasil.com>.
+.SH 缺陷（BUGS）
+如果有的话，那一定是在核心代码中。
+
+.SH "[中文版维护人]"
+.B billpan <billpan@netease.com>
+.SH "[中文版最新更新]"
+.BR 2002/01/10
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

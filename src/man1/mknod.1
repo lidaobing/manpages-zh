@@ -1,0 +1,91 @@
+.\" Copyright Andries Brouwer, Ragnar Hojland Espinosa and A. Wik, 1998.
+.\" 中文版版权所有 Alian Yao, www.linuxforum.net 2000
+.\" This file may be copied under the conditions described
+.\" in the LDP GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH MKNOD 1 "November 1998" "GNU fileutils 4.0"
+.SH NAME
+mknod \- 建立块专用或字符专用文件
+
+.SH 总览
+.BI "mknod [" options "] " name " {bc} " "major minor"
+.br
+.BI "mknod [" options "] " name " p"
+.SH GNU 选项（缩写）：
+.BI "[\-m " mode "] [\-\-help] [\-\-version] [\-\-]"
+.SH 描述
+mknod 用指定名称产生一个FIFO（命名管道），字符专用或块专用文件。
+.PP
+文件系统中的一个专用文件存贮着三种信息（布朗型、整型、整型）。
+布朗型在字符文件与块文件之间作出选择，两个整型是主、次设备号。
+.PP
+通常，一个专用文件并不在磁盘上占用空间，仅仅是为操作系统提供
+交流，而不是为数据存贮服务。一般地，专用文件会指向一个硬件设
+备（如：磁盘、磁带、打印机、虚拟控制台）或者操作系统提供的服
+务（如：/dev/null, /dev/random）。
+.PP
+块文件通常类似于磁盘设备（在数据可以被访问的地方赋予一个块号，
+意味着同时设定了一个块缓存）。所有其他设备都是字符文件。（以
+前，两种文件类型间是有差别的。比如：字符文件I/O没有缓存，而块
+文件则有。）
+.PP
+mknod命令就是用来产生这种类型文件的。
+.PP
+以下参数指定了所产生文件的类型：
+.RS
+.TP
+.B p
+FIFO型
+.TP
+.B b
+块文件
+.TP
+.B c
+字符文件
+.RE
+.PP
+GNU版本还允许使用u（'unbufferd'非缓冲化），
+以保持与C语言的一致。
+.PP
+当创建一个块文件或字符文件时，主、次设备号必须在
+文件类型参数后给出。（十进制或八进制以0开头；GNU
+版本还允许使用以0x开头的十六进制）缺省地，所产生
+的文件模式为0666（'a+rw'）。
+.SH 选项
+.TP
+.BI "\-m " mode ", \-\-mode=" mode
+为新建立的文件设定模式，就象应用命令chmod一样，以后仍然使
+用缺省模式建立新目录。
+
+.SH GNU 标准选项
+.TP
+.B "\-\-help"
+在标准输出上显示使用信息并顺利退出。
+.TP
+.B "\-\-version"
+在标准输出上显示版本信息并顺利退出
+.TP
+.B "\-\-"
+终端选项列表。
+
+.SH 遵循
+POSIX 认为该命令不能移植而不支持这个命令，它推荐使用
+mkfifo(1)来建立FIFO文件。SVID有一个命令/etc/mknod有以上
+语法，但没有模式选项。 
+.SH 注意
+在某些linux系统上（1.3.22或之后的版本）
+/usr/src/linux/Documentation/devices.tex文件包含了一个
+设备列表，包括设备名、类型及主、次设备号。本页对mknod的
+描述可以在fileutils-4.0中找到；其他版本会略有差别。任何
+添加或纠错意见请寄aeb@cwi.nl，程序Bugs请告知：
+fileutils-bugs@gnu.ai.mit.edu
+.SH 另见
+chmod(1), mkfifo(1),mknod(2)
+
+.SH "[中文版维护人]"
+.B Alan Yao  <Alan_Yao@163.net>
+.SH "[中文版最新更新]"
+.BR 2000/10/19
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

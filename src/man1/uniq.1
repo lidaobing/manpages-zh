@@ -1,0 +1,81 @@
+.TH UNIQ "1" "December 1999" "GNU textutils 2.0a" FSF
+.SH NAME
+uniq \- 删除排序文件中的重复行
+
+.SH "总览 (SYNOPSIS)"
+.B ../src/uniq
+[\fIOPTION\fR]... [\fIINPUT \fR[\fIOUTPUT\fR]]
+
+.SH "描述 (DESCRIPTION)"
+.\" Add any additional description here
+.PP
+从 INPUT (或 标准输入) 数据 中 忽略 (但是 保留 一行) 连续的 相似行,
+结果 送入 OUTPUT (或 标准输出).
+.TP
+\fB\-c\fR, \fB\-\-count\fR
+在 行首 显示 出现 的 数目
+.TP
+\fB\-d\fR, \fB\-\-repeated\fR
+仅显示 重复行
+.TP
+\fB\-D\fR, \fB\-\-all\-repeated\fR
+显示 全部 重复行
+.TP
+\fB\-f\fR, \fB\-\-skip\-fields\fR=\fIN\fR
+不比较 起初的 N 栏
+.TP
+\fB\-i\fR, \fB\-\-ignore\-case\fR
+比较时 忽略 大小写
+.TP
+\fB\-s\fR, \fB\-\-skip\-chars\fR=\fIN\fR
+不比较 起初的 N 个 字符
+.TP
+\fB\-u\fR, \fB\-\-unique\fR
+仅显示 无重复行
+.TP
+\fB\-w\fR, \fB\-\-check\-chars\fR=\fIN\fR
+每行中 比较 不超过 N 个 字符
+.TP
+\fB\-N\fR
+同 \fB\-f\fR N
+.TP
++N
+同 \fB\-s\fR N
+.TP
+\fB\-\-help\fR
+显示 帮助信息, 然后 结束
+.TP
+\fB\-\-version\fR
+显示 版本信息, 然后 结束
+.PP
+栏(field) 指 一段 空白符(whitespace), 接下来 一段 非空白符.
+字符前 的 栏 被 忽略 (Fields are skipped before chars).
+
+.SH "作者 (AUTHOR)"
+Richard Stallman 和 David MacKenzie.
+.SH "报告 BUGS"
+发现的 bug 送往 <bug-textutils@gnu.org>.
+.SH "版权 (COPYRIGHT)"
+Copyright \(co 1999 Free Software Foundation, Inc.
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+.SH "另见 (SEE ALSO)"
+.B uniq
+的 完整文档 以 Texinfo 手册 的 格式 维护. 如果 正确 安装了
+.B info
+和
+.B uniq
+程序, 使用 命令
+.IP
+.B info uniq
+.PP
+能够 访问到 完整 的 手册.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

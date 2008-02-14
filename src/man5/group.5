@@ -1,0 +1,34 @@
+.\" 版权所有(c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\"
+.\" 这是免费的文档;你可以遵照自由软件基金会出版的GNU通用出版许可版本2或者更高版本的条例来重新发布和/或修改它.
+.\"
+.\" GNU通用出版许可中涉及到的"目标代码(object code)"和"可执行程序(executables)"可解释为任意文档格式化的输出或者排版系统,包括中间的和已输出的结果.
+.\"
+.\" 该文档的发布寄望于能够实用,但并不做任何担保;甚至也不提供隐含的商品性的保证或者针对特殊目的的适用性.参见GNU通用版权许可以获知详情.
+.\"
+.\" 你应该接收到与本文档一同发布的GNU通用版权许可的副本;如果没有,请写信到自由软件基金会(Free Software Foundation), Inc., 59 Temple Place, Suite 330, Boston, MA 02111, USA.
+.\"
+.\" 于1993年1月24日星期六17:06:03由Rik Faith (faith@cs.unc.edu)修改
+.TH GROUP 5 "1992年12月29日" "Linux" "Linux Programmer's Manual(Linux程序员手册)"
+.SH NAME(名称)
+group \- 用户组文件
+.SH DESCRIPTION(描述)
+\fB/etc/group\fp 是一个ASCII码的文件,它定义了用户所属的组.文件中每行包括一条记录,其格式如下:
+.sp
+.RS
+group_name:passwd:GID:user_list
+.RE
+.sp
+字段描述如下:
+.IP group_name
+组名
+.IP password
+(加密的)组密码.如果该字段为空,则不需要密码.
+.IP GID
+组的数字标识.
+.IP user_list
+组内所有成员的用户名,以逗号分隔.
+.SH FILES(相关文件)
+/etc/group
+.SH "SEE ALSO"(另见)
+.BR login "(1), " newgrp "(1), " passwd (5) 

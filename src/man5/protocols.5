@@ -1,0 +1,54 @@
+.TH PROTOCOLS 5 "1995 年 10 月 18 日" "Linux" "Linux 程序员手册"
+.SH NAME 名称
+protocols \- 协议定义文件
+.SH 描述
+该文件为普通 ASCII 文件，它描述了 TCP/IP 子系统中各类 DARPA internet 协议族．
+你应该参考这个文件, 而不是使用 ARPA 的 include 文件中的号码, 更不必去猜测它们.
+这些号码将出现在任何 ip 包头的协议字段中.
+
+你应该保持这个文件不变, 因为修改会导致不正确的 ip 包.
+协议号码和名字由 DDN 网络信息中心指定.
+
+每行的格式如下:
+
+.RS
+.I 协议 号码 别名 ...
+.RE
+
+这里的字段以空格或者 tab 键分隔. 空行和以散列符 (#) 开头的行将忽略.
+从散列符起始的行的剩余部分也将忽略.
+
+字段描述如下:
+
+.TP
+.I 协议
+协议的本名.例如 :ip, tcp 或者 udp.
+.TP
+.I 号码
+协议的正式号码, 它将出现在 ip 包头中.
+.TP
+.I 别名
+协议的可选别名.
+.LP
+
+该文件也可以使用网络范围中的名字服务，如黄页/NIS 或 BIND/Hesoid，
+在网络分发．
+
+.SH 文件
+.TP
+.I /etc/protocols
+协议定义文件.
+.SH 参见
+.BR getprotoent (3)
+
+黄页服务的指南
+
+BIND/Hesiod 服务的指南
+
+.SH "[中文版维护人]"
+.B riser <boomer@ccidnet.com>
+.SH "[中文版最新更新]" 
+.B 2000/11/6
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net 
+.br

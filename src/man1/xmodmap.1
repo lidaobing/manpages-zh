@@ -1,0 +1,312 @@
+.\" $TOG: xmodmap.man /main/27 1997/04/02 09:22:54 kaleb $
+.\" Copyright (c) 1988, 1989, 1990  X Consortium
+.\" Copyright 1987 Sun Microsystems, Inc.
+.\" 
+.\" Permission is hereby granted, free of charge, to any person obtaining
+.\" a copy of this software and associated documentation files (the
+.\" "Software"), to deal in the Software without restriction, including
+.\" without limitation the rights to use, copy, modify, merge, publish,
+.\" distribute, sublicense, and/or sell copies of the Software, and to
+.\" permit persons to whom the Software is furnished to do so, subject to
+.\" the following conditions:
+.\" 
+.\" The above copyright notice and this permission notice shall be included
+.\" in all copies or substantial portions of the Software.
+.\" 
+.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+.\" OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+.\" MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+.\" IN NO EVENT SHALL THE X CONSORTIUM BE LIABLE FOR ANY CLAIM, DAMAGES OR
+.\" OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+.\" ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+.\" OTHER DEALINGS IN THE SOFTWARE.
+.\" 
+.\" Except as contained in this notice, the name of the X Consortium shall
+.\" not be used in advertising or otherwise to promote the sale, use or
+.\" other dealings in this Software without prior written authorization
+.\" from the X Consortium.
+.\" $XFree86: xc/programs/xmodmap/xmodmap.man,v 1.1.1.3.2.2 1997/07/05 15:55:55 dawes Exp $
+.de EX		\"Begin example
+.ne 5
+.if n .sp 1
+.if t .sp .5
+.nf
+.in +.5i
+..
+.de EE
+.fi
+.in -.5i
+.if n .sp 1
+.if t .sp .5
+..
+.TH XMODMAP 1 "Release 6.3" "X Version 11"
+.SH NAME
+xmodmap - 在 X 环境中调节键盘映射和鼠标键映射
+
+.SH "总览 (SYNOPSIS)"
+.B xmodmap
+[-options ...] [filename]
+
+.SH "描述 (DESCRIPTION)"
+.PP
+\fIxmodmap\fP 用来 编辑 或 显示 键盘的
+\fI修饰键映射(modifier map)\fP 和 \fI键盘映射表(keymap table)\fP,
+客户程序 用 它们 把 键码(keycode) 事件 转换为 keysym. 通常 在 用户会话 的 
+启动脚本 中 使用 \fIxmodmap\fP, 把 键盘 配置成 用户 喜爱的 风格.
+
+.SH "选项 (OPTIONS)"
+.PP
+\fIxmodmap\fP 可以 使用 下列 选项:
+.TP 8
+.B \-display \fIdisplay\fP
+这个选项 指定 主机 和 显示器.
+
+.TP 8
+.B \-help
+这个选项 在 标准错误设备 显示 命令行参数 的 说明. 如果 出现了 无法识别 的
+参数, 
+.I xmodmap 
+也会 执行 这个 功能.
+
+.TP 8
+.B \-grammar
+这个选项 在 标准错误设备 显示 表达式 的 语法. 该语法 适用于 文件 或
+\-e expression 选项.
+
+.TP 8
+.B \-verbose
+这个选项 要求
+.I xmodmap
+在 分析 输入数据 的 时候 显示 日志信息.
+
+.TP 8
+.B \-quiet
+这个选项 要求 关闭 verbose 日志信息. 这是 缺省选项.
+
+.TP 8
+.B \-n
+这个选项 不要求
+.I xmodmap
+真的改变 (键盘,鼠标) 映射, 而只是 显示出 它 可能 做什么, 如同
+\fImake(1)\fP 的 相同 选项 一样.
+
+.TP 8
+.B \-e \fIexpression\fB
+这个选项 执行 一个 给定的 表达式. 命令行上 可以 指定 任何 数量 的 表达式.
+
+.TP 8
+.B \-pm
+这个选项 要求 在 标准输出设备 显示 当前的 修饰键(modifier)映射.
+
+.TP 8
+.B \-pk
+这个选项 要求 在 标准输出设备 显示 当前的 键盘映射表(keymap).
+
+.TP 8
+.B \-pke
+这个选项 要求 在 标准输出设备 显示 当前的 键盘映射表(keymap). 输出格式
+能够 作为 \fIxmodmap\fP 的 输入.
+
+.TP 8
+.B \-pp
+这个选项 要求 在 标准输出设备 显示 当前的 鼠标(pointer)映射.
+
+.TP 8
+.B \-
+单独的 短横线(-) 说明 把 标准输入设备 作为 输入文件 使用.
+
+.PP
+\fIfilename\fP 指定 一个文件, 其中 包含 \fIxmodmap\fP 将要 执行的 表达式.
+这个文件 通常 命名为 \fI.xmodmaprc\fP, 存放在 用户的 根目录下.
+
+.SH "语法 (EXPRESSION GRAMMAR)"
+.PP
+.I xmodmap
+读入 一连串的 表达式, 在 执行 它们 以前, 对 所有 表达式 进行 分析.
+这样 就可以 不用担心 重定义 的 keysym 出现 名字冲突.
+
+.TP 8
+.B keycode \fINUMBER\fP = \fIKEYSYMNAME ...\fP
+把 这一串 keysym 赋于 指定的 键码.
+(键码 可以是 十进制数, 十六进制数, 八进制数, 可以用 
+.I xev 
+程序 测出.)
+
+.TP 8
+.B keycode any = \fIKEYSYMNAME ...\fP
+如果 不存在 分配了 上述 keysym 序列 的 键, \fIxmodmap\fP 就 选择 键盘上 的 
+空闲键, 把 这些 keysym 分配 给 它. keysym 可以是 十进制数, 十六进制数 或者
+八进制数.
+
+.TP 8
+.B keysym \fIKEYSYMNAME\fP = \fIKEYSYMNAME ...\fP
+左边的 \fIKEYSYMNAME\fP 翻译为 对应的 键码, 该键码 应用于 相应的 
+键码表达式集.
+你 可以 在 头文件 \fI<X11/keysymdef.h>\fP 中 找到 keysym 的 名称列表
+(去掉 \fIXK_\fP 前缀), 也可以 查 keysym 数据库 \fI<XRoot>/lib/X11/XKeysymDB\fP,
+这里的 <XRoot> 指 X11 的 安装树. 注意, 如果 多个 键码 编联(bind)了 相同的 
+keysym, 那么 每个 对应的 键码 都要 执行 这个 表达式.
+
+.TP 8
+.B clear \fIMODIFIERNAME\fP
+删除 给定 修饰键 在 修饰键映射表 中 的 所有 表项, 修饰键 的 名字 有:
+.BR Shift ,
+.BR Lock ,
+.BR Control ,
+.BR Mod1 ,
+.BR Mod2 ,
+.BR Mod3 ,
+.BR Mod4 ,
+和 \fBMod5\fP (修饰键名字 不分 大小写, 但是 其他 名字 对 大小写 敏感).
+例如, ``clear Lock'' 将 删除 所有 编联为 shift lock 的 键.
+
+.TP 8
+.B add \fIMODIFIERNAME\fP = \fIKEYSYMNAME ...\fP
+这条语句 把 所有 包含 给定 keysym 的 键 加入到 指定的 修饰键映射表 中.
+读取完 全部 输入表达式 之后, xmodmap 才分析 这些 keysym, 这样 有利于 
+编写 一些 交换 键位 的 表达式. (见 EXAMPLES 节)
+
+.TP 8
+.B remove \fIMODIFIERNAME\fP = \fIKEYSYMNAME ...\fP
+这条语句 在 指定的 修饰键映射表 中 删除 所有 包含 指定 keysym 的 键. 和
+.B add
+不同, xmodmap 每 读取 一行 就 执行 一行. 这样 可以 避免 考虑 这些键
+是否 被 重分配过.
+
+.TP 8
+.B "pointer = default"
+这条语句 把 鼠标映射 设置为 缺省值 (按键1 产生 代码1, 按键2 产生 代码2, 等等).
+
+.TP 8
+.B pointer = \fINUMBER ...\fP
+这条语句 把 鼠标映射 设置为 指定的 按键代码. 这个 代码列表 总是 从 第一个
+按键 开始.
+
+.PP
+注释行 以 感叹号(!) 开始.
+
+.PP
+如果 你 打算 改变 某个 修饰键 的 编联, 你 必须 把它 从 相应的
+修饰键映射表 中 同时 删除.
+
+.SH "示例 (EXAMPLE)"
+.PP
+大多数 鼠标 设计成 右手 食指 按 第一个键, 左撇子 却觉得 如果 把 按键
+代码 反过来, 使 左手 食指 按上 主键 会 更舒服些. 对于 三键鼠标 可以 这样:
+.EX
+%  xmodmap -e "pointer = 3 2 1"
+.EE
+
+.PP
+很多 应用程序 支持 Meta 键,
+然而, 有些 服务器 的 键盘映射表 中 没有 提供 Meta keysym, 因此 需要 手工
+添加. 下面的 命令 将把 Meta 附加到 Multi-language 键上 (有时也 称为
+Compose Character).  另一个 有利方面 是, 需要 Meta 键 的 程序 只是要求 获得 
+键码, 不要求 keysym 位于 键盘映射表 的 第一列.
+这 意味着 需要 Multi_key 的 程序 不会 发觉 有 任何 变化.
+.EX
+%  xmodmap -e "keysym Multi_key = Multi_key Meta_L"
+.EE
+
+.PP
+类似的, 有些 键盘 只有 Alt 键, 而没有 Meta 键. 这种情况下 可以 用:
+.EX
+%  xmodmap -e "keysym Alt_L = Meta_L Alt_L"
+.EE
+
+.PP
+\fIxmodmap\fP 最简单, 也是 最合适的 用途 之一 是 设置 键盘的 "rubout" 键,
+产生 替换的 keysym.  它 经常 用于 交换 Backspace 和 Delete 键.
+如果 \fIxterm\fP 的 \fIttyModes\fP 资源 也 做了 同样的 设置,
+所有的 终端模拟窗口 将 用 相同的键 删除 字符.
+.EX
+%  xmodmap -e "keysym BackSpace = Delete"
+%  echo "XTerm*ttyModes:  erase ^?" | xrdb -merge
+.EE
+.PP
+有些键盘 按下 shift 键 和 逗号, 句号键 时, 不能 产生 小于号 和 大于号.
+这个现象 可以 通过 重新编联 逗号键 和 句号键 矫正:
+.EX
+!
+! make shift-, be < and shift-. be >
+!
+keysym comma = comma less
+keysym period = period greater
+.EE
+
+.PP
+键盘间 最烦人 的 区别 之一 就是 Control 和 Shift Lock 键 的 位置.  
+\fIxmodmap\fP 的 一个 常用功能 就是 交换 这两个 键, 象这样:
+.EX
+!
+! Swap Caps_Lock and Control_L
+!
+remove Lock = Caps_Lock
+remove Control = Control_L
+keysym Control_L = Caps_Lock
+keysym Caps_Lock = Control_L
+add Lock = Caps_Lock
+add Control = Control_L
+.EE
+.PP
+如果 要 对 多个 键码 分配 同一个 keysym, 可以 使用 \fIkeycode\fP 命令.
+尽管 这个做法 不能 移植, 但是 你可以 用它 写一段 脚本, 把 键盘 复位为
+已知状态.
+下面的 脚本 把 backspace 设为 Delete (如上所示), 清除 cap lock 的 编联,
+把 CapsLock 设为 Control 键, F5 设为 Escape, Break/Reset 设为 shift lock.
+.EX
+!
+! On the HP, the following keycodes have key caps as listed:
+!
+!     101  Backspace
+!      55  Caps
+!      14  Ctrl
+!      15  Break/Reset
+!      86  Stop
+!      89  F5
+!
+keycode 101 = Delete
+keycode 55 = Control_R
+clear Lock
+add Control = Control_R
+keycode 89 = Escape
+keycode 15 = Caps_Lock
+add Lock = Caps_Lock
+.EE
+
+.SH "环境变量 (ENVIRONMENT)"
+.PP
+.TP 8
+.B DISPLAY
+指示 缺省的 主机 和 显示器号.
+
+.SH "另见 (SEE ALSO)"
+X(1), xev(1), \fIXlib\fP 关于 键盘 和 鼠标 事件 的 文档.
+
+.SH BUGS
+.PP
+服务器 每执行 一个 \fBkeycode\fP 表达式, 就要在 每一个 客户机 上 产生 一个
+\fIMappingNotify\fP 事件. 这可能 导致 某些 异常情况. 所有的 改变 都应该
+收集 在一起, 然后 一次 完成. 那些 接收了 键盘输入, 却 忽略了 
+\fIMappingNotify\fP 事件 的 客户机 将 无法 注意到 对 键盘映射 的 任何 改变.
+
+.PP
+如果 编联了 某个 修饰键 的 键码 发生 变化, 
+.I Xmodmap
+将 自动 产生 "add" 和 "remove" 表达式.
+
+.PP
+应该 有 某种办法, 当你 确实 搞乱了 键盘映射 的 时候, 使
+.I remove
+表达式 接受 键码 以及 keysym.
+
+.SH "作者 (AUTHOR)"
+Jim Fulton, MIT X 协会, 根据 David Rosenthal 在 Sun Microsystems 中 的 
+早期版本 改写.
+
+.SH "[中文版维护人]"
+.B 徐明 <xuming@users.sourceforge.net>
+.SH "[中文版最新更新]"
+.BR 2003/05/13
+.SH "《中国Linux论坛man手册页翻译计划》"
+.BI http://cmpp.linuxforum.net

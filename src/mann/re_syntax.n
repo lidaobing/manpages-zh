@@ -1,0 +1,771 @@
+'\"
+'\" Copyright (c) 1998 Sun Microsystems, Inc.
+'\" Copyright (c) 1999 Scriptics Corporation
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) $Id: re_syntax.n,v 1.3 2004/03/01 14:15:48 bbbush Exp $
+'\"
+'\" The definitions below are for supplemental macros used in Tcl/Tk
+'\" manual entries.
+'\"
+'\" .AP type name in/out ?indent?
+'\"	Start paragraph describing an argument to a library procedure.
+'\"	type is type of argument (int, etc.), in/out is either "in", "out",
+'\"	or "in/out" to describe whether procedure reads or modifies arg,
+'\"	and indent is equivalent to second arg of .IP (shouldn't ever be
+'\"	needed;  use .AS below instead)
+'\"
+'\" .AS ?type? ?name?
+'\"	Give maximum sizes of arguments for setting tab stops.  Type and
+'\"	name are examples of largest possible arguments that will be passed
+'\"	to .AP later.  If args are omitted, default tab stops are used.
+'\"
+'\" .BS
+'\"	Start box enclosure.  From here until next .BE, everything will be
+'\"	enclosed in one large box.
+'\"
+'\" .BE
+'\"	End of box enclosure.
+'\"
+'\" .CS
+'\"	Begin code excerpt.
+'\"
+'\" .CE
+'\"	End code excerpt.
+'\"
+'\" .VS ?version? ?br?
+'\"	Begin vertical sidebar, for use in marking newly-changed parts
+'\"	of man pages.  The first argument is ignored and used for recording
+'\"	the version when the .VS was added, so that the sidebars can be
+'\"	found and removed when they reach a certain age.  If another argument
+'\"	is present, then a line break is forced before starting the sidebar.
+'\"
+'\" .VE
+'\"	End of vertical sidebar.
+'\"
+'\" .DS
+'\"	Begin an indented unfilled display.
+'\"
+'\" .DE
+'\"	End of indented unfilled display.
+'\"
+'\" .SO
+'\"	Start of list of standard options for a Tk widget.  The
+'\"	options follow on successive lines, in four columns separated
+'\"	by tabs.
+'\"
+'\" .SE
+'\"	End of list of standard options for a Tk widget.
+'\"
+'\" .OP cmdName dbName dbClass
+'\"	Start of description of a specific option.  cmdName gives the
+'\"	option's name as specified in the class command, dbName gives
+'\"	the option's name in the option database, and dbClass gives
+'\"	the option's class in the option database.
+'\"
+'\" .UL arg1 arg2
+'\"	Print arg1 underlined, then print arg2 normally.
+'\"
+'\" RCS: @(#) $Id: re_syntax.n,v 1.3 2004/03/01 14:15:48 bbbush Exp $
+'\"
+'\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+'\"	# Start an argument description
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+'\"	# define tabbing values for .AP
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+'\"	# BS - start boxed text
+'\"	# ^y = starting y location
+'\"	# ^b = 1
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+'\"	# BE - end boxed text (draw box now)
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+'\"	# VS - start vertical sidebar
+'\"	# ^Y = starting y location
+'\"	# ^v = 1 (for troff;  for nroff this doesn't matter)
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+'\"	# VE - end of vertical sidebar
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+'\"	# Special macro to handle page bottom:  finish off current
+'\"	# box/sidebar if in box/sidebar mode, then invoked standard
+'\"	# page bottom macro.
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+'\"	# DS - begin display
+.de DS
+.RS
+.nf
+.sp
+..
+'\"	# DE - end display
+.de DE
+.fi
+.RE
+.sp
+..
+'\"	# SO - start of list of standard options
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+'\"	# SE - end of list of standard options
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+'\"	# OP - start of full description for a single option
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+'\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+..
+'\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+.TH re_syntax n "8.1" Tcl "Tcl Built-In Commands"
+.BS
+.SH NAME
+re_syntax \- Tcl 正则表达式的语法。
+.BE
+
+.SH "描述 DESCRIPTION"
+.PP
+一个\fB正则表达式\fR (\fIregular expression\fR ) 描述了一类字符串。它是匹配特定字符串而不匹配其他的字符串的一个模式。
+
+.SH "RE 的不同风格 DIFFERENT FLAVORS OF REs"
+正则表达式(“RE”)由 POSIX 定义，有两种风格(flavor): \fB扩展\fR RE(``EREs'')和\fB基本\fRRE(``BREs'')。ERE 粗略的相当于传统的 \fBegrep\fR \fI\fR的正则表达式，而 BRE 粗略的相当于传统的 \fBed\fR 的正则表达式。这个实现增加了第三种风格，\fB高级\fRRE(``AREs'')，它基本上是 ERE 再加上一些重要的扩展。
+.PP
+译注：grep 缺省支持 BRE，通过指定 -E 选项来支持 ERE，历史上的 egrep 和 fgrep 已经合并入 grep 中。ed、sed 支持 BRE，lex、AWK 支持 ERE。
+.PP
+这个手册页主要描述 ARE。提供 BRE 主要是为了在一些老程序中反向(backward)兼容；它们将最后讨论。POSIX 
+ERE 基本上是 ARE 的一个真子集。在 ERE 中不存在的 ARE 的特征将被指示出来。
+
+.SH "正则表达式的语法 REGULAR EXPRESSION SYNTAX"
+.PP
+实现 Tcl 正则表达式使用了 Henry Spencer 写的包，基于 POSIX 1003.2 规定和一些(不是全部) Perl5 扩展 (感谢 Henry!)。下面的许多正则表达式描述是原封不动的从他的手册页复制过来的。
+.PP
+译注：Perl5 的正则表达式也是从 Henry Spencer 所写的包演变而来。
+.PP
+一个 ARE 是一个或多个由`\fB|\fR'分隔的\fB分支\fR(branch)(构成的)，它匹配与任何一个分支匹配的一个字符序列。
+.PP
+一个分支是零或多个串联起来的\fB约束\fR(constraint)或\fB定量\fR\fB原子\fR(quantified atom)(构成的)。它与每个构件(约束或定量原子)所匹配的任何字符序列的一个串联相匹配，组成这个字符序列的串联的第一个字符序列与这个分支的第一个构件相匹配，第二个字符序列与第二个构件相匹配，以此类推。一个空分支匹配空串。
+.PP
+一个定量原子是可能跟随一个单一的\fB定量符\fR (quantifier) 的原子。不加定量符，它匹配这个原子的一个匹配。定量符和它所定量的原子的匹配如下:
+.RS 2
+.TP 6
+\fB*\fR
+零个或多个这个原子的匹配的一个序列
+.TP
+\fB+\fR
+一个或多个这个原子的匹配的一个序列
+.TP
+\fB?\fR
+零个或一个这个原子的匹配的一个序列
+.TP
+\fB{\fIm\fB}\fR
+严格的 \fIm\fR 个这个原子的匹配的一个序列
+.TP
+\fB{\fIm\fB,}\fR
+\fIm\fR 或更多个这个原子的匹配的一个序列
+.TP
+\fB{\fIm\fB,\fIn\fB}\fR
+从 \fIm\fR 到 \fIn\fR (包括二者)个这个原子的匹配的一个序列；\fIm\fR 不能超过 \fIn\fR
+.TP
+\fB*?  +?  ??  {\fIm\fB}?  {\fIm\fB,}?  {\fIm\fB,\fIn\fB}?\fR
+不贪婪的 (\fInon-greedy\fR) 定量符，它匹配与上面相同的可能性，但偏好最小字符数而不是最大字符数的匹配(参见MATCHING 匹配)。
+.RE
+.PP
+使用 \fB{\fR 和 \fB}\fR 的形式叫做\fB束缚\fR(bound)。数 \fIm\fR 和 \fIn\fR 是无符号十进制整数，允许的值从 0 到 255(包括0 及 255)。
+.PP
+\fB原子\fR是下列之一:
+.RS 2
+.TP 6
+\fB(\fIre\fB)\fR
+(这里的 \fIre\fR 是任何正则表达式) 匹配对 \fIre \fR的一个匹配，为可能的报告而记录(最长和最短的)匹配
+
+译注：使用圆括号来组合原子。例如，ab*     被识别为原子 a 和原子 b 的闭包 b* 的串联 a(b)*，而不是原子  a 和原子 b 的串联 ab 的闭包 (ab)*。捕获的意思是把在圆括号中的子表达式所匹配的字符序列保存下来，由后续的后引用去使用。
+.TP
+\fB(?:\fIre\fB)\fR
+同上，但不报告(设置为“非捕获”的圆括号)
+.TP
+\fB()\fR
+匹配一个空串，为可能的报告而记录(匹配)
+.TP
+\fB(?:)\fR
+匹配一个空串，不报告
+.TP
+\fB[\fIchars\fB]\fR
+一个方括号表达式 (\fIbracket expression\fR) ，匹配 \fBchars\fR 中的任何一个字符(详情参见 BRACKET EXPRESSIONS 方括号表达式)
+.TP
+ \fB.\fR
+匹配任何单一字符
+.TP
+\fB\e\fIk\fR
+(这里的 \fIk\fR 是一个非 alphanumeric (字母或数字)字符)，匹配被接受为普通字符的这个字符，例如，\e\e 匹配一个反斜杠字符
+.TP
+\fB\e\fIc\fR
+(这里的 \fIc\fR 是一个 alphanumeric 字符(可能跟随着其他字符))，一个\fB转义 (escape)\fR(专属 ARE)，参见后面的ESCAPES 转义)
+.TP
+\fB{\fR
+当跟随着不是数字的一个字符的时候，匹配左花括号字符`\fB{\fR'；在跟随着一个数字的时候，它是一个\fB束缚\fR的开始(参见前面)
+.TP
+\fIx\fR
+这里 \fIx\fR 是没有其他意义的一个单一字符，匹配这个字符。
+.RE
+.PP
+\fB约束\fR (constraint) 在指定条件满足的时候匹配一个空串。一个约束不能跟随一个定量符。简单的约束如下；其他的在以后的 ESCAPES 转义 章节中介绍。
+
+译注：约束的术语叫锚定
+.RS 2
+.TP 8
+\fB^\fR
+匹配一行的开始
+.TP
+\fB$\fR
+匹配一行的结束
+.TP
+\fB(?=\fIre\fB)\fR
+\fB正前行\fR(positive lookahead) (专属 ARE)，匹配任何与 \fIre\fR 相匹配的子串的开始端点
+.TP
+\fB(?!\fIre\fB)\fR
+\fB负前行\fR(negative lookahead) (专属 ARE)，匹配任何不与 \fIre\fR 相匹配的子串的开始端点
+.RE
+.PP
+前行约束不能包括后引用(参见后面)，并且其中的所有圆括号被认为是非捕获的。
+.PP
+一个 RE 不能结束于`\fB\e\fR'.
+
+.SH "方括号表达式 BRACKET EXPRESSIONS"
+一个方括号表达式是一个在`\fB[\|]\fR'中包围的一个列表。它通常匹配列表中的任意一个单一字符(参见后面)。如果这个列表以“\fB^\fR”为开始，它匹配不属于这个列表剩余部分的任意一个单一字符(参见后面)。
+.PP
+如果在这个列表中的两个字符被`\fB\-\fR'分割，这是在归并序列(collating sequence)中这两个字符之间(包括二者)的字符的完整范围的简写，例如，\fB[0\-9]\fR 在 ASCII 中匹配任何十进制数字。两个范围不能共享同一个端点，比如 \fBa\-c\-e\fR 是非法的。范围是很依赖于整理序列的，可移植程序应该避免依靠它们。
+.PP
+译注：\fB整理元素\fR \-\- 用来确定字符或宽字符字符串的逻辑次序的最小实体。一个整理元素的组成要么是一个单一字符，要么是被整理为一个实体的两个或更多字符。由当前地域(locale)中的 LC_COLLATE 类属的值确定整理元素的当前设置。
+.PP
+译注：\fB整理序列\fR \-\- 当前地域中的 LC_COLLATE 类属的设置确定 整理元素的相对次序。这个字符次序定义所有整理元素的相对位置，在这个次序中每个元素都占有一个唯一的位置。
+.PP
+要在这个列表中包括一个文字的
+\fB]\fR
+或者
+\fB\-\fR
+，最简单的方法是把它包围在
+\fB[.\fR 和 \fB.]\fR
+中使它成为一个整理元素(见后)。可替代的，使它成为第一个字符(跟随在可能的‘\fB^\fR’的后面)，或(专属 ARE) 加以 ‘\fB\\fR’先导。可选的，对于‘\fB\-\fR’，使它成为最后的字符，或一个范围的第二端点。要使用一个文字 \fB\-\fR 作为一个范围的开始端点，可以使它成为一个整理元素或(专属 ARE) 加以‘\fB\e\fR’先导。除了这些例外、一些使用 \fB[\fR (参见下段)的组合、和转义，在一个方括号表达式中的所有其他特殊字符失去其特殊意义。
+.PP
+在一个方括号表达式当中，在 \fB[.\fR 和 \fB.]\fR 当中包围一个\fB归并元素\fR(collating element)(一个字符、一个多字符序列被整理为如同一个单一字符，或给二者的一个整理序列名字)表示这个整理元素的一个字符序列。这个序列是这个方括号表达式列表中的一个单一元素。在有多字符整理元素的地域中，一个方括号表达式可以匹配多于一个字符。
+.VS 8.2
+所以(潜藏的)，即使在方括号表达式中未出现多字符整理元素，以 \fB^\fR 为开始的一个方括号表达式仍可以匹配多字符整理元素! (注意：Tcl 目前没有多字符整理元素。这些信息只是用来解释概念。)
+.PP
+例如，假定整理序列包含一个 \fBch\fR 多字符整理元素，则 RE \fB[[.ch.]]*c\fR (后面跟随着 \fBc\fP的零或多个 \fBch\fP) 匹配`\fBchchcc\fR'的最先的5个字符。还有 \fB[^c]b\fR 匹配整个`\fBchb\fR'(因为 \fB[^c]\fR 匹配多字符 \fBch\fR)。
+.VE 8.2
+.PP
+在一个方括号表达式中，在 \fB[=\fR 和 \fB=]\fR 当中包含的一个整理元素是一个equivalence class 等价类，表示等价于这个整理元素的所有整理元素的字符序列，包括它自身。(如果没有其他等价的整理元素，与在分界符`\fB[.\fR'\&和`\fB.]\fR'中包含一样对待。) 例如，如果 \fBo\fR 和\fB\o'o^'\fR 是一个等价类的成员，则`\fB[[=o=]]\fR'、`\fB[[=\o'o^'=]]\fR'、和`\fB[o\o'o^']\fR'\&都是同义词。一个等价类不能是一个范围的端点。
+.VS 8.2
+(注意：Tcl 目前只实现了 Unicode 地域。它不定义任何等价类。上面的例子只是用来解释概念。)
+.VE 8.2
+.PP
+在一个方括号表达式中，在 \fB[:\fR 和 \fB:]\fR 中包含的一个\fIcharacter class\fR 字符类 的名字表示属于这个类的所有字符的列表(不是所有整理元素!)。标准字符类有:
+.PP
+.RS
+.ne 5
+.nf
+.ta 3c
+\fBalpha\fR	一个字母
+\fBupper\fR	一个大写字母
+\fBlower\fR	一个小写字母 
+\fBdigit\fR	一个十进制数字
+\fBxdigit\fR	一个十六进制数字
+\fBalnum\fR	一个 alphanumeric (字母或数字)
+\fBprint\fR	一个 alphanumeric (同于 alnum)
+\fBblank\fR	一个空格或 tab 字符
+\fBspace\fR	在显示的文本中产生白空格的一个字符 
+\fBpunct\fR	一个标点字符
+\fBgraph\fR	有图形表示的一个字符
+\fBcntrl\fR	一个控制字符
+.fi
+.RE
+.PP
+一个地域可以提供其他的字符类。
+.VS 8.2
+(注意：Tcl 目前只实现了一个地域：Unicode 地域。) 
+.VE 8.2
+一个字符类不能用做一个范围的端点。
+.PP
+方括号表达式有两个特殊情况: 方括号表达式
+\fB[[:<:]]\fR
+和
+\fB[[:>:]]\fR
+是约束，分别匹配在一个字开始处和结束处的空串。定义一个字为既没有前导的又没有尾随的单词字符的单词字符的一个序列。一个单词字符是一个 \fBalnum \fR字符或一个下划线(\fB_\fR)。这些特殊的方括号表达式已被淘汰；ARE 用户应当转而使用约束转义(见后)。
+.SH "转义 ESCAPES"
+转义(专属 ARE)，它以
+\fB\e\fR
+为开始后面跟随着一个字母字符，存在一些变体: 字符录入(entry)、类简写、约束转义、和后引用。在 ARE 中，跟随着一个 alphanumeric 字符但不约束一个有效转义的
+\fB\e\fR
+是非法的。在 ERE 中，没有转义: 在方括号表达式外部，跟随着一个 alphanumeric 字符的一个
+\fB\e\fR
+仅表示这个字符为一个普通字符，而在一个方括号表达式内部，
+\fB\e\fR
+是一个普通字符。(后者是在 ERE 和 ARE 之间的一个实际上的不兼容。)
+.PP
+字符录入转义 (Character-entry escapes) (专属 ARE) 的存在简便了在 RE 中指定一个非打印和其他非常规字符:
+.RS 2
+.TP 5
+\fB\ea\fR
+警报(震铃)字符，如同 C 语言
+.TP
+\fB\eb\fR
+退格，如同 C 语言
+.TP
+\fB\eB\fR
+\fB\e\fR 的同义词，在有多层反斜杠处理的一些应用中用来减少双反斜杠
+.TP
+\fB\ec\fIX\fR
+(这里的 X 是任何字符) 字符的低端5位与 \fIX \fR的低端5位相同，而其他位全是零
+.TP
+\fB\ee\fR
+其整理序列名字是‘\fBESC\fR’的字符，如果尝试失败，这个字符有八进制值 033
+.TP
+\fB\ef\fR
+换页，如同 C 语言
+.TP
+\fB\en\fR
+换行，如同 C 语言
+.TP
+\fB\er\fR
+回车，如同 C 语言
+.TP
+\fB\et\fR
+水平 tab，如同 C 语言
+.TP
+\fB\eu\fIwxyz\fR
+(这里的 \fIwxyz\fR 是严格的四个十六进制数字) 在本地字节次序中的 Unicode 字符 \fBU+\fIwxyz\fR
+.TP
+\fB\eU\fIstuvwxyz\fR
+(这里的 \fIstuvwxyz\fR 是严格的八个十六进制数字)     保留给假定的某种扩展到32位的 Unicode
+.TP
+\fB\ev\fR
+垂直 tab，如同 C 语言
+.TP
+\fB\ex\fIhhh\fR
+(这里的 \fIhhh\fR 是十六进制数字的任意序列) 其十六进制值为 \fB0x\fIhhh\fR 的字符(不管使用了多少十六进制数字它都是一个单一字符)。
+.TP
+\fB\e0\fR
+其值为 \fB0 \fR的字符
+.TP
+\fB\e\fIxy\fR
+(这里的 \fIxy\fR 是严格的两个八进制数字，并且不是一个\fB后引用\fR(参见后面)) 其八进制值为\fB0\fIxy\fR 的字符
+.TP
+\fB\e\fIxyz\fR
+(这里的 \fIxyz\fR 是严格的两个八进制数字，并且不是一个\fB后引用\fR(参见后面)) 其八进制值为 \fB0\fIxyz\fR的字符
+.RE
+.PP
+十六进制数字是 `\fB0\fR'-`\fB9\fR', `\fBa\fR'-`\fBf\fR',
+和`\fBA\fR'-`\fBF\fR'.
+八进制数字是 `\fB0\fR'-`\fB7\fR'.
+.PP
+字符录入转义总是被接受为普通字符。例如，
+\fB\e135\fR
+是ASCII中的
+\fB]\fR
+而
+\fB\e135\fR
+不终结一个方括号表达式。但是要小心，一些应用(例如 C 编译器)在正则表达式包得到它们之前要自己解释这些序列，这可能就要求写两次(四次 (quadrupling)，等等) `\fB\e\fR'。
+.PP
+类简写转义 Class-shorthand escapes (专属 ARE) 为特定的通用字符类提供简写:
+.RS 2
+.TP 10
+\fB\ed\fR
+\fB[[:digit:]]\fR
+.TP
+\fB\es\fR
+\fB[[:space:]]\fR
+.TP
+\fB\ew\fR
+\fB[[:alnum:]_]\fR
+(注意有下划线)
+.TP
+\fB\eD\fR
+\fB[^[:digit:]]\fR
+.TP
+\fB\eS\fR
+\fB[^[:space:]]\fR
+.TP
+\fB\eW\fR
+\fB[^[:alnum:]_]\fR
+(注意有下划线)
+.RE
+.PP
+W在方括号表达式中，没有外面的方括号的`\fB\ed\fR', `\fB\es\fR',
+和 `\fB\ew\fR'\&
+，还有
+`\fB\eD\fR', `\fB\eS\fR',
+和 `\fB\eW\fR'\&
+都是非法的。
+.VS 8.2
+(所以，等价于\fB[a-c[:digit:]]\fR 的 \fB[a-c\ed]\fR 和等价于 \fB[a-c^[:digit:]]\fR 的\fB[a-c\eD]\fR 是非法的)
+.VE 8.2
+.PP
+约束转义 constraint escape (AREs only) 是如果指定条件满足则匹配空串的一个约束，它被写成一个转义:
+.RS 2
+.TP 6
+\fB\eA\fR
+只在字符串开始处匹配(与 `\fB^\fR'的不同之处请参见下面的 MATCHING 章节)
+.TP
+\fB\em\fR
+只在一个字开始处匹配
+.TP
+\fB\eM\fR
+在一个字的结束处匹配
+.TP
+\fB\ey\fR
+只在一个字的开始处或结束处匹配
+.TP
+\fB\eY\fR
+只在一个字的不是开始处或结束处的某点上匹配
+.TP
+\fB\eZ\fR
+只在一个字符串的结束处匹配(与 `\fB$\fR'的不同之处请参见下面的 MATCHING 章节)
+.TP
+\fB\e\fIm\fR
+(这里的 \fIm\fR 是一个非零数字)一个\fIback reference\fR 后引用， 参见后面
+.TP
+\fB\e\fImnn\fR
+(这里的 \fIm\fR 是一个非零数字，而 \fInn\fR 是一些更多的数字，并且十进制值 \fImnn\fR 不大于目前为止闭合的捕获圆括号的数目) 一个\fB后引用\fR，参见下面　
+.RE
+.PP
+同于上面规定的
+\fB[[:<:]]\fR
+和 
+\fB[[:>:]]\fR
+，字定义为既没有前导的又没有尾随的单词字符的一个序列。
+一个单词字符是一个 \fBalnum \fR字符或一个下划线(\fB_\fR)。
+在方括号表达式中，约束转义是非法的。
+.PP
+一个\fB后引用\fR(专属 ARE) 匹配的字符串与用数字指定的在圆括号中的子表达式所匹配的字符串相同，所以(例如) \fB([bc])\e1\fR 匹配 \fBbb\fR 或 \fBcc\fR 而不是 ‘\fBbc\fR’。在 RE 中，子表达式必须全部在后引用的前面。以前导的圆括号(左圆括号)的次序给子表达式编号。非捕获圆括号不定义子表达式。
+.PP
+译注：后引用是原属 BRE 的特征，ERE 无此特征。例如，表达式 ^(.*)\e1$ 匹配由同一个字符串的两个毗连的出现组成的一行，而表达式 (a)*\e1 不匹配 a。(a)(b)\e1 匹配 aba，(a)(b)\e2 匹配 abb，(a(b))\e1 匹配 abab，(a(b))\e2 匹配abb。(a)\e1 等价于 a{2,2}。
+.PP
+在八进制字符录入转义和后引用之间有一个历史遗留的二义性，只能象上面提示的那样用启发式的方法来解决。一个前导的零总是指示一个八进制转义。一个单一的非零数字，不跟随着其他数字，总是接受为一个后引用。不以一个零为开始的一个多数字序列如果在一个合适的子表达式后面，则被接受为一个后引用 (比如给出的后引用的序号在合法范围内)，否则被接受为一个八进制转义。
+.SH "元语法 METASYNTAX"
+除了上面描述的主要的语法之外，还可获得特殊形式和杂项的一些语法性的设施。
+.PP
+一般通过应用相关的方式指定使用的 RE 的风格。但是，可以用\fB指示符\fR(\fIdirector\fR)来屏弃它们。如果某种风格的一个 RE 以‘\fB***:\fR’为开始，则 RE 的剩余部分是一个 ARE。如果某种风格的一个 RE 以‘\fB***=\fR’为开始，则 RE 的剩余部分被接受为一个文字串，并且其中的所有字符被认为是普通字符。
+.PP
+一个 ARE 可以以\fIembedded options\fR 嵌入选项为开始: 
+一个序列
+\fB(?\fIxyz\fB)\fR
+(这里的
+\fIxyz\fR
+是一个或更多的字母字符) 指定影响 RE 剩余部分的选项。它们提供和屏弃由应用指定的任何选项。可获得的选项字母有:
+.RS 2
+.TP 3
+\fBb\fR
+RE 的剩余部分是一个 BRE
+.TP 3
+\fBc\fR
+大小写敏感 (通常是缺省的)
+.TP 3
+\fBe\fR
+RE 的剩余部分是一个 ERE
+.TP 3
+\fBi\fR
+大小写不敏感 (参见下面的 MATCHING 匹配)
+.TP 3
+\fBm\fR
+历史上的 \fBn \fR的同义词
+.TP 3
+\fBn\fR
+换行敏感匹配 (参见下面的 MATCHING 匹配)
+.TP 3
+\fBp\fR
+部分换行敏感匹配 (参见下面的 MATCHING 匹配)
+.TP 3
+\fBq\fR
+RE 的剩余部分是一个文字 (被引用起来的 ``quoted'')字符串，都是普通字符
+.TP 3
+\fBs\fR
+非换行敏感匹配 (通常是缺省的)
+.TP 3
+\fBt\fR
+紧凑语法 (通常是缺省的；参见后面)
+.TP 3
+\fBw\fR
+反向部分换行敏感 (离奇的 ``weird'') 匹配 (参见下面的 MATCHING 匹配)
+.TP 3
+\fBx\fR
+展开语法 (参见后面)
+.RE
+.PP
+嵌入选项影响的序列被
+\fB)\fR
+终结。它们只在一个 ARE 的开始处有效，此后不可以在其中使用。
+.PP
+除了通常的(紧凑) RE 语法，其中所有字符都有意义，还有一个展开语法，在所有风格的 RE 中都可以使用 \fB-expanded\fR 开关来获得它，或者在 ARE 中使用嵌入的 x 选项。在展开语法中，忽略白空格和在 \fB#\fR 和随后的换行(或 RE 结束)之间的所有字符，这就允许了在一个复杂的 RE 中进行分段和注释。有对这些基本规则的三个例外:
+.RS 2
+.PP
+保留有前导`\fB\e\fR'的白空格或 `\fB#\fR'
+.PP
+保留在方括号表达式中的白空格或 `\fB#\fR' 
+.PP
+在多字符符号如 ARE `\fB(?:\fR' 或 `\fB\e(\fR' 中间的白空格或注释是非法的
+.RE
+.PP
+展开语法中的白空格是 blank、tab
+.VS 8.2
+、和属于空格字符类的任何字符。
+.VE 8.2
+.PP
+最后，在 ARE 中，在方括号表达式外面，序列 `\fB(?#\fIttt\fB)\fR'
+(这里的
+\fIttt\fR
+是不包含 `\fB)\fR' 的任何文本)
+是一个注释，它将被完全忽略。同样，不允许它在多字符符号如 `\fB(?:\fR'中间的出现。这种注释是历史产物而不是很有用的设施，它的使用被淘汰了；应使用展开语法来替代。
+.PP
+如果应用(或一个启始的 \fB***=\fR 指示符)指定用户的输入被作为一个文字串而不是一个 RE 来对待，则不能获得这些元语法扩展。
+.SH "匹配 MATCHING"
+译注：下述引自 XBD RE 规定中的匹配定义，略有变更。
+.PP
+译注：零个或多个字符的一个序列被称为与 RE 匹配的条件是在这个序列中的字符对应于这个模式定义的一个字符序列。
+.PP
+译注：对一个匹配的序列的查找开始于一个字符串的开始处，停止于找到第一个匹配字符串的时候，这里定义\fB第一个\fR的意思为“字符串中最早开始的”。如果模式允许匹配的字符有可变的数目，因此在这个点开始的序列多于一个，则匹配最长的那个序列。例如: RE bb* 匹配 abbbc 中的第2到第4个字符，而 RE (wee|week)(knights|night) 匹配 weeknights 的所有10个字符。
+.PP
+译注：与整个匹配是最长的最左匹配相一致，从左到右的每个子模式，匹配最长的可能的字符串。为此，一个空串被认为比根本没有匹配长。例如，针对(against) abcdef 匹配 RE (.*).* ,子表达式 (\1) 是 abcdef，而针对 bc 匹配 RE (a*)*，子表达式 (\1) 是空串。
+.PP
+译注：通过向每个子表达式递归的提供最左最长匹配来确定什么(子)字符串对应于子表达式是可能的，而附带条件是整体匹配是最左的、最长的。例如，针对acdacaaa 匹配 (ac*)c*d[ac]*\1 匹配出 acdacaaa (这里 \1=a)； 而简单的给 (ac*) 匹配最长的将生成 \1=ac，但整体匹配将变小 (acdac)。概念上，实现必须检查每种可能的匹配，并在生成的最左最长的总体匹配中，为最左子表达式挑出一个最长的匹配(子串)并以此类推。注意，这意味着子表达式的匹配是上下文相关的: 在一个很大的 RE 中的一个子表达式所匹配的字符串可能与它作为一个独立的 RE 时不同，还有，即使在类似的字符序列中，在同一个很大的 RE 中的同一个子表达式的两个实例可能匹配不同的长度。例如，在 RE (a.*b)(a.*b) 中，两个完全相同的子表达式将分别的匹配 accbaccccb 的四个和六个字符。
+.PP
+如果一个 RE 能匹配一个给定字符串中的多于一个的子串，RE 匹配在这个字符串中最先开始的子串。如果 RE能匹配的在这一点上开始的子串多于一个，它的选择决定于它的\fB偏好\fR(preference): 要么是最长的子串，要么是最短的子串。
+.PP
+多数原子和所有约束，都没有偏好。一个有圆括号的 RE 与 RE 有相同的偏好(有可能没有)。一个有
+\fB{\fIm\fB}\fR
+或
+\fB{\fIm\fB}?\fR
+定量符的定量原子与原子自身有相同的偏好(有可能没有)。一个有其他平常的定量符的定量原子(包括在 
+\fB{\fIm\fB,\fIn\fB}\fR
+中
+\fIm\fR
+等于
+\fIn\fR)
+偏好最长的匹配。一个有不贪婪定量符的定量原子(包括在 
+\fB{\fIm\fB,\fIn\fB}?\fR
+中
+\fIm\fR
+等于
+\fIn\fR
+的情况)
+偏好最短的匹配。一个分支与在它的里面的第一个定量原子有相同的偏好。用 \fB|\fR 操作符连接起来的一个由两个或多个分支组成的 RE 偏好最长的匹配。
+.PP
+取决于匹配整个 RE 的规则所强加的约束，基于可能子串的表现，子表达式可以匹配最长或最短的可能子串，在 
+RE 中开始较早的子表达式优先于开始较晚的。注意，外部的子表达式优先于其中的构件子表达式。
+.PP
+注意，可以分别的使用定量符
+\fB{1,1}\fR
+和
+\fB{1,1}?\fR
+在子表达式或整个 RE 上强制最长和最短偏好。
+.PP
+用字符数而不是整理元素数来测量匹配长度。一个空串被当作比根本没有匹配长 ，例如
+\fBbb*\fR
+匹配 `\fBabbbc\fR'中间的三个字符，
+\fB(week|wee)(night|knights)\fR
+匹配 `\fBweeknights\fR'的所有10个字符，在针对(against)
+\fBabc\fR
+匹配 \fB(.*).*\fR 的时候圆括号中的子表达式匹配所有这三个字符，而在针对
+\fBbc\fR
+匹配 \fB(a*)*\fR 的时候整个 RE 和圆括号中子表达式都匹配一个空串。
+.PP
+如果指定了大小写无关匹配，效果如同所有字母的大小写区别都消失了。当存在大小写区别的一个字符在方括号表达式外面作为一个普通字符出现的时候，它被有效的转变成包含大小写二者的一个方括号表达式， 所以 \fBx\fR 变成了`\fB[xX]\fR'。当它出现在一个方括号表达式中，把它对应的所有大小写添加到方括号中，所以\fB[x]\fR 变成 \fB[xX]\fR而 \fB[^x]\fR 变成 `\fB[^xX]\fR'。
+.PP
+如果指定了换行敏感匹配，则 \fB.\fR 和使用 \fB^\fR 的方括号表达式永不匹配换行字符(所以除非 RE 显式安排，否则永不会跨越换行来进行匹配)，并且 \fB^\fR 和 \fB$\fR 除了分别匹配字符串的开始和结束之外，还分别的匹配在换行之后和之前的空串。ARE \fB\A\fR 和 \fB\Z\fR 继续\fB只\fR匹配字符串的开始和结束。
+.PP
+如果指定了部分换行敏感，这将致使 \fB.\fR 和方括号表达式成为换行敏感匹配，但不影响 \fB^\fR 和‘\fB$\fR’。
+.PP
+如果指定了反向部分换行敏感，这将致使 \fB^\fR 和 \fB$\fR 成为换行敏感匹配，但不影响 \fB.\fR 和方括号。这不是很有用，提供它只是为了对称。
+.SH "限制和兼容性 LIMITS AND COMPATIBILITY"
+对于 RE 的长度没有强加特定的限制。想要高度可移植的程序不应该依赖比 256 字节长的 RE，因为遵从 POSIX 的实现可能拒绝接受这样的 RE。
+.PP
+专属 ARE 并且实际上与 POSIX ERE 不相容的特征是在方括号表达式中的 \fB\e\fR 不失去它的特殊意义。所有其他 ARE 特征使用的语法在 POSIX ERE 中是非法的，或着有未定义或未指定的效果；指示符的 \fB***\fR 语法同样不属于 BRE 和 ERE 二者的 POSIX 语法。
+.PP
+许多 ARE 扩展取自 Perl，为了整理它们而进行了一些变更，还有一些 Perl 扩展未提供。要注意的不相容包括：‘\fB\eb\fR’、‘\fB\eB\fR’，缺乏对尾随的换行的特殊对待，为受换行敏感匹配影响的 RE 增加了方括号表达式补全，在先行约束中对圆括号和后引用的限制，和最长/最短匹配的匹配语义。
+.PP
+自从这个包的一个早期的 beta 测试版本做了变更以来，RE 的匹配的规则包含正常的和非贪婪的定量符二者。(新规则更加简单和清晰，而不在猜测用户的真实意图上费很大力气。)
+.PP
+Henry Spencer 的原始的 1986 \fIregexp\fR 包，仍被广泛的使用(例如，在 Tcl 8.1 之前的发行中)，它实现了今天的 ERE 的一个早期版本。在 \fIregexp \fR的近似 ERE (简写为 RRE)和 ARE 之间有四点不相容:　
+In roughly increasing order of significance:
+.PP
+.RS
+在 ARE 中，跟随着一个字母字符的 \fB\e\fR  要么是转义要么是一个错误，而在 RRE 中，它只是写字母的另一种方式。这不应该是一个问题，因为在  RRE 中没有理由写出这样的一个序列。
+.PP
+在 ARE 中跟随着一个数字的 \fB{\fR 是一个束缚的开始，而在 RRE 中，\fB{\fR 总是一个普通字符。这样的序列是少见的，并且经常导致一个错误，原因是随后的字符看起来不象一个有效的束缚。
+.PP
+在 ARE 中，在`\fB[\|]\fR'内 \fB\e\fR 保持是一个特殊字符，所以在`\fB[\|]\fR'内一个文字 \fB\e\fR 必须写成`\fB\e\e\fR'。在 RRE 中，在\fB[\|]\fR内 `\fB\e\e\fR' 也给出一个文字 \fB\e\fR，但只有真正的偏执狂程序员才例行公事的双写反斜杠。
+.PP
+ARE 为 RE 报告最长的和最短的匹配，而不是按指定的查找次序找到的第一个匹配。这可能影响寄希望于第一个匹配不被报告的一些 RRE。(废弃了为快速匹配而优化查找次序的 RRE 细致工艺(ARE 并行的检查所有可能的匹配，并且它们的性能在很大程度上不敏感于它们的复杂性)，而为故意的找寻非最长或最短的一个匹配而开发的查找次序需要重写。)
+.RE
+
+.SH "基本正则表达式 BASIC REGULAR EXPRESSIONS"
+BRE 在一些方面与 ERE 有所区别。 `\fB|\fR', `\fB+\fR',
+和
+\fB?\fR
+是普通字符并且没有与之等价的功能。用于束缚的分界符是
+\fB\e{\fR
+和 `\fB\e}\fR',
+而 
+\fB{\fR
+和
+\fB}\fR
+本身是普通字符。用于嵌套子表达式的圆括号是
+\fB\e(\fR
+和`\fB\e)\fR',
+而 
+\fB(\fR
+和
+\fB)\fR
+自身是普通字符。除了在 RE 或一个圆括号中的子表达式的开始处之外，
+\fB^\fR
+是一个普通字符，除了在 RE 或一个圆括号中的子表达式的结束处之外，
+\fB$\fR
+是一个普通字符，而在 RE 或一个圆括号中的子表达式的开始处之外出现的 
+\fB*\fR
+是一个普通字符(在可能的前导 `\fB^\fR' 之后)。最后，可获得单一数字的后引用， 
+\fB\e<\fR
+和
+\fB\e>\fR
+分别是
+\fB[[:<:]]\fR
+和
+\fB[[:>:]]\fR
+的同义词；没有其他可获得的转义。
+
+.SH "参见 SEE ALSO"
+RegExp(3), regexp(n), regsub(n), lsearch(n), switch(n), text(n)
+
+.SH "关键字 KEYWORDS"
+match, regular expression, string
+
+.SH "[中文版维护人]"
+.B 寒蝉退士
+.SH "[中文版最新更新]"
+.B 2001/10/26
+.SH "《中国 Linux 论坛 man 手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

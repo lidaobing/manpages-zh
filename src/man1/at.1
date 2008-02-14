@@ -1,0 +1,281 @@
+.TH AT 1 "Nov 1996" local "Linux Programmer's Manual"  
+.SH NAME
+at, batch, atq, atrm \- 排队、检查或删除以后要执行的作业。
+.SH 总览
+.B at
+.RB [-V]
+.RB [-q 
+.IR 队列]
+.RB [-f
+.IR 文件]
+.RB [-mldbv]
+.B 时间
+.B "at -c"
+.I 作业
+.RI [作业...]
+.B atq
+.RB [-V]
+.RB [-q
+.IR 队列]
+.RB [-v]
+.br
+.B atrm
+.RB [-V]
+.I 作业
+.RI [作业...]
+.br
+.B batch
+.RB [-V]
+.RB [-q
+.IR 队列]
+.RB [-f
+.IR 文件]
+.RB [-mv]
+.RB [时间]
+.SH 描述
+.B at
+和
+.B batch
+从标准输入或一个指定的文件读取命令，这些命令在以后
+某个时间用
+.BR /bin/sh
+执行。
+.TP 8
+.BR at
+在指定的时间执行命令。 
+.TP 8
+.BR atq
+列出用户的等待执行的作业；在用户是超级用户的情况下，列出所
+有人的作业。 
+.TP 8
+.BR atrm
+删除作业。
+.TP 8
+.BR batch
+在系统负载水平允许的时候执行命令；换句话说，当平均负
+载降到低于0.8，或降到了在 atrun 文件中指定的期望值时运行。
+译注：atrun 文件参见 atd 手册页。
+.PP
+.B At
+允许相当复杂的时间指定，它扩展了 POSIX.2 标准。它接受
+.B HH:MM
+的时间式样，用来指定在一天的某个时间运行一个作业。
+(如果时间已经过了则假定为第二天。)你可以指定
+.B midnight
+(午夜)、
+.B noon
+(中午) 或 
+.B teatime
+(下午4点)，你可以用
+.B AM
+或
+.B PM
+后缀指定一天的上午或下午。你可以给出
+.B month-name day
+加上可选
+的年份的式样用来指定运行 at 的日期，或者给出
+.B MMDDYY
+、
+.B MM/DD/YY
+或
+.B DD.MM.YY
+式样用来指定运行 at 的日期。日期的指定
+必须跟在时间指定的后面。你也可以给出象
+.B now \+
+.I 计数 时间单位
+的式样，这里的时间单位可以是
+.B minutes
+、
+.B hours
+、
+.B days
+或
+.B weeks，
+你可以给时间加一个
+.B today
+后缀来指定
+.B at
+今天运行作业，可以
+给时间加一个
+.B tomorrow
+后缀来指定
+.B at
+明天运行作业。
+.PP
+例如，要在三天以后的下午 4 点运行一个作业，at 时间参数可以
+指定为
+.B 4pm \+ 3 days。
+要在7月31日上午10:00运行一个作业，
+at 时间参数可以指定为
+.B 10am Jul 31，
+要在明天上午1点运行一个
+作业，at 时间参数可以指定为
+.B 1am tomorrow。
+.PP
+时间指定的精确的定义可以在
+.IR /usr/doc/at-3.1.7/timespec
+找到。
+.PP
+对于
+.BR at
+和
+.BR batch
+两者，从标准输入或以
+.B -f
+选项指定的文件中
+读取命令并执行之。工作路径、环境变量(除了
+.BR TERM、
+.BR DISPLAY
+和
+.BR _ )、
+umask 从所期望的时间起保持不变。从一个从执行
+.B su(1)
+命令得到的 
+shell 中调用的
+.B "at "\-
+或
+.B "batch "\-
+命令将保持当前的 userid。
+用户的命令的标准错误输出和标准输出将用邮件发给用户。发送邮件
+使用命令
+.BR /usr/sbin/sendmail。
+从一个从执行
+.B su(1)命令得到的 
+shell 中执行了
+.B at
+，登录 shell 的所有者将接到邮件。 
+译注：userid 是用户标识的意思。umask 是与每个进程相关联的文件
+方式创建屏蔽字。
+.PP
+超级用户可以在任何情况下使用这些命令。对于其他用户，使用 at
+的权限由文件
+.I /etc/at.allow
+和
+.I /etc/at.deny
+确定。
+.PP
+如果文件
+.I /etc/at.allow
+存在，在其中提及的用户名被允许使用
+.BR at
+命令。
+.PP
+如果
+.I /etc/at.allow
+不存在，而
+.I /etc/at.deny
+存在，所有在
+.I /etc/at.deny
+中未提及的用户被允许使用
+.BR at
+命令。
+.PP
+如果两者均不存在，只用超级用户可以使用
+.BR at
+命令。
+.PP
+一个空的
+.I /etc/at.deny
+意味着所有用户均被允许使用这些命令，
+这是缺省的配置。
+
+.SH 选项
+.TP 8
+.B -V 
+在标准错误上输出版本号。
+.TP 8
+.B -q queue
+使用指定的队列。一个队列用一个字母标定，有效的的队列标定的
+范围是从a到z和从A到Z。at 的缺省队列是 a,batch 的缺省队列是
+b。队列的字母顺序越高，则队列运行时越谦让(运行级别越低)。
+指定的队列 "=" 保留给当前运行的作业所在的队列。
+.P
+如果一个作业被提交到一个以大写字母标定的队列，则与提交到
+batch 同样对待。如果给
+.BR atq
+指定一个队列，则只显示在此指定
+队列中的作业。
+.TP 8
+.B -m
+当作业完成时即使没有输出也给用户发邮件。
+.TP 8
+.B -f file 
+从文件而不是标准输入中读取作业信息。
+.TP 8
+.B -l
+是
+.B atq
+的别名。
+.TP 8
+.B -d
+是
+.B atrm
+的别名。
+.TP 8
+.B -v
+对于
+.B atq，
+显示完整的在队列中未被删除的作业，对于其他
+命令，显示作业将要执行的时间。
+.P
+显示的时间的格式类似于"1997-02-20 14:50"，但如果设置了
+.B POSIXLY_CORRECT
+环境变量之后，格式类似于"Thu Feb 20 
+14:50:00 1996"。
+.TP 8
+.B -c
+连接命令行中列出的作业并输出到标准输出。
+
+.SH 相关文件
+.I /var/spool/at
+.br
+.I   /var/spool/at/spool
+.br
+.I   /proc/loadavg
+.br
+.I   /var/run/utmp
+.br
+.I   /etc/at.allow
+.br
+.I   /etc/at.deny
+.SH 参见
+cron(1), nice(1), sh(1), umask(2), atd(8)
+
+.SH 缺陷
+在 Linux 下正确的批处理操作依赖于挂装在/proc 上的一个
+.IR proc -
+类型的目录的存在。
+.PP
+如果文件
+.I /var/run/utmp
+不可获得或已经损坏，或者在
+.B at
+所期
+待的时间用户没有登录，向在环境变量
+.BR LOGNAME
+中找到的 userid
+发送邮件。如果
+.BR  LOGNAME 未定义或是空的，假定为当前的 userid。
+.PP
+当前实现的
+.B at
+和
+.B batch
+在用户竞争资源的时候是不适合的。
+如果你的站点是这种情况，你可以考虑其他的批处理系统，
+例如
+.BR nqs。
+.SH 著作者
+AT 大部分是由Thomas Koenig写的。ig25@rz.uni-karlsruhe.de.
+
+.SH "[中文版维护人]"
+.B mhss <jijingzhisheng@up369.com>
+.br
+主要参照了：
+.BR Linux 实用大全
+/ 陈向阳，方汉 编著. -北京：
+科学出版社，1998.8 
+.SH "[中文版最新更新]"
+.BR 2000/10/27 
+.SH "《中国linux论坛man手册页翻译计划》:"
+.BI http://cmpp.linuxforum.net

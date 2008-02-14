@@ -1,0 +1,2482 @@
+.\" Copyright (c) 1990, 1993
+.\"	The Regents of the University of California.  All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"
+.\" This tutorial sampler invokes every macro in the package several
+.\" times and is guaranteed to give a worst case performance
+.\" for an already extremely slow package.
+.\"
+.Dd December 30, 1993
+.Os
+.Dt MDOC.SAMPLES 7
+.Sh NAME (名字)
+.Nm mdoc.samples
+.Nd 用
+.Nm \-mdoc
+编写
+.Bx
+手册 的 示范教程
+.Sh SYNOPSIS (总览)
+.Nm man mdoc.samples
+.Sh DESCRIPTION (描述)
+这个 示范教程 用于 编写
+.Bx
+手册页 (manual page), 它 使用了
+.Nm \-mdoc
+宏定义包, 这是个
+.Em 基于内容
+和
+.Em 基于宏域 (domain Ns \-base)
+的 格式化包, 交由
+.Xr troff 1 
+处理. 它的 前身
+.Xr \-man 7
+包, 定义了 页面布局 (page layout), 但是 把 诸如 字体控制 和 其他 排版 细节 
+留给了 每一个 作者. 在
+.Nm \-mdoc 
+包里, 页面布局宏 构成了
+.Em "页结构宏域 (page structure domain)"
+它 由 标题, 小节首部, 显示 (displays) 和 列表 宏 组成. 这些 基本项目 影响
+正文 在 格式化页上 的 物理位置.
+作为 页结构宏域 的 补充, 这里 还 定义了 另外 两个 宏域, 手册宏域 和
+基本正文宏域. 基本正文宏域 定义了 一些 宏, 执行 例如 引文 或 文字强调 
+之类的任务.
+手册宏域 定义的宏 是 非正式 日常用语 的 子集, 用于 描述 命令, 例程
+和 相关的
+.Bx
+文件.
+手册宏域里 的 宏 用来处理 命令名, 命令行参数和选项, 函数名称, 函数参数,
+路径, 变量, 以及 到 其他手册页 的 参照 等.
+这些 域项 留有 为 作者 和 手册页的 未来用户 设置的 值.
+希望 从 手册集中 获得的 一致性 能够为 将来的 文档工具 提供 更简单的 转换.
+.Pp
+从 整个的
+.Ux
+手册页 上 来看, 每个 手册项
+可以 简单的 理解为 一个 man page, 不用 注意 它的 实际长度, 
+也没有 性别歧视 意图. (译注: 可能是双关语, man page...男人页)
+.Sh 开始 GETTING STARTED
+因为 人们 通常是 为了 能够 马上 使用 这些材料 的 时候 才 阅读 教程，所以 
+我们 假设 此文档的 用户 是 缺乏耐心的．下面 简述一下 这份文档 剩余部分 
+的 组织:
+.Bl -enum -offset indent
+.It
+.Tn "TROFF 特性"
+.Bl -tag -width flag -compact -offset indent
+.It "使用宏" .
+.It "参数中传递空白符" .
+.It "尾部的空白符" .
+.It "转义特殊字符" .
+.El
+.It
+.Tn "手册页的结构分析"
+.Bl -tag -width flag -compact -offset indent
+.It "手册页的模板" .
+.El
+.It
+.Tn "标题宏" .
+.It
+.Tn "手册宏域和基本正文宏域的介绍" .
+.Bl -tag -width flag -compact -offset indent
+.It "名称背后 ..." .
+.It "基本语法" .
+.El
+.It
+.Tn "手册宏域"
+.Bl -tag -width flag -compact -offset indent
+.It "地址" .
+.It "作者名字" .
+.It "参数" .
+.It "配置声明 (仅用于手册第四部分)" .
+.It "命令修饰" .
+.It "已定义的变量" .
+.It "Errno's (仅用于手册第二部分)" .
+.It "环境变量" .
+.It "函数参数" .
+.It "函数声明" .
+.It "标志 (Flags)" .
+.It "函数 (库例程)" .
+.It "函数类型" .
+.\" .It "头文件 Header File (源代码嵌入 including source code)" .
+.It "交互命令" .
+.It "名称" .
+.It "选项" .
+.It "路径" .
+.It "变量" .
+.It "参照" .
+.El
+.It
+.Tn "基本正文宏域"
+.Bl -tag -width flag -compact -offset indent
+.It "AT&T 宏" .
+.It "BSD 宏" .
+.It "FreeBSD 宏" .
+.It "UNIX 宏" .
+.It "嵌入/引用宏 (Enclosure/Quoting)"
+.Bl -tag -width flag -compact -offset indent
+.It "尖括弧引用/嵌入" .
+.It "方括弧引用/嵌入" .
+.It "双引号引用/嵌入宏" .
+.It "圆括弧引用/嵌入" .
+.It "单引号引用/嵌入" .
+.It "前缀宏" .
+.El
+.It "No\-Op 或正文宏" .
+.It "消除空白宏" .
+.It "手册节对照" .
+.It "参考和引用" .
+.It "返回值 (仅用于手册页第二和第三部分)"
+.It "Trade Names (缩略和类型名称)" .
+.It "参数扩展" .
+.El
+.It
+.Tn "页结构宏域"
+.Bl -tag -width flag -compact -offset indent
+.It "小节首部" .
+.It "段落和空行" .
+.It "保持 (Keeps)" .
+.It "显示" .
+.It "字体模式 (加重, 原文和 Symbolic)" .
+.It "列表和栏" .
+.El
+.It
+.Tn "预定义串"
+.It
+.Tn "诊断"
+.It
+.Tn "用 GROFF, TROFF 和 NROFF 格式化"
+.It
+.Tn "臭虫 BUGS"
+.El
+.ne 7
+.Sh TROFF 特性
+使用
+.Nm \-mdoc
+宏包 的 目的 是 简化 写手册页 的 过程. 理论上讲, 要使用
+.Nm \-mdoc
+不一定 要 学习
+.Xr troff 1
+的 腌脏细节; 然而, 有些 限制 无法回避, 最好 把它们 摆平.
+而且 你 应该 知道, 这个 宏包 的 速度 比较
+.Em 慢.
+.Ss 宏的用法 Macro Usage
+在
+.Xr troff 1 
+里, 宏调用的形式 是 在行首 以
+.Ql \&\.
+(句点符) 起始, 紧随其后 是 作为 宏名 的 两个字符. 参数 跟在 宏名 之后,
+用 空格符 隔开. 这个 位于行首的 句点符 使
+.Xr troff 1
+把 紧随其后 的 两个字符 视作 宏名. 在 某些情况下 要把
+.Ql \&\.
+(句点符) 放在 行首, 但不希望 被理解成 宏请求, 方法是 在
+.Ql \&\.
+(句点) 前 使用
+.Ql \e&
+转义序列.
+.Ql \e&
+被 解释成 一段 长度为零 的 空白, 所以 不会 在 输出端 显示 出来.
+.Pp
+一般说来,
+.Xr troff 1
+宏 最多 接受 九个参数, 忽略掉 其余的. 大多数 在
+.Nm \-mdoc
+里的 宏 支持 九个参数, 某些场合 可以 续加 参数, 或扩展到 下一行. (见
+.Sx 扩展 Extensions ) .
+有些宏 能够 处理 引号 引起来的 参数 (见 下面的
+.Sx 在参数中传递空格符 ) .
+.Pp
+大多数
+.Nm \-mdoc
+的 基本正文宏域 和 手册宏域 的宏 拥有 一种特性, 表现在 把 参数列表 当成
+可调用的宏 
+.Em 分析 (解释) .
+这意味着 如果 参数列表里的参数 是 普通正文宏域 或 手册宏域
+里的 宏, 并且 是 可调用宏, 那么 处理的时候 会 执行 或 调用.
+这种情况下的 参数, 即 宏名, 不需要 用
+.Ql \&\.
+(句点符) 引导.
+这种风格 使 很多 宏 嵌套 在 一起; 例如 这个 选项宏
+.Ql \&.Op ,
+可能
+.Em 调用
+标志和参数宏,
+.Ql \&Fl
+和
+.Ql \&Ar ,
+用来 说明 一个 带参数的 选项:
+.Bl -tag -width "\&.Op \&Fl s \&Ar bytes" -offset indent
+.It Op Fl s Ar bytes
+来自
+.Li \&.Op \&Fl s \&Ar bytes
+.El
+.Pp
+为了 防止 把 两个字符的字符串 解释成 宏名, 在这个 字符串 前面 加上
+.Ql \e& 
+转义序列:
+.Bl -tag -width "\&.Op \&Fl s \&Ar bytes" -offset indent
+.It Op \&Fl s \&Ar bytes
+来自
+.Li \&.Op \e&Fl s \e&Ar bytes
+.El
+.Pp
+这里的 字符串
+.Ql \&Fl
+和
+.Ql \&Ar
+没有 被解释成 宏.
+在 这篇文档 和 相应的 快速参考手册
+.Xr mdoc 7
+中, 参数列表 按 可调用参数 分析 的 宏 称为 已分析, 可以 从 参数列表
+调用 的 宏 称为 可调用.
+这里 用的 术语 '分析' 可能是个 技术失误, 几乎 所有的
+.Nm \-mdoc
+宏 都 被分析, 既 用它 指 可调用宏, 又 指 有 调用 其他宏的 能力, 显得 很笨拙.
+.Ss 在参数中传递空格符 Passing Space Characters in an Argument
+某些时候 我们 希望 能够 把 含有 一个或多个 空格符 的 字符串 作为 单个参数
+传递. 如果 要 突破 九个参数的限制, 或者 传递给 宏 的 参数 需要 一些 特定布置, 
+这个 能力 是必须的. 例如, 函数宏
+.Ql \&.Fn
+的 第一个参数 是 函数名称, 剩下的参数 作为 函数的参数.
+.Tn "ANSI C"
+规定 函数的参数 在 圆括弧内 声明, 每个 参数 至少 由 两个 标示符 组成.
+例如,
+.Fa int foo .
+.Pp
+有 两个方法 传递 嵌有空格符 的 参数.
+.Em 补充一点 :
+不幸的是, 在
+.Tn AT&T
+.Xr troff 
+中, 那个 最容易的方法, 就是 作为 单个 参数 传递 两个引号之间的 
+字符串和空格符, 非常 消耗 时间 和 内存空间.
+虽然 它 对
+.Xr groff
+并不费事, 但是 为了 可移植性, 这种 做法 只限于 下列 有迫切需要 的 宏:
+.Pp
+.Bl -tag -width 4n -offset indent -compact
+.It Li \&Cd
+配置声明 (手册第四部分
+.Sx 概要 SYNOPSIS )
+.It Li \&Bl
+列表开始 (指定宽度的)
+.It Li \&Em
+加重文字
+.It Li \&Fn
+函数 (手册第二, 四部分)
+.It Li \&It
+列表项
+.It Li \&Li
+原文
+.It Li \&Sy
+Symbolic text
+.It Li \&%B
+书题
+.It Li \&%J
+期刊名
+.It Li \&%O
+参考选注
+.It Li \&%R
+报告题目(在参考文件中)
+.It Li \&%T
+在书籍或期刊中的题目
+.El
+.Pp
+一种 传递 含空格符字符串 的 方法 是 用
+.Ql \e\  
+硬编码 或 不可填充空格符, 也就是 在 空格符 前 加上 转义符
+.Ql \e .
+这个 方法 适用于 任何宏, 但 有个 副效应, 它 干扰了 对 长行 的 调整.
+.Xr Troff
+把 这种 硬编码的 空格符 看作 可显示字符, 因此 无法 在需要的时候 把 字符串
+分段 或 换行. 这种 方法 适用于 字符串 不会 到达 行边界 时, 例如:
+.Bl -tag -width "fetch(char *str)" -offset indent
+.It Fn fetch char\ *str
+来自
+.Ql \&.Fn fetch char\e *str
+.It Fn fetch "char *str"
+也可以来自
+.Ql \&.Fn fetch "\\*qchar *str\\*q"
+.El
+.Pp
+如果 忽略
+.Ql \e
+或 引号,
+.Ql \&.Fn
+宏 会认为 有 三个参数, 结果 成为:
+.Pp
+.Dl Fn fetch char *str
+.Pp
+如果 想知道 参数列表 到达 行边界 时 出现什么, 参看
+.Sx BUGS
+小节.
+.Ss 尾部的空白符 Trailing Blank Space Characters
+.Xr Troff
+可能 被 行尾的 空白符 搞乱, 它的防范规则 是 消除 所有 位于行末 的 空白符. 
+如果 坚持 在 行末 加上 空白符, 可以 用 硬空格符 和
+.Ql \e&
+转义字符. 例如,
+.Ql string\e\ \e& .
+.Ss 转义特殊字符 Escaping Special Characters
+特殊字符, 如 换行符
+.Ql \en ,
+是 通过 用
+.Ql \ee
+替换
+.Ql \e
+(e.g.例如
+.Ql \een )
+保留住 反斜杠.
+.Sh "手册页结构分析 THE ANATOMY OF A MAN PAGE"
+手册页 可以 很容易的 通过 模板 构建, 模板 放在
+.Pa /usr/share/misc/mdoc.template . 
+另外 在
+.Pa /usr/share/examples/mdoc
+目录下 有一些 手册页 的 例子.
+.Pp
+.Ss 手册页的模板 A manual page template
+.Bd -literal -offset indent
+\&.\e" 所有的手册页都要求有下面的内容
+\&.Dd 月 日, 年Month day, year
+\&.Os 操作系统 [版本/发行号] 
+\&.Dt 文档标题 [手册节号][卷] 
+\&.Sh 名称 NAME
+\&.Nm 名称 name
+\&.Nd 对名称的简单描述 one line description of name
+\&.Sh 总览 SYNOPSIS
+\&.Sh 描述 DESCRIPTION
+\&.\e" 后面的内容取消注释后可以用在你需要的任何地方.
+\&.\e" 紧接着的这条命令用于手册第二和第三部分, 函数的返回值.
+\&.\e" .Sh 返回值 RETURN VALUES
+\&.\e" 下面的命令用于手册第1, 6, 7, 8部分.
+\&.\e" .Sh 环境 ENVIRONMENT
+\&.\e" .Sh 文件 FILES
+\&.\e" .Sh 示例 EXAMPLES
+\&.\e" 下面的命令用于手册第1, 6, 7, 8部分
+\&.\e"     (在shell下的命令返回值和标准错误类型的诊断)
+\&.\e" .Sh 诊断 DIAGNOSTICS
+\&.\e" 下面的命令用于手册第二和第三部分中的错误和信号处理.
+\&.\e" .Sh 错误 ERRORS
+\&.\e" .Sh 另见 SEE ALSO
+\&.\e" .Sh 遵循 CONFORMING TO
+\&.\e" .Sh 历史 HISTORY
+\&.\e" .Sh 作者 AUTHORS
+\&.\e" .Sh BUGS
+.Ed
+.Pp
+模板中 的 第一个部分 是
+.Pq Li \&.Dd , \&.Os , \&.Dt 
+宏; 文档日期, 手册或其内容 针对的 操作系统, 手册页的标题
+.Pq Em (大写)
+和 该手册页 所属的节 (部分号).
+这些宏 确认和标识了 这个手册页. 在 后面的
+.Sx 标题宏 TITLE MACROS
+将 继续 讨论.
+.Pp
+这个 模板中 的 其余部分 是 小节首部 (section header)
+.Pq Li \&.Sh ;
+其中
+.Sx 名称 NAME ,
+.Sx 总览 SYNOPSIS
+和
+.Sx 描述 DESCRIPTION
+是 必不可少的.
+这些 首部 在
+.Sx 页结构宏域
+中 讨论 ( 介绍完
+.Sx 手册域
+之后 ) .
+有一些 内容宏 被用来 示范 页面布局宏; 建议 接触 页面布局宏 前 先看看 内容宏.
+.Sh 标题宏 TITLE MACROS
+标题宏 是 页结构宏域 的 第一部分, 但 在 过去, 人们 如果 编写 手册页, 
+它 是 手册的 第一部分, 也是 独立部分. 这里 设计了 三个宏 分别 描述
+文档标题 或 手册标题, 操作系统, 和 制作日期. 它们 放在 文档的 最前面, 
+一次 只 调用 一个, 用来 构建 文档的 页头 和 页脚.
+.Bl -tag -width 6n
+.It Li \&.Dt 文档标题 手册区# [卷]
+文档标题 是 手册页的 主题, 由于 troff 的 限制, 必须
+.Tn 大写 .
+手册节号 (部分号) 介于 1,\ ...,\ 8, 如果 指明了 手册节号, 可以 忽略 卷标.
+卷标 用 下列 标识的 一个 或 任意个:
+.\" .Cl
+.\" USD	UNIX 用户增补文档 User's Supplementary Documents
+.\" .Cl
+.\" PS1	UNIX 程序员增补文档 Programmer's Supplementary Documents
+.Pp
+.Bl -column SMM -offset indent -compact
+.It Li AMD	UNIX 历史遗留的手册文档 Ancestral Manual Documents
+.It Li SMM	UNIX 系统管理员手册 System Manager's Manual
+.It Li URM	UNIX 参考手册 Reference Manual
+.It Li PRM	UNIX 程序员手册 Programmer's Manual
+.El
+.Pp
+缺省的卷标
+.Li URM
+代表 手册区 1, 6, and 7;
+.Li SMM
+代表 手册区 8;
+.Li PRM
+代表 手册区 2, 3, 4, and 5.
+.\" .Cl
+.\" MMI	UNIX Manual Master Index
+.\" .Cl
+.\" CON	UNIX Contributed Software Manual
+.\" .Cl
+.\" LOC	UNIX Local Manual
+.It Li \&.Os 操作系统 发行号#
+操作系统 的 名字 可能 是 缩写, 像
+.Tn BSD
+或
+.Tn FreeBSD
+或
+.Tn ATT .
+发行号 应该 是 系统 专用的 标准发行术语, 像 4.3, 4.3+Tahoe, V.3, V.4.
+识别不出的 参数 就 照原样 显示在 页脚. 例如, 典型的页脚 可能是:
+.Pp
+.Dl \&.Os BSD 4.3
+.Pp
+或
+.Dl \&.Os FreeBSD 2.2
+.Pp
+或者 象 订制的产品
+.Pp
+.Dl \&.Os CS Department
+.Pp
+作为 伯克利的缺省设置, 不带 参数 的
+.Ql \&.Os
+定义为
+.Tn BSD 
+(指定在文件
+.Pa /usr/share/tmac/mdoc/doc-common 
+中). 你 应该 把缺省值 设成
+.Tn 本机.
+注意, 如果 不设置
+.Ql \&.Os
+宏, 页面的左下角 会 很难看.
+.It Li \&.Dd 月 日, 年 (month day, year)
+日期 应当 写的 正规点:
+.Pp
+.ne 5
+.Dl January 25, 1989
+.El
+.Sh 手册宏域 和 基本正文宏域的介绍
+.Ss 名称背后 What's in a name...
+手册宏域 的 宏名 来自 非正式的 日常用语, 用来 描述 命令, 子程序 及其 
+相关文件. 在 写 手册页 时, 文字用语 有些 轻微的变化, 分别描述 三个 
+不同 应用面. 首先是
+.Nm \-mdoc
+宏请求 的 用法. 其次, 用
+.Nm \-mdoc
+宏 描述
+.Ux
+命令. 最后, 对 用户 具体的描述 这条命令; 也就是 在 手册页 正文 里 
+讨论这条命令.
+.Pp
+第一种 情况 下,
+.Xr troff 1
+宏 本身 就是 一种 命令; troff 命令 的 基本语法 是:
+.Bd -filled -offset indent
+\&.Va argument1 argument2 ... argument9
+.Ed
+.Pp
+这里的
+.Ql \&.Va
+是 宏命令 或 宏请求, 紧随其后 的 是 待处理的参数.
+第二种 情况 下, 使用 内容宏 描述 一条
+.Ux
+命令 要 复杂 些; 一个 典型的
+.Sx 总览 SYNOPSIS
+命令行 显示 如下:
+.Bd -filled -offset indent
+.Nm filter
+.Op Fl flag
+.Ar infile outfile
+.Ed
+.Pp
+这里的
+.Nm filter
+是 命令名称, 方括弧内 的
+.Fl flag
+是一个
+.Em 标志
+参数, 作为 可选参数 放在 代表 选项 的 方括弧内. 在
+.Nm \-mdoc
+术语 中,
+.Ar infile
+和
+.Ar outfile
+称为
+.Em 参数 .
+产生 上述效果 的 宏 是 这样的:
+.Bd -literal -offset indent
+\&.Nm filter
+\&.Op \&Fl flag
+\&.Ar infile outfile
+.Ed
+.Pp
+第三种 情况 讨论 命令 及其语法, 包括 它们的例子, 可能 还有 更多细节.
+上面的例子里, 可以把
+.Ar infile
+和
+.Ar outfile
+理解为
+.Em 操作参数 operands
+或
+.Em 文件参数 file arguments .
+有些 命令行参数 罗列的 十分 长:
+.Bl -tag -width make -offset indent
+.It Nm make
+.Op Fl eiknqrstv
+.Op Fl D Ar variable
+.Op Fl d Ar flags
+.Op Fl f Ar makefile
+.Bk -words
+.Op Fl I Ar directory
+.Ek
+.Op Fl j Ar max_jobs
+.Op Ar variable=value
+.Bk -words
+.Op Ar target ...
+.Ek
+.El
+.Pp
+这里 你 可能 讨论
+.Nm make
+命令 和 它的参数
+.Ar makefile ,
+作为 一个 标志的参数,
+.Fl f ,
+或者 讨论 一个 可选的文件操作对象
+.Ar target .
+在 具体的上下文 中, 这种细节 能够 防止 混淆. 然而
+.Nm \-mdoc
+宏包中 没有为 标志的参数 准备 宏. 作为 替代 是
+.Ql \&Ar
+参数宏, 用于 描述 操作对象 或 文件参数 如
+.Ar target
+以及 标志的参数 如
+.Ar variable .
+上面的 make 命令行 是 这样 产生的:
+.Bd -literal -offset indent
+\&.Nm make
+\&.Op Fl eiknqrstv
+\&.Op Fl D Ar variable
+\&.Op Fl d Ar flags
+\&.Op Fl f Ar makefile
+\&.Op Fl I Ar directory
+\&.Op Fl j Ar max_jobs
+\&.Op Ar variable=value
+\&.Bk -words
+\&.Op Ar target ...
+\&.Ek
+.Ed
+.Pp
+在 
+.Sx Keeps 
+小节中 将会 解释
+.Ql \&.Bk
+和
+.Ql \&.Ek
+宏.
+.Ss 基本语法 General Syntax
+手册宏域 和 基本正文宏域 的 宏 有着 相似的语法, 仅有 微小差别:
+.Ql \&.Ar ,
+.Ql \&.Fl ,
+.Ql \&.Nm ,
+和
+.Ql \&.Pa
+仅当 无参数调用时 才有 区别;
+.Ql \&.Fn
+和
+.Ql \&.Xr
+的 参数列表 要求 一定的 顺序;
+.Ql \&.Op
+和
+.Ql \&.Fn
+宏有嵌套限制. 所有的 内容宏 能够 识别和正确处理 标点符号, 每个 标点符号 
+要在 前面 用 空格 隔开. 如果 给出 这样的 宏请求:
+.Pp
+.Dl \&.Li sptr, ptr),
+.Pp
+结果是:
+.Pp
+.Dl Li sptr, ptr),
+.Pp
+标点符号 没有 被识别 出来, 全都按 原文字体 输出. 如果 标点符号 前面用
+空格符 隔开:
+.Pp
+.Dl \&.Li "sptr , ptr ) ,"
+.Pp
+结果是:
+.Pp
+.Dl Li sptr , ptr ) ,
+.Pp
+标点符号 被 识别出来 了, 缺省的字体 也 有别于 原文文字的字体.
+.Pp
+用
+.Ql \e& .
+转义符 可以 去掉 标点字符 的 特殊意义.
+.Xr Troff
+作为 宏语言 有一定 的 限制, 当 表达的字串 中 含有
+数学, 逻辑 或 引用 符号时 将 难于 处理:
+.Bd -literal -offset indent-two
+\&{+,\-,/,*,\&%,<,>,<=,>=,=,==,&,`,',"}
+.Ed
+.Pp
+问题是
+.Xr troff
+会 认为 它 应该 执行或运算 这些 符号 代表的操作.
+要 防止 这一点 可以 用
+.Ql \e&
+转义 这些 字符. 典型语法 在 下面 显示的 第一个 内容宏 中 可以见到,
+.Ql \&.Ad .
+.Sh 手册域 MANUAL DOMAIN
+.Ss 地址宏 Address Macro
+地址宏 用 这种 格式 标明地址: addr1[,addr2[,addr3]].
+.Pp
+.Dl Usage: .Ad address ... \*(Pu
+.Bl -tag -width ".Ad f1 , f2 , f3 :" -compact -offset 14n
+.It Li \&.Ad addr1
+.Ad addr1
+.It Li \&.Ad addr1\ .
+.Ad addr1 .
+.It Li \&.Ad addr1\ , file2
+.Ad addr1 , file2
+.It Li \&.Ad f1\ , f2\ , f3\ :
+.Ad f1 , f2 , f3 :
+.It Li \&.Ad addr\ )\ )\ ,
+.Ad addr ) ) ,
+.El
+.Pp
+不带参数 调用
+.Ql \&.Ad
+是个 错误.
+.Ql \&.Ad
+可以被 (其他宏) 调用和分析.
+.Ss 作者名称 Author Name
+The
+.Ql \&.An
+宏用以 说明 这个文档的 描述对象的 作者, 或者 这篇手册页的 作者.
+名字 信息 后面的 其他参数 被认为是 标点符号.
+.Pp
+.Dl Usage: .An author_name \*(Pu
+.Bl -tag -width ".An Joe Author ) ) ," -compact -offset 14n
+.It Li \&.An Joe\ Author
+.An Joe Author
+.It Li \&.An Joe\ Author\ ,
+.An Joe\ Author ,
+.It Li \&.An Joe\ Author\ \&Aq\ nobody@FreeBSD.ORG
+.An Joe Author Aq nobody@FreeBSD.ORG
+.It Li \&.An Joe\ Author\ )\ )\ ,
+.An Joe Author ) ) ,
+.El
+.Pp
+.Ql \&.An
+宏可以被 (其他宏) 分析和调用, 
+不带参数调用
+.Ql \&.An
+是个错误.
+.Ss 参数宏 Argument Macro
+当 引用 命令行参数时 可以使用
+.Ql \&.Ar
+参数宏.
+.Pp
+.Dl Usage: .Ar argument ... \*(Pu
+.Bl -tag -width ".Ar file1 file2" -compact -offset 15n
+.It Li \&.Ar
+.Ar
+.It Li \&.Ar file1
+.Ar file1
+.It Li \&.Ar file1\ .
+.Ar file1 .
+.It Li \&.Ar file1 file2
+.Ar file1 file2
+.It Li \&.Ar f1 f2 f3\ :
+.Ar f1 f2 f3 :
+.It Li \&.Ar file\ )\ )\ ,
+.Ar file ) ) ,
+.El
+.Pp
+如果不带参数调用
+.Ql \&.Ar
+宏, 缺省为
+.Ql Ar .
+.Ql \&.Ar
+宏可以被 (其他宏) 分析和调用.
+.Ss 配置定义 (手册第四部分) Configuration Declaration
+.Ql \&.Cd
+宏用于描述
+.Xr config 8
+对 设备接口的定义 (手册第四部分).
+这个宏 接受 引号内的参数 (只能是双引号).
+.Pp
+.Bl -tag -width "device le0 at scode?" -offset indent
+.It Cd "device le0 at scode?"
+来自:
+.Ql ".Cd device le0 at scode?" .
+.El
+.Ss 命令修饰 Command Modifier
+命令修饰宏和
+.Ql \&.Fl
+(标志) 命令相似, 除了
+.Ql \&.Cm
+宏 不在 任何参数 前 加 短横线 (dash).
+传统的标志 以 短横线 开头, 但 一些 命令 或 命令的子集 不用这个.
+命令修饰宏 也可以 和 交互命令 结合 使用, 如 编辑命令. 另见
+.Sx Flags .
+.Ss 已定义的变量 Defined Variables
+在 头文件 中 已经 定义了的变量 用
+.Ql \&.Dv 
+宏说明.
+.Pp
+.Dl Usage: .Dv defined_variable ... \*(Pu
+.Bl -tag -width ".Dv MAXHOSTNAMELEN" -compact -offset 14n
+.It Li ".Dv MAXHOSTNAMELEN"
+.Dv MAXHOSTNAMELEN
+.It Li ".Dv TIOCGPGRP )"
+.Dv TIOCGPGRP )
+.El
+.Pp
+不带参数调用
+.Ql \&.Dv
+是个错误.
+.Ql \&.Dv
+宏可以被 (其他宏) 分析和调用.
+.Ss Errno's (仅供手册第二部分)
+这个
+.Ql \&.Er
+errno 宏 指明 手册 第二部分, 库函数 的 错误返回值.(译注: 应该是系统调用)
+下面的 第二个 例子 显示了
+.Ql \&.Er
+配合
+.Ql \&.Bq
+基本正文宏 的 使用, 就象 用在 手册 第二部分 一样.
+.Pp
+.Dl Usage: .Er ERRNOTYPE ... \*(Pu
+.Bl -tag -width ".Bq Er ENOTDIR" -compact -offset 14n
+.It Li \&.Er ENOENT
+.Er ENOENT
+.It Li \&.Er ENOENT\ )\ ;
+.Er ENOENT ) ;
+.It Li \&.Bq \&Er ENOTDIR
+.Bq Er ENOTDIR
+.El
+.Pp
+不带参数调用
+.Ql \&.Er
+宏是个错误.
+.Ql \&.Er
+宏可以被 (其他宏) 分析和调用.
+.Ss 环境变量 Environment Variables
+.Ql \&.Ev
+宏说明一个环境变量.
+.Pp
+.Dl Usage: .Ev argument ... \*(Pu
+.Bl -tag -width ".Ev PRINTER ) ) ," -compact -offset 14n
+.It Li \&.Ev DISPLAY
+.Ev  DISPLAY
+.It Li \&.Ev PATH\ .
+.Ev PATH .
+.It Li \&.Ev PRINTER\ )\ )\ ,
+.Ev PRINTER ) ) ,
+.El
+.Pp
+不带参数调用
+.Ql \&.Ev
+宏是个错误.
+.Ql \&.Ev
+宏可以被 (其他宏) 分析和调用.
+.Ss 函数参数 Function Argument
+.Ql \&.Fa
+宏 用来 说明 在手册的
+.Sx 总览 SYNOPSIS
+小节 之外的 函数参数, 或者在
+.Sx 总览 SYNOPSIS
+小节内, 其 参数列表对
+.Ql \&.Fn
+宏 而言 过长, 并且 必须 使用
+.Ql \&.Fo
+和
+.Ql \&.Fc
+宏时.
+.Ql \&.Fa
+也 有可能 用来 说明 结构成员.
+.Pp
+.Dl Usage: .Fa function_argument ... \*(Pu
+.Bl -tag -width ".Fa d_namlen\ )\ )\ ," -compact -offset 14n
+.It Li \&.Fa d_namlen\ )\ )\ ,
+.Fa d_namlen ) ) ,
+.It Li \&.Fa iov_len
+.Fa iov_len
+.El
+.Pp
+不带参数调用
+.Ql \&.Fa
+宏是个错误.
+.Ql \&.Fa
+宏可以被 (其他) 宏分析和调用.
+.Ss 函数声明 Function Declaration
+.Ql \&.Fd
+宏 用于 第二或 第三部分 手册页 的
+.Sx 总览 SYNOPSIS
+小节.
+.Ql \&.Fd
+宏 既 不调用 其他宏, 也 不能 被 其他宏调用.
+.Pp
+.Dl Usage: .Fd include_file (or defined variable)
+.Pp
+在
+.Sx 总览 SYNOPSIS
+小节, 如果 已经 说明了 某个 函数, 并且 没有 出现 省略号, 则
+.Ql \&.Fd
+宏请求 能够 产生 一个 断行.
+在 函数 和 函数声明 之间, 垂直方向上 产生 一定的 空白.
+.Ss 标志 Flags
+.Ql \&.Fl
+宏 处理 命令行标志. 它 在 标志前 加一个 短横线
+.Ql \- ,
+对于 交互命令 标志, 它 不需要 短横线, 可以用
+.Ql \&.Cm
+(命令修饰 command modifier)
+宏替换, 它 没有 短横线.
+.Pp
+.Dl Usage: .Fl argument ... \*(Pu
+.Bl -tag -width ".Fl \-s \-t \-v" -compact -offset 14n
+.It Li \&.Fl
+.Fl
+.It Li \&.Fl cfv
+.Fl cfv
+.It Li \&.Fl cfv\ .
+.Fl cfv .
+.It Li \&.Fl s v t
+.Fl s v t
+.It Li \&.Fl -\ ,
+.Fl - ,
+.It Li \&.Fl xyz\ )\ ,
+.Fl xyz ) ,
+.El
+.Pp
+如果
+.Ql \&.Fl
+宏 不带 任何 参数, 将 只产生 一个 短横线, 代表 stdin/stdout.
+注意 如果 把 一个 短横线 做为
+.Ql \&.Fl
+的参数, 结果 会 得到 两个短横线.
+.Ql \&.Fl
+宏可以被 (其他宏) 分析和调用.
+.Ss 函数(库函数) Functions (library routines)
+宏 .Fn 是 ANSI C 函数风格 的 模型.
+.Bd -literal
+Usage: .Fn [type] function [[type] parameters ... \*(Pu]
+.Ed
+.Bl -tag -width ".Fn int align. .const * char *sptrsxx" -compact
+.It Li "\&.Fn getchar"
+.Fn getchar
+.It Li "\&.Fn strlen ) ,"
+.Fn strlen ) ,
+.It Li \&.Fn "\\*qint align\\*q" "\\*qconst * char *sptrs\\*q" ,
+.Fn "int align" "const * char *sptrs" ,
+.El
+.Pp
+不带参数调用
+.Ql \&.Fn
+是一个错误.
+.Ql \&.Fn
+宏可以被 (其他宏) 分析和调用,
+注意 任何 对 其他宏 的 调用 应该在
+.Ql \&.Fn
+宏调用 的 结尾处 给出 标记 (反括弧).
+.Pp
+对于 八个 参数 以上的 函数 (尽管少见), 可以 用 宏
+.Ql \&.Fo
+(function open) 和
+.Ql \&.Fc
+(function close) 配合
+.Ql \&.Fa
+(function argument) 宏 的 使用, 突破 参数 过多 的 限制, 例如:
+.Bd -literal -offset indent
+\&.Fo "int res_mkquery"
+\&.Fa "int op"
+\&.Fa "char *dname"
+\&.Fa "int class"
+\&.Fa "int type"
+\&.Fa "char *data"
+\&.Fa "int datalen"
+\&.Fa "struct rrec *newrr"
+\&.Fa "char *buf"
+\&.Fa "int buflen"
+\&.Fc
+.Ed
+.Pp
+产生:
+.Bd -filled -offset indent
+.Fo "int res_mkquery"
+.Fa "int op"
+.Fa "char *dname"
+.Fa "int class"
+.Fa "int type"
+.Fa "char *data"
+.Fa "int datalen"
+.Fa "struct rrec *newrr"
+.Fa "char *buf"
+.Fa "int buflen"
+.Fc
+.Ed
+.Pp
+宏
+.Ql \&.Fo
+和
+.Ql \&.Fc
+可以被 (其他宏) 分析和调用. 在
+.Sx 总览 SYNOPSIS
+小节, 函数 总是 位于 行的开始 处.
+如果 在
+.Sx 总览 SYNOPSIS
+小节 有 一个以上的 函数声明, 而且 函数类型 没有 说明, 则 会产生 一个 断行.
+在 函数 和 函数 的 垂直方向 上 产生 一定的 空白. 此时
+.Ql \&.Fn
+宏 不按 troff 的 行长 检查 单词 边界, 有可能 难看的 从 单词中间 断开.
+以后 会 解决 这个 问题.
+.Ss 函数类型 Function Type
+这个宏 设计 用在
+.Sx 总览 SYNOPSIS
+小节. 它 可以 毫无困难的 用在 手册页的 其他 地方, 但 它的 主要 目的
+是 为 第二 和 第三部分 手册页的
+.Sx 总览 SYNOPSIS
+小节, 以 核心标准形式 (kernel normal form) 描述 函数类型
+(它 导致 断行, 在 下一行 显示 函数 名称).
+.Pp
+.Dl Usage: .Ft type ... \*(Pu
+.Bl -tag -width "\&.Ft struct stat" -offset 14n -compact
+.It Li \&.Ft struct stat
+.Ft struct stat
+.El
+.Pp
+.Ql \&.Ft
+宏不能被其他宏调用.
+.Ss 交互命令 Interactive Commands
+宏
+.Ql \&.Ic
+用于 说明 交互 或 内部命令.
+.Pp
+.Dl Usage: .Ic argument ... \*(Pu
+.Bl -tag -width ".Ic setenv , unsetenvxx" -compact -offset 14n
+.It Li \&.Ic :wq
+.Ic :wq
+.It Li \&.Ic do while {...}
+.Ic do while {...}
+.It Li \&.Ic setenv\ , unsetenv
+.Ic setenv , unsetenv
+.El
+.Pp
+不带参数调用
+.Ql \&.Ic
+是个错误.
+.Ql \&.Ic
+宏可以被 (其他宏) 分析和调用.
+.Ss 名称宏 Name Macro
+.Ql \&.Nm
+宏 用于 说明 文档题目 或 主题. 它的特点 是 能够 记住 调用时 带的 第一个 
+参数, 这个 参数 就是 该页的 主题. 当 不带 参数 调用它 时,
+.Ql \&.Nm
+宏 把 以前 记住的 参数 显示 出来, 可以 为作者 省点劲.
+注意: 手册第二部分或第三部分的函数名称, 在
+.Sx 名称 NAME
+小节 用
+.Ql \&.Nm
+说明, 在
+.Sx 总览 SYNOPSIS
+和 其余 小节 用
+.Ql \&.Fn
+说明. 对于 交互命令, 例如 在
+.Xr csh 1
+中的
+.Ql while
+命令, 应该 使用
+.Ql \&.Ic
+宏.
+.Ql \&.Ic
+宏和
+.Ql \&.Nm ,
+宏 非常接近, 只是 它 不能够 记忆 调用时的 参数.
+.Pp
+.Dl Usage: .Nm argument ... \*(Pu
+.Bl -tag -width ".Nm mdoc.sample" -compact -offset 14n
+.It Li \&.Nm mdoc.sample
+.Nm  mdoc.sample
+.It Li \&.Nm \e-mdoc
+.Nm \-mdoc .
+.It Li \&.Nm foo\ )\ )\ ,
+.Nm foo ) ) ,
+.It Li \&.Nm
+.Nm
+.El
+.Pp
+.Ql \&.Nm
+宏可以被 (其他宏) 分析和调用.
+.Ss 选项 Options
+.Ql \&.Op
+宏 把 命令行上 剩余的 所有 参数 用 方括弧 括在一起, 把 最后的 标点符号
+放到 方括弧 外面. 宏
+.Ql \&.Oc
+和
+.Ql \&.Oo
+用于 处理 跨行.
+.Pp
+.Dl Usage: .Op options ... \*(Pu
+.Bl -tag -width ".Op Fl c Ar objfil Op Ar corfil ," -compact -offset indent
+.It Li \&.Op
+.Op
+.It Li ".Op Fl k"
+.Op Fl k
+.It Li ".Op Fl k ) ."
+.Op Fl k ) .
+.It Li ".Op Fl k Ar kookfile"
+.Op Fl k Ar kookfile
+.It Li ".Op Fl k Ar kookfile ,"
+.Op Fl k Ar kookfile ,
+.It Li ".Op Ar objfil Op Ar corfil"
+.Op Ar objfil Op Ar corfil
+.It Li ".Op Fl c Ar objfil Op Ar corfil ,"
+.Op Fl c Ar objfil Op Ar corfil ,
+.It Li \&.Op word1 word2
+.Op word1 word2
+.El
+.Pp
+应用
+.Ql \&.Oc
+和
+.Ql \&.Oo
+宏:
+.Bd -literal -offset indent
+\&.Oo
+\&.Op \&Fl k \&Ar kilobytes
+\&.Op \&Fl i \&Ar interval
+\&.Op \&Fl c \&Ar count
+\&.Oc
+.Ed
+.Pp
+产生:
+.Oo
+.Op Fl k Ar kilobytes
+.Op Fl i Ar interval
+.Op Fl c Ar count
+.Oc
+.Pp
+宏
+.Ql \&.Op ,
+.Ql \&.Oc
+和
+.Ql \&.Oo
+可以被 (其他宏) 分析和调用.
+.Ss 路径名 Pathnames
+.Ql \&.Pa
+宏 用于 格式化 路径 或 文件名.
+.Pp
+.Dl Usage: .Pa pathname \*(Pu
+.Bl -tag -width ".Pa /tmp/fooXXXXX ) ." -compact -offset 14n
+.It Li \&.Pa /usr/share
+.Pa /usr/share
+.It Li \&.Pa /tmp/fooXXXXX\ )\ .
+.Pa /tmp/fooXXXXX ) .
+.El
+.Pp
+.Ql \&.Pa
+宏可以被 (其他宏) 分析和调用.
+.Ss 变量 Variables
+基本的 变量 参考:
+.Pp
+.Dl Usage: .Va variable ... \*(Pu
+.Bl -tag -width ".Va char s ] ) ) ," -compact -offset 14n
+.It Li \&.Va count
+.Va count
+.It Li \&.Va settimer ,
+.Va settimer ,
+.It Li \&.Va int\ *prt\ )\ :
+.Va int\ *prt ) :
+.It Li \&.Va char\ s\ ]\ )\ )\ ,
+.Va char\ s ] ) ) ,
+.El
+.Pp
+不带参数调用
+.Ql \&.Va
+宏是个错误.
+.Ql \&.Va
+宏可以被 (其他宏) 分析和调用.
+.Ss 手册页参照 Manual Page Cross References
+.Ql \&.Xr
+宏 把 第一个参数 当做 手册页 名称, 第二个参数, 如果 存在,
+当做 标点符号 或 手册页 的 部分号 (节号). 剩下 所有的参数
+视做 标点符号.
+.Pp
+.Dl Usage: .Xr man_page [1,...,8] \*(Pu
+.Bl -tag -width ".Xr mdoc 7 ) ) ," -compact -offset 14n
+.It Li \&.Xr mdoc
+.Xr mdoc
+.It Li \&.Xr mdoc\ ,
+.Xr mdoc ,
+.It Li \&.Xr mdoc 7
+.Xr mdoc 7
+.It Li \&.Xr mdoc 7\ )\ )\ ,
+.Xr mdoc 7 ) ) ,
+.El
+.Pp
+.Ql \&.Xr
+宏可以被 (其他宏) 分析和调用.
+不带参数调用
+.Ql \&.Xr
+宏是个错误.
+.Sh 基本正文宏域 GENERAL TEXT DOMAIN
+.Ss AT&T 宏
+.Bd -literal -offset indent -compact
+Usage: .At [v6 | v7 | 32v | V.1 | V.4] ... \*(Pu
+.Ed
+.Bl -tag -width ".At v6 ) ," -compact -offset 14n
+.It Li ".At"
+.At
+.It Li ".At v6 ."
+.At v6 .
+.El
+.Pp
+.Ql \&.At
+宏
+.Em 不能
+被 (其他宏) 分析, 也
+.Em 不能
+被 (其他宏) 调用. 该宏 最多 接受 两个 参数.
+.Ss BSD 宏
+.Dl Usage: .Bx [Version/release] ... \*(Pu
+.Bl -tag -width ".Bx 4.3 ) ," -compact -offset 14n
+.It Li ".Bx"
+.Bx
+.It Li ".Bx 4.3 ."
+.Bx 4.3 .
+.El
+.Pp
+.Ql \&.Bx
+宏可以被 (其他宏) 分析和调用.
+.Ss FreeBSD 宏
+.Bd -literal -offset indent -compact
+Usage: .Fx Version.release ... \*(Pu
+.Ed
+.Bl -tag -width ".Fx 2.2 ) ," -compact -offset 14n
+.It Li ".Fx 2.2 ."
+.Fx 2.2 .
+.El
+.Pp
+.Ql \&.Fx
+宏
+.Em 不能
+被 (其他宏) 分析, 也
+.Em 不能
+被 (其他宏) 调用. 该宏 最多 接受 两个 参数.
+.Ss UNIX 宏
+.Dl Usage: .Ux ... \*(Pu
+.Bl -tag -width ".Ux 4.3 ) ," -compact -offset 14n
+.It Li ".Ux"
+.Ux
+.El
+.Pp
+.Ql \&.Ux
+宏可以被 (其他宏) 分析和调用.
+.Ss 嵌入和引用宏 Enclosure and Quoting Macros
+嵌入 的 概念 和 引用 类似. 把 一句 或 多句 引用对象 嵌到 一对 字符 中, 
+象 引号 或 括弧. 本篇 文档中 将 混用 术语
+.Ql 嵌入
+和
+.Ql 引用.
+大多数 单行的 引用宏名 用 一个 小写字母
+.Ql q
+结尾, 表明 这是 一个 引用(quoting), 但 也有 不规则变化.
+每个 引用宏 都有 一对 开始(open) 和 结束(close) 宏, 各自 以
+.Ql o
+和
+.Ql c
+结尾. 在 某些限制时 这些宏 可以 跨行 使用, 单行的引用宏 可以 嵌套在里面.
+.Pp
+.ne 5
+.Bd -filled -offset indent
+.Bl -column "quote " "close " "open " "Enclose Stringx(in XX) " XXstringXX
+.Em " Quote	 Close	 Open	Function	Result"
+\&.Aq	.Ac	.Ao	Angle Bracket Enclosure	<string>
+\&.Bq	.Bc	.Bo	Bracket Enclosure	[string]
+\&.Dq	.Dc	.Do	Double Quote	``string''
+	.Ec	.Eo	Enclose String (in XX)	XXstringXX
+\&.Pq	.Pc	.Po	Parenthesis Enclosure	(string)
+\&.Ql			Quoted Literal	`st' or string
+\&.Qq	.Qc	.Qo	Straight Double Quote	"string"
+\&.Sq	.Sc	.So	Single Quote	`string'
+.El
+.Ed
+.Pp
+除了 下面的 不规则宏, 所有的 引用宏 可以被 (其他宏) 分析和调用. 所有的 
+引用宏 能够 正确 处理 标点符号, 只要 一次 一个字符, 中间 用 空格 隔开.
+引用宏 检查 开始和结束 符号, 以决定 把 它 放在 引用串的 前面还是后面.
+这样 就 有了 一定的 嵌套能力.
+.Bl -tag -width xxx,xxxx
+.It Li \&.Ec , \&.Eo
+这些宏 的 第一个参数 是 各自的 开始和结束串.
+.It Li \&.Ql
+原文引用宏 的 表现在
+.Xr troff
+中和
+.Xr nroff 
+不一样. 如果用
+.Xr nroff 
+格式化, 引用的原文 始终 被引用. 如果用 troff 格式化,
+只有 宽度 小于 三个定宽字符 的 项 才被 引用.
+This is to make short strings more visible where the font change
+to literal (constant width) is less noticeable.
+当 字体 变成 原文(定宽) 时, 短串显得更容易被看到.
+.It Li \&.Pf
+前缀宏不能被 (其他宏) 调用, 但是可以被分析.
+.Bl -tag -width "(namexx" -offset indent
+.It Li ".Pf ( Fa name2"
+变成
+.Pf ( Fa name2 .
+.El
+.Pp
+这个
+.Ql \&.Ns
+(无空格) 宏 执行 类似的 后缀 功能.
+.El
+.Pp
+.ne 4
+引用举例:
+.Bl -tag -width ".Aq Pa ctype.h ) ,xxxxxxxx" -compact -offset indent
+.It Li \&.Aq
+.Aq
+.It Li \&.Aq \&Ar ctype.h\ )\ ,
+.Aq Ar ctype.h ) ,
+.It Li \&.Bq
+.Bq
+.It Li \&.Bq \&Em Greek \&, French \&.
+.Bq Em Greek , French .
+.It Li \&.Dq
+.Dq
+.It Li ".Dq string abc ."
+.Dq string abc .
+.It Li ".Dq \'^[A-Z]\'"
+.Dq \'^[A-Z]\'
+.It Li "\&.Ql man mdoc"
+.Ql man mdoc
+.It Li \&.Qq
+.Qq
+.It Li "\&.Qq string ) ,"
+.Qq string ) ,
+.It Li "\&.Qq string Ns ),"
+.Qq string Ns ),
+.It Li \&.Sq
+.Sq
+.It Li "\&.Sq string
+.Sq string
+.El
+.Pp
+作为 嵌套引用宏的 典型范例, 参见
+.Ql \&.Op
+选项宏. 它们 都 来自 上面 列出的 基本 引用宏.
+.Ql \&.Xo
+和
+.Ql \&.Xc
+扩展的 参数列表宏 同样 来自 相同的 基本例程, 并且, 在 最坏的情况 下, 是
+.Nm \-mdoc
+宏 用法的 很好范例.
+.Ss No\-Op 或正文宏 or Normal Text Macro
+宏
+.Ql \&.No
+用在 某个 宏命令行 上, 意如其名, 将
+.Em 不
+被格式化, 语法 遵循 一般的 内容宏.
+.Ss 无空格宏 No Space Macro
+.Ql \&.Ns
+在 宏请求 之间 消除 不需要的 空格.
+它 用在 旧式风格的 参数列表 中, 标志和参数 间 没有 空格:
+.Bl -tag -width ".Op Fl I Ns Ar directoryxx" -offset indent
+.It Li ".Op Fl I Ns Ar directory"
+产生
+.Op Fl I Ns Ar directory
+.El
+.Pp
+注意:
+.Ql \&.Ns
+宏 在 消除空格后 总会 调用
+.Ql \&.No
+宏, 除非 还有 其他 宏名 跟在 后面.
+.Ql \&.Ns
+宏可以被 (其他宏) 分析和调用.
+.Ss 手册页对照参考 Section Cross References
+.Ql \&.Sx
+宏 指定了 到 同一个文档内的 小节首部 的 对照参考.
+该宏可以被 (其他宏) 分析和调用.
+.Pp
+.Bl -tag -width "Li \&.Sx FILES" -offset 14n
+.It Li \&.Sx FILES
+.Sx FILES
+.El
+.Ss 参考和引言 References and Citations
+The following macros make a modest attempt to handle references.
+At best, the macros make it convenient to manually drop in a subset of
+refer style references.
+下面的宏 试图 适度的 处理 参考资料. 最好情况时, 这些宏 便于 手工
+插入 一段 相关风格的 参考资料.
+.Pp
+.Bl -tag -width 6n -offset indent -compact
+.It Li ".Rs"
+参考开始. 它 导致 一次 断行, 并且 开始 收集 参考资料, 直到 遇到 参考结束宏.
+.It Li ".Re"
+参考结束. 则 打印出 参考信息.
+.It Li ".%A"
+参考资料 的 作者名字, 一次一个.
+.It Li ".%B"
+书名.
+.It Li ".\&%C"
+城市/地点.
+.It Li ".\&%D"
+日期.
+.It Li ".%J"
+期刊名.
+.It Li ".%N"
+发行号.
+.It Li ".%O"
+可选信息.
+.It Li ".%P"
+页码.
+.It Li ".%R"
+报告名.
+.It Li ".%T"
+文章题目.
+.It Li ".%V"
+卷.
+.El
+.Pp
+用
+.Ql %
+符号 开始的 宏 不能被 (其他宏) 调用, 只能 被 trade name macro 分析,
+结果 返回给 调用者 (此时 结果 不太好 预测). 其目的 是 允许 trade name 
+能够 很好的 打印在
+.Xr troff Ns / Ns Xr ditroff
+的 输出端.
+.Ss 返回值 Return Values
+.Ql \&.Rv
+宏 产生 一些 用在
+.Sx 返回值 RETURN VALUES
+小节的 文字.
+.Pp
+.Dl Usage: .Rv [-std function]
+.Pp
+.Ql \&.Rv -std atexit
+将输出 下列文字:
+.Pp
+.Rv -std atexit
+.Pp
+这个
+.Fl std
+选项 仅用于 手册页的 第二和第三部分.
+.Ss Trade Names (或缩略和类型名)
+trade name 宏 一般说来 是 一个 很小的 大写字母宏, 用于 所有 大于
+两个字符的 大写单词.
+.Pp
+.Dl Usage: .Tn symbol ... \*(Pu
+.Bl -tag -width ".Tn ASCII" -compact -offset 14n
+.It Li \&.Tn DEC
+.Tn DEC
+.It Li \&.Tn ASCII
+.Tn ASCII
+.El
+.Pp
+.Ql \&.Tn
+宏可以被 (其他宏) 分析和调用.
+.Ss 扩展参数 Extended  Arguments
+.Ql \&.Xo
+和
+.Ql \&.Xc
+宏 可以 在 宏的边界 扩展 参数列表. 如果 某个宏 要求 所有的参数 在 一行上 
+出现, 则 参数列表 不能 在 这儿 被 扩展. 例如
+.Ql \&.Op .
+.Pp
+这里有
+.Ql \&.Xo
+宏的一个示例, 用 空格模式宏 把 空格 去掉:
+.Bd -literal -offset indent
+\&.Sm off
+\&.It Xo Sy I Ar operation
+\&.No \een Ar count No \een
+\&.Xc
+\&.Sm on
+.Ed
+.Pp
+产生
+.Bd -filled -offset indent
+.Bl -tag -width flag -compact
+.Sm off
+.It Xo Sy I Ar operation
+.No \en Ar count No \en
+.Xc
+.Sm on
+.El
+.Ed
+.Pp
+还有一个:
+.Bd -literal -offset indent
+\&.Sm off
+\&.It Cm S No \&/ Ar old_pattern Xo
+\&.No \&/ Ar new_pattern
+\&.No \&/ Op Cm g
+\&.Xc
+\&.Sm on
+.Ed
+.Pp
+产生
+.Bd -filled -offset indent
+.Bl -tag -width flag -compact
+.Sm off
+.It Cm S No \&/ Ar old_pattern Xo
+.No \&/ Ar new_pattern
+.No \&/ Op Cm g
+.Xc
+.Sm on
+.El
+.Ed
+.Pp
+另一个示例用
+.Ql \&.Xo
+和 引用宏:
+测试一个变量的值.
+.Bd -literal -offset indent
+\&.It Xo
+\&.Ic .ifndef
+\&.Oo \e&! Oc Ns Ar variable
+\&.Op Ar operator variable ...
+\&.Xc
+.Ed
+.Pp
+产生
+.Bd -filled -offset indent
+.Bl -tag -width flag -compact
+.It Xo
+.Ic .ifndef
+.Oo \&! Oc Ns Ar variable
+.Op Ar operator variable ...
+.Xc
+.El
+.Ed
+.Pp
+上面 所有的例子 都在
+.Ql \&.It
+(list-item) 宏 的 参数列表 中 使用了
+.Ql \&.Xo
+宏. 扩展宏 不经常 使用, 一般用来 扩展 list-item 宏 的 参数列表.
+这也 不幸的 是 扩展宏 最苛刻的 地方. 前两个例子里 空格 被去掉; 第三个 例子中, 
+希望 能 输出 部分 空格, 而不是 全部. 在 这种情况下 用 这些宏, 要 确保
+.Ql \&.Xo
+和
+.Ql \&.Xc
+宏 摆放到 第三个例子 中 示范的位置. 如果
+.Ql \&.Xo
+宏 没有 单独 出现在
+.Ql \&.It
+的 参数表 中, 则 无法预测 空格 情况. 这种情况下,
+.Ql \&.Ns
+(no space macro) 一定 不能 作为 一行的 第一个宏 或 最后一个宏. 当前
+.Bx
+发布的 超过 900个 手册页 (事实上大约1500个) 中,
+只有 十五个 用到了
+.Ql \&.Xo
+宏.
+.Sh 页结构宏宏域 PAGE STRUCTURE DOMAIN
+.Ss 小节首部 Section Headers
+每个 手册页 里 都用到了 下面 列出的 三个
+.Ql \&.Sh
+小节首部宏. 作者 写 手册页 时 可以 酌情考虑 其他 建议使用的 小节首部.
+.Ql \&.Sh
+宏 最多 带 九个 参数. 它 可以 被 (其他宏) 分析, 但不能 被调用.
+.Bl -tag -width ".Sh SYNOPSIS"
+.It \&.Sh 名称 NAME
+.Ql \&.Sh 名称 NAME
+宏是 必不可少的. 否则 无法设置 页头, 页脚 和 缺省的 页布局, 样子 会 很难看.
+.Sx 名称 NAME
+小节 至少 由 三项 组成. 第一个 是
+.Ql \&.Nm
+名称宏, 命名 手册页的 主题. 第二个 是 名称描述宏
+.Ql \&.Nd ,
+它 把 主题名称 和 第三项, 描述, 分离开来.
+描述 应该 尽可能的 精简易懂, 少占空间.
+.It \&.Sh 总览 SYNOPSIS
+.Sx SYNOPSIS
+总览小节 描述 该 手册页对象 的 典型用途.
+请求的宏 是 下面 的 任意一个,
+.Ql ".Nm" ,
+.Ql ".Cd" ,
+.Ql ".Fn" ,
+(也可能是
+.Ql ".Fo" ,
+.Ql ".Fc" ,
+.Ql ".Fd" ,
+.Ql ".Ft"
+宏). 函数名称宏
+.Ql ".Fn"
+用在 手册页 的 第二第三部分, 命令 和 基本名称宏
+.Ql \&.Nm
+用在 手册页 的 1, 5, 6, 7, 8 部分. 手册 第四部分 需要
+.Ql ".Nm" , 
+.Ql ".Fd"
+或
+.Ql ".Cd"
+配制设备用途宏. 其他一些 宏 可能 用来 产生 概要行, 象下面的:
+.Pp
+.Bd -filled -offset indent
+.Nm cat
+.Op Fl benstuv
+.Op Fl
+.Ar
+.Ed
+.Pp
+下面 用到的 宏
+.Pp
+.Dl \&.Nm cat
+.Dl \&.Op \&Fl benstuv
+.Dl \&.Op \&Fl
+.Dl \&.Ar
+.Pp
+.Sy 注意 :
+宏
+.Ql \&.Op ,
+.Ql \&.Fl ,
+和
+.Ql \&.Ar
+能够 识别 管道符
+.Ql \*(Ba ,
+因此 命令行 如:
+.Pp
+.Dl ".Op Fl a | Fl b"
+.Pp
+的 表现 会 出轨.
+.Xr Troff
+一般把 \*(Ba 当做 特殊符号. 参见
+.Sx 预定义串 PREDEFINED STRINGS ,
+在 其他情况下 \*(Ba 的使用.
+.It \&.Sh 描述 DESCRIPTION
+大多数 情况下
+.Sx 描述 DESCRIPTION
+小节 的 第一段话 是 关于 这个 命令, 函数 或 文件 的 摘要, 后跟 字典式的
+选项 以及 相应的解释. 创建 这样的 列表, 应该 使用
+.Ql \&.Bl
+列表开始,
+.Ql \&.It
+列表项和
+.Ql \&.El
+列表结束宏 (参见下面的
+.Sx 列表和栏目 Lists and Columns
+).
+.El
+.Pp
+下面的
+.Ql \&.Sh
+小节首部 是 手册页 编排的 常见内容, 为了 保证 连续性, 应 适当 使用.
+它们 按照 应该 出现 的 顺序 排列.
+.Bl -tag -width SYNOPSIS
+.It \&.Sh 环境 ENVIRONMENT
+.Sx 环境 ENVIRONMENT
+小节 用来 揭示 相关的 环境变量 和 线索, 它们的 行为, 表现, 用法.
+.It \&.Sh 示例 EXAMPLES
+有 很多 办法 创建 示例, 详见 下面的
+.Sx 示例 EXAMPLES
+小节.
+.It \&.Sh 文件 FILES
+由 手册页的 主题对象 创建 或 使用 的 文件, 应该 通过
+.Ql \&.Pa
+宏在
+.Sx 文件 FILES
+小节 陈列 出来.
+.It \&.Sh 另见 SEE ALSO
+如果 提及 其他 手册页 或 参照 相应的 手册, 应 把它们 放在
+.Sx 另见 SEE ALSO
+小节. 参照主题 由
+.Ql \&.Xr
+宏指定. 在
+.Sx 另见 SEE ALSO
+小节 的 参照主题 应该按 手册节号 排序, 按 字母顺序 陈列, 并用 逗号 隔开, 
+例如:
+.Pp
+.Xr ls 1 ,
+.Xr ps 1 ,
+.Xr group 5 ,
+.Xr passwd 5 .
+.Pp
+这时候 不太适合 用
+.Xr refer 1
+风格 的 参考引用.
+.It \&.Sh 遵循 CONFORMING TO
+如果 那些 命令, 库函数 或 文件 遵循 一定的 标准 实现, 如
+.St -p1003.2
+或
+.St -ansiC ,
+那就 不需要 这一小节. 如果 命令 不符合 任何标准, 应该 把 它的历史 放在
+.Sx 历史 HISTORY
+小节.
+.It \&.Sh 历史 HISTORY
+任何 不属于 已知标准 的 命令 应该 在 这一节 给出 它的 大致历史.
+.It \&.Sh 作者 AUTHORS
+如果 有 必要, 把 致谢名单 也 列这儿.
+.It \&.Sh 诊断 DIAGNOSTICS
+应该 把 诊断命令 放在 这一节.
+.It \&.Sh 错误 ERRORS
+特定的 错误处理, 尤其是 库函数 (手册页第二第三部分), 放这儿.
+.Ql \&.Er
+宏 用来 指定 一个 errno.
+.It \&.Sh BUGS
+明显的 问题 放这儿...
+.El
+.Pp
+可以 增加一些 用户 制定的
+.Ql \&.Sh
+小节, 例如, 这样 设 小节:
+.Bd -literal -offset 14n
+\&.Sh PAGE STRUCTURE DOMAIN
+.Ed
+.Ss 段落和空行 Paragraphs and Line Spacing.
+.Bl -tag -width 6n
+.It \&.Pp
+.Ql \&.Pp
+把 段落命令 放在 所需的位置, 可以 产生 一个空行. 在
+.Ql \&.Sh
+或
+.Ql \&.Ss
+宏 后面 不需要 这个 宏, 
+.Ql \&.Bl
+宏 的 前面 也不需要. (
+.Ql \&.Bl
+声明了 垂直方向 的 距离, 除非 给出 -compact 标志).
+.El
+.\" This worked with version one, need to redo for version three
+.\" .Pp
+.\" .Ds I
+.\" .Cw (ax+bx+c) \ is\ produced\ by\ \&
+.\" .\".Cw (ax+bx+c) \&.Va_by_) \&_and_\& \&[?/]m_b1_e1_f1[?/]\&
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx\ (
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Va ax
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Sy \+
+.\" .Cx
+.\" .Cl Cx \&(\&
+.\" .Va ax
+.\" .Cx +
+.\" .Va by
+.\" .Cx +
+.\" .Va c )
+.\" .Cx \t
+.\" .Em is produced by
+.\" .Cx \t
+.\" .Li \&.Va by
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Sy \+
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Va c )
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx
+.\" .Cx
+.\" .Cw
+.\" .De
+.\" .Pp
+.\" This example shows the same equation in a different format.
+.\" The spaces
+.\" around the
+.\" .Li \&+
+.\" signs were forced with
+.\" .Li \e :
+.\" .Pp
+.\" .Ds I
+.\" .Cw (ax\ +\ bx\ +\ c) \ is\ produced\ by\ \&
+.\" .\".Cw (ax+bx+c) \&.Va_by_) \&_and_\& \&[?/]m_b1_e1_f1[?/]\&
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx\ (
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Va a
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Sy x
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx \e\ +\e\ \e&
+.\" .Cx
+.\" .Cl Cx \&(\&
+.\" .Va a
+.\" .Sy x
+.\" .Cx \ +\ \&
+.\" .Va b
+.\" .Sy y
+.\" .Cx \ +\ \&
+.\" .Va c )
+.\" .Cx \t
+.\" .Em is produced by
+.\" .Cl Cx \t\t
+.\" .Li \&.Va b
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Sy y
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx \e\ +\e\ \e&
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Va c )
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx
+.\" .Cx
+.\" .Cw
+.\" .De
+.\" .Pp
+.\" The incantation below was
+.\" lifted from the
+.\" .Xr adb 1
+.\" manual page:
+.\" .Pp
+.\" .Ds I
+.\" .Cw \&[?/]m_b1_e1_f1[?/]\& is\ produced\ by
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx Op Sy ?/
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Nm m
+.\" .Cx
+.\" .Cl Cx Op Sy ?/
+.\" .Nm m
+.\" .Ad \ b1 e1 f1
+.\" .Op Sy ?/
+.\" .Cx \t
+.\" .Em is produced by
+.\" .Cx \t
+.\" .Li \&.Ar \e\ b1 e1 f1
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Op Sy ?/
+.\" .Cx
+.\" .Cl Cx \t\t
+.\" .Li \&.Cx
+.\" .Cx
+.\" .Cw
+.\" .De
+.\" .Pp
+.Ss 保持 Keeps
+目前 只实现了 对单词的 保持 能力. 这个宏 有
+.Ql \&.Bk
+(开始保持 begin-keep) 和
+.Ql \&.Ek
+(结束保持 end-keep ) .
+.Ql \&.Bk
+宏 的 唯一 参数是
+.Fl words ,
+用于 防止 在 选项语句 的 中间 断行. 在 make 命令行参数的 例子里 (参见
+.Sx 名称背后 What's in a name ) ,
+keep 宏防止
+.Xr nroff
+把 标志 和 参数 分成 两行.
+(事实上 可以 用 选项宏 防止 此类 事情, 但 当我们 决定 在
+.Xr troff
+中 作为 基本选项, 强制 右边界对齐 时, 它 在 稀疏行里 展开的 很糟糕.
+使用 保持宏 时 需要 多做点事, 增加 一个
+.Fl line
+选项 ) .
+.Ss 示例和显示
+有 五种类型 的 显示, 一个 快速的单行缩进显示
+.Ql \&.D1 ,
+快速的单行原文显示
+.Ql \&.Dl ,
+原文块, 填充块, 和由
+.Ql \&.Bd
+(begin-display) 显示开始 和
+.Ql \&.Ed
+(end-display) 显示结束 宏对 组成的 不规则块.
+.Pp
+.Bl -tag -width \&.Dlxx
+.It Li \&.D1
+(D-one) 显示 一行 缩进文字. 该宏 可以被 (其他宏) 分析, 但 不能 被调用.
+.Pp
+.Dl Fl ldghfstru
+.Pp
+上面是这样产生的:
+.Li \&.Dl Fl ldghfstru .
+.It Li \&.Dl
+(D-ell) 显示 一行 缩进的
+.Em 原文 literal .
+.Ql \&.Dl
+示例宏 已经 遍布 这篇 文档. 它 允许 缩进 (显示) 一行 文字.
+其 缺省字体 设为 定宽 (原文), 它 可以 被 其他宏 分析 和 识别.
+然而 不能 被 其他宏 调用.
+.Pp
+.Dl % ls -ldg /usr/local/bin
+.Pp
+上面是这样产生的
+.Li \&.Dl % ls -ldg /usr/local/bin .
+.It Li \&.Bd
+显示开始.
+.Ql \&.Bd
+的 显示 必须由
+.Ql \&.Ed
+宏 结束. 显示 可以 嵌套在 显示 和 列表中.
+.Ql \&.Bd
+有 这样的 语法:
+.Pp
+.Dl ".Bd display-type [-offset offset_value] [-compact]"
+.Pp
+显示类型 必须是 下面四个 之一, 可以 指定 一个 缩进量.
+.Ql \&.Bd .
+.Pp
+.Bl -tag -width "file file_name  " -compact
+.It Fl ragged
+以 打字 形式 显示 一块 正文, 其 右(和左)边界 是 不平整边界.
+.It Fl filled
+显示 填充 (格式化) 块. 块中文字 被 格式化 (边界 已经 填充过, 
+不再是 左边 不对齐 ).
+.It Fl literal
+显示 原文块, 适用于 源程序, 或 那种 简单的, 用 table 和
+空格 调整的 文字.
+.It Fl file Ar file_name
+阅读 并 显示 跟在
+.Fl file
+标志 后面的 文件. 原文模式 被打开, table 设为 8个字符 宽, 然而 文件中 
+出现的 任何
+.Xr troff/ Ns Nm \-mdoc
+命令 都将 被处理.
+.It Fl offset Ar string
+如果
+.Fl offset
+指定为 下面 字符串 之一, 这些 字符串 解释为 对 以后的 正文块的 缩进层次.
+.Pp
+.Bl -tag -width "indent-two" -compact
+.It Ar left
+正文块 按 当前 左边界 对齐, 这是
+.Ql \&.Bd 
+的 缺省模式.
+.It Ar center
+应该 是把 正文块 布在 中间. 不幸的是, 目前 只能在 大致的 中间位置
+靠左 对齐.
+.It Ar indent
+按 缺省 缩进值 或 table 值 缩进. 这个 缺省 缩进值 同时 用于
+.Ql \&.D1
+显示, 因此 你 应该 使 这两种 显示 一致. 缩进值 一般 设为 6n, 
+大约 2/3 英寸 (六个字符宽度).
+.It Ar indent-two
+缩进 缺省值的 两倍.
+.It Ar right
+在 距离 右边界 大约 两英寸处 把 正文块 靠
+.Em 左
+对齐. 这个宏 要 试验 效果, 有可能
+.Xr troff 
+怎么 都 弄不对.
+.El
+.El
+.It ".Ed"
+End-display.
+显示结束.
+.El
+.Ss 字体模式 Font Modes
+现有 五个宏 用于 改变 手册页的 文字外观:
+.Bl -tag -width \&.Emxx
+.It \&.Em
+文字 可以 用
+.Ql \&.Em
+宏 加重或强调. 常用的 强调字体 是 斜体 (italic).
+.Pp
+.Dl Usage: .Em argument ... \*(Pu
+.Bl -tag -width ".Em vide infra ) ) ," -compact -offset 14n
+.It Li ".Em does not"
+.Em does not
+.It Li ".Em exceed 1024 ."
+.Em exceed 1024 .
+.It Li ".Em vide infra ) ) ,"
+.Em vide infra ) ) ,
+.El
+.Pp
+.Ql \&.Em
+宏可以被 (其他宏) 分析和调用. 不带参数 调用
+.Ql \&.Em
+宏 是 一个错误.
+.It \&.Li
+.Ql \&.Li
+原文宏 用来 显示 字符, 变量, 常数, 任何 希望 照 输入文字 原样显示 的 内容.
+.Pp
+.Dl Usage: .Li argument ... \*(Pu
+.Bl -tag -width ".Li cntrl-D ) ,"  -compact -offset 14n
+.It Li \&.Li \een
+.Li \en
+.It Li \&.Li M1 M2 M3\ ;
+.Li M1 M2 M3 ;
+.It Li \&.Li cntrl-D\ )\ ,
+.Li cntrl-D ) ,
+.It Li \&.Li 1024\ ...
+.Li 1024 ...
+.El
+.Pp
+.Ql \&.Li
+宏可以被 (其他宏) 分析和调用.
+.It \&.Sy
+一般说来 symbolic 强调宏 无论在 象徵主义 角度, 还是 传统的英语 里,
+都是 用 黑体 (bold) 显示.
+.Pp
+.Dl Usage: .Sy symbol ... \*(Pu
+.Bl -tag -width ".Sy Important Noticex" -compact -offset 14n
+.It Li \&.Sy Important Notice
+.Sy Important Notice
+.El
+.Pp
+.Ql \&.Sy
+宏可以被 (其他宏) 分析和调用.
+.Ql \&.Sy
+的参数 可以 用 引号括起.
+.It Li \&.Bf
+字体模式开始.
+.Ql \&.Bf
+字体模式 必须用
+.Ql \&.Ef
+宏结束. 字体模式宏 可以 嵌套.
+.Ql \&.Bf
+宏 用 下面的 语法:
+.Pp
+.Dl ".Bf font-mode"
+.Pp
+字体模式 必须 是 下列 三种 之一:
+.Ql \&.Bf .
+.Pp
+.Bl -tag -width "file file_name  " -compact
+.It Sy \&Em | Fl emphasis
+就象 是 把
+.Ql \&.Em
+宏 用在 整个 正文块 一样.
+.It Sy \&Li | Fl literal
+就象 是 把
+.Ql \&.Li
+宏 用在 整个 正文块 一样.
+.It Sy \&Sy | Fl symbolic
+就象 是 把
+.Ql \&.Sy
+宏 用在 整个 正文块 一样.
+.El
+.It ".Ef"
+字体模式结束.
+.El
+.Ss 标记栏和列表 Tagged Lists and Columns
+有 多种 用
+.Ql ".Bl"
+列表开始宏 初始化的 列表. 表项 用
+.Ql ".It"
+项目宏 指定, 每一个 列表 必须 用
+.Ql ".El"
+宏结束. 列表 可以 嵌套在 列表和显示 中. 栏 可以 用在 列表 中, 但是 列表 
+不能 列在 栏里.
+.Pp
+另外 还可以 指定 列表属性, 像标记宽度, 列表偏移, 以及 紧凑模式
+(允许 或 不允许 表项间的 空行)
+在本文中 大多 使用了 标记风格 (tag style) 的 列表
+.Pq Fl tag .
+作为 步距变化, 表示 列表类型的 列表类型 是个 突出来 (overhanging) 的 列表
+.Pq Fl ohang .
+这种 列表类型 在
+.Tn TeX
+用户中 很流行, 但 看过 很多 页 的 标记列表 后 可能会 觉得 有点 滑稽.
+.Ql ".Bl" 
+宏 可以 接受 下面的 列表类型:
+.Pp
+.Bl -ohang -compact
+.It Fl bullet
+.It Fl item
+.It Fl enum
+这三个 是 最简单的 列表类型. 一旦 使用了
+.Ql ".Bl"
+宏, 只能用
+.Ql ".It"
+宏 组织 表项 . 例如, 可以 这样 写 一个 简单的 数字列表"
+.Bd -literal -offset indent-two
+\&.Bl -enum -compact
+\&.It
+\&Item one goes here.
+\&.It
+\&And item two here.
+\&.It
+\&Lastly item three goes here.
+\&.El
+.Ed
+.Pp
+结果是:
+.Pp
+.Bl -enum -offset indent-two -compact
+.It
+Item one goes here.
+.It
+And item two here.
+.It
+Lastly item three goes here.
+.El
+.Pp
+简单的布告栏:
+.Bd -literal -offset indent-two
+\&.Bl -bullet -compact
+\&.It
+\&Bullet one goes here.
+\&.It
+\&Bullet two here.
+\&.El
+.Ed
+.Pp
+产生:
+.Bl -bullet -offset indent-two -compact
+.It
+Bullet one goes here.
+.It
+Bullet two here.
+.El
+.Pp
+.It Fl tag
+.It Fl diag
+.It Fl hang
+.It Fl ohang
+.It Fl inset
+这些 列表类型 收集
+.Ql \&.It
+宏 指定的 参数, 并且 创建 一个 标签, 它 可能会
+.Em 插入 inset
+后面的 文字中,
+.Em 悬挂 (hanged)
+显示在 后面的 文字前,
+.Em 突前 (overhanged)
+显示在 更高 位置, 并且 不能 缩进 或
+.Em 标记 tagged .
+这个 列表 由
+.Ql Fl ohang
+列表类型 构建.
+.Ql \&.It
+宏 只能 被 插入 (inset), 悬挂 (hang), 和 标记列表类型宏 分析,
+且 不能 被调用. 
+.El
+这是 一个 插入标签 的 例子:
+.Bl -inset -offset indent
+.It Em Tag
+The tagged list (also called a tagged paragraph) is the
+most common type of list used in the Berkeley manuals.
+.It Em Diag
+Diag lists create section four diagnostic lists
+and are similar to inset lists except callable
+macros are ignored.
+.It Em Hang
+Hanged labels are a matter of taste.
+.It Em Ohang
+Overhanging labels are nice when space is constrained.
+.It Em Inset
+Inset labels are useful for controlling blocks of
+paragraphs and are valuable for converting
+.Nm \-mdoc
+manuals to other formats.
+.El
+.Pp
+下面是 产生 这个例子 的 源文本:
+.Bd -literal -offset indent
+\&.Bl -inset -offset indent
+\&.It Em Tag
+\&The tagged list (also called a tagged paragraph) is the
+\&most common type of list used in the Berkeley manuals.
+\&.It Em Diag
+\&Diag lists create section four diagnostic lists
+\&and are similar to inset lists except callable
+\&macros are ignored.
+\&.It Em Hang
+\&Hanged labels are a matter of taste.
+\&.It Em Ohang
+\&Overhanging labels are nice when space is constrained.
+\&.It Em Inset
+\&Inset labels are useful for controlling blocks of
+\&paragraphs and are valuable for converting
+\&.Nm \-mdoc
+\&manuals to other formats.
+\&.El
+.Ed
+.Pp
+这是 含有 两个表项 的 悬挂列表:
+.Bl -hang -offset indent
+.It Em Hanged
+labels appear similar to tagged lists when the
+label is smaller than the label width.
+.It Em Longer hanged list labels
+blend in to the paragraph unlike
+tagged paragraph labels.
+.El
+.Pp
+它们的 源文本为:
+.Bd -literal -offset indent
+\&.Bl -hang -offset indent
+\&.It Em Hanged
+\&labels appear similar to tagged lists when the
+\&label is smaller than the label width.
+\&.It Em Longer hanged list labels
+\&blend in to the paragraph unlike
+\&tagged paragraph labels.
+\&.El
+.Ed
+.Pp
+带有 可选 宽度项的 标记列表 可以 控制 标记的 宽度.
+.Pp
+.Bl -tag -width "PAGEIN" -compact -offset indent
+.It SL
+sleep time of the process (seconds blocked)
+.It PAGEIN
+number of disk
+.Tn I/O Ns 's
+resulting from references
+by the process to pages not loaded in core.
+.It UID
+numerical user-id of process owner
+.It PPID
+numerical id of parent of process process priority
+(non-positive when in non-interruptible wait)
+.El
+.Pp
+源文本是:
+.Bd -literal -offset indent
+\&.Bl -tag -width "PAGEIN" -compact -offset indent
+\&.It SL
+\&sleep time of the process (seconds blocked)
+\&.It PAGEIN
+\&number of disk
+\&.Tn I/O Ns 's
+\&resulting from references
+\&by the process to pages not loaded in core.
+\&.It UID
+\&numerical user-id of process owner
+\&.It PPID
+\&numerical id of parent of process process priority
+\&(non-positive when in non-interruptible wait)
+\&.El
+.Ed
+.Pp
+可接受的 宽度说明:
+.Bl -tag -width Ar -offset indent
+.It Fl width Ar "\&Fl"
+把 宽度 设置为 标志 (flag) 的 缺省 宽度. 所有 可调用的 宏 都有
+一个 缺省 宽度值. 目前
+.Ql \&.Fl 
+的 值 设为 十个 字符宽度, 大约 5/6 英寸.
+.It Fl width Ar "24n"
+设置 宽度 为 24 个 字符宽度, 大约 两英寸. 要使 比例 调整正常, 字母
+.Ql n
+必不可少
+.It Fl width Ar "ENAMETOOLONG"
+设置 宽度为 所给串的 长度.
+.It Fl width  Ar "\\*qint mkfifo\\*q"
+同样, 设置 宽度为 所给串的 长度.
+.El
+.Pp
+如果 没有 为 标记列表类型 指定 宽度, 第一次 调用
+.Ql \&.It
+的 时候, 格式化软件 试图 决定 适当的宽度. 如果
+.Ql ".It"
+的 第一个 参数 是 可调用宏, 就 使用 这个宏的 缺省宽度, 就像 把 宏名 当做宽度.
+可是 如果 列表中 的 其他表项 得到 另一个 可调用宏, 则 认为 它是 新的, 
+嵌套的 列表.
+.Sh 预定义串 PREDEFINED STRINGS
+下面的串 是 预定义的, 可以 用在 troff 的 串翻译序列
+.Ql \&\e*(xx
+中, 这里的
+.Em xx
+就是 定义的 串名; 以及 串翻译序列
+.Ql \&\e*x ,
+这里的
+.Em x
+是串名. 翻译序列 可以 用在 文本 的 任何地方.
+.Pp
+.Bl -column "String " "Nroff " "Troff " -offset indent
+.It Sy "String	Nroff	Troff"
+.It Li "<=" Ta \&<\&= Ta \*(<=
+.It Li ">=" Ta \&>\&= Ta \*(>=
+.It Li "Rq" Ta "''" Ta \*(Rq
+.It Li "Lq" Ta "``" Ta \*(Lq
+.It Li "ua" Ta ^ Ta \*(ua
+.It Li "aa" Ta ' Ta \*(aa
+.It Li "ga" Ta \` Ta \*(ga
+.\" .It Li "sL" Ta ` Ta \*(sL
+.\" .It Li "sR" Ta ' Ta \*(sR
+.It Li "q" Ta \&" Ta \*q
+.It Li "Pi" Ta pi Ta \*(Pi
+.It Li "Ne" Ta != Ta \*(Ne
+.It Li "Le" Ta <= Ta \*(Le
+.It Li "Ge" Ta >= Ta \*(Ge
+.It Li "Lt" Ta < Ta \*(Gt
+.It Li "Gt" Ta > Ta \*(Lt
+.It Li "Pm" Ta +- Ta \*(Pm
+.It Li "If" Ta infinity Ta \*(If
+.It Li "Na" Ta \fINaN\fP Ta \*(Na
+.It Li "Ba" Ta \fR\&|\fP Ta \*(Ba
+.El
+.Pp
+.Sy 注意 :
+那个 名为
+.Ql q
+的 串 应该 写成
+.Ql \e*q ,
+因为 它 只有 一个字符.
+.Sh 诊断 DIAGNOSTICS
+.Nm \-mdoc
+的 除错系统 比较 有限, 但是 可以 帮助你 检测出 微妙的 错误,
+例如 参数名 和 内部寄存器 或 宏名 冲突. (是什么?) 寄存器 是
+.Xr troff
+的 算术存储类, 用 一到二个字符 命名.
+.Nm \-mdoc
+对
+.Xr troff
+和
+.Xr ditroff
+而言, 所有
+.Nm \-mdoc
+的 内部寄存器 由 两个字符 组成, 格式是 <大写字母> <小写字母> 如
+.Ql \&Ar ,
+<小写字母> <大写字母> 如
+.Ql \&aR
+或 <字母> <数字> 如
+.Ql \&C\&1 .
+作为 乱上加乱,
+.Xr troff
+有 它 自己的 内部寄存器, 由 两个 小写字母 组成, 或者 是 一个点 加上 
+一个字母, 或者 是 转义字符 (meta-character) 和 字符. 已经 介绍过的 
+示例中 展示过 怎样用 转义序列
+.Ql \e& 
+防止 解释宏. 这办法 同样 适用于 内部寄存器名.
+.Pp
+.\" Every callable macro name has a corresponding register
+.\" of the same name (<upper_case><lower_case>).
+.\" There are also specific registers which have
+.\" been used for stacks and arrays and are listed in the
+.\" .Sx Appendix .
+.\" .Bd -ragged -offset 4n
+.\" [A-Z][a-z]	registers corresponding to macro names (example ``Ar'')
+.\" [a-z][A-Z]	registers corresponding to macro names (example ``aR'')
+.\" C[0-9]		argument types (example C1)
+.\" O[0-9]		offset stack (displays)
+.\" h[0-9]		horizontal spacing stack (lists)
+.\" o[0-9]		offset (stack) (lists)
+.\" t[0-9]		tag stack (lists)
+.\" v[0-9]		vertical spacing stack (lists)
+.\" w[0-9]		width tag/label stack
+.\" .Ed
+.\" .Pp
+如果 未经转义的 寄存器名 出现在 宏请求的 参数列表 中, 其 后果 不可预测.
+一般说来, 如果 大段的文字 没有 出现在 该出现的 地方, 或者 短句, 如标签, 
+消失了, 多半是 这个地方 误解了 参数列表中的 参数类型.
+既然 你的母亲 都 没打算 让你 记住 那些 乱七八糟的 东西, 那就 用 一种办法
+来 找出 参数 是否 有效: 
+.Ql \&.Db
+(debug) 宏 可以 显示出 对 大多数宏 的 参数列表的 解释.
+诸如
+.Ql \&.Pp
+之类 的 宏 不包含 调试信息, 但是 所有 可调用宏 包含, 我们 强烈建议 一旦
+有 疑点, 打开
+.Ql \&.Db
+宏.
+.Pp
+.Dl Usage: \&.Db [on | off]
+.Pp
+在 这个 示例中, 我们把 介于 debug 宏 之间 的 文本 故意 弄出点 错误 (标志参数
+.Ql \&aC
+应该 写成
+.Ql \e&aC
+):
+.Bd -literal -offset indent
+\&.Db on
+\&.Op Fl aC Ar file )
+\&.Db off
+.Ed
+.Pp
+结果输出为:
+.Bd -literal -offset indent
+DEBUGGING ON
+DEBUG(argv) MACRO: `.Op'  Line #: 2
+	Argc: 1  Argv: `Fl'  Length: 2
+	Space: `'  Class: Executable
+	Argc: 2  Argv: `aC'  Length: 2
+	Space: `'  Class: Executable
+	Argc: 3  Argv: `Ar'  Length: 2
+	Space: `'  Class: Executable
+	Argc: 4  Argv: `file'  Length: 4
+	Space: ` '  Class: String
+	Argc: 5  Argv: `)'  Length: 1
+	Space: ` '  Class: Closing Punctuation or suffix
+	MACRO REQUEST: .Op Fl aC Ar file )
+DEBUGGING OFF
+.Ed
+.Pp
+调试信息的 第一行 是 调用的 宏名, 这里是
+.Ql \&.Op 
+和 它 所在的 行号. 如果 涉及了 一个 或 多个 文件 (特别是 其他文件 
+包含进来), 行号有可能失灵. 但如果 只有 一个文件, 它 应该是 准的.
+第二行 给出了 参数计数, 参数
+.Pq Ql \&Fl
+和 它的长度. 如果 参数的长度 是 两个字符, 将会 测试 看它 能否 执行 
+(不幸的是,含有 非零值 的 寄存器 看上去 都能执行).
+第三行 给出 分配给类的 空间, 以及 类的类型. 这里的 问题是, 参数 aC 
+不应该 可执行. 类的 四种类型是 字符串, 可执行类, 结束标点, 和开始标点.
+最后一行 显示了 读入的 完整 参数行. 下个例子里, 惹祸的
+.Ql \&aC
+被转义了:
+.Bd -literal -offset indent
+\&.Db on
+\&.Em An escaped \e&aC
+\&.Db off
+.Ed
+.Bd -literal -offset indent
+DEBUGGING ON
+DEBUG(fargv) MACRO: `.Em'  Line #: 2
+	Argc: 1  Argv: `An'  Length: 2
+	Space: ` '  Class: String
+	Argc: 2  Argv: `escaped'  Length: 7
+	Space: ` '  Class: String
+	Argc: 3  Argv: `aC'  Length: 2
+	Space: ` '  Class: String
+	MACRO REQUEST: .Em An escaped &aC
+DEBUGGING OFF
+.Ed
+.Pp
+参数
+.Ql \e&aC
+表现出 同样的 长度2, 这是 因为
+.Ql \e&
+序列的 长度 为零, 但是 不存在 叫做
+.Ql \e&aC
+的 寄存器, 因此 它的类型 是 字符串.
+.Pp
+其他 诊断内容 是 使用报告等, 能够 自我解释的.
+.Sh GROFF, TROFF AND NROFF
+The
+.Nm \-mdoc
+宏包 不需要 和
+.Xr groff 
+的 兼容模式.
+.Pp
+为了 便于 在线阅读, 这个宏包 阻止了 分页, 页头, 页脚 之类 常常在
+.Xr nroff 
+中 出现的 中断. 此时 即使在 手册页 尾,
+.Xr groff
+(和参数
+.Fl T Ns Ar ascii
+) 也 不会 提示 什么. 对 分页的 阻止 使得
+.Xr nroff Ns 'd
+文件 不适合 硬拷贝 (hardcopy). 有一个 名为
+.Ql \&cR
+的 寄存器 可以 通过 在 文件
+.Pa /usr/src/share/tmac/doc-nroff
+(依赖于宿主系统) 中置零, 恢复 传统风格.
+.Sh 相关文件 FILES
+.Bl -tag -width /usr/share/man0/template.doc -compact
+.It Pa /usr/share/tmac/tmac.doc
+手册宏包
+.It Pa /usr/share/misc/mdoc.template
+编写 手册 的 模板
+.It Pa /usr/share/examples/mdoc/*
+一些 手册页 的 例子
+.El
+.Sh 另见 SEE ALSO
+.Xr man 1 ,
+.Xr troff 1 ,
+.Xr mdoc 7
+.Sh BUGS
+仍然 没有 解决 在 标志参数中的 连字符, 在
+.Sx 描述 DESCRIPTION
+小节 偶尔 会 出点麻烦 (在 连字符处 断行).
+.Pp
+文档中 没有 声明 预定义串.
+.Pp
+还没有 把 3f 小节 加进 头例程 (header routine) 中.
+.Pp
+.Ql \&.Nm
+字体 不应当在
+.Sx NAME
+小节 中 改变.
+.Pp
+应该 检查
+.Ql \&.Fn
+防止 行 太短 的 时候 断行.
+偶然 它会 断开 反括弧, 而 有时候 如果 某行 已满时, 看上去 会 很可笑.
+.Pp
+当 使用 nroff 格式化 文档 时, 防止 页头和页脚 (不是 初始的 头和脚) 断开 的 方法
+有可能 偶尔 在 页的底部 产生 一个 不可见的 部分填满的 行 (空行).
+.Pp
+列表和显示宏不做任何保存, 显然它应该做的.
+.\" Note what happens if the parameter list overlaps a newline
+.\" boundary.
+.\" to make sure a line boundary is crossed:
+.\" .Bd -literal
+.\" \&.Fn struct\e\ dictionarytable\e\ *dictionarylookup struct\e\ dictionarytable\e\ *tab[]
+.\" .Ed
+.\" .Pp
+.\" produces, nudge nudge,
+.\" .Fn struct\ dictionarytable\ *dictionarylookup char\ *h struct\ dictionarytable\ *tab[] ,
+.\" .Fn struct\ dictionarytable\ *dictionarylookup char\ *h struct\ dictionarytable\ *tab[] ,
+.\" nudge
+.\" .Fn struct\ dictionarytable\ *dictionarylookup char\ *h struct\ dictionarytable\ *tab[] .
+.\" .Pp
+.\" If double quotes are used, for example:
+.\" .Bd -literal
+.\" \&.Fn \*qstruct dictionarytable *dictionarylookup\*q \*qchar *h\*q \*qstruct dictionarytable *tab[]\*q
+.\" .Ed
+.\" .Pp
+.\" produces, nudge nudge,
+.\" .Fn "struct dictionarytable *dictionarylookup" "char *h" "struct dictionarytable *tab[]" ,
+.\" nudge
+.\" .Fn "struct dictionarytable *dictionarylookup" "char *h" "struct dictionarytable *tab[]" ,
+.\" nudge
+.\" .Fn "struct dictionarytable *dictionarylookup" "char *h" "struct dictionarytable *tab[]" .
+.\" .Pp
+.\" Not a pretty sight...
+.\" In a paragraph, a long parameter containing unpaddable spaces as
+.\" in the former example will cause
+.\" .Xr troff
+.\" to break the line and spread
+.\" the remaining words out.
+.\" The latter example will adjust nicely to
+.\" justified margins, but may break in between an argument and its
+.\" declaration.
+.\" In
+.\" .Xr nroff
+.\" the right margin adjustment is normally ragged and the problem is
+.\" not as severe.
+.Bf
+.Sh "[中文版维护人]"
+.Sy 徐明 <xuming@users.sourceforge.net>
+.Sh "[中文版最新更新]"
+.Sy 2003/05/13
+.Sh "《中国Linux论坛man手册页翻译计划》"
+.Sy http://cmpp.linuxforum.net
+.Ef

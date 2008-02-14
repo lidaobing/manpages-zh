@@ -1,0 +1,382 @@
+.\" Copyright 1996 Derek B. Noonburg
+.TH xpdf 1 "02 Aug 1999"
+.SH NAME
+xpdf \-Portable Document Format(PDF)文件阅读器(版本0.90)
+.SH 总览
+.B xpdf
+[选项]
+.RI [ PDF文件
+.RI [ page]]
+.SH 描述
+.B Xpdf是一个 Portable Document Format(PDF) 文件阅读软件.(PDF文件也经常被称为"Acrobat" 文件,这种叫法来源于Adobe公司的PDF软件的名字.) Xpdf运行在UNIX,VMS和OS/2的X Window系统下.
+.PP
+运行xpdf,只要键入:
+.PP
+.RS
+xpdf file.pdf
+.RE
+.PP
+.I file.pdf
+是你的PDF文件.文件名字后面可以跟随一个数字,用于指定最先显示的页面的页码,比如:
+.PP
+.RS
+xpdf file.pdf 18
+.RE
+.PP
+你当然也可以启动xpdf而不打开任何文件.
+.PP
+.RS
+xpdf
+.RE
+.SH 选项
+方括弧中列出了X资源和相应的选项
+.TP
+.B \-err
+将错误信息指定送到/dev/tty而不是标准错误中(此选项当xpdf被其它程序,比如netscape,打开时,十分有用,否则,每个错误都会弹出一个令人讨厌的小窗口).
+.TP
+.BI \-z " zoom"
+设定初始的放大因子.放大因子是(-5..5)之间的一个数字,其中0表示72dpi.你也可以通过\`page`设定显示页面大小配合窗口大小,或者通过\`width`设定显示页面宽度配合窗口宽度.
+.RB [ xpdf.initialZoom]
+.TP
+.BI \-g " geometry"
+设定窗口的初始几何参数.
+.RB (相当于 \-geometry.)
+.RB [ xpdf.geometry]
+.TP
+.BI \-remote " name"]
+启动/连接名为name的xpdf远程服务器(参见后面的"远程服务器模式"部分)
+.TP
+.B \-raise
+建立xpdf远程服务器窗口.(仅适用于-remote时)
+.TP
+.B -\quit
+退出xpdf远程服务器.(仅适用于-remote时)
+.TP
+.B \-cmap
+安装一个自定义的色彩地图.此选项在TrueColor模式下无效.
+.RB [ xpdf.installCmap]
+.TP
+.BI \-rgb " number"
+设置xpdf将要分配的最大RGB值.缺省值是5(即RGB值5x5x5); 设置一个小数值,可以节省色彩表记录.在自定义色彩地图和TrueColor模式下,此选项无效.
+.TP
+.BI \-papercolor " color"
+设置"页面色彩",比如,页面的显示背景.当pdf文件出现类似在字符后填充白色等情况的时候,此选项无法正常工作.
+.RB [ xpdf.paperColor]
+.TP
+.B \-eucjp
+复制字符时,将日文字符转换成EUC-JP编码.这是至今为止唯一的日文字符转换选项---它的唯一作用就是将非日文字符转换成7-bit的ASCII,以便于配合EUC-JP编码.(此选项只有在编译pdftotext时加上日文支持才有效)
+.RB [ xpdf.eucjp ]
+.TP
+.BI \-t1lib " font-type"
+设定使用t1lib类型的字体提供器.选项为\`none`(完全不使用t1lib),\`plain`(使用non-anti-aliased字体),\`low`或\`high`(使用low-level或者high-level anti-aliased 字体).
+.RB [ xpdf.t1libControl]
+.TP
+.BI \-ps " PS-file"
+设定缺省的PostScript输出文件的名字.此选项也可以以\`|command`的形式,通过某个命令来管道PostScript文件.
+.RB [ xpdf.psFile]
+.TP
+.BI \-paperw " size"
+设定页面宽度,单位是像素点.
+.RB [ xpdf.psPaperWidth]
+.TP
+.BI \-paperh " size"
+设定页面高度,单位是像素点.
+.RB [ xpdf.psPaperHeight]
+.TP
+.B \-level1
+产生Level1 PostScript文件.输出的PostScript文件相当的大(如果它包含图片的话),但是确可以在Level 1打印机上打印输出.此选项将所有的图像转换成黑白图像.
+.RB [ xpdf.psLevel1]
+.TP
+.B \-cmd
+打印出命令的执行结果(在调试时有用)
+.TP
+.B \-q
+不打印任何信息或者错误
+.TP
+.B \-h
+打印帮助信息
+.RB (相当于 \-help)
+.PP
+一些其他的X选项和资源同样可以如预期的一样执行
+.TP
+.BI \-display " display"
+.RB [ xpdf.display]
+.TP
+.BI \-fg " color"
+.RB [ 相当于 \-foreground]
+.RB [ xpdf.foreground]
+.RB \-bg " color"
+.RB (相当于 \-background)
+.RB [ xpdf.background]
+.TP
+.BI \-font " font"
+.RB ( 相当于 \-fn)
+.RB [ xpdf.font]
+.PP
+色彩和字体选项只影响用户界面部分,不影响PDF文件的显示.(\`paper`)
+.PP
+下列的X资源没有对应的命令行选项
+.TP
+.B xpdf.urlCommand
+设定,当你点击网络链接时执行的命令.详情参见后面的
+.B "网络浏览器"
+部分.
+.TP
+.B xpdf.japaneseFont
+设定用于使用日文字符的相应的X字体模式.缺省的是:
+.PP
+.RS
+-*-fixed-medium-r-normal-*-%s-*-*-*-*-*-jisx0208.1983-0
+.RE
+.TP
+.B xpdf.viKeys
+设定将左,右,上和下的滚动由\`h`,\`l`,\`k`和\`j`键执行.
+.PP
+下面的资源用于设定文件名字使用的14种基本的Type 1字体.
+.PP
+.RS
+.B xpdf.t1TimesRoman
+.br
+.B xpdf.t1TimesItalic
+.br
+.B xpdf.t1TimesBold
+.br
+.B xpdf.t1TimesBoldItalic
+.br
+.B xpdf.t1Helvetica
+.br
+.B xpdf.t1HelveticaOblique
+.br
+.B xpdf.t1HelveticaBold
+.br
+.B xpdf.t1HelveticaBoldOblique
+.br
+.B xpdf.t1Courier
+.br
+.B xpdf.t1CourierOblique
+.br
+.B xpdf.t1CourierBold
+.br
+.B xpdf.t1CourierBoldOblique
+.br
+.B xpdf.t1Symbol
+.br
+.B xpdf.t1ZapfDingbats
+.RE
+.PP
+如果激活t1lib,这些Type 1字体将被用于取代X服务器的字体.
+.SH 控制
+.SS 屏幕控制在xpdf窗口的底部.
+.TP
+.B "左/右箭头按键"
+翻到前/后一页
+.TP
+.B "双左/右箭头按键"
+向前/后翻动10页
+.TP
+.B "破折号左/右箭头按键"
+沿着历史路径向前/后翻动
+.TP
+.B "\`Page`输入框"
+翻到指定的页码.通过点击激活输入框,输入页码,然后回车.
+.TP
+.B "放大缩小弹出菜单"
+调整放大因子.(参见前面-z选项的说明)
+.TP
+.B "望远镜按键"
+查找某个文本.
+.TP
+.B "打印机按键"
+弹出一个产生PostScript文件的对话框.对话框可以设定需要
+打印的页面和PostScript文件的名字.当文件名字为\'-'时,代表
+标准输出,或者用\'|command'通过某个命令来管道PostScript,
+比如,\'|lpr'.
+.TP
+.B "\'?'按键"
+弹出一个\'about xpdf'窗口.
+.TP
+.B "链接信息"
+当鼠标移动到某个链接的上面,\`?`和\`Quit`按键之间的空间用来显示链接地址或者外部文件名.
+.TP
+.B "\`Quit`按键"
+退出xpdf.
+.PP
+.SS 菜单
+按鼠标右键,会弹出一个含有以下命令的弹出菜单.
+.TP
+.B "Open..."
+通过文件选择器打开一个新文件.
+.TP
+.B "Save PDF..."
+通过文件选择器保存现有文件.
+.TP
+.B "Rotate left"
+将当前页面逆时针旋转90度.
+.TP
+.B "Rotate right"
+将当前页面顺时针旋转90度.这两个旋转命令主要是为了那些没有在文件中正确指定旋转信息的PDF文件设计的,即使您的X服务器不支持字体旋转,它依然起作用.
+.TP
+.B "Quit"
+退出xpdf.
+.PP
+.SS 字符选择
+按住鼠标并拖动它,可以高亮出一个任意的矩形.任何在此矩形中的字符都会被复制到X选择缓冲中去.
+.PP
+.SS 链接
+点击一个超级链接可以跳转到此链接的目标地址中去.一个指向某个PDF文件的链接将促使xpdf打开此文件.一个指向某可执行程序的\`launch`的链接将弹出一个对话框,如果您点击\`ok`,就会执行此程序.URL链接调出某个外部命令.(参见下面网络浏览器部分.)
+.PP
+.SS 滚动
+按住鼠标中键并拖动之,可以滚动页面.
+.PP
+.SS 快捷键
+.TP
+.B o
+通过文件选择器打开一个新PDF文件.
+.TP
+.B f
+查找字符串.
+.TP
+.B n
+翻到下一页.
+.TP
+.B p
+翻到前一页.
+.TP
+.BR 空格键,PageDown键或者Next键
+向下滚动当前页面,如果已经到达当前页面低部,则翻到下一页.
+.TP
+.BR Backspace键,Delete键,PageUp或者Previous键
+向上滚动当前页面,如果已经到达页面顶部,则翻到前一页.
+.TP
+.B Home键
+滚动到当前页面顶部.
+.TP
+.B End键
+滚动到当前页面低部.
+.TP
+.B 箭头键
+滚动当前页面.
+.TP
+.B control-L
+更新当前页面.
+.TP
+.B q
+退出xpdf.
+.SH "网络浏览器"
+如果您希望点击一个指向PDF文件的链接时,从netscape或者mosaic(或者其他的浏览器)中自动启动xpdf,您需要在您的用户目录下修改(或者创建)
+.I .mime.types
+和
+.I .mailcap
+文件.
+在
+.I .mime.types
+中加入一行:
+.PP
+.RS
+application/pdf pdf
+.RE
+.PP
+在
+.I .mailcap
+中加入:
+.PP
+.RS
+# Use xpdf to view PDF files.
+.RE 
+.RS
+application/pdf; xpdf -err %s
+.RE
+.PP
+确认xpdf在您的可执行查找路径中.
+.PP
+当您点击一个PDF文件中的URL链接,xpdf将执行一个由xpdf.urlCommand资源指定的命令,并将资源中\`%s`替换为相应的URL.比如,指定netscape打开URL,可以这样设定资源.
+.PP
+.RS
+xpdf.urlCommand: netscape -remote `openURL(%s)`
+.RE
+.SH "远程服务器模式"
+通过指定一个服务器的名字,xpdf可以以远程服务器模式打开(和文件名,页码).
+.PP
+.RS
+xpdf -remote myServer file.pdf
+.RE
+.PP
+如果没有xpdf运行在以myServer为名字的服务器模式中,那么一个新的xpdf窗口会被打开.此时,如果键入另一个命令:
+.PP
+.RS
+xpdf -remote myServer another.pdf 9
+.RE
+.PP
+则不会启动新的xpdf,而前一个xpdf(服务器)将会打开
+.I another.pdf
+并且显示第9页.如果文件名字相同:
+.PP
+.RS
+xpdf -remote myServer another.pdf 4
+.RE
+.PP
+xpdf服务器将会简单的显示指定的页面.
+.PP
+-raise选项通知服务器唤醒它的窗口.它既可以后面跟随文件名和页码也可以单独使用.
+.PP
+-quit选项通知服务器关闭窗口并且退出.
+.SH "选项文件"
+xpdf会从您的用户目录(如果有的话)中读取一个叫做
+.I .xpdfrc
+的文件.这个文件可以包含两种条目.
+.TP
+.BI fontpath " directory"
+在
+.IR dicrectory
+中寻找Type 1字体.
+Xpdf只通过此条目获得字体编码.为了显示,还要通过
+.B fontmap
+条目来布局字体.
+.TP
+.BI fontmap " PDF-font" "" " X-font"
+将
+.I PDF-font
+(PDF文件中指定的)布局到
+.IR X-font
+中去,X-font必须是一个在像素大小位置上含有\`%s`的标准X字体描述.
+.PP
+比如,使用
+.PP
+.RS
+fontmap TimesCE-Roman -*-times-medium-r-*-*-%s-*-*-*-*-*-iso8859-2
+.RE
+.PP
+来布局Central European(Latin-2)版的Times-Roman字体.这里假设您已经安装了适当的X字体(参见
+.BR mkfontdir(1)
+).
+Xpdf理解ISO8859-2编码,所以您不需要这些字体的
+.B fontpath
+条目.
+使用Bakoma Type 1字体,可以这样做:
+.PP
+.RS
+fontpath /home/derekn/fonts/bakoma
+.br
+fontmap cmb10 -bakoma-cmb10-medium-r-normal--%s-*-*-*-p-*-adobe-fontspecific
+.br
+fontmap cmbsy10 -bakoma-cmbsy10-medium-r-normal--%s-*-*-*-p-*-adobe-fontspecific
+.br
+etc...
+.RE
+.PP
+这里假设Type 1字体在目录
+.IR /home/derekn/fonts/bakoma
+下.
+.SH 臭虫
+不支持TypeType和Type 3字体.
+.SH 作者
+The xpdf software and documentation are copyright 1996-1999 Derek
+B. Noonburg (derekn@foolabs.com).
+.SH "另见"
+.BR pdftops(1).
+.BR pdftotext(1).
+.BR pdfinfo(1).
+.BR pdftopbm(1).
+.BR pdfimages(1).
+.br
+.B http://www.foolabs.com/xpdf/

@@ -1,0 +1,85 @@
+.\" Copyright (c) Bruno Haible <haible@clisp.cons.org>
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" References consulted:
+.\"   GNU glibc-2 source code and manual
+.\"   GNU gettext source code and manual
+.\"   LI18NUX 2000 Globalization Specification
+.\"
+
+.TH BINDTEXTDOMAIN 3 "May 2001" "GNU gettext 0.10.38"
+.SH NAME
+bindtextdomain \- 设置 包括 消息条目 的 路径
+
+.SH "总览 (SYNOPSIS)"
+.nf
+.B #include <libintl.h>
+.sp
+.BI "char * bindtextdomain (const char * " domainname ", const char * " dirname );
+.fi
+
+.SH "描述 (DESCRIPTION)"
+\fBbindtextdomain\fP 函数 的 作用 是 设置 指定消息域 里，包含 消息条目
+(message catalog) 的 基本目录 层次结构。
+
+.PP
+一个 消息域 是 一套 可翻译的 \fImsgid\fP 消息。 通常，
+每一个 软件包 有 它自己的 消息域。 提出 \fBbindtextdomain\fP 的 需求 是因为
+软件包 安装 的 时候，并不总和 <libintl.h> 头文件 和 libc/libintl 库文件 的前缀
+保持一致.
+
+.PP
+消息条目 期望的 路径名 是
+\fIdirname\fP/\fIlocale\fP/\fIcategory\fP/\fIdomainname\fP.mo,
+其中 \fIlocale\fP 是 locale 名, 而 \fIcategory\fP 是 locale 面, 如 
+\fBLC_MESSAGES\fP.
+.PP
+\fIdomainname\fP 必须 是 非空字符串。
+.PP
+如果 \fIdirname\fP 不是 NULL, 属于 \fIdomainname\fP 域 的
+消息条目 的 基本目录 被设置为 \fIdirname\fP。 函数 能够 复制 参数字符串。
+如果 程序 希望 调用 \fBchdir\fP 函数， \fIdirname\fP 必须 是 绝对路径名；
+否则 程序 无法 保证 找到 消息条目。
+.PP
+如果 \fIdirname\fP 是 NULL， 函数 返回 以前 为 \fIdomainname\fP 域 设置的 
+基本目录。
+
+.SH "返回值 (RETURN VALUE)"
+如果成功, \fBbindtextdomain\fP 函数 返回 当前 \fIdomainname\fP 域
+的 基本目录, 如果 改变了 基本目录, 返回 改变后的 基本目录。 
+返回的 字符串 一直 有效, 直到 下一次 对 同一个 \fIdomainname\fP 调用
+\fBbindtextdomain\fP; 这个 字符串 不应该 被修改 或 释放。
+如果 发生 内存分配错误, \fBerrno\fP 设置为 \fBENOMEM\fP, 然后 返回 NULL.
+
+.SH "错误 (ERRORS)"
+下列 错误 可能 发生， 包括 其它的：
+.TP
+.B ENOMEM
+没有 足够的 内存 可用。
+
+.SH BUGS
+返回类型 应该是 \fBconst char *\fP, 但是 为了 避免 较早版本 ANSI C 代码 的 
+警告, 返回类型 是 \fBchar *\fP.
+
+.SH "另见 (SEE ALSO)"
+.BR gettext (3),
+.BR dgettext (3),
+.BR dcgettext (3),
+.BR ngettext (3),
+.BR dngettext (3),
+.BR dcngettext (3),
+.BR textdomain (3),
+.BR realpath (3)
+
+.SH "[中文版维护人]"
+.B Viamu <viamu@msn.com>
+.SH "[中文版最新更新]"
+2003/11/28
+.SH "[中文版校对人]"
+.B Xuming <xuming@users.sourceforge.net>
+.SH "《中文MAN-PAGE计划》"
+.BI http://cmpp.linuxforum.net

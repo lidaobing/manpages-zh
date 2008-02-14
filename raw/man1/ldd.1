@@ -1,0 +1,55 @@
+.\" Copyright 1995-2000 David Engel (david@ods.com)
+.\" Copyright 1995 Rickard E. Faith (faith@cs.unc.edu)
+.\" Copyright 2000 Ben Collins (bcollins@debian.org)
+.\"    Redone for GLibc 2.2
+.\" Copyright 2000 Jakub Jelinek (jakub@redhat.com)
+.\"    Corrected.
+.\" Most of this was copied from the README file.  Do not restrict distribution.
+.\" May be distributed under the GNU General Public License
+.TH LDD 1 "30 October 2000"
+.SH NAME
+ldd \- print shared library dependencies
+.SH SYNOPSIS
+.B ldd
+.RB [OPTION]...
+FILE...
+.SH DESCRIPTION
+.B ldd
+prints the shared libraries required by each program or shared library
+specified on the command line.
+.SH OPTIONS
+.TP
+.B \-\-version
+Print the version number of
+.BR ldd .
+.TP
+.B \-v\ \-\-verbose
+Print all information, including e.g. symbol versioning information.
+.TP
+.B \-d\ \-\-data\-relocs
+Perform relocations and report any missing objects (ELF only).
+.TP
+.B \-r\ \-\-function\-relocs
+Perform relocations for both data objects and functions, and
+report any missing objects or functions (ELF only).
+.TP
+.B \-\-help
+Usage information.
+.SH BUGS
+.B ldd
+does not work on a.out shared libraries.
+.PP
+.B ldd
+does not work with some extremely old a.out programs which were
+built before
+.B ldd
+support was added to the compiler releases.
+If you use
+.B ldd
+on one of these programs, the program will attempt to run with argc = 0 and
+the results will be unpredictable.
+.SH AUTHOR
+Roland McGrath and Ulrich Drepper.
+.SH SEE ALSO
+.BR ldconfig (8),
+.BR ld.so (8).
