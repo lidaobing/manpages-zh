@@ -1,4 +1,4 @@
-.TH while n
+.TH while 3tcl
 .SH NAME
 .B while - 在条件满足时重复的执行脚本
 .SH 总览

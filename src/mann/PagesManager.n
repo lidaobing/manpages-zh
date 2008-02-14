@@ -1,4 +1,4 @@
-.TH PagesManager "tcl" "tcllib - BWidget"
+.TH PagesManager 3 "tcllib - BWidget"
 
 .SH NAME
 .B PagesManager - 页面管理器组件

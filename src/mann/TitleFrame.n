@@ -1,4 +1,4 @@
-.TH TitleFrame "tcl" "tcllib - BWidget"
+.TH TitleFrame 3 "tcllib - BWidget"
 
 .SH NAME
 .B TitleFrame - 有一个标题的框架

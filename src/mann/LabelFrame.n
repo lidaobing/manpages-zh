@@ -1,4 +1,4 @@
-.TH LabelFrame "tcl" "tcllib - BWidget"
+.TH LabelFrame 3 "tcllib - BWidget"
 
 .SH NAME
 .B LabelFrame - 有一个标签的框架.

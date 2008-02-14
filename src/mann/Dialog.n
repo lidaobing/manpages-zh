@@ -1,4 +1,4 @@
-.TH Dialog "tcl" "tcllib - BWidget"
+.TH Dialog 3 "tcllib - BWidget"
 
 .SH NAME
 .B Dialog  - 有定制按钮的对话框

@@ -1,4 +1,4 @@
-.TH ProgressBar "tcl" "tcllib - BWidget"
+.TH ProgressBar 3 "tcllib - BWidget"
 
 .SH NAME
 .B ProgressBar - 进度指示器组件

@@ -242,7 +242,7 @@ Database Class:	\\fB\\$3\\fR
 .de UL
 \\$1\l'|0\(ul'\\$2
 ..
-.TH library n "8.0" Tcl "Tcl Built-In Commands"
+.TH library 3tcl "8.0" Tcl "Tcl Built-In Commands"
 .BS
 .SH NAME
 auto_execok, auto_import, auto_load, auto_mkindex, auto_mkindex_old, auto_qualify, auto_reset, tcl_findLibrary, parray, tcl_endOfWord, tcl_startOfNextWord, tcl_startOfPreviousWord, tcl_wordBreakAfter, tcl_wordBreakBefore \- standard library of Tcl procedures

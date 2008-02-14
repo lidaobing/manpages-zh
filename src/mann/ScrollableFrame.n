@@ -1,4 +1,4 @@
-.TH ScrollableFrame "tcl" "tcllib - BWidget"
+.TH ScrollableFrame 3 "tcllib - BWidget"
 
 .SH NAME
 .B ScrollableFrame - 包含组件的可滚动的框架

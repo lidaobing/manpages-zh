@@ -243,7 +243,7 @@ Database Class:	\\fB\\$3\\fR
 .de UL
 \\$1\l'|0\(ul'\\$2
 ..
-.TH lindex n 8.2 Tcl "Tcl Built-In Commands"
+.TH lindex 3tcl 8.2 Tcl "Tcl Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME

@@ -15,7 +15,7 @@
 .\" $Id: memory.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
 .\"----------------------------------------------------------------------------
 .\"
-.TH "Memory" TCL "" "Tcl"
+.TH "Memory" 3tcl "" "Tcl"
 .BS
 .SH NAME
 ckalloc, memory, ckfree, Tcl_DisplayMemory, Tcl_InitMemory, Tcl_ValidateAllMemory - 合法的内存分配接口

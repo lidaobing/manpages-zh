@@ -1,4 +1,4 @@
-.TH SpinBox "tcl" "tcllib - BWidget"
+.TH SpinBox 3 "tcllib - BWidget"
 
 .SH NAME
 .B SpinBox - SpinBox 组件

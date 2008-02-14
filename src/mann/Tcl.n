@@ -241,7 +241,7 @@ Database Class:	\\fB\\$3\\fR
 .de UL
 \\$1\l'|0\(ul'\\$2
 ..
-.TH Tcl n "8.1" Tcl "Tcl Built-In Commands"
+.TH Tcl 3tcl "8.1" Tcl "Tcl Built-In Commands"
 .BS
 .SH NAME
 Tcl \- 语言语法总结.

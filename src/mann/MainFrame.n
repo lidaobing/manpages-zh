@@ -1,4 +1,4 @@
-.TH MainFrame "tcl" "tcllib - BWidget"
+.TH MainFrame 3 "tcllib - BWidget"
 
 .SH NAME
 .B MainFrame - 管理带有菜单、工具条和状态条的顶层窗口

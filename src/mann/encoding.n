@@ -242,7 +242,7 @@ Database Class:	\\fB\\$3\\fR
 .de UL
 \\$1\l'|0\(ul'\\$2
 ..
-.TH encoding n "8.1" Tcl "Tcl Built-In Commands"
+.TH encoding 3tcl "8.1" Tcl "Tcl Built-In Commands"
 .BS
 .SH NAME
 encoding \- 操纵编码

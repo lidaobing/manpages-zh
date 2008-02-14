@@ -1,4 +1,4 @@
-.TH ArrowButton "tcl" "tcllib - BWidget"
+.TH ArrowButton 3 "tcllib - BWidget"
 
 .SH NAME
 .B ArrowButton 带有一个箭头形状的按钮组件。

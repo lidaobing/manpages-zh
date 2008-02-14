@@ -1,4 +1,4 @@
-.TH Button "tcl" "tcllib - BWidget"
+.TH Button 3 "tcllib - BWidget"
 
 .SH NAME
 .B Button - 有增强选项的按钮组件

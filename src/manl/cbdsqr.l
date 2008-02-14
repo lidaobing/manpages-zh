@@ -1,4 +1,4 @@
-.TH CBDSQR l "15 June 2000" "LAPACK version 3.0"
+.TH CBDSQR 3 "15 June 2000" "LAPACK version 3.0"
 .SH NAME
 CBDSQR - 计算一个实 (real) NxN 上/下 (upper/lower) 三角 (bidiagonal) 矩阵 B 的单值分解 (singular value decomposition (SVD))
 .SH "总览 SYNOPSIS"

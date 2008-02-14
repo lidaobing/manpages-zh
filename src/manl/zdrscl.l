@@ -1,4 +1,4 @@
-.TH ZDRSCL l "15 June 2000" "LAPACK version 3.0"
+.TH ZDRSCL 3 "15 June 2000" "LAPACK version 3.0"
 .SH NAME
 ZDRSCL - 使用实数量 1/a 乘一个 n 维复向量
 .SH "总览 SYNOPSIS"

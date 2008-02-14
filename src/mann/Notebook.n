@@ -1,4 +1,4 @@
-.TH NoteBook "tcl" "tcllib - BWidget"
+.TH NoteBook 3 "tcllib - BWidget"
 
 .SH NAME
 .B NoteBook - 笔记本管理器组件
