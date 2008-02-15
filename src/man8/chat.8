@@ -273,7 +273,9 @@ ABORT   'BUSY'
 .br
 ABORT   'NO CARRIER'
 .br
-''      ATZ
+ ''
+.br
+ATZ
 .br
 OK\\r\\n  ATD1234567
 .br
@@ -303,7 +305,7 @@ signal behavior.  Here is an (simple) example script:
 .IP
 ABORT   'BUSY'
 .br
-''      ATZ
+\'\'      ATZ
 .br
 OK\\r\\n  ATD1234567
 .br
@@ -346,15 +348,14 @@ ATZ OK ATDT5551212 CONNECT TIMEOUT 10 ogin:--ogin: TIMEOUT 5 assword: hello2u2
 EOT 這個特別的回覆字串指示 chat 程式應該送出一個 EOT 字元到遠
 端去。這是一般的檔案結束(End-of-file)字元程序。 在 EOT 後面並
 不會跟著送出一個返回字元(return)。
-.PR
+.PP
 這個 EOT 程序可以用 ^D 序列嵌入到送出的字串裡。
 .SH "產生中斷 GENERATING BREAK"
 BREAK 這個特別的回覆字串將會使得一個中斷情況被送出。 這個中斷
 是傳送端的一個特殊。接收端一般對此的處理是改變傳輸率。 它可以
 用來循環測試遠端可能的傳輸率直到你能夠接到有效的簽入提示。
-.PR
- 這
-個中斷程序可以用 \fI\\K\fR  序列嵌入到送出的字串裡。
+.PP
+這個中斷程序可以用 \fI\\K\fR  序列嵌入到送出的字串裡。
 .SH "转义序列 ESCAPE SEQUENCES"
 期待以及回覆字串可以包含转义序列。 所有這種程序在回覆字串中都
 是合法的。有許多在期待字串中是合法的。 那些在期待程序中無效的
@@ -391,7 +392,8 @@ BREAK 這個特別的回覆字串將會使得一個中斷情況被送出。 這�
 傳送或期待一個機架返回（字元）
 .TP
 .B \\\\s
-代替字串中的空白。這個可以用在不願引用包含空白的字串之  時。'HI TIM' 以及 HI\sTIM 是相同的。
+代替字串中的空白。這個可以用在不願引用包含空白的字串之時。'HI TIM' 以及
+HI\\sTIM 是相同的。
 .TP
 .B \\\\t
 傳送或期待一個定位(tab)字元。

@@ -1,17 +1,9 @@
-.TH ping
-.DD January 7, 1999
-.DT PING 8
-.OS "iputils-ss990107"
-.SH NAME
-ping\ - 向网络主机发送ICMP回显请求(ECHO_REQUEST)分组
-.SH 总览
-.Nm ping
-.Op Fl dfnqrvR
-.Op Fl c Ar count
-.Op Fl i Ar wait
-.Op Fl l Ar preload
-.Op Fl p Ar pattern
-.Op Fl s Ar packetsize
+.TH "ping" "8"  "iputils-ss990107"
+.SH 名称
+ping, ping6\ - 向网络主机发送ICMP回显请求(ECHO_REQUEST)分组
+.SH 命令概要
+\fBping\fR [\fB -LRUbdfnqrvR\fR] [\fB-c \fIcount\fB\fR] [\fB-i \fIwait\fB\fR]
+[\fB-l \fIpreload\fB\fR] [\fB-p \fIpattern\fB\fR] [\fB-s \fI packetsize\fB\fR]
 .PP
 更改过的选项：
 .TP 2.5i
@@ -77,7 +69,7 @@ ping\ - 向网络主机发送ICMP回显请求(ECHO_REQUEST)分组
 .I wait
 个秒数。缺省值为每个分组等待一秒。此选项与-f选项不能同时使用。
 .TP
-.B-l 
+.B -l 
 .I preload
 如果指定
 .I preload

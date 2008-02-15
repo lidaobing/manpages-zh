@@ -330,11 +330,10 @@ iptables可以使用扩展目标模块：以下都包含在标准版中。
 .SS MARK
 用来设置包的netfilter标记值。只适用于mangle表。
 .TP
-.Nr "--set-mark mark"
+.BR "--set-mark mark"
 
 .SS REJECT
 作为对匹配的包的响应，返回一个错误的包：其他情况下和DROP相同。
-
 此目标只适用于INPUT、FORWARD和OUTPUT链，和调用这些链的用
 户自定义链。这几个选项控制返回的错误包的特性：
 .TP
@@ -384,8 +383,8 @@ o-unreachable、 icmp-net-prohibited 或者
 
 .SS REDIRECT
 只适用于nat表的PREROUTING和OUTPUT链，和只调用它们的用户自定义链。它修改包的
-目标IP地址来发送包到机器自身（本地生成的包被安置为地址127.0
-.0.1）。它包含一个选项：
+目标IP地址来发送包到机器自身（本地生成的包被安置为地址127.0.0.1）。它包含一
+个选项：
 .TP
 .BR "--to-ports <port>[<port>]"
 指定使用的目的端口或端口范围：不指定的话，目标端口不会被修改。只能用于指定了-p tcp 或 -p udp的规则。

@@ -1,5 +1,5 @@
 .\" rpm - Red Hat Package Manager
-.TH rpm 8 "22 December 1998" "Red Hat Software" "Red Hat Linux"
+.TH "rpm" "8" "1998年12月22日" "Red Hat Software" "Red Hat Linux"
 .SH NAME
 rpm \- Red Hat 包管理器
 .SH 总览
@@ -426,13 +426,13 @@ There are two other ways to invoke building with rpm:
 而且还需PGP能找到一个带有RPM公钥的公钥环.
 缺省情况下,RPM使用PGP的缺省设置(著名的PGPPATH)来查找钥环.
 如果你的钥环并不在PGP所期望它们处在的地方,则你需要配置宏
-.IP "\fB_pgp_path\fP" ,
+.IP "\fB_pgp_path\fP"
 将其设为要使用的PGP钥环所在的位置.
 .PP
 
 如果你想要签名一个你自己生成的包,你还必须创建自己的公钥和密钥对(请参阅PGP手册).
 还需要配置签名类型宏:
-.IP "\fB_signature\fP",
+.IP "\fB_signature\fP"
 目前只支持pgp.还有用户名宏:
 .IP "\fB_pgp_name\fP"
 指明想要使用其键去签名你的包的用户.
@@ -522,10 +522,9 @@ RPM允许使用下列操作辅助http URLs
 /var/lib/rpm/nameidx
 /tmp/rpm*
 .fi
-.El
 .SH 另见
-.IR glint (8) ,
-.IR rpm2cpio (8) ,
+.IR glint (8)， 
+.IR rpm2cpio (8) 
 .B http://www.rpm.org/
 .nf
 .SH 作者

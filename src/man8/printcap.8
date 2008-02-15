@@ -114,9 +114,9 @@ because it may allow accounting to be bypassed.
 .fi
 .PP
 if 過濾器的用法是:
-.CS
+.nf
            if [-c] -wwidth -llength -iindent -n login -h host acct-file
-.CE
+.fi
 .PP
 \fI-c\fP 這個旗標只有在 -l 旗標有列在 lpr 中時才可忽略. width 和 length 定義
 了 page 的長和寬 (from pw and pl respectively). -n 和 -h 可指定列印工作擁有者
@@ -128,9 +128,9 @@ if is better suited to performing accounting.  The of is only given the
 width and length flags.
 .PP
 其它過濾器的呼叫用法如下:
-.CS
+.nf
            filter -xwidth -ylength -n login -h host acct-file
-.CE
+.fi
 .PP
 如果要用 pixels 為單位來定長寬的話, 用 px 和 py 這二個變數.
 所有的過濾器都經由 stdin 輸入檔案, stdout 輸出到印表機, 用 stderr 或 
