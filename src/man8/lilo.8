@@ -144,22 +144,22 @@ lilo 安装一个你在下一次启动时被激活的引导装入程序
 .LP
 上面的命令行选项相对应于下面在配置文件指出的关键字。
 .IP
-.TS
-1.1
--b bootdev boot=bootdev
--c compact
--d dsec delay=dsec
--D label default=label
--i bootsector install=bootsector
--f file disktab=file
--l linear
--m mapfile map=mapfile
--P fix fix-table
--P ignore ignore-table
--s file backup=file
--S file force-backup=file
--v verbose=level
-.TE
+.nf
+    1.1
+  	-b bootdev boot=bootdev
+	-c compact
+	-d dsec delay=dsec
+	-D label default=label
+	-i bootsector install=bootsector
+	-f file disktab=file
+	-l linear
+	-m mapfile map=mapfile
+	-P fix fix-table
+	-P ignore ignore-table
+	-s file backup=file
+	-S file force-backup=file
+	-v verbose=level
+.fi
 .SH ”请参阅”
 lilo.conf(5).
 .br
