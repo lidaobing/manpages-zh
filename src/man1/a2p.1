@@ -99,26 +99,27 @@ a2p \- Awk 到 Perl 翻译器
 .SH "描述 (DESCRIPTION)"
 \fIA2p\fR 从命令行或标准输入取得一个awk脚本文件，
 并且向标准输出产生一个相同功能的 \fIperl\fR 脚本文件。
-.Sh "选项 (OPTIONS)"
+.SH "选项 (OPTIONS)"
 可选选项有:
-.Ip "\fB\-D<number>\fR" 5
+.IP "\fB\-D<number>\fR" 5
 设置调试标记。
-.Ip "\fB\-F<character>\fR" 5
+.IP "\fB\-F<character>\fR" 5
 告诉a2p，awk脚本总是带 \fB\-F\fR 选项执行。
-.Ip "\fB\-n<fieldlist>\fR" 5
+.IP "\fB\-n<fieldlist>\fR" 5
 如果输入不分解为一个数组，你需要指定输入的各字段的名称。
 假如要翻译一个用于处理密码文件的awk脚本，你应当这样:
-.Sp
+.PP
 .Vb 1
 \&        a2p -7 -nlogin.password.uid.gid.gcos.shell.home
 .Ve
+.Sp
 任何定界符都可以用来分隔字段名。
-.Ip "\fB\-<number>\fR" 5
+.IP "\fB\-<number>\fR" 5
 使得a2p总是假设输入包含那么多字段。
-.Ip "\fB\-o\fR" 5
+.IP "\fB\-o\fR" 5
 告诉a2p使用旧的awk行为。当前，唯一的区别是旧的awk总是有一个
 每行的循环，即使没有对每行的操作；新的awk不是这样。
-.Sh "\*(M"Considerations\*(S""
+.IX Subsection "Considerations"
 a2p 不能翻译得像人一样好，但是通常都做得很好。
 在生成的perl脚本中，你应当检查和修改一些东西。这里是
 其中的一些，没有顺序。
@@ -190,11 +191,11 @@ Larry Wall <\fIlarry@wall.org\fR>
 .SH "文件 (FILE)"
 .SH "另见 (SEE ALSO)"
 .PP
-.Vb 3
+.VB 3
 \& perl   perl 编译器和解释器
 \& 
 \& s2p    sed 到 perl的翻译工具
-.Ve
+.VE
 .SH "诊断 (DIAGNOSTICS)"
 .SH "BUGS"
 可以在运行时根据操作数来选择字符还是数字操作，从而模拟awk。
@@ -207,7 +208,6 @@ Larry Wall <\fIlarry@wall.org\fR>
 .BR 2003/10/25
 .SH "《中国Linux论坛man手册页翻译计划》" 
 http://cmpp.linuxforum.net
-
 .rn }` ''
 .IX Title "A2P 1"
 .IX Name "a2p - Awk to Perl translator"

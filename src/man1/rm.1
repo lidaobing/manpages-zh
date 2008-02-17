@@ -45,7 +45,7 @@ rm移除每个给定的文件。默认情况下，它不能移除目录。
 .SH SVID(System V Interface Definition)细节
 System V接口定义(SVID)禁止移除正在执行的可执行二进制文件的最后一个链接。
 
-.SHGNU细节
+.SH GNU细节
 GNU的实现（在fileutils-3.16中）会因为可移除的层次深度的上限而招致损坏。
 （如果确实必要，可使用‘deltree’工具来移除非常深的目录树。）
 

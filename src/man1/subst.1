@@ -1,8 +1,6 @@
-.TH SUBST 1 local
-.DA 25 Feb 1990
+.TH SUBST 1 local  "25 Feb 1990"
 .SH NAME
 subst \- 替换文件中的定义
-
 .SH "总览 (SYNOPSIS)"
 .B subst
 [
@@ -12,7 +10,6 @@ editor
 .B \-f
 substitutions
 victim ...
-
 .SH "描述 (DESCRIPTION)"
 .I Subst
 能够 替换 文件 的 内容, 适用于 针对 本地情况 定制 软件. 它 根据
@@ -38,7 +35,6 @@ victim ...
 将 分析 这个原形, 寻找 替换说明 中 名字域 的 所有 实例, 名字实例 是用 
 ``@\&<'' 和 ``>\&@'' 括起来的, 把 它们 改变成 对应的值, 然后 用这个 结果 替换
 目标行.
-
 .SH "选项 (OPTIONS)"
 .TP
 .B \-e
@@ -49,7 +45,6 @@ victim ...
 或
 .I /usr/bin
 目录 下面. 用 ``\-e'' 开关 可以 指定 一个 不同位置 的 执行程序.
-
 .SH "示例 (EXAMPLE)"
 .PP
 如果 \fIsubstitutions\fP 文件内容 是
@@ -88,23 +83,18 @@ z = 5;
 \fIvictimdir\fP/substtmp.new	建立出来的新版本文件
 .br
 \fIvictimdir\fP/substtmp.old	经过改名的老版本文件
-
 .SH "另见 (SEE ALSO)"
 sed(1)
-
 .SH "诊断 (DIAGNOSTICS)"
 如果 subst 无法 创建 临时文件, 或者 临时文件 已经 存在, 程序 中止 并 报错.
-
 .SH "历史 (HISTORY)"
 Henry Spencer 写于 U of Toronto.
 .PP
 Rich $alz 在 1991 年 7 月 增加了 ``\-e'' 选项.
-
 .SH BUGS
 当 创建 准备 用 \fIsubst\fP 处理的 文件 时, 很容易 忘记 在 原形行 后面 插入
 一个 要命的 目标行; 如果 你 忘了 目标行, \fIsubst\fP 最终 会 删掉 原形行 
 下面一行, 不管 那行 是 什么.
-
 .SH "[中文版维护人]"
 .B 徐明 <xuming@users.sourceforge.net>
 .SH "[中文版最新更新]"

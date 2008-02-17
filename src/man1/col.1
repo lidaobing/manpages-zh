@@ -34,18 +34,15 @@
 .\"
 .\"     @(#)col.1	6.8 (Berkeley) 6/17/91
 .\"
-.TH col 1
-.Dd 1991年6月17日
-.Dt COL 1
-.Os
-.Sh NAME(名称)
+.TH col 1 1991年6月17日 "COL 1"
+.SH NAME(名称)
 .Nm col
-.Nd 过滤掉输入中的反向换行符
-.Sh SYNOPSIS(总览)
+过滤掉输入中的反向换行符
+.SH SYNOPSIS(总览)
 .Nm col
 .Op Fl bfx
-.OP Fl l Ar num
-.Sh DESCRIPTION(描述)
+.Op Fl l Ar num
+.SH DESCRIPTION(描述)
 .Nm Col
 过滤掉反向(以及半反向)换行符(LF: line feed or NL: new line),
 这样输出按正常顺序，即只包括正向和半正向换行符,
@@ -54,10 +51,10 @@
 和
 .Xr tbl  1
 的输出处理很有用处.
-.Pp
+.PP
 .Nm col
 从标准输出读入,并写出到标准输出上.
-.Pp
+.PP
 选项如下:
 .Bl -tag -width "-lnum"
 .It Fl b
@@ -73,10 +70,10 @@
 行.
 默认情况下,缓冲128行.
 .El
-.Pp
+.PP
 .Nm col
 所能理解的用于回车操作的控制序列以及它们的十进制值都列在下面的表中:
-.Pp
+.PP
 .Bl -tag -width "carriage return" -compact
 .It ESC\-7
 反向换行符(escape后接7)
@@ -101,26 +98,26 @@
 .It vertical tab
 反向换行符(11)
 .El
-.Pp
+.PP
 丢弃所有不被承认的控制字符和escape序列.
-.Pp
+.PP
 当读取字符时,
 .Nm Col
 保持着与字符集的联系,而且在输出时确保字符集是正确的.
-.Pp
+.PP
 如果输入设备试图回复到最近被刷新的行,
 .Nm col
 会显示一条警告消息.
-.Sh SEE ALSO(另见)
+.SH SEE ALSO(另见)
 .Xr expand 1 ,
 .Xr nroff 1 ,
 .Xr tbl 1
-.Sh HISTORY(历史)
+.SH HISTORY(历史)
 .Nm col
 命令出现于AT&T UNIX版本6.
-.Sh "[中文版维护人]"
+.SH "[中文版维护人]"
 .B riser <boomer@ccidnet.com>
-.Sh "[中文版最新更新]" 
+.SH "[中文版最新更新]" 
 2000/12/6
-.Sh 《中国Linux论坛man手册页翻译计划》:
+.SH 《中国Linux论坛man手册页翻译计划》:
 .B http://cmpp.linuxforum.net

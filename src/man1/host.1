@@ -50,13 +50,11 @@
 .\" SOFTWARE.
 .\" -
 .\" --Copyright--
-.Dd December 15, 1994
-.Dt HOST 1
-.Os BSD 4
-.Sh NAME (名字)
+.TH HOST 1 "1994年12月15日" BSD 4
+.SH NAME (名字)
 .Nm host 
-.Nd 使用域名服务器查询主机名字
-.Sh SYNOPSIS (总览)
+使用域名服务器查询主机名字
+.SH SYNOPSIS (总览)
 .Nm host 
 .Op Fl l
 .Op Fl v
@@ -67,7 +65,7 @@
 .Op Fl a 
 .Ar host 
 .Op Ar server 
-.Sh DESCRIPTION (描述)
+.SH DESCRIPTION (描述)
 .Ic Host
 查询 Internet 主机 的 信息. 它 通过 一组 分布在 国家间的 互连服务器 获取
 这些 信息. 缺省情况下, host 只是 简单的 做 主机名字 和 Internet 地址 的 转换. 
@@ -76,15 +74,15 @@
 或
 .Dq Fl a 
 选项, 它 可以 用来 查找 由 域名服务器 维护的 某个主机 的 全部信息.
-.Pp
+.PP
 参数 可以是 主机名称, 也可以是 数字地址. 此程序 首先 把它 当做 主机的 
 数字地址, 如果 尝试 失败, 再把它 当做 主机名称. 主机的 数字地址 由 句点隔开的
 四个 十进位制数 组成, 例如 128.6.4.194. 主机名称 由 句点隔开的 名字 组成, 
 例如 topaz.rutgers.edu. 除非 名字 以句点 结尾, 否则 本地域名 将 自动 添加在
 后面. 因此, Rutgers 的 用户 可以 输入
-.Pp
+.PP
 .D1 Ic host topaz 
-.Pp
+.PP
 它 实际上 查找  "topaz.rutgers.edu". 
 如果 尝试 失败, 就用 原来输入的 名字 再试一次 (这里就是 "topaz").
 邮件 和 其他 网络工具 用了 同样的 策略.
@@ -94,23 +92,23 @@
 (另见 下面
 .Sx 定制查询主机名字 
 的 描述. )
-.Pp
+.PP
 第一个参数 是 你 打算查询的 主机名称.
 如果 是 数字地址, 就 执行
 .Dq 反向查询 (inverse query)
 也就是说, 域名系统 查看 一系列 独立的 数据库, 把 数字地址 转换成 名字.
-.Pp
+.PP
 第二个 参数 是 可选的. 它 允许你 指定查询 某个 特定的 服务器. 如果 没有 使用
 这个参数, 就用 缺省 服务器 (一般是本地机).
-.Pp
+.PP
 如果 指定了 名字, 你 可以见到 三个 不同种类的 输出. 这里是 它们的 例子:
-.Pp
+.PP
 .D1 Ic % host sun4
 .Dl sun4.rutgers.edu is a nickname for ATHOS.RUTGERS.EDU
 .Dl ATHOS.RUTGERS.EDU has address 128.6.5.46
 .Dl ATHOS.RUTGERS.EDU has address 128.6.4.4
 .Dl ATHOS.RUTGERS.EDU mail is handled by ARAMIS.RUTGERS.EDU
-.Pp
+.PP
 用户 键入的命令 是
 .Dq Ic host sun4 .  
 第一行 表明
@@ -125,14 +123,14 @@
 处理. 由于 某些系统 拥有 多个 处理邮件的 系统, 可能 会有 多行 这样的显示.
 从 技术角度 看, 我们 认为 每个 能够 接收邮件 的 系统 应该有 这样的项. 如果 
 系统 接收 它自己的 邮件, 应该 有一项 提及 该系统 自身; 例如:
-.Pp
+.PP
 .D1 Li XXX mail is handled by XXX 
-.Pp
+.PP
 然而, 很多 能够 接收 自己邮件 的 系统 不愿意 提及 这个事实. 如果 系统 有一项
 .Dq Li mail is handled by ,
 但是 没有 地址, 这 表明 它 不是 Internet 的 一部分, 而是 在 网络上 转发
 邮件 的 系统. Usenet, Bitnet 和 许多 其他网络 都有 类似项.
-.Sh 选项
+.SH 选项
 在 主机名字 前面 能够 使用 很多 选项. 大多数 选项 只对 维护 域名数据库 有意义.
 .Bl -tag -width Fl
 .It Fl w 
@@ -200,24 +198,24 @@
 .Dq Fl v Fl t Cm any .
 .It Fl l
 列出 全部域项; 例如:
-.Pp
+.PP
 .D1 Ic host -l rutgers.edu
-.Pp
+.PP
 将 列出  rutgers.edu 域 中 所有的 主机.
 .Dq Fl t
 选项 可以 按需 过滤 收到的信息. 缺省值 是 地址信息, 包括 PTR 和 NS
 记录. 
-.Pp
+.PP
 .D1 Ic host -l -v -t any rutgers.edu
-.Pp
+.PP
 命令 以 正式主域文件格式 下载 rutgers.edu 的 全部 区域(zone) 数据.
 (然而 由于 某些 复杂原因, SOA 记录 显示了 两次.)
-.Pp
+.PP
 .Sy 注意: 
 .Dq Fl l 
 执行 全部的 区域 传输, 然后 过滤出 要求的 信息. 所以 万不得已
 才用 这个 命令.
-.Sh 定制查询主机名字
+.SH 定制查询主机名字
 一般说来, 如果 用户 给出的 名字 中 不含 任何 句点, host 就把 缺省域名
 添加在 它的末尾. 缺省域名 能够 定义 在
 .Pa /etc/resolv.conf 
@@ -230,42 +228,42 @@
 这个 名字文件 必须 用
 .Ev HOSTALIASES 
 环境变量 指出.
-.Sh 环境变量
-.Bl -tag -width "/etc/resolv.conf  " -compress
+.SH 环境变量
+.Bl \-tag \-width "/etc/resolv.conf  " \-compress
 .It Ev HOSTALIASES
 名字文件, 含有
 .Pq Ar 主机别名 , 主机全名
 对.
 .El
-.Sh 文件
+.SH 文件
 .Bl -tag -width "/etc/resolv.conf  " -compress
 .It Pa /etc/resolv.conf 
 另见
 .Xr resolver 5 .
-.Sh 另见
+.SH 另见
 .Xr named  8 , 
 .Xr resolver 5 .
-.Sh BUGS
+.SH BUGS
 当你 输入的 名字 不属于 本地域 时, 将会 出现 不希望 的 现象. 
 请记住 除非 输入的名字 以 点 结尾, 否则 本地域名 总会 附加在 它 后面,
 失败后 才使用 原来的 名字.
-.Pp
+.PP
 .Dq Fl l 
 选项 只 联系 指定域 中 的 第一个 名字服务器. 如果 这个 服务器 宕机,
 你 应该 手工 指定 一个 服务器. 例如, 要 获取 foo.edu 的清单, 可以 用
-.Pp
+.PP
 .D1 Ic host -t ns foo.edu 
-.Pp
+.PP
 获得 foo.edu 的 全部 名字服务器, 然后 用
-.Pp
+.PP
 .D1 Ic host -l foo.edu xxx
-.Pp
+.PP
 试验 每一个
 .Dq Ic xxx 
 名字服务器, 直到 碰上 能用的.
-.Sh "[中文版维护人]"
+.SH "[中文版维护人]"
 徐明 <xuming@users.sourceforge.net>
-.Sh "[中文版最新更新]"
+.SH "[中文版最新更新]"
 2003/05/13
-.Sh "《中国Linux论坛man手册页翻译计划》"
+.SH "《中国Linux论坛man手册页翻译计划》"
 http://cmpp.linuxforum.net

@@ -143,13 +143,13 @@ tex, virtex, initex \- 文本格式化和排版
 这个版本的 \*(TX 可以解释下列命令行选项。
 .TP
 .B --file-line-error-style
-.rb
+.br
 打印错误消息，以
 .I file:line:error
 的形式，与大多数编译器格式化消息的方式相似。
 .TP
 .BI --fmt \ format
-.rb
+.br
 使用
 .I format
 作为要使用的格式名，而不是调用
@@ -158,11 +158,11 @@ tex, virtex, initex \- 文本格式化和排版
 一行指定的内容。
 .TP
 .B --help
-.rb
+.br
 打印帮助信息，然后退出。
 .TP
 .B --ini
-.rb
+.br
 成为
 .BR initex
 ，用于转储格式 (dump formats)；如果调用的程序名是
@@ -170,7 +170,7 @@ tex, virtex, initex \- 文本格式化和排版
 ，那么隐含这个选项。
 .TP
 .BI --interaction \ mode
-.rb
+.br
 设置交互模式。mode 可以是
 .IR batchmode ,
 .IR nonstopmode ,
@@ -182,29 +182,29 @@ tex, virtex, initex \- 文本格式化和排版
 相同。
 .TP
 .B --ipc
-.rb
+.br
 将 DVI 输出发送到一个 socket，同时像通常那样输出到文件。这个选项是否可用取决于安装程序的选择。
 .TP
 .B --ipc-start
-.rb
+.br
 与
 .BR --ipc
 类似，并且同时也在另一段启动服务器。这个选项是否可用取决于安装程序的选择。
 .TP
 .BI --jobname \ name
-.rb
+.br
 使用
 .I name
 作为作业名，而不是从输入文件名获得。
 .TP
 .BI --kpathsea-debug \ bitmask
-.rb
+.br
 根据位掩码，设置路径搜索调试标志。细节请参见
 .I Kpathsea
 手册页。
 .TP
 .BI --maketex \ fmt
-.rb
+.br
 启用
 .RI mktex fmt
 ，这里
@@ -216,11 +216,11 @@ tex, virtex, initex \- 文本格式化和排版
 之一。
 .TP
 .B --mltex
-.rb
+.br
 启用 ML\*(TX 扩展。
 .TP
 .BI --no-maketex \ fmt
-.rb
+.br
 禁用
 .RI mktex fmt
 这里
@@ -232,13 +232,13 @@ tex, virtex, initex \- 文本格式化和排版
 之一。
 .TP
 .BI --output-comment \ string
-.rb
+.br
 使用
 .I string
 作为 DVI 文件的注释，而不是时间。
 .TP
 .B --parse-first-line
-.rb
+.br
 如果主输入文件的第一行以
 .I %&
 开始，就解释它，从中查找一个转储名称或者一个
@@ -246,19 +246,19 @@ tex, virtex, initex \- 文本格式化和排版
 选项。
 .TP
 .BI --progname \ name
-.rb
+.br
 伪装是程序
 .IR name
 。这对所用格式和搜索路径都有影响。
 .TP
 .B --recorder
-.rb
+.br
 启用文件名记录。这将在一个扩展名为
 .IR .fls
 的文件中记录输入和输出中打开的所有文件。
 .TP
 .B --shell-escape
-.rb
+.br
 启用
 .BI \ewrite18{ command }
 结构。
@@ -266,13 +266,13 @@ tex, virtex, initex \- 文本格式化和排版
 可以是任何 Bourne shell 命令。出于安全原因，这个结构通常被禁止。
 .TP
 .BI --translate-file \ tcxname
-.rb
+.br
 使用
 .I tcxname
 转换表。
 .TP
 .B --version
-.rb
+.br
 显示版本信息，然后退出。
 .\"=====================================================================
 .SH "ENVIRONMENT 环境"
