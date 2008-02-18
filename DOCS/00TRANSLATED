@@ -621,7 +621,7 @@ mann/cd.n
 mann/chooseColor.n
 mann/chooseDirectory.n
 mann/ckalloc.3tcl
-mann/ckfree.n
+mann/ckfree.3tcl
 mann/clipboard.n
 mann/clock.n
 mann/close.n
