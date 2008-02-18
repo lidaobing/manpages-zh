@@ -1,5 +1,6 @@
 .TH LAPACK 3 "2 April 1993" "LAPACK Version 1.1" "LAPACK FORTRAN LIBRARY ROUTINES"
-
+.SH NAME
+LAPACK \- library of linear algebra routines
 .SH 什么是 LAPACK ?
 .in -0.3i
 \fBLAPACK\fR 是一个 \fIFortran 77\fR 子程序的 transportable library ，

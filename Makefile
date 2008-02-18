@@ -11,21 +11,15 @@ u8:
 	cp -r src/man* UTF-8/
 gb:
 	mkdir -p zh_CN
-	#for i in $(MAN) ; do \
-	#	mkdir -p zh_CN/man$$i ; \
-	#done
 	for f in `cat $(TRANSLATED)` ; do \
-		OFNAME=$$(basename $$f | sed -e s/\\./.zh_CN./) ; \
+		OFNAME=`basename $$f | sed -e 's/\.\([^.]*\)$$/.zh_CN.\1/'` ; \
 		cp src/$$f zh_CN/$$OFNAME ; \
 		dos2unix zh_CN/$$OFNAME ; \
 	done
 b5:
 	mkdir -p zh_TW
-	#for i in $(MAN) ; do \
-	#	mkdir -p zh_TW/man$$i ; \
-	#done
 	for f in `cat $(TRANSLATED)` ; do \
-		OFNAME=$$(basename $$f | sed -e s/\\./.zh_TW./) ; \
+		OFNAME=`basename $$f | sed -e 's/\.\([^.]*\)$$/.zh_TW.\1/'` ; \
 		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/$$OFNAME ; \
 		dos2unix zh_TW/$$OFNAME ; \
 	done
