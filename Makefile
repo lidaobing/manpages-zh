@@ -11,19 +11,19 @@ u8:
 	cp -r src/man* UTF-8/
 gb:
 	for i in $(MAN) ; do \
-		mkdir -p GB/man$$i ; \
+		mkdir -p zh_CN/man$$i ; \
 	done
 	for f in `cat $(TRANSLATED)` ; do \
-		iconv -f utf8 -t gb18030 src/$$f > GB/$$f ; \
-		dos2unix GB/$$f ; \
+		iconv -f utf8 -t gb18030 src/$$f > zh_CN/$$f ; \
+		dos2unix zh_CN/$$f ; \
 	done
 b5:
 	for i in $(MAN) ; do \
-		mkdir -p BIG5/man$$i ; \
+		mkdir -p zh_TW/man$$i ; \
 	done
 	for f in `cat $(TRANSLATED)` ; do \
-		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > BIG5/$$f ; \
-		dos2unix BIG5/$$f ; \
+		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/$$f ; \
+		dos2unix zh_TW/$$f ; \
 	done
 html-gb:
 	mkdir html-gb
