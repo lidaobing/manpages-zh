@@ -14,16 +14,16 @@ gb:
 		mkdir -p zh_CN/man$$i ; \
 	done
 	for f in `cat $(TRANSLATED)` ; do \
-		iconv -f utf8 -t gb18030 src/$$f > zh_CN/$$f ; \
-		dos2unix zh_CN/$$f ; \
+		iconv -f utf8 -t gb18030 src/$$f > zh_CN/`basename $$f` ; \
+		dos2unix zh_CN/`basename $$f` ; \
 	done
 b5:
 	for i in $(MAN) ; do \
 		mkdir -p zh_TW/man$$i ; \
 	done
 	for f in `cat $(TRANSLATED)` ; do \
-		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/$$f ; \
-		dos2unix zh_TW/$$f ; \
+		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/`basename $$f` ; \
+		dos2unix zh_TW/`basename $$f` ; \
 	done
 html-gb:
 	mkdir html-gb
@@ -35,7 +35,7 @@ html-gb:
 		iconv -f utf8 -t gb18030 src/$$f | utils/man2html > html-gb/$$f.html ; \
 	done
 clean:
-	rm -rf UTF-8 GB BIG5 html-u8 html-gb html-b5 
+	rm -rf UTF-8 zh_CN zh_TW html-u8 html-gb html-b5 
 	find . -name *~ -type f | xargs rm -f
 	@rm -f *-stamp
 	@cd src && find man* -type f -path *.[1-9nlpo] -o -name *.tcl \
