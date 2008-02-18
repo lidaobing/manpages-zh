@@ -1,3 +1,4 @@
+.TH ZDROT 3
 .SH NAME
 
 .SH "总览 SYNOPSIS"

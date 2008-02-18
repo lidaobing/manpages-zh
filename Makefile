@@ -16,7 +16,7 @@ gb:
 	#done
 	for f in `cat $(TRANSLATED)` ; do \
 		OFNAME=$$(basename $$f | sed -e s/\\./.zh_CN./) ; \
-		iconv -f utf8 -t gb18030 src/$$f > zh_CN/$$OFNAME ; \
+		cp src/$$f zh_CN/$$OFNAME ; \
 		dos2unix zh_CN/$$OFNAME ; \
 	done
 b5:

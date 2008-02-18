@@ -1,7 +1,7 @@
 .TH ArrowButton 3 "tcllib - BWidget"
 
 .SH NAME
-.B ArrowButton 带有一个箭头形状的按钮组件。
+.B ArrowButton \- 带有一个箭头形状的按钮组件。
 
 .SH 创建 CREATION
 .B ArrowButton pathName ?option value...?

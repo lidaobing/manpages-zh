@@ -70,7 +70,7 @@
 '\" RCS: @(#) $Id: loadTk.n,v 1.2 2003/11/24 05:09:59 bbbush Exp $
 '\"
 '\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
-.TH "Safe Tk" 3tk 8.0 Tk "Tk Built-In Commands"
+.TH "loadTk" 3tk 8.0 Tk "Tk Built-In Commands"
 .BS
 '\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
