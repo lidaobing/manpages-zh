@@ -10,20 +10,24 @@ u8:
 	mkdir UTF-8
 	cp -r src/man* UTF-8/
 gb:
-	for i in $(MAN) ; do \
-		mkdir -p zh_CN/man$$i ; \
-	done
+	mkdir -p zh_CN
+	#for i in $(MAN) ; do \
+	#	mkdir -p zh_CN/man$$i ; \
+	#done
 	for f in `cat $(TRANSLATED)` ; do \
-		iconv -f utf8 -t gb18030 src/$$f > zh_CN/`basename $$f` ; \
-		dos2unix zh_CN/`basename $$f` ; \
+		OFNAME=$$(basename $$f | sed -e s/\\./.zh_CN./) ; \
+		iconv -f utf8 -t gb18030 src/$$f > zh_CN/$$OFNAME ; \
+		dos2unix zh_CN/$$OFNAME ; \
 	done
 b5:
-	for i in $(MAN) ; do \
-		mkdir -p zh_TW/man$$i ; \
-	done
+	mkdir -p zh_TW
+	#for i in $(MAN) ; do \
+	#	mkdir -p zh_TW/man$$i ; \
+	#done
 	for f in `cat $(TRANSLATED)` ; do \
-		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/`basename $$f` ; \
-		dos2unix zh_TW/`basename $$f` ; \
+		OFNAME=$$(basename $$f | sed -e s/\\./.zh_TW./) ; \
+		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/$$OFNAME ; \
+		dos2unix zh_TW/$$OFNAME ; \
 	done
 html-gb:
 	mkdir html-gb
@@ -42,6 +46,7 @@ clean:
 	-o -name *.1[ml] -o -name *.3t -o -name *.3pm -o -name *.3perl \
 	-o -name *.3thr -o -name *.[357]ssl -o -name *.8c \
 	-o -name *.3gl -o -name *.[13457]x -o -name *.[013]p \
+	-o -name *.3tcl \
 	|sort > TRANSLATED && cd .. && mv src/TRANSLATED $(TRANSLATED)
 install-doc:
 	rm -rf $(INSTDIR)/doc/$(NAME)

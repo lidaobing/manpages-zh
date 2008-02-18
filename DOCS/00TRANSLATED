@@ -620,7 +620,7 @@ mann/catch.n
 mann/cd.n
 mann/chooseColor.n
 mann/chooseDirectory.n
-mann/ckalloc.n
+mann/ckalloc.3tcl
 mann/ckfree.n
 mann/clipboard.n
 mann/clock.n
