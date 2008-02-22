@@ -36,84 +36,94 @@
 .\"
 .TH col 1 1991年6月17日 "COL 1"
 .SH NAME(名称)
-.Nm col
-过滤掉输入中的反向换行符
+col \- 过滤掉输入中的反向换行符
 .SH SYNOPSIS(总览)
-.Nm col
-.Op Fl bfx
-.Op Fl l Ar num
+.B col
+[
+.B -bfx
+]
+[
+.B -l
+.IR num
+]
 .SH DESCRIPTION(描述)
-.Nm Col
+.B col
 过滤掉反向(以及半反向)换行符(LF: line feed or NL: new line),
 这样输出按正常顺序，即只包括正向和半正向换行符,
 而且在可能的地方使用tab替换白空格.这对
-.Xr nroff 1
+nroff(1)
 和
-.Xr tbl  1
+tbl(1)
 的输出处理很有用处.
 .PP
-.Nm col
+.B col
 从标准输出读入,并写出到标准输出上.
 .PP
 选项如下:
-.Bl -tag -width "-lnum"
-.It Fl b
+.TP 
+-b
 不输出任何退格符,在每列的位置上只打印最后写的那个字符.
-.It Fl f
+.TP 
+-f
 允许正向半换行符(``fine''模式).
 通常,处于半行分界线上的字符打印在下一行.
-.It Fl x
+.TP 
+-x
 输出多个空格以替换tab.
-.It Fl l Ns Ar num
+.TP 
+-l num
 在内存中至少缓冲
-.Ar num
+.IR num
 行.
 默认情况下,缓冲128行.
 .El
 .PP
-.Nm col
+.B col
 所能理解的用于回车操作的控制序列以及它们的十进制值都列在下面的表中:
 .PP
 .Bl -tag -width "carriage return" -compact
-.It ESC\-7
+.IP ESC\-7
 反向换行符(escape后接7)
-.It ESC\-8
+.IP ESC\-8
 反向半换行符(escape后接8)
-.It ESC\-9
+.IP ESC\-9
 正向半换行符(escape后接9)
-.It backspace
+.IP backspace
 反向移动一列(8);在第一列则忽略.
-.It carriage return
+.TP 
+carriage return
 (13)
-.It newline
+.IP newline
 正向换行符(10);同时执行回车(carriage return)操作
-.It shift in
+.TP 
+shift in
 转到正常字符集(15)
-.It shift out
+.TP 
+shift out
 转到备选的字符集(14)
-.It space
+.IP space
 正向移动一列(32)
-.It tab
+.IP tab
 正向移动到下一个tab(9)
-.It vertical tab
+.TP 
+vertical tab
 反向换行符(11)
-.El
 .PP
 丢弃所有不被承认的控制字符和escape序列.
 .PP
 当读取字符时,
-.Nm Col
+.B col
 保持着与字符集的联系,而且在输出时确保字符集是正确的.
 .PP
 如果输入设备试图回复到最近被刷新的行,
-.Nm col
+.B col
 会显示一条警告消息.
 .SH SEE ALSO(另见)
-.Xr expand 1 ,
-.Xr nroff 1 ,
-.Xr tbl 1
+.BR expand (1)
+.BR nroff (1)
+.BR tbl (1)
 .SH HISTORY(历史)
-.Nm col
+.B col
 命令出现于AT&T UNIX版本6.
 .SH "[中文版维护人]"
 .B riser <boomer@ccidnet.com>

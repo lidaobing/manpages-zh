@@ -108,11 +108,9 @@ a2p \- Awk 到 Perl 翻译器
 .IP "\fB\-n<fieldlist>\fR" 5
 如果输入不分解为一个数组，你需要指定输入的各字段的名称。
 假如要翻译一个用于处理密码文件的awk脚本，你应当这样:
-.PP
-.Vb 1
-\&        a2p -7 -nlogin.password.uid.gid.gcos.shell.home
-.Ve
-.Sp
+
+a2p -7 -nlogin.password.uid.gid.gcos.shell.home
+
 任何定界符都可以用来分隔字段名。
 .IP "\fB\-<number>\fR" 5
 使得a2p总是假设输入包含那么多字段。
