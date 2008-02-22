@@ -1,4 +1,4 @@
-.TH Scrolledwindow 3 "tcllib - BWidget"
+.TH Scrolledwindow 3tk "tcllib - BWidget"
 
 .SH NAME
 .B ScrolledWindow - 通用滚动组件

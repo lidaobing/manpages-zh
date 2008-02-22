@@ -1,4 +1,4 @@
-.TH ComboBox 3 "tcllib - BWidget"
+.TH ComboBox 3tk "tcllib - BWidget"
 
 .SH NAME
 .B ComboBox - ComboBox 组件

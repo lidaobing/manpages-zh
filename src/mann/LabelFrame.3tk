@@ -1,33 +1,29 @@
-.TH TitleFrame 3 "tcllib - BWidget"
+.TH LabelFrame 3tk "tcllib - BWidget"
 
 .SH NAME
-.B TitleFrame - 有一个标题的框架
+.B LabelFrame - 有一个标签的框架.
 
 .SH 创建 CREATION
-.B TitleFrame pathName ?option value...?
+.B LabelFrame pathName ?option value...?
 
 .SH 描述 DESCRIPTION
-TitleFrame 使用户能建立带有象 XmFrame Motif 组件那样的框架。
+LabelFrame 使用户能建立带有可定位在任何一边的一个标签的框架。ComboBox 和 SpinBox 使用了 LabelFrame。
 
 .SH 组件特有选项 WIDGET-SPECIFIC OPTIONS
-.TP
-.TP
--baseline  
-指定标题的垂直对齐: top、center 或 bottom。 
 
 .TP
--ipad  
-指定在这个框架和用户框架之间的填充(pad)。值使用屏幕单位。 
-
-.TP
--side  
-指定标题的水平对齐: left、center 或 right。
+-side (read-only)  
+指定把标签定位于相对于用户框架的: top、bottom、left 或 right。 
 
 .SH 组件命令
 
 .TP
+LabelFrame::align ?arg...? 
+这个命令通过设置用 args 给出的类 LabelFrame (或衍生(derive)类)的所有组件的标签的宽度为最大的那个宽度 + 1 来对齐(align)这些标签。 
+
+.TP
 pathName cget option  
-返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。
+返回用 option 给出的配置选项的当前值。Option 可以是能被建立命令接受的任何值。 
 
 .TP
 pathName configure ?option? ?value option value ...? 
@@ -40,6 +36,6 @@ pathName getframe
 .SH "[中文版维护人]"
 .B 寒蝉退士
 .SH "[中文版最新更新]"
-.B 2001/05/08
+.B 2001/05/06
 .SH "《中国 Linux 论坛 man 手册页翻译计划》:"
 .BI http://cmpp.linuxforum.net

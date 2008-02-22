@@ -1,4 +1,4 @@
-.TH PanedWindow 3 "tcllib - BWidget"
+.TH PanedWindow 3tk "tcllib - BWidget"
 
 .SH NAME
 .B PanedWindow - 平铺布局管理器组件
