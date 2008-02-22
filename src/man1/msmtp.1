@@ -1,0 +1,456 @@
+.\" -*-nroff-*-
+.\"
+.\" msmtp version 1.4.9
+.\"
+.TH MSMTP 1 2006-11
+.SH NAME
+msmtp \- An SMTP client 
+.SH 概要 (SYNOPSIS)
+.IP "发邮件模式 (默认):"
+.B msmtp
+[option...] [--] recipient...
+.br
+.B msmtp
+[option...] -t [--] [recipient...]
+.IP "服务器消息模式:"
+.B msmtp
+[option...] --serverinfo
+.IP "远程消息队列模式:"
+.B msmtp
+[option...] --rmqs=\fIhost\fP|\fI@domain\fP|\fI#queue\fP
+.SH 描述 (DESCRIPTION)
+在默认的发邮件模式下，msmtp 从标准输入读取邮件，然后把它送给SMTP 服务器处理
+.br
+当处于服务器消息模式下，msmtp 会显示SMTP 服务器的有关信息
+.br
+而当它处于远程消息队列模式时，msmtp 将为主机或者域发出RMQS 请求，或者向SMTP 
+服务器发出队列请求
+.SH 退出状态 (EXIT STATUS)
+这里使用标准的sendmail 退出状态代码，就像在 sysexits.h 中定义的那样
+.BR
+想快速上手，可跳到EXAMPLES 部分
+.SH 选项  (OPTIONS)
+这里的选项将覆盖配置文件中的相同选项
+.br
+他们在某些地方与sendmail 兼容
+.IP "\fB一般选项 (General options)\fP"
+.RS
+.IP "--version"
+显示版本信息。这些信息包括TLS/SSL 库信息（如果有），用于验证的库以及这些库
+所支持的验证方式，还有默认的全局配置文件和用户配置文件信息
+.IP "--help"
+显示帮助
+.IP "-P, --pretend"
+显示使用的配置信息，但不真正执行什么操作。密码将会以 *** 的形式显示
+.IP "-d, --debug"
+显示很多调试信息，包括与SMTP 服务器的所有会话。小心使用这个选项（潜在风险）：
+所有输出没经过什么处理，密码可能以一种极易解码的方式被显示出来
+.RE
+.IP "\fB改变操作模式选项 (Changing the mode of operation)\fP"
+.RS
+.IP "-S, --serverinfo"
+显示SMTP 服务器的信息并退出。信息中包含了所有支持的特性，如邮件大小限制、
+验证方式、TLS、DSN 等等。如果服务器支持TLS 的话，还有TLS 证书信息
+.IP "--rmqs=(\fIhost\fP|\fI@domain\fP|\fI#queue\fP)"
+为指定的主机或者域发送一个开启远程消息队列的请求，或者向SMTP 服务器发送队列
+请求，并退出
+.RE
+.IP "\fB配置选项 (Configuration options)\fP"
+.RS
+.IP "-C, --file=\fIfilename\fP"
+用指定的文件代替~/.msmtprc 作为用户配置文件
+.IP "-a, --account=\fIaccount_name\fP"
+用指定的帐号代替"default" 字段中的帐号。这个帐号的设置能以命令行选项的方式进行
+更改。但这个选项不能与 \fB--host\fP 合用
+.IP "--host=\fIhostname\fP"
+用命令行指定一个SMTP 服务器，不用配置文件中的任何数据。这个选项不能与
+\fB--account\fP 选项合用
+.IP "--port=\fInumber\fP"
+设置要连接的端口。参看下面 \fBport\fP 命令
+.IP "--timeout=(\fIoff\fP|\fIseconds\fP)"
+设定网络超时。参看下面 \fBtimeout\fP 命令。为了兼容老版本，--connect-timeout 
+作为这个选项的别名
+.IP "--protocol=(\fIsmtp\fP|\fIlmtp\fP)
+设定所用的协议。参看下面 \fBprotocol\fP 命令
+.IP "--auth[=(\fIon\fP|\fIoff\fP|\fImethod\fP)]"
+开启或关闭验证，也可随意选择一个验证方式。参看下面 \fBauth\fP 命令
+.IP "--user=\fI[username]\fP"
+设置或清空用于验证的用户名。参看下面 \fBuser\fP 命令
+.IP "--tls[=(\fIon\fP|\fIoff\fP)]"
+开启或关闭TLS 加密。参看 \fBtls\fP 命令
+.IP "--tls-starttls[=(\fIon\fP|\fIoff\fP)]"
+开启或关闭TLS 加密的STARTTLS 。参看下面 \fBtls_starttls\fP 命令
+.IP "--tls-trust-file=[\fIfile\fP]"
+设置或清空TLS 加密的trust file。参看下面 \fBtls_trust_file\fP 命令
+.IP "--tls-key-file=[\fIfile\fP]"
+设置或清空TLS 加密的key file。参看下面 \fBtls_key_file\fP 命令
+.IP "--tls-cert-file=[\fIfile\fP]"
+设置或清空TLS 加密的cert file。参看下面 \fBtls_cert_file\fP 命令
+.IP "--tls-certcheck[=(\fIon\fP|\fIoff\fP)]"
+开启或关闭TLS 加密的证书检验。参看下面 \fBtls_certcheck\fP 命令
+.IP "--tls-force-sslv3[=(\fIon\fP|\fIoff\fP)]"
+强制使用SSLv3。参看下面 \fBtls_force_sslv3\fP 命令
+.IP "--domain=[\fIstring\fP]"
+设置SMTP EHLO (or LMTP LHLO)命令的参数。参看 \fBdomain\fP 命令
+.RE
+.IP "\fB发件模式的选项 (Options specific to sendmail mode)\fP"
+.RS
+.IP "--auto-from[=(\fIon\fP|\fIoff\fP)]"
+开启或关闭automatic envelope-from addresses。默认关闭。参看下面
+\fBauto_from\fP 命令
+.IP "-f, --from=\fIaddress\fI"
+设定envelope-from address。仅当 \fIauto_from\fP 关闭时才有用
+.br
+如果未用 \fB--account\fP 或 \fB--host\fP 指定帐号，这个选项会选择第一个拥有给
+定envelope-from address 的帐号。看看 \fBfrom\fP 命令。如果没找到符合条件的帐号
+，就用"default"
+.IP "--maildomain=[\fIdomain\fP]"
+为生成的envelope-from addresses 指定一个域。仅当 \fIauto_from\fP 开启时才有用。
+参看下面 \fBmaildomain\fP 命令
+.IP "-N, --dsn-notify=(\fIoff\fP|\fIcond\fP)"
+设置或清空DSN notification conditions。参看下面 \fBdsn_notify\fP 命令
+.IP "-R, --dsn-return=(\fIoff\fP|\fIret\fP)"
+设置或清空 DSN notification amount。参看下面 \fBdsn_return\fP 命令。注意为
+兼容sendmail ，\fIhdrs\fP 被定义成 \fIheaders\fP 的别名
+.IP "--keepbcc[=(\fIon\fP|\fIoff\fP)]"
+是否保留Bcc header。参看下面 \fBkeepbcc\fP 命令
+.IP "-X, --logfile=[\fIfile\fP]"
+设置或清除log file。参看下面 \fBlogfile\fP 命令
+.IP "--syslog[=(\fIon\fP|\fIoff\fP|\fIfacility\fP)]"
+是否启用syslog。参看下面 \fBsyslog\fP 命令
+.IP "-t, --read-recipients"
+从邮件的To, Cc, Bcc headers 处提取收件人地址，而不从命令行读入
+.IP "--"
+从这以后的参数均被认为是收件人地址，即使以 '-' 开头。这标志着选项列表结束了
+.RE
+.PP
+以下选项可用，但兼容的sendmail 忽略。
+.br
+-B\fItype\fP, -bm, -F\fIname\fP, -G, -h\fIN\fP, -i, -L \fItag\fP, -m, -n, -O
+\fIoption=value\fP, -o\fIx\fP \fIvalue\fP, -v
+.SH 用法 (USAGE)
+通常，全局配置文件和(或)用户配置文件包含了SMTP 服务器以及如何与之通信的所有信
+息。但是，几乎所有的选项也可以在命令行上配置
+.PP
+SMTP 服务器的信息以 \fIaccounts\fP 方式组织在一起。每个帐号描述了一台SMTP 服
+务器的主机名、验证设置、TLS 设置等等。每个配置文件能定义多个帐号
+.PP
+在发件模式，必须要有一个envelope-from，这被作为原始发件人发送给SMTP 服务器。
+当 \fIauto_from\fP 开启时，Envelope-from 的地址也能自动生成，或者也能明确地
+用 \fBform\fP 或 \fB--from\fP 设定。\fIauto_from\fP 能生成形如 user@domain
+这样的地址。user 部分将以 \fB$USER\fP 代替，如果不行，就用 \fB$LOGNAME\fP 
+代替，再不行的话，就用当前登录的用户名。domain 部分能用 \fBmaildomain\fP 设
+定。如果maildomain 未设好，envelope-from 中将只有用户名，而不含域名。
+.PP
+用户能选择用哪个帐号，以下方法三选一：
+.IP "--account=\fIid\fP"
+用给定帐号。命令行选项会覆盖配置文件中的设定
+.IP "--host=\fIhostname\fP
+只用来自命令行的选项，不用配置文件中的
+.IP "--from=\fIaddress\fP"
+从全局或用户配置文件中选择与 \fBfrom\fP 命令指定的地址匹配的envelop-from 地址。
+只有 \fB--account\fP 和 \fB--host\fP 都没有设定时才用得到这个选项
+.PP
+如果以上选项一个都没用到，又或者用了 \fB--from\fP 但没有一个帐号与 \fBfrom\fP
+命令的结果匹配，那就使用"default" 帐号
+.SH 配置文件 (CONFIGURATION FILES)
+如果全局配置文件存在并可读，会调用文件SYSCONFDIR/msmtprc，SYSCONFDIR 依赖于你的
+系统。用 \fB--version\fP 可以找到用了哪个目录
+.br
+如果用户配置文件存在并可读，就调用它(默认是~/.msmtprc )。用户配置中的帐号会覆盖
+全局配置中的相同帐号。除了拥有者的读写权外，决不给配置文件其它多余的权限。无论
+哪个配置文件中的设置都可以用命令行选项更改
+.PP
+配置文件是个普通文本而已，忽略空行和注释行(以'#'开头)
+.br
+其它行必须包含一条命令以及可能的参数
+.br
+如果参数的第一个或最后一个有空白，要用双引号(")括起来
+.br 
+如果文件的第一个字符是"~"，将会用$HOME 代替。如果命令能接受一个 \fIon\fP 参数，
+它也会接受空参数并默认它是 \fIon\fP 参数。
+.br
+命令的集合形成groups 。每组以 \fBaccount\fP 命令开头，接着是SMTP 服务器的设置
+.PP
+想快速上手，可跳到EXAMPLES 部分
+.PP
+命令说明如下：
+.IP "defaults"
+设置defaults。接下去的设置命令将当前配置文件中的所有帐号指定默认值
+.IP "account \fIname\fP [:\fIaccount\fP[,...]]"
+开始定义新帐号，填充默认值
+.br
+如果有逗号和预先定义好的帐号名跟在account 后面，所有列表中的帐号会拥有同样的
+设置，并填充默认值
+.IP "host \fIhostname\fP"
+邮件发送目的地SMTP 服务器，参数可以是主机名或者网络地址。每个帐号都必须包含
+这个命令
+.IP "port \fInumber\fP"
+SMTP 服务器监听端口。默认端口会从你操作系统的service database 中获取。对于
+SMTP 来说，服务名是"smtp" (默认端口25)，除非使用不带STARTTLS 的TLS ，在此种
+情况下服务名是"ssmtp"(445)。对于LMTP，服务名是"lmtp"
+.IP "timeout (\fIoff\fP|\fIseconds\fP)"
+设置或清除网络超时(以秒计)。\fIoff\fP 参数表示不设超时，这意味着使用操作系统
+默认的超时设定
+.br
+为与老版本兼容， \fIconnect_timeout\fP 可作为这条命令的别名
+.IP "protocol (\fIsmtp\fP|\fIlmtp\fP)"
+设置所用的协议，目前只支持SMTP 和LMTP，默认SMTP。想知道默认端口，看上面的
+\fBport\fP 命令 
+.IP "auto_from [(\fIon\fP|\fIoff\fP)]
+是否允许automatic envelope-from。默认不允许。开启时，会生成类似user@domain 形
+式的envelope-from。 user 部分将以 \fB$USER\fP 代替，如果不行，就用
+\fB$LOGNAME\fP 代替，再不行的话，就用当前登录的用户名。domain 部分能用
+\fBmaildomain\fP 设定。如果maildomain 未设好，envelope-from 中将只有用户名，而
+不含域名。关闭时，，envelope-from 必须明确指定
+.IP "from \fIenvelope_from\fP"
+设置envelope-from，仅当 \fIauto_from\fP 关闭时才有用
+.IP "maildomain [\fIdomain\fP]"
+设置envelope 域名部分。仅当 \fIauto_from\fP 开启时才有用，域名可以为空
+.IP "auth [(\fIon\fP|\fIoff\fP|\fImethod\fP)]"
+这条命令控制是否允许SMTP 验证。你没有必要自己来设定验证方式，只要用了 \fIon\fP
+参数，msmtp 会为你选择一个最佳方案(看下面)。
+.br
+你可能需要用 \fBuser\fP 命令来设置一个用户名，用 \fBpassword\fP 命令设置一个
+密码。如果不指定密码，而msmtp 运行时发现在验证时又需要密码，msmtp 会试着从
+~/.netrc 中找一个，如果不行的话，msmtp 会提示你输入一个
+.br
+支持的验证方式有 \fIplain\fP, \fIcram-md5\fP, \fIdigest-md5\fP, \fIgssapi\fP,
+\fIexternal\fP, \fIlogin\fP, and \fIntlm\fP 。注意由于可能缺少下面的验证库，你
+会有一个或多个验证方式不能用。用 \fB--version\fP 选项看看支持哪些方法。
+.br
+\fIplain\fP 和 \fIlogin\fP 把你的验证信息在网上以明文传输，因此应该仅把它们和
+\fBtls\fP 命令一起用。
+.br
+如果不自己选择方式的话，msmtp 会选择SMTP 服务器支持的最安全的方式，安全指你的
+信息在网上不会以明文发送。在TLS 加密连接下任何一种验证方式都是安全的。如果不
+用TLS ，只有gssapi,digest-md5,cram-md5 and ntlm 是安全的。
+.br
+\fIexternal\fP 方法比较特殊：真正的验证操作位于SMTP 协议之外，发送TLS 客户端
+证书(看 \fBtls_cert_file\fP 命令)就是个典型例子。\fIexternal\fP 只确认这次验
+证对于给定的用户是否成功，如果不给用户名的话，就只确认验证是否成功。[注：总之
+它就把具体验证和加密的事情全推给了外面程序，与msmtp 无关了]。msmtp 不会选这种
+验证方式，你必须亲自指定。
+.IP "user [\fIusername\fP]"
+设置用于SMTP 验证的用户名，参数为空时清除用户名。证验操作必须用 \fBauth\fP 命
+令激活
+.IP "password [\fIsecret\fP]"
+设置用于SMTP 验证的密码，参数为空时清除密码。证验操作必须用 \fBauto\fP 命令
+激活。如果不指定密码，而验证操作又需要密码，msmtp 会试着从 ~/.netrc 中找一个，
+如果不行的话，msmtp 会提示你输入一个
+.IP "ntlmdomain [\fIdomain\fP]"
+设置用于 \fIntlm\fP 验证方式的域名，默认不用域名(等同于空参数)。但有些服务器好
+像要的，即便给出的是任意字符串
+.IP "tls [(\fIon\fP|\fIoff\fP)]"
+是否允许TLS/SSL 加密连接。不是每个服务器都支持TLS ，但有了TLS，可以防止有人偷听
+与SMTP 的对话。除非用 \fBtls_certcheck\fP 命令关闭服务器证书验证，否则每次都要
+完备性检查。为全面发挥TLS/SSL 效力，推荐用 \fBtls_trust_file\fP 命令(看下面)
+.IP "tls_starttls [(\fIon\fP|\fIoff\fP)]"
+缺省状态下，TLS 加密以STARTTLS SMTP 命令激活。关闭后，TLS 加密会立即启动(这是
+有名的SMTP tunneled through TLS/SSL)。默认端口是465
+.br
+为兼容老版本， \fBtls_nostarttls\fP 作为 \fBtls_starttls off\fP 的别名
+.IP "tls_trust_file [\fIfile\fP]"
+这条命令激活严格的服务器证书验证。这个文件必须包含一个或多个以PEM 格式存在的受
+信任的证书注册机构(CAs)。空参数会关闭这个特性。msmtp 通过受信文件验证服务器的
+可靠性
+.IP "tls_key_file [\fIfile\fP]"
+与 \fBtls_cert_file\fP 命令一起，使msmtp 在需要时发一份客户端证书给SMTP 服务
+器。这个文件必须包含PEM 格式证书的私钥。空参数会关闭这个特性
+.IP "tls_cert_file [\fIfile\fP]"
+与 \fBtls_key_file\fP 命令一起，使msmtp 在需要时发一份客户端证书给SMTP 服务器。
+这个文件必须包含PEM 格式的证书。空参数会关闭这个特性
+.IP "tls_certcheck [(\fIon\fP|\fIoff\fP)]"
+当TLS 启用时，默认对服务器证书进行完备性检查。如果没有检查未通过，会取消TLS 
+连接。
+.br
+为兼容老版本， \fBtls_nocertcheck\fP 作为 \fBtls_certcheck off\fP 的别名
+.IP "tls_force_sslv3 [(\fIon\fP|\fIoff\fP)]"
+强制使用TLS/SSL 的SSLv3 版本。可能在一些用SSL 的老旧服务器上有用。不过万不得
+已，别用这个
+.IP "dsn_notify (\fIoff\fP|\fIcondition\fP)"
+设定在哪在情况下，邮件系统应该发送DSN (Delivery Status Notification)信息。
+\fIoff\fP 参数明确关闭DSN 请求，这意味着让邮件决定什么时候发DSN 信息，默认如
+此。 \fIcondition\fP 可以是 \fInever\fP ，从不发送请求。或者是以逗号(没有空
+格！)分隔的一个或多个下列参数： \fIfailure\fP 失败时发送， \fIdelay\fP 延迟时
+发送， \fIsuccess\fP 成功时发送。SMTP 服务器必须支持DSN 才行。
+.IP "dsn_return (\fIoff\fP|\fIamount\fP)"
+在一封邮件中允许返回多少DSN 信息。 \fIoff\fP 明确关闭DSN 请求，这意味着让邮件
+系统决定，默认如此。 \fIamount\fP 可以是 \fIheaders\fP 只返回信息头，\fIfull\fP 返回邮件全部内容。SMTP 服务器必须支持DSN 才行
+.IP "domain \fIargument\fP"
+用来设定SMTP EHLO(or LMTP LHLO)命令的参数。默认是 \fIlocalhost\fP (笨方法，但
+有效)。其它可能的选择有：邮件地址的域名部分(provider.example for joe@provider.
+example)，或者如果可能的话给出你主机的完整域名
+.IP "keepbcc [(\fIon\fP|\fIoff\fP)]"
+当发送邮件时是否保留Bcc header 信息，默认不保留。
+.IP "logfile [\fIfile\fP]"
+不给参数会关闭记录，默认如此。
+.br
+当选择一个logfile 时，msmtp 会为每一封指定logfile 帐号的邮件添加一行记录
+.br 
+记录中会包含如下信息：日期、时间、SMTP 服务器名字、是否用TLS、是否验证、用于
+验证的用户名(仅当用了验证后)、信件来自哪里、收件人地址、发出去的邮件大小(仅
+当发送成功时)、SMTP 状态代码、SMTP 错误信息(仅当发送失败且错误信息可得时)、
+错误信息(仅当发送失败且错误信息可得时)、退出代码(来自 sysexits.h；EX_OK 代表
+发送成功)
+.br
+如果文件是一短横(-)，msmtp 就把记录信息输出至标准输出
+.IP "syslog [(\fIon\fP|\fIoff\fP|\fIfacility\fP)]"
+是否允许syslog 。facility 可以是LOG_USER、LOG_MAIL、LOG_LOCAL0...LOG_LOCAL7 诸多策略中的一个，默认是LOG_USER。
+.br
+每次msmtp 通过含有这条命令的帐号发邮件时，它均会在syslog 服务中以选定的策略追
+加一条记录
+.br 
+记录中会包含如下信息：日期、时间、SMTP 服务器名字、是否用TLS、是否验证、用于
+验证的用户名(仅当用了验证后)、信件来自哪里、收件人地址、发出去的邮件大小(仅
+当发送成功时)、SMTP 状态代码、SMTP 错误信息(仅当发送失败且错误信息可得时)、
+错误信息(仅当发送失败且错误信息可得时)、退出代码(来自 sysexits.h；EX_OK 代表
+发送成功)
+.SH 范例 (EXAMPLES)
+.B 配置文件 (Configuration file)
+.PP
+# Set default values for all following accounts.
+.br
+defaults
+.br
+tls on
+.br
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+.br
+logfile ~/.msmtp.log
+.br
+
+.br
+# A freemail service
+.br
+account freemail
+.br
+host smtp.freemail.example
+.br
+from joe_smith@freemail.example
+.br
+auth on
+.br
+user joe.smith
+.br
+password secret
+.br
+
+.br
+# A second mail address at the same freemail service
+.br
+account freemail2 : freemail
+.br
+from joey@freemail.example
+.br
+
+.br
+# The SMTP server of the provider.
+.br
+account provider
+.br
+host mail.provider.example
+.br
+from smithjoe@provider.example
+.br
+auth on
+.br
+user 123456789
+.br
+password my_password
+.br
+
+.br
+# Set a default account
+.br
+account default : provider
+.br
+
+.PP
+.B 在Mutt 中使用msmtp (Using msmtp with Mutt)
+.PP
+为msmtp 建立一个配置文件，然后把下面几行加到Mutt 配置文件中去
+.br
+.B set sendmail="/path/to/msmtp"
+.br
+.B set use_from=yes
+.br
+.B set realname="Your Name"
+.br
+.B set from=you@example.com
+.br
+.B set envelope_from=yes
+.br
+envelope_from=yes 让Mutt 用msmtp的
+.BR -f 
+参数。这样msmtp 会选择符合you@example.com 的第一个帐号
+.br
+你也可以选用
+.BR -a
+参数
+.br
+.B set sendmail="/path/to/msmtp -a my-account"
+.br
+或者从命令行中设定所有内容
+.br
+.B set sendmail="/path/to/msmtp --host=mailhub -f me@example.com --tls"
+.PP
+如果你有多个邮件帐号，并且想让Mutt 用
+.BR -f
+参数让你可以在帐号之间轻松切换，把下面几行加到Mutt 配置文件中去
+.br
+.B macro generic\ "<esc>1"\ ":set from=you@example.com"
+.br
+.B macro generic\ "<esc>2"\ ":set from=you@your-employer.example"
+.br
+.B macro generic\ "<esc>3"\ ":set from=you@some-other-provider.example"
+.PP
+.B 在mail 中用上msmtp (Using msmtp with mail)
+.PP
+定义一个默认帐号，然后把下面一行放在 ~/.mailrc 中
+.br
+.B set sendmail="/path/to/msmtp"
+.SH 文件/系统环境 (FILES / ENVIRONMENT)
+.IP "SYSCONFDIR/msmtprc"
+全局配置文件。用
+.B --version
+找出系统中的SYSCONFDIR 在哪里
+.IP "~/.msmtprc"
+用户配置文件
+.IP "~/.netrc"
+文件.netrc 包含了登录信息。如果在配置文件中没有找到密码信息的话，msmtp 会在提
+示用户输入之前先找这个文件。 .netrc 的用法在
+.BR netrc (5)
+或 
+.BR ftp (1)
+中能找到
+.br
+.IP "$USER, $LOGNAME"
+在构造信件来源地址时，这些变量会覆盖用户的登录名。如果未指定$USER，就用$LOGNAME 
+.IP "$TMPDIR"
+建立临时文件的地方。如果未设置就用系统默认定义
+.br
+仅当用到
+.BR -t/--read-recipients
+选项时，才会创建临时文件。这个文件用于缓存邮件头，不包括邮件本身，所以文件不
+会太大
+.SH 作者 (AUTHORS)
+msmtp was written by Martin Lambers <marlam@marlam.de>.
+.br
+Other authors are listed in the AUTHORS file in the source distribution.
+.SH 参看 (SEE ALSO)
+.BR mutt (1), 
+.BR mail (1),
+.BR sendmail (8), 
+.BR netrc (5)
+or
+.BR ftp (1)
+.br
+.SH [中文版维护人]
+"Nickel Cobalt" <angelerosster@gmail.com>
+.SH [中文版最新更新]
+2007/05/01
+.SH [中文版校对人]
+"Nickel Cobalt" <angelerosster@gmail.com>
+.SH 《中文MAN-PAGE计划》
+http://cmpp.linuxforum.net
