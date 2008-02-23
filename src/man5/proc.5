@@ -28,7 +28,7 @@
 .\"; Minor changes by aeb and Marty Leisner (leisner@sdsp.mc.xerox.com).
 .\"; Sat Apr 13 02:32:45 1996: aeb@cwi.nl, added sys, various fixes.
 .\"; Mon Jul 22 17:14:44 1996: aeb@cwi.nl, minor fix.
-.TH PROC 5 ";22 July 1996"; ";"; ";Linux Programmer's Manual";
+.TH PROC 5 "22 July 1996" "Linux Programmer's Manual"
 .SH NAME
 proc \- 进程信息伪文件系统
 
@@ -494,7 +494,7 @@ eth0: 644324    1    0    0    1   563770    0    0    0   581    0
 .TP
 .I raw
 该文件保存了 RAW 套接字表, 大部分信息除用于调试以外没有什么用.
-'sl' 指出了套接字的内核散列槽号; 'local address'
+`sl' 指出了套接字的内核散列槽号; 'local address'
 包括本地地址和协议号对; "St" 是套接字的内部状态;
 tx_queue 和 rx_queue 是内核存储器使用意义上的输入输
 出数据队列; RAW 没有使用"tr", "tm-&gt;when" 和 "rexmits";
@@ -553,7 +553,7 @@ Num RefCount Protocol Flags    Type St Path
 .sp .5
 .fi
 .PP
-'Num' 是内核散列槽号; 'RefCount' 是用户套接字号; 'Protocol'
+`Num' 是内核散列槽号; 'RefCount' 是用户套接字号; 'Protocol'
 当前总是 0; 'Flags' 是内核标志, 指出了套接字的状态; 'Type'
 当前总是 1(在内核中尚未支持 unix 域数据报套接字); 'St'
 是套接字内部状态; 'Path' 套接字绑捆的路径(如果有的话). 

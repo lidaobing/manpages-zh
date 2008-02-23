@@ -3,12 +3,12 @@
 .SH NAME
 keymaps \- 对键盘映射文件的描述
 
-.SH "描述 (DESCRIPTION)
-.IX "keymaps" "" "\fLkeymaps\fR \(em keyboard table descriptions for loadkeys and dumpkeys" ""
-.IX "loadkeys" "keyboard table descriptions" "\fLloadkeys\fR" "keyboard table descriptions"
-.IX "dumpkeys" "keyboard table descriptions" "\fLdumpkeys\fR" "keyboard table descriptions"
-.IX keyboard "table descriptions for loadkeys and dumpkeys" keyboard "table descriptions for \fLloadkeys\fR and \fLdumpkeys\fR"
-.IX "translation tables"
+.SH "描述 (DESCRIPTION)"
+\" .IX "keymaps" "" "\fLkeymaps\fR \(em keyboard table descriptions for loadkeys and dumpkeys" ""
+\" .IX "loadkeys" "keyboard table descriptions" "\fLloadkeys\fR" "keyboard table descriptions"
+\" .IX "dumpkeys" "keyboard table descriptions" "\fLdumpkeys\fR" "keyboard table descriptions"
+\" .IX keyboard "table descriptions for loadkeys and dumpkeys" keyboard "table descriptions for \fLloadkeys\fR and \fLdumpkeys\fR"
+\" .IX "translation tables"
 .LP
 .BR loadkeys (1)
 能够 通过 调入 指定的 文件 修改 键盘翻译表, 键盘翻译表 通常 用于 内核的 
@@ -48,9 +48,7 @@ include "pathname"
 字符集 定义 的 格式 是:
 .LP
 .RS
-.EX
 charset "iso-8859-x"
-.EE
 .RE
 .LP
 它 指出 如何 解释 后面的 keysym.
@@ -186,9 +184,7 @@ VoidSymbol, 什么 都 不发生. 这意味着 尽管 你 已经 松开了 这�
 首先, 你 可以 给出 一个 映射说明行, 如
 .LP
 .RS
-.EX
 keymaps 0-2,4-5,8,12
-.EE
 .RE
 .LP
 表明 键定义行 并不 使用 全部的 256 列, 而 只用 指定的 列. 
@@ -296,14 +292,12 @@ Meta_Control_x	Meta_Control_y
 .LP
 例如:
 .RS
-.EX
 .nf
 plain keycode 14 = BackSpace
 control alt keycode 83 = Boot
 alt keycode 105 = Decr_Console
 alt keycode 106 = Incr_Console
 .fi
-.EE
 .RE
 这里的 "plain" 指 该键的 基本动作 (就是说, 没有 使用 修饰键 时),
 不影响 该键 的 其他 修饰键 组合.

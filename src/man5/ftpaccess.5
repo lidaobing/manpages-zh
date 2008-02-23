@@ -1,7 +1,7 @@
 .TH ftpaccess 5 
 
 .SH NAME
-ftpaccess - ftpd的配置档
+ftpaccess \- ftpd的配置档
 
 .SH "描述 DESCRIPTION"
 这个ftpaccess档案是用来配置下述功能的运作
@@ -21,7 +21,7 @@ class<类别><类型列表><全球位址>[<全球位址>...]
 位址。
 
 .TP
- deny<全球位址><讯息档案>
+deny<全球位址><讯息档案>
 永远拒绝符合<全球位址>主机的存取。显示<讯息档案>。<全球位址>可以是"!nameserved"用来拒绝没有名称伺服器服务中的节点的存取。
 
 .TP
@@ -32,10 +32,10 @@ guestgroup<群组名称>[<群组名称>...]
 
 在/etc/passwd里，该真实的项目：
 
-.CS
+.nf
 guest1::100:92:Guest
 Account:/ftp/./incoming:/etc/ftponly
-.CE
+.fi
 
 当guest1成功地签入的时候，此ftp伺服器将会执行一次chroot("/ftp")然後接著chdir("/incoming")。该guest使用者将只能够存取/ftp下的目录结构（此目录对guest1而言看起来跟用起来就像是/目录），就如同一个匿名FTP使用者所见到的。
 
@@ -45,7 +45,7 @@ Account:/ftp/./incoming:/etc/ftponly
 
 .TP
 loginfails<数字>
-在<数字>签入失败後，记录一个″重复签入失败(repeated loginfailures)讯息″并且终止该FTP连线。预设值是5。
+在<数字>签入失败後，记录一个重复签入失败(repeated loginfailures)讯息并且终止该FTP连线。预设值是5。
 
 .TP
 private
@@ -53,9 +53,7 @@ private
 
 该群组存取档案的格式是：
 
-.CS
 存取群组名称：经编码的密码：真实群组名称
-.CE
 
 其中的存取群组是一个随意的（文数字＋标点）字串。经编码的密码是经由crypt(3)编码过的密码，与/etc/passwd里的完全一样。真实群组名称是/etc/group里所列出有效群组其中的一个名称。
 
@@ -80,7 +78,8 @@ message<路径>{<时机>{<类别>...}}
 
 该选择性的<类别>指定允许该讯息只对特殊类别的成员显示。可以指定超过一个类别。
 
-在说明档中可以有″代换变数(magiccookies)″这会使ftp伺服器以指定的文字字串取代该变数：
+在说明档中可以有代换变数(magiccookies)这会使ftp伺服器以指定的文字字串取代
+该变数：
 
 .RS
 .TP
@@ -140,9 +139,7 @@ alias<字串><目录>
 
 例如：
 
-.CS
 aliasrfc:/pub/doc/rfc
-.CE
 
 允许使用者从任何目录以指令"cdrfc:"存取/pub/doc/rfc。别名只应用於cd指令上。
 
@@ -152,18 +149,18 @@ cdpath<目录>
 
 例如：
 
-.CS
+.nf
 cdpath/pub/packages
 cdpath/.aliases
-.CE
+.fi
 
 允许使用者直接cd到任何/pub/packages或/.alias目录以下的目录。该搜寻路径系以该行出现在ftpaccess档案里的顺序定义。
 
 如果使用者所下的指令是：
 
-.CS
+.nf
 cdfoo
-.CE
+.fi
 
 则会以下列的顺序搜寻该目录：
 
@@ -175,19 +172,19 @@ cdfoo
 该cdpath只能够配合cd指令使用。如果你有数量很大的别名那麽你可能想要设立一个目录别名链结到所有你希望能让使用者使用的区域。
 
 .TP
-.CS
+.nf
 compress[...]
 tar[...]
-.CE
+.fi
 为任何符合任何的类别启动压缩(compress)或包裹(tar)功能。实际的转换(conversions)定义在外部的档案FTPLIB/ftpconversions之中。
 
 .TP
 shutdown<路径>
 如果<路径>所指的档案存在，伺服器将会规律地检查该档案以便得知该伺服器是否将要被停机。如果计画一次停机，则会通告使用者，新的连线在停机之前的一段指定的时间之後会被拒绝且目前的连线在停机之前的一段指定的时间之後会被停止。<路径>指到一个结构如下的档案：
 
-.CS
+.nf
 <年><月><日><时><分><拒绝_期间><抛弃_期间><本文>
-.CE
+.fi
 .RS
 .TP
 <年>
@@ -226,12 +223,12 @@ shutdown<路径>
 .PP
 许可功能(PermissionCapabilities)
 .TP
-.CS
+.nf
 chmod<类型列表>
 delete<类型列表>
 overwrite<类型列表>
 umask<类型列表>
-.CE
+.fi
 允许或不允许执行指定功能的能力。依照预设值，允许所有的使用者执行。
 
 <类型列表>是一个以任何"anonymous","guest"及"real"关键字所组成使用逗点隔开的列表。
@@ -262,9 +259,9 @@ enforce
 path-filter<类型列表><讯息><允许的字元集>{<不允许的正规表示式>...}
 对於属於<类型列表>的使用者，path-filter定义控制何种档案名称允许或不允许的正规表示式(regularexpressions)。可以有多个不允许的正规表示式。如果一个档案名称因为不符合正规表示式的标准而无效的话，将会显示<讯息>给该使用者。例如：
 
-.CS
+.nf
 path-filteranonymous/etc/pathmsg^[-A-Za-z0-9._]*$^.^-
-.CE
+.fi
 
 指定所有匿名使用者所上传的档案名称只能以A-Z,a-z,0-9以及"._-"组成而且不能以一个"."或是一个"-"开始。如果该档案名称是不合法的，则将会显示/etc/pathmsg给该使用者。
 
@@ -278,12 +275,12 @@ upload<拥有者><群组>["dirs"|"nodirs"]
 
 例如：
 
-.CS
+.nf
 upload*no
 upload/incomingyesftpdaemon0666
 upload/incoming/gifsyesjlcguest0600
 nodirs
-.CE
+.fi
 
 这将仅允许上传到/incoming以及/incoming/gifs。上传到/incoming的档案将由ftp/daemon所拥有并且具有0666的权限。上传到/incoming/gifs的档案将由jlc/guest拥有并且具有0600的权限。
 

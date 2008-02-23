@@ -11,24 +11,22 @@
 .\"     @(#)aliases.5	8.8 (Berkeley) 5/19/1998
 .\"
 .TH aliases 5
-.DD May 19, 1998
-.DT ALIASES 5
-.OS BSD 4
+\" .DD May 19, 1998
+\" .DT ALIASES 5
+\" .OS BSD 4
 .SH NAME
-.br
-aliases - sendmail使用的别名文件
+aliases \- sendmail使用的别名文件
 .SH 总览
 aliases
 .SH 描述
 此文件描述了
-.B /usr/sbin/sendmai
+.B /usr/sbin/sendmail
 使用的用户账号别名。它位于
 .B /etc
 并格式化
 成如下形式的一连串的行：
-.BD -filled -offset indent
+
 name: name_1, name2, name_3, . . .
-.ED
 .PP
 其中的
 .B name
@@ -54,12 +52,8 @@ name: name_1, name2, name_3, . . .
 .BR dbopen(3),
 .BR dbm(3),
 .BR sendmail(8)
-.RS
-.%T "SENDMAIL 安装和操作指南。"
-.RE
-.RS
-.%T "SENDMAIL 互联网络邮件路由器。"
-.RE
+.BR "SENDMAIL 安装和操作指南。"
+.BR "SENDMAIL 互联网络邮件路由器。"
 .SH 错误
 如果你已经在编译
 .B sendmail
@@ -76,7 +70,6 @@ name: name_1, name2, name_3, . . .
 那就是，把一个作为延续的虚设名来作为别名串中的最后一个名称。
 .SH 历史记录
 别名文件格式出现于BSD 4.0
-.BX 4.0
 。
 .SH "[中文版维护人]"
 .B mhss
