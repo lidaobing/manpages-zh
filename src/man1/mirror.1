@@ -12,7 +12,7 @@
 .\" 
 .TH mirror 1
 .SH NAME
-mirror - 映射在远端节点上的档案
+mirror \- 映射在远端节点上的档案
 
 .SH "总览 SYNOPSIS"
 mirror [flags] -gsite:pathname
@@ -493,8 +493,7 @@ get_missing
 值都在 mirror.defaults 这个将会在任何 package 细节前自动
 载入的档案里。
 .PP
-.CS
-
+.nf
 # Sample mirror.defaults
 package=defaults
 # The LOCAL hostname - if not the same as `hostname` returns
@@ -504,8 +503,7 @@ hostname=src.doc.ic.ac.uk
 # Keep all local_dirs relative to here
 local_dir=/public/
 remote_password=ukuug-soft@doc.ic.ac.uk
-
-.CE
+.fi
 .PP
 如果档案包裹不是 defaults 的话，则 mirror 将会执行下列步骤
 。除非侦测出一个内部错误，任何错误都将会使得目前的档案包裹
@@ -545,51 +543,51 @@ remote_fs 变数以符合将会传回(return)的目录列表类型。此变数
 变数的建议。在配合某些设定与众不同的档案服务处的时候你可能
 必须变更此处所建议的变数设定。
 .PP
-.CS
+.nf
 remote_fs=unix
 total 65
 -rw-r--r-- 1 ukuug ukuug 2245 Jun 28 20:06 README
 -rw-r--r-- 1 ukuug ukuug 61949 Jun 29 19:13 mirror-2.1.tar.gz
-.CE
+.fi
 .PP
 这是预设值而且你应该不必重设任何其它变数。
 .PP
-.CS
+.nf
 remote_fs=dls
 00index.txt 189916
 0readme 5793
 1_x/ = OS/2 1.x-specific files
-.CE
+.fi
 .PP
 这是某些 unix 档案服务处所使用的 ls 变化型。它在列表中提供
 其所知项目的描述。把 flags_recursive 设为 -dtR 即可。
 .PP
-.CS
+.nf
 remote_fs=netware
 - [R----F--] jrd 1646 May 07 21:43 index
 d [R----F--] jrd 512 Sep 09 10:52 netwire
 d [R----F--] jrd 512 Sep 02 01:31 pktdrvr
 d [RWCE-F--] jrd 512 Sep 04 10:55 incoming
-.CE
+.fi
 .PP
 这是 Novell 档案服务处所使用的。把 recurse_hard 设为 true
 并且把 flags_recursive 设为空(nothing)的。参阅 remote_dir
 .PP
-.CS
+.nf
 dosftp
 00-index.txt 6,471 13:54 7/20/93 alabama.txt 1,246 23:29 5/08/92
 alaska.txt 873 23:29 5/08/92 alberta.txt 2,162 23:29 5/08/92
-.CE
+.fi
 .PP
 dosftp 是在 dos 上执行的一套 ftp 伺服程式。recurse_hard
 设为 true 并且把 flags_recursive 设为空(nothing)的。
 .PP
-.CS
+.nf
 remote_fs=macos
 -------r-- 0 127 127 Aug 27 13:53 !Gopher Links
 drwxrwxr-x folder 32 Sep 9 16:30 FAQ
 drwxrwx-wx folder 0 Sep 9 09:59 incoming
-.CE
+.fi
 .PP
 macos 是麦金塔(Macintosh) ftp 伺服程式的一个变化型。虽然此
 输出类似於 unix 但是 unix 这个 remote_fs 型态无法应付它是
@@ -598,7 +596,7 @@ recursive 设为空(nothing)的，get_size_change 设为 false 并
 将 compress_patt 设为空（最後这个设定是因为此不平常的档案
 名称会扰乱执行压缩的 shell 界面）。参阅 remote_dir 设定。
 .PP
-.CS
+.nf
 remote_fs=vms
 USERS:[ANONYMOUS.PUBLIC]
 
@@ -606,14 +604,14 @@ USERS:[ANONYMOUS.PUBLIC]
 PALTER.DIR;1 1 18-JAN-1993 11:56 [ANONYMOUS] (RWE,RWE,RE,RE)
 PRESS-RELEASES.DIR;1
 1 11-AUG-1992 20:05 [ANONYMOUS] (RWE,RWE,,)
-.CE
+.fi
 .PP
 alternatively:
 .PP
-.CS
+.nf
 [VMSSERV.FILES]ALARM.DIR;1 1/3 5-MAR-1993 18:09
 [VMSSERV.FILES]ALARM.TXT;1 1/3 4-FEB-1993 12:20
-.CE
+.fi
 .PP
 把 flags_recursive 设为 '[...]' 并将 get_size_change 设为
 false。recurse_hard 在 vms 上不能使用。除此之外还可以参阅
@@ -628,11 +626,10 @@ help/all-files 有意义。recurse_hard 应该设为 true。
 remote_fs=lsparse
 允许开启高阶除错方式重新剖析由 mirror 产生的列表。这只对於
 mirror wizards 有用。
-.SE
 .SH "范例 EXAMPLES"
 这里是从 src.doc.ic.ac.uk 上来的 mirror.defaults 档案:
 .PP
-.CS
+.nf
 # This is the default mirror settings used by my site:
 # src.doc.ic.ac.uk (146.169.2.1)
 # This is home of the UKUUG Software Distribution Service
@@ -681,9 +678,9 @@ local_ignore=README.doc.ic
 # Automatically delete local copies of files that the
 # remote site has zapped
 do_deletes=true
-.CE
+.fi
 Here are some sample package descriptions:
-.CS
+.nf
 package=gnu
 comment=Powerful and free Un*x utilities
 site=prep.ai.mit.edu
@@ -731,7 +728,7 @@ flags_recursive=[...]
 get_size_change=false
 
 # and on, and on ...
-.CE
+.fi
 .SH 提示
 要增加一个新的档案包裹，首先打开 -n 选项检查它。
 .PP
@@ -746,13 +743,13 @@ get_size_change=false
 .PP
 如果远端节点包含你想展开("flatten out") 到相对应档案的符号
 链结，那麽以改变传送给远端 ls 旗标的方式执行之。
-.CS
+.nf
 flags_recursive+L
-.CE
+.fi
 或是
-.CS
+.nf
 flags_nonrecursive+L
-.CE
+.fi
 首先以在远端节点的 ftp 指令下尝试 ls -lRatL 的方式来测试
 远端档案服务处是否有任何符号链结回圈。
 .PP

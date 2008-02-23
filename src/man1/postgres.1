@@ -95,7 +95,11 @@ postgres \- 以单用户模式运行一个 PostgreSQL服务器
 .PP
  要告诉 postgres 重新读取配置文件， 使用一个 SIGHUP 信号。 通常我们最好给 postmaster 发送 SIGHUP； postmaster 将随后 SIGHUP 他的每个子进程。 但是有时候我们可能想只让一个 postgres 进程重装载配置文件。
 .PP
-\fBpostmaster\fR 使用 SIGTERM 告诉postgres进程正常退出， 而 SIGQUIT 是不经过正常清理的退出。 这些信号不应该由用户使用。 给一个 postgres 进程发送 SIGKILL 也是不明智的 —— postmaster 将把这个信号解释成一次在 postgres 里的崩溃， 并且会强制所有他的子 postgres 进程像在一个标准的崩溃－恢复过程里一样退出。
+\fBpostmaster\fR 使用 SIGTERM 告诉postgres进程正常退出， 而 SIGQUIT 是不
+经过正常清理的退出。 这些信号不应该由用户使用。 给一个 postgres 进程发送
+SIGKILL 也是不明智的: postmaster 将把这个信号解释成一次在 postgres 里的
+崩溃， 并且会强制所有他的子 postgres 进程像在一个标准的崩溃－恢复过程里一
+样退出。
 .SH "USAGE 用法"
 .PP
  用下面这样的命令启动一个独立的服务器

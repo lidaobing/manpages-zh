@@ -29,7 +29,7 @@
 .\" real vertical bar.  \*(C+ will give a nicer C++.  Capital omega is used to
 .\" do unbreakable dashes and therefore won't be available.  \*(C` and \*(C'
 .\" expand to `' in nroff, nothing in troff, for use with C<>.
-.tr \(*W-|\(bv\*(Tr
+.tr \(*W-|\(bv
 .ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
 .ie n \{\
 .    ds -- \(*W-
@@ -128,12 +128,10 @@
 .rm #[ #] #H #V #F C
 .\" ========================================================================
 .\"
-.IX Title "PERL 1"
 .TH PERL 1 "2003-09-02" "perl v5.8.1" "Perl Programmers Reference Guide"
 .SH NAME
 perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 .SH "总览 SYNOPSIS"
-.IX Header "SYNOPSIS"
 \&\fBperl\fR	[\ \fB\-sTuU\fR\ ] [\ \fB\-hv\fR\ ]\ [\ \fB\-V\fR[:\fIconfigvar\fR]\ ]
     [\ \fB\-cw\fR\ ]\ [\ \fB\-d\fR[:\fIdebugger\fR]\ ]\ [\ \fB\-D\fR[\fInumber/list\fR]\ ]
     [\ \fB\-pna\fR\ ]\ [\ \fB\-F\fR\fIpattern\fR\ ]\ [\ \fB\-l\fR[\fIoctal\fR]\ ]\ [\ \fB\-0\fR[\fIoctal\fR]\ ]
@@ -145,14 +143,12 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 .PP
 为方便阅读，Perl 手册分成了很多章
 .Sh "概述 Overview"
-.IX Subsection "Overview"
 .Vb 3
 \&    perl                Perl 概述 (本小节) 
 \&    perlintro           Perl 介绍 (为新手准备) 
 \&    perltoc             Perl 目录 (所有内容列表) 
 .Ve
 .Sh "教程 Tutorials"
-.IX Subsection "Tutorials"
 .Vb 3
 \&    perlreftut          Perl 引用 
 \&    perldsc             Perl 数据结构 
@@ -194,7 +190,6 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 \&      perlfaq9          网络
 .Ve
 .Sh "参考手册 Reference Manual"
-.IX Subsection "Reference Manual"
 .Vb 21
 \&    perlsyn             Perl 语法
 \&    perldata            Perl 数据结构
@@ -262,7 +257,6 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 \&    perlfilter          Perl 源码过滤
 .Ve
 .Sh "内部以及 C 接口 Internals and C Language Interface"
-.IX Subsection "Internals and C Language Interface"
 .Vb 7
 \&    perlembed           在 C/C++ 应用中内置 Perl 的独特方法
 \&    perldebguts         Perl 调试要点和技巧
@@ -276,7 +270,7 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 .Vb 4
 \&    perlapi             Perl API 列表 (自动生成)
 \&    perlintern          Perl 内部函数 (自动生成)
-\&    perliol             Perl 以“层”方式实现 IO 用到的 C API 
+\&    perliol             Perl 以\(lq层\(rq方式实现 IO 用到的 C API 
 \&    perlapio            Perl 内部 IO 抽象接口
 .Ve
 .PP
@@ -284,7 +278,6 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 \&    perlhack            修改 Perl 
 .Ve
 .Sh "杂项 Miscellaneous"
-.IX Subsection "Miscellaneous"
 .Vb 2
 \&    perlbook            Perl 书籍信息 
 \&    perltodo            Perl 的未来
@@ -313,7 +306,6 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 \&    perlgpl             GNU General Public License
 .Ve
 .Sh "语言相关 Language-Specific"
-.IX Subsection "Language-Specific"
 .Vb 4
 \&    perlcn              Perl 简体中文支持 (原文是 EUC-CN 编码)
 \&    perljp              Perl 日本语支持 (原文是 EUC-JP 编码)
@@ -321,7 +313,6 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 \&    perltw              Perl 繁体中文支持 (原文是 Big5 编码)
 .Ve
 .Sh "平台相关 Platform-Specific"
-.IX Subsection "Platform-Specific"
 .Vb 32
 \&    perlaix             Perl notes for AIX
 \&    perlamiga           Perl notes for AmigaOS
@@ -388,7 +379,6 @@ perl \- Practical Extraction and Report Language (实用摘录和汇报语言)
 如果你的程序出了问题，又不知道该到哪里去找帮助，就先试一试
 \fB\-w\fR 选项。它会精确地报告错误发生在哪一行
 .SH "描述 DESCRIPTION"
-.IX Header "DESCRIPTION"
 Perl 是一种特别为扫描复杂文本文件优化过的语言，
 从中提取有用的信息，然后据此生成结果。
 它也是系统管理任务中很好用的语言。它的目标是实用 (易用，高效，完整) 而不是
@@ -402,7 +392,7 @@ C, \fBsed\fR, \fBawk\fR, 还有 \fBsh\fR 的优点，熟悉它们的人学起 Pe
 你的数据的大小
 \*(-- 只要你有足够的内存，Perl 可以把你的整个文件当作单一的字符串来享受。
 递归的深度是无限的。
-散列 (有时又叫做“关联数组”
+散列 (有时又叫做\(lq关联数组\(rq
 \&\*(L"associative arrays\*(R"
 ) 会按需生长，以避免性能下降。
 Perl 使用精致的模式匹配技术来保证快速扫描大量数据。
@@ -484,26 +474,21 @@ perldebtut, perldebug 和 perldebguts 中
 .PP
 Okay, 这些已经是绝对的绝对够用了
 .SH "可用性 AVAILABILITY"
-.IX Header "AVAILABILITY"
 Perl 在大部分操作系统上都可用，包含几乎所有类 Unix 的平台。参见 perlport 中的
 \*(L"Supported Platforms\*(R" 段来查看平台列表
 .SH "环境 ENVIRONMENT"
-.IX Header "ENVIRONMENT"
 参见 perlrun
 .SH "作者 AUTHOR"
-.IX Header "AUTHOR"
 Larry Wall <larry@wall.org>, with the help of oodles of other folks.
 .PP
 如果你使用 Perl 的成功案例对想在项目中应用 Perl 的人有用，
 或者如果你只是想想表达你对 Larry 和 Perl 开发者的感激之情，请写信到
 <perl\-thanks@perl.org>
 .SH "文件 FILES"
-.IX Header "FILES"
 .Vb 1
 \& "@INC"                 locations of perl libraries
 .Ve
 .SH "参见 SEE ALSO"
-.IX Header "SEE ALSO"
 .Vb 2
 \& a2p    awk 到 perl 翻译器
 \& s2p    sed 到 perl 翻译器
@@ -515,7 +500,6 @@ Larry Wall <larry@wall.org>, with the help of oodles of other folks.
 \& http://www.perl.org/       Perl Mongers (Perl 用户组)
 .Ve
 .SH "诊断 DIAGNOSTICS"
-.IX Header "DIAGNOSTICS"
 \f(CW\*(C`use warnings\*(C'\fR 编译指示 (pragma) (还有 \fB\-w\fR 选项) 会产生
 一些有用的诊断信息
 .PP
@@ -535,7 +519,6 @@ Larry Wall <larry@wall.org>, with the help of oodles of other folks.
 我们说过你一定要用
 \fB\-w\fR 选项了吗？
 .SH "BUGS"
-.IX Header "BUGS"
 \fB\-w\fR 选项不是必要的
 .PP
 Perl 依赖于你的机器中操作的定义，类似于类型转换，
@@ -559,7 +542,6 @@ Perl 真正意义是
 Pathologically Eclectic Rubbish Lister, 但是
 不要告诉任何人我说过它
 .SH "注意 NOTES"
-.IX Header "NOTES"
 Perl 的信条是
 \*(L"There's more than one way to do it.\*(R"
 至于探索有多少种办法，就是读者自己的事了

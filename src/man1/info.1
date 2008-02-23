@@ -51,7 +51,10 @@ info \- 阅读 info 文档
 \fB\-\-version\fR
 显示版本信息，然后退出。
 .PP
-如果存在并非选项的参数，那么其中的第一个将成为目录项的起始点；它被从 INFOPATH 的所有 “目录文件” 中搜索。如果它不存在，info 将合并所有的 “目录文件”，并且显示结果。任何剩余的参数都被视为相对于阅读的初始节点的目录项的名称。
+如果存在并非选项的参数，那么其中的第一个将成为目录项的起始点；它被从
+INFOPATH 的所有 \(lq目录文件\(rq 中搜索。如果它不存在，info 将合并所有的
+\(lq目录文件\(rq，并且显示结果。任何剩余的参数都被视为相对于阅读的初始节
+点的目录项的名称。
 .SH "EXAMPLES 范例"
 .TP
 info
@@ -64,7 +67,7 @@ info emacs buffers
 从 emacs 手册中的 buffers 节点开始
 .TP
 info \fB\-\-show\-options\fR emacs
-从 emacs 的 “命令行选项” 节点开始
+从 emacs 的 \(lq命令行选项\(rq 节点开始
 .TP
 info \fB\-f\fR ./foo.info
 显示文件 ./foo.info，不搜索目录

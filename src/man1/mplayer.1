@@ -1954,7 +1954,9 @@ aspect: 控制长宽比, 按DVB_HEIGHT*ASPECTRATIO计算(默认值:
 .REss
 .IPs
 只应该与expand+scale一起使用:
+.nf
 \-vf lavc,expand=-1:576:-1:-1:1,scale=-1:0,dvbscale
+.fi
 .IPs "noise[=亮度[u][t|a][h][p]:色度[u][t|a][h][p]]"
 增加噪音.
 .RSss
@@ -2648,7 +2650,9 @@ I/\:B帧量化值 = P帧量化值 * v{b|i}_qfactor + v{b|i}_qoffset
 设置q= -q * v{b|i}_qfactor + v{b|i}_qoffset
 .IPs
 技巧: 对I/P和B帧使用不同的量化值的常量化编码可以使用:
+.nf
 vqmin=<ip_quant>:vqmax=<ip_quant>:vb_qfactor=<b_quant/ip_quant>
+.fi
 .IPs vqblur=<0.0\-1.0>
 量化模糊(pass\ 1), 值越大量化对时间平均越大(变化缓慢).
 .RSss
