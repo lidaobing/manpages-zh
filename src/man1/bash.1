@@ -45,7 +45,7 @@
 \fI\|\\$1\|\fP
 ..
 .SH NAME
-bash \- GNU Bourne-Again SHell (GNU 命令解释程序 “Bourne二世”)
+bash \- GNU Bourne-Again SHell (GNU 命令解释程序 \(lqBourne二世\(rq)
 .SH "概述(SYNOPSIS)"
 .B bash
 [options]
@@ -627,7 +627,7 @@ shell 不会等待命令执行结束，返回状态总是 0。以分号
 \fBfor\fP (( \fIexpr1\fP ; \fIexpr2\fP ; \fIexpr3\fP )) ; \fBdo\fP \fIlist\fP ; \fBdone\fP
 首先，算术表达式 \fIexpr1\fP 被根据下面
 .SM
-.BR "算术求值 (ARITHMETIC EVALUATION)“
+.BR "算术求值 (ARITHMETIC EVALUATION)"
 中的规则进行求值。
 然后算术表达式 \fIexpr2\fP 被循环求值，直到它等于 0。每次 \fIexpr2\fP 结果非零时，序列 \fIlist\fP 都被执行，
 算术表达式 \fIexpr3\fP 被求值。如果任何表达式被忽略，将被视为执行结果是 1。
@@ -3097,7 +3097,7 @@ shell 将每个管道分配给一个
 .I 作业(job)
 概念作为作业控制的基础。
 .PP
-为简化作业控制的用户界面的实现，操作系统负责管理“当前终端的进程组” 
+为简化作业控制的用户界面的实现，操作系统负责管理\(lq当前终端的进程组\(rq
 (\fIcurrent terminal process group ID\fP) 的概念。这个进程组的成员
 (进程组 ID 是当前终端进程组 ID 的进程) 可以收到键盘产生的信号，例如
 .SM
@@ -3797,10 +3797,10 @@ readline 可以记住上次增量搜索的字符串。如果键入两次 Ctrl-R�
 移动到输入历史行的末尾，也就是当前输入的行的末尾。
 .TP
 .B reverse\-search\-history (C\-r)
-从当前行开始向后搜索，按照需要在历史中向“上”移动。这是一个增量的搜索。
+从当前行开始向后搜索，按照需要在历史中向\(lq上\(rq移动。这是一个增量的搜索。
 .TP
 .B forward\-search\-history (C\-s)
-从当前行开始向前搜索，按照需要在历史中向“下”移动。这是一个增量的搜索。
+从当前行开始向前搜索，按照需要在历史中向\(lq下\(rq移动。这是一个增量的搜索。
 .TP
 .B non\-incremental\-reverse\-search\-history (M\-p)
 从当前行开始向后，使用非增量搜索来查找用户给出的字符串。
@@ -6900,7 +6900,7 @@ chet@ins.CWRU.Edu
 .I bashbug
 命令来提交一个错误报告。
 如果你有固定住址，鼓励你用邮政的方式提交一份！
-建议和有关 \fBbash\fP “哲学” (`philosophical') 的 “错误报告” 可以寄给
+建议和有关 \fBbash\fP \(lq哲学\(rq (`philosophical') 的 \(lq错误报告\(rq 可以寄给
 \fIbug-bash@gnu.org\fP 或者贴到 Usenet 新闻组
 .BR gnu.bash.bug
 之上。
@@ -6917,7 +6917,7 @@ chet@ins.CWRU.Edu
 .TP
 对 bug 行为的描述
 .TP
-可以激活这个 bug 的一个短小的脚本或者什么 “秘诀” (recipe)
+可以激活这个 bug 的一个短小的脚本或者什么 \(lq秘诀\(rq (recipe)
 .PD
 .PP
 .I bashbug

@@ -7,22 +7,26 @@ createuser \- 定义一个新的 PostgreSQL 用户帐户
 \fBcreateuser\fR\fR [ \fR\fB\fIoption\fB\fR...\fB \fR\fR]\fR\fR [ \fR\fB\fIusername\fB \fR\fR]\fR
 .SH "DESCRIPTION 描述"
 .PP
-\fBcreateuser\fR 创建一个新的 PostgreSQL 用户。只有超级用户（在 pg_shadow 表中设置了 usesuper 的用户）可以创建新的 PostgreSQL 用户。 因此，createuser 必须由某位可以以 PostgreSQL 超级用户连接的用户执行。
+\fBcreateuser\fR 创建一个新的 PostgreSQL 用户。只有超级用户（在
+pg_shadow 表中设置了 usesuper 的用户）可以创建新的 PostgreSQL 用户。 因此，
+createuser 必须由某位可以以 PostgreSQL 超级用户连接的用户执行。
 .PP
  作为超级用户同时也意味着绕开数据库内访问检查的能力， 因此我们应该少赋予超级用户权限。
 .PP
-\fBcreateuser\fR 是 SQL 命令 CREATE USER [\fBcreate_user\fR(7)] 的封装。 因此，用那种方法创建新用户都没什么特别的。
+\fBcreateuser\fR 是 SQL 命令 CREATE USER [\fBcreate_user\fR(7)] 的封装。
+因此，用那种方法创建新用户都没什么特别的。
 .SH "OPTIONS 选项"
 .PP
 \fBcreateuser\fR 接受下列命令行参数：
 .TP
 \fB\fIusername\fB\fR
- 声明要创建的 PostgreSQL 用户名称。 该名称必须在所有 PostgreSQL 用户中唯一。
+声明要创建的 PostgreSQL 用户名称。 该名称必须在所有 PostgreSQL 用户中唯一。
 .TP
 \fB-a\fR
 .TP
 \fB--adduser\fR
- 允许该新建用户创建其他用户。 （注意∶实际上这样做相当于把这个新用户变成了 superuser，只不过这个选项命名得比较烂。）
+允许该新建用户创建其他用户。(注意: 实际上这样做相当于把这个新用户变成了
+superuser，只不过这个选项命名得比较烂。)
 .TP
 \fB-A\fR
 .TP
