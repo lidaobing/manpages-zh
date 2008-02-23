@@ -14,8 +14,8 @@ testprns \- 为smbd测试合法的打印机名
 .PP
 testprns是个非常简单的测试程序，用于检查smbd作为服务提供的打印机名是否合法。
 .PP
-在这里“Valid”的意思就是“在printcap中可以找到该打印机”。实际上总是使用printcap文件
-来指定打印机是非常明智的。
+在这里\(lqValid\(rq的意思就是\(lq在printcap中可以找到该打印机\(rq。实际上
+总是使用printcap文件来指定打印机是非常明智的。
 .PP
 .SH 选项 
 .PP 
@@ -23,10 +23,10 @@ testprns是个非常简单的测试程序，用于检查smbd作为服务提供�
 .IP "\fBprintername\fP" 
 要测试的打印机名。 
 .IP
-打印机可以从printcap文件的每个记录首字段中获得，字段中用“|” 号来识别单个的打印机
-名和别名。注意当测试请求的打印机名时并不确认或检查printcap文件的总览。打印假脱机系
-统会比testprns程序更多或更少地放宽printcap文件的总览。但是，如果testprns找到了打印
-机的话smbd会作这样的检查。
+打印机可以从printcap文件的每个记录首字段中获得，字段中用\(lq|\(rq 号来识
+别单个的打印机名和别名。注意当测试请求的打印机名时并不确认或检查printcap
+文件的总览。打印假脱机系统会比testprns程序更多或更少地放宽printcap文件的
+总览。但是，如果testprns找到了打印机的话smbd会作这样的检查。
 .IP 
 .IP "\fBprintcapname\fP" 
 此参数指定想要对给出的打印机名进行查找的printcap文件名。 
@@ -40,9 +40,11 @@ testprns是个非常简单的测试程序，用于检查smbd作为服务提供�
 .PP 
 .SH 诊断
 .PP
-如果发现检测的打印机合法，则显示“Printer name <printername> is valid”这样的信息。
+如果发现检测的打印机合法，则显示\(lqPrinter name <printername> is
+valid\(rq这样的信息。
 .PP
-如果发现检测的打印机不合法，则显示“Printer name <printername> is not valid”这样的信息。
+如果发现检测的打印机不合法，则显示\(lqPrinter name <printername> is not
+valid\(rq这样的信息。
 .PP
 所有测试结果信息通常情况下会被记录到当前目录下的test.log文件中。程序运行在调试级3上，所以
 会记录十分详细的信息。如果有出错或警告的话应该仔细检查这个文件。

@@ -37,9 +37,9 @@ testparm是个非常简单的程序，用于检查smbd配置文件的内部正�
 指定要检查的配置文件名。如果不指定的话，程序对默认的smb.conf文件进行检查。 
 .IP 
 .IP "\fBhostname\fP" 
-如果命令行带有这个参数时，测试程序将检查smb.conf文件中的“hosts allow”和“hosts 
-deny”参数用以测试这些IP地址对应的主机名是否可以访问smbd服务器。如果用这样的参数时，
-hostIP参数也必须一并使用。 
+如果命令行带有这个参数时，测试程序将检查smb.conf文件中的\(lqhosts
+allow\(rq和\(lqhosts deny\(rq参数用以测试这些IP地址对应的主机名是否可以访
+问smbd服务器。如果用这样的参数时，hostIP参数也必须一并使用。
 .IP 
 .IP "\fBhostIP\fP" 
 这个参数用于指定前面给出的主机名相对应的IP地址。如上说述，主机名参数和这个地址必须一并

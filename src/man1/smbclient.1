@@ -22,8 +22,12 @@
 smbclient \- 类似FTP操作方式的访问SMB/CIFS服务器资源的客户端
 .SH "总览 SYNOPSIS"
 
-
-\fBsmbclient\fR {servicename} [password] [-b <buffer size>] [-d debuglevel] [-D Directory] [-U username] [-W workgroup] [-M <netbios name>] [-m maxprotocol] [-A authfile] [-N] [-l logfile] [-L <netbios name>] [-I destinationIP] [-E] [-c <command string>] [-i scope] [-O <socket options>] [-p port] [-R <name resolve order>] [-s <smb config file>] [-T<c|x>IXFqgbNan] [-k]
+\fBsmbclient\fR {servicename} [password] [-b <buffer size>] [-d
+debuglevel] [-D Directory] [-U username] [-W workgroup] [-M <netbios
+name>] [-m maxprotocol] [-A authfile] [-N] [-l logfile] [-L <netbios
+name>] [-I destinationIP] [-E] [-c <command string>] [-i scope] [-O
+<socket options>] [-p port] [-R <name resolve order>] [-s <smb config
+file>] [-T<c|x>IXFqgbNan] [-k]
 
 .SH "描述 DESCRIPTION"
 
@@ -31,7 +35,9 @@ smbclient \- 类似FTP操作方式的访问SMB/CIFS服务器资源的客户端
 此程序是\fBSamba\fR(7)套件的一部分。
 
 .PP
-\fBsmbclient\fR 是个可以和SMB/CIFS服务器“交谈”的客户端程序。它提供了类似FTP程序(参见\fBftp\fR (1))的用户界面。它可以完成的操作包括象从服务器下载文件到本地，上传本地文件到服务器及在服务器上查找目录信息等。
+\fBsmbclient\fR 是个可以和SMB/CIFS服务器\(lq交谈\(rq的客户端程序。它提供
+了类似FTP程序(参见\fBftp\fR (1))的用户界面。它可以完成的操作包括象从服务
+器下载文件到本地，上传本地文件到服务器及在服务器上查找目录信息等。
 
 .SH "选项 OPTIONS"
 
@@ -59,7 +65,7 @@ password
 -R <name resolve order>
 通过指定这个选项让Samba套件中的程序决定使用怎样的名字解析服务及其次序来解决主机名和IP的对应。这个选项以一个以空格分隔的不同的名称解析方法为选项值。
 
-可选值是：“lmhosts”，“host”，“wins”和“bcast”。这些选项使名字解析按以下的方法来进行：
+可选值是：\(lqlmhosts\(rq，\(lqhost\(rq，\(lqwins\(rq和\(lqbcast\(rq。这些选项使名字解析按以下的方法来进行：
 
 \fBlmhosts\fR: 向Samba的lmhosts文件查询IP地址。If the line in lmhosts has no name type attached to the NetBIOS name (see the \fBlmhosts\fR(5) for details) then any name type matches for lookup.
 
@@ -75,7 +81,7 @@ password
 
 .TP
 -M NetBIOS name
-使用这个选项可以让你以“WinPopup” 协议向其它计算机发送信息。一旦联接成功你就可以发送信息了，结束时可以按^D(Ctl-D).
+使用这个选项可以让你以\(lqWinPopup\(rq 协议向其它计算机发送信息。一旦联接成功你就可以发送信息了，结束时可以按^D(Ctl-D).
 
 如果接受方计算机也正在运行WinPopup的话，用户会收到发送的信息并且系统可能会鸣叫一声。如果对方并没有运行WinPopup的话信息就被丢弃，而不会发出出错信息。
 
@@ -89,7 +95,7 @@ password
 
 参见\fBsmb.conf\fR(5)配置文件中的\fImessage command\fR参数获得如何在Samba中处理新进的WinPopup消息的详细描述。
 
-\fB注意\fR：如果你总是要用你的WfWg PC的WinPopup来接收消息的话可以在你的Windows机器中把它拷到“启动”中。
+\fB注意\fR：如果你总是要用你的WfWg PC的WinPopup来接收消息的话可以在你的Windows机器中把它拷到\(lq启动\(rq中。
 
 .TP
 -p port
@@ -102,7 +108,7 @@ password
 
 .TP
 -I IP-address
-指定要联接的服务器IP地址。当然格式应该是“a.b.c.d”。
+指定要联接的服务器IP地址。当然格式应该是\(lqa.b.c.d\(rq。
 
 通常client会使用上面介绍过的\fIname resolve order\fR参数中描述的NetBIOS名字解析机制通过查询尝试查找一个已命名的SMB/CIFS服务器。使用这个参数会强制客户端程序采用指定的IP地址而忽略要联接的服务资源的NetBIOS名部分。
 
@@ -266,7 +272,7 @@ TCP套接字选项用来在客户端设定套接字方面的功能。参见\fIsm
 
 .TP
 -c command string
-命令字符串串是一个以单引号(“'”)分隔的用来替换标准输入提示的一系列命令列表，这个参数意味着\fI -N\fR。
+命令字符串串是一个以单引号(\(lq'\(rq)分隔的用来替换标准输入提示的一系列命令列表，这个参数意味着\fI -N\fR。
 
 当使用脚本或者要打印标准输入信息到服务器时这个选项就非常有用了，例如：\fB-c 'print -'\fR
 

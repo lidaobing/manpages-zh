@@ -20,8 +20,8 @@ smbcontrol \- 向smbd或nmbd进程发送消息
 .SH 选项
 .TP
 \fB-i\fR
-以交互方式运行。在标准输入上可以输入单独的“目标 消息类型 参
-数”形式的命令，输入空行或“q”字符退出程序。
+以交互方式运行。在标准输入上可以输入单独的``目标 消息类型 参
+数''形式的命令，输入空行或``q''字符退出程序。
 .TP
 \fB目标\fR
 \fInmbd\fR或\fIsmbd\fR或进程ID。
@@ -43,17 +43,17 @@ debug消息：可以把调试等级设为参数所指定的值。可以向所有
 force-election消息：只能向nmbd发送。这种消息使\fBnmbd\fR进程强
 制进行一次新的主浏览器选举。
 
-ping消息：发送指定数量的“ping”并等待相同数量的回复。可以向所
+ping消息：发送指定数量的\(lqping\(rq并等待相同数量的回复。可以向所
 有目标发送这种类型的消息。
 
-profile消息：使用参数通知smbd来修改profile的配置。参数为“on”
-则获取profile状态，“off”则反之，“count”为只获取计数状态(禁
-止时间状态)，“flush”把当前profile的状态清零。
+profile消息：使用参数通知smbd来修改profile的配置。参数为\(lqon\(rq 则获取
+profile状态，\(lqoff\(rq则反之，\(lqcount\(rq为只获取计数状态(禁止时间状
+态)，\(lqflush\(rq把当前profile的状态清零。
 
-debuglevel消息：发送“请求调试等级”消息，再由一个这种类型的消
+debuglevel消息：发送\(lq请求调试等级\(rq消息，再由一个这种类型的消
 息返回当前设置的调试等级。可以向所有目标发送这种类型的消息。
 
-profilelevel消息：发送“请求profile等级”消息，再由一个这种类
+profilelevel消息：发送\(lq请求profile等级\(rq消息，再由一个这种类
 型的消息返回当前设置的profile等级可以向所有目标发送这种类型的
 消息。
 
