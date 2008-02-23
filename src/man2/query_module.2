@@ -1,6 +1,6 @@
-.TH	query_module ""
+.TH query_module 2
 .SH NAME
-query_module - 向内核查询和模块有关的各个位.   /* 查询有关的位?? */
+query_module \- 向内核查询和模块有关的各个位.   /* 查询有关的位?? */
 .SH 总览
 .B #include <linux/module.h>
 .sp
@@ -19,8 +19,9 @@ ules.
     返回所有已加载的模块的名字.输出缓冲区的格式是邻近的以null终止的字符串;ret
 被
 设置为模块的数目.
-QM_DEPS        Returns the names of all modules used by the indicated module
-. The output buffer format is adjacent null-terminated strings; ret is set t
+QM_DEPS        Returns the names of all modules used by the indicated
+module.
+The output buffer format is adjacent null-terminated strings; ret is set t
 o the number of modules.    返回所有被name参数指定的模块使用的模块的名字.输出
 缓
 冲区格式是邻近的以null终止的字符串;ret被设置为模块的数目.
