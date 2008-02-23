@@ -238,7 +238,7 @@ Database Class:	\\fB\\$3\\fR
 .de UL
 \\$1\l'|0\(ul'\\$2
 ..
-.TH Tcl_Obj 3 8.0 Tcl "Tcl Library Procedures"
+.TH Tcl_Obj 3tcl 8.0 Tcl "Tcl Library Procedures"
 .BS
 .SH NAME
 Tcl_NewObj, Tcl_DuplicateObj, Tcl_IncrRefCount, Tcl_DecrRefCount, Tcl_IsShared, Tcl_InvalidateStringRep \- 操纵 Tcl 对象
