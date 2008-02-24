@@ -17,7 +17,10 @@ REINDEX { DATABASE | TABLE | INDEX } \fIname\fR [ FORCE ]
  索引崩溃，并且不再包含有效的数据。尽管理论上这是不可能发生的， 但实际上索引会因为软件毛病或者硬件问题而崩溃。REINDEX 提供了一个恢复方法。
 .TP 0.2i
 \(bu
- 要处理的索引包含大量无用的索引页未被回收。在某些情况下， 这个问题会发生在 PostgreSQL 里面的 B-树索引上。REINDEX  提供了一个缩小索引空间消耗的方法，它采用的方法是写一个不带无用索引页的新版本的索引。 参阅Section 21.2 ``Routine Indexing'' 获取更多信息。
+要处理的索引包含大量无用的索引页未被回收。在某些情况下， 这个问题会发生
+在 PostgreSQL 里面的 B-树索引上。REINDEX  提供了一个缩小索引空间消耗的方
+法，它采用的方法是写一个不带无用索引页的新版本的索引。 参阅Section 21.2
+``Routine Indexing'' 获取更多信息。
 .PP
 .SH "PARAMETERS 参数"
 .TP
@@ -69,9 +72,8 @@ REINDEX INDEX my_index;
  重建一个数据库上的所有系统索引，不管他们是否有效：
 .sp
 .nf
-$ \fBexport PGOPTIONS="-P"\fR
-$ \fBpsql broken_db\fR
-...
+$\fBexport PGOPTIONS="-P"\fR
+$\fBpsql broken_db\fR
 broken_db=> REINDEX DATABASE broken_db;
 broken_db=> \\q
 .sp
