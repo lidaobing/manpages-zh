@@ -184,7 +184,7 @@
 .Nm \-mdoc
 不一定 要 学习
 .Xr troff 1
-的 腌脏细节; 然而, 有些 限制 无法回避, 最好 把它们 摆平.
+的 隐藏细节; 然而, 有些 限制 无法回避, 最好 把它们 摆平.
 而且 你 应该 知道, 这个 宏包 的 速度 比较
 .Em 慢.
 .Ss 宏的用法 Macro Usage
@@ -662,7 +662,7 @@ Symbolic text
 .Ss 地址宏 Address Macro
 地址宏 用 这种 格式 标明地址: addr1[,addr2[,addr3]].
 .Pp
-.Dl Usage: .Ad address ... \*(Pu
+.Dl Usage: .Ad address ... 
 .Bl -tag -width ".Ad f1 , f2 , f3 :" -compact -offset 14n
 .It Li \&.Ad addr1
 .Ad addr1
@@ -687,7 +687,7 @@ The
 宏用以 说明 这个文档的 描述对象的 作者, 或者 这篇手册页的 作者.
 名字 信息 后面的 其他参数 被认为是 标点符号.
 .Pp
-.Dl Usage: .An author_name \*(Pu
+.Dl Usage: .An author_name ... 
 .Bl -tag -width ".An Joe Author ) ) ," -compact -offset 14n
 .It Li \&.An Joe\ Author
 .An Joe Author
@@ -709,7 +709,7 @@ The
 .Ql \&.Ar
 参数宏.
 .Pp
-.Dl Usage: .Ar argument ... \*(Pu
+.Dl Usage: .Ar argument ... 
 .Bl -tag -width ".Ar file1 file2" -compact -offset 15n
 .It Li \&.Ar
 .Ar
@@ -757,7 +757,7 @@ The
 .Ql \&.Dv 
 宏说明.
 .Pp
-.Dl Usage: .Dv defined_variable ... \*(Pu
+.Dl Usage: .Dv defined_variable ... 
 .Bl -tag -width ".Dv MAXHOSTNAMELEN" -compact -offset 14n
 .It Li ".Dv MAXHOSTNAMELEN"
 .Dv MAXHOSTNAMELEN
@@ -780,7 +780,7 @@ errno 宏 指明 手册 第二部分, 库函数 的 错误返回值.(译注: 应
 .Ql \&.Bq
 基本正文宏 的 使用, 就象 用在 手册 第二部分 一样.
 .Pp
-.Dl Usage: .Er ERRNOTYPE ... \*(Pu
+.Dl Usage: .Er ERRNOTYPE ... 
 .Bl -tag -width ".Bq Er ENOTDIR" -compact -offset 14n
 .It Li \&.Er ENOENT
 .Er ENOENT
@@ -799,7 +799,7 @@ errno 宏 指明 手册 第二部分, 库函数 的 错误返回值.(译注: 应
 .Ql \&.Ev
 宏说明一个环境变量.
 .Pp
-.Dl Usage: .Ev argument ... \*(Pu
+.Dl Usage: .Ev argument ... 
 .Bl -tag -width ".Ev PRINTER ) ) ," -compact -offset 14n
 .It Li \&.Ev DISPLAY
 .Ev  DISPLAY
@@ -830,7 +830,7 @@ errno 宏 指明 手册 第二部分, 库函数 的 错误返回值.(译注: 应
 .Ql \&.Fa
 也 有可能 用来 说明 结构成员.
 .Pp
-.Dl Usage: .Fa function_argument ... \*(Pu
+.Dl Usage: .Fa function_argument ... 
 .Bl -tag -width ".Fa d_namlen\ )\ )\ ," -compact -offset 14n
 .It Li \&.Fa d_namlen\ )\ )\ ,
 .Fa d_namlen ) ) ,
@@ -868,7 +868,7 @@ errno 宏 指明 手册 第二部分, 库函数 的 错误返回值.(译注: 应
 (命令修饰 command modifier)
 宏替换, 它 没有 短横线.
 .Pp
-.Dl Usage: .Fl argument ... \*(Pu
+.Dl Usage: .Fl argument ... 
 .Bl -tag -width ".Fl \-s \-t \-v" -compact -offset 14n
 .It Li \&.Fl
 .Fl
@@ -895,7 +895,7 @@ errno 宏 指明 手册 第二部分, 库函数 的 错误返回值.(译注: 应
 .Ss 函数(库函数) Functions (library routines)
 宏 .Fn 是 ANSI C 函数风格 的 模型.
 .Bd -literal
-Usage: .Fn [type] function [[type] parameters ... \*(Pu]
+Usage: .Fn [type] function [[type] parameters ... 
 .Ed
 .Bl -tag -width ".Fn int align. .const * char *sptrsxx" -compact
 .It Li "\&.Fn getchar"
@@ -974,7 +974,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 小节, 以 核心标准形式 (kernel normal form) 描述 函数类型
 (它 导致 断行, 在 下一行 显示 函数 名称).
 .Pp
-.Dl Usage: .Ft type ... \*(Pu
+.Dl Usage: .Ft type ... 
 .Bl -tag -width "\&.Ft struct stat" -offset 14n -compact
 .It Li \&.Ft struct stat
 .Ft struct stat
@@ -987,7 +987,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 .Ql \&.Ic
 用于 说明 交互 或 内部命令.
 .Pp
-.Dl Usage: .Ic argument ... \*(Pu
+.Dl Usage: .Ic argument ... 
 .Bl -tag -width ".Ic setenv , unsetenvxx" -compact -offset 14n
 .It Li \&.Ic :wq
 .Ic :wq
@@ -1028,7 +1028,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 .Ql \&.Nm ,
 宏 非常接近, 只是 它 不能够 记忆 调用时的 参数.
 .Pp
-.Dl Usage: .Nm argument ... \*(Pu
+.Dl Usage: .Nm argument ... 
 .Bl -tag -width ".Nm mdoc.sample" -compact -offset 14n
 .It Li \&.Nm mdoc.sample
 .Nm  mdoc.sample
@@ -1051,7 +1051,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 .Ql \&.Oo
 用于 处理 跨行.
 .Pp
-.Dl Usage: .Op options ... \*(Pu
+.Dl Usage: .Op options ... 
 .Bl -tag -width ".Op Fl c Ar objfil Op Ar corfil ," -compact -offset indent
 .It Li \&.Op
 .Op
@@ -1101,7 +1101,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 .Ql \&.Pa
 宏 用于 格式化 路径 或 文件名.
 .Pp
-.Dl Usage: .Pa pathname \*(Pu
+.Dl Usage: .Pa pathname 
 .Bl -tag -width ".Pa /tmp/fooXXXXX ) ." -compact -offset 14n
 .It Li \&.Pa /usr/share
 .Pa /usr/share
@@ -1114,7 +1114,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 .Ss 变量 Variables
 基本的 变量 参考:
 .Pp
-.Dl Usage: .Va variable ... \*(Pu
+.Dl Usage: .Va variable ... 
 .Bl -tag -width ".Va char s ] ) ) ," -compact -offset 14n
 .It Li \&.Va count
 .Va count
@@ -1137,7 +1137,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 当做 标点符号 或 手册页 的 部分号 (节号). 剩下 所有的参数
 视做 标点符号.
 .Pp
-.Dl Usage: .Xr man_page [1,...,8] \*(Pu
+.Dl Usage: .Xr man_page [1,...,8] 
 .Bl -tag -width ".Xr mdoc 7 ) ) ," -compact -offset 14n
 .It Li \&.Xr mdoc
 .Xr mdoc
@@ -1157,7 +1157,7 @@ Usage: .Fn [type] function [[type] parameters ... \*(Pu]
 .Sh 基本正文宏域 GENERAL TEXT DOMAIN
 .Ss AT&T 宏
 .Bd -literal -offset indent -compact
-Usage: .At [v6 | v7 | 32v | V.1 | V.4] ... \*(Pu
+Usage: .At [v6 | v7 | 32v | V.1 | V.4] ... 
 .Ed
 .Bl -tag -width ".At v6 ) ," -compact -offset 14n
 .It Li ".At"
@@ -1173,7 +1173,7 @@ Usage: .At [v6 | v7 | 32v | V.1 | V.4] ... \*(Pu
 .Em 不能
 被 (其他宏) 调用. 该宏 最多 接受 两个 参数.
 .Ss BSD 宏
-.Dl Usage: .Bx [Version/release] ... \*(Pu
+.Dl Usage: .Bx [Version/release] ... 
 .Bl -tag -width ".Bx 4.3 ) ," -compact -offset 14n
 .It Li ".Bx"
 .Bx
@@ -1185,7 +1185,7 @@ Usage: .At [v6 | v7 | 32v | V.1 | V.4] ... \*(Pu
 宏可以被 (其他宏) 分析和调用.
 .Ss FreeBSD 宏
 .Bd -literal -offset indent -compact
-Usage: .Fx Version.release ... \*(Pu
+Usage: .Fx Version.release ... 
 .Ed
 .Bl -tag -width ".Fx 2.2 ) ," -compact -offset 14n
 .It Li ".Fx 2.2 ."
@@ -1199,7 +1199,7 @@ Usage: .Fx Version.release ... \*(Pu
 .Em 不能
 被 (其他宏) 调用. 该宏 最多 接受 两个 参数.
 .Ss UNIX 宏
-.Dl Usage: .Ux ... \*(Pu
+.Dl Usage: .Ux ... 
 .Bl -tag -width ".Ux 4.3 ) ," -compact -offset 14n
 .It Li ".Ux"
 .Ux
@@ -1404,7 +1404,7 @@ refer style references.
 trade name 宏 一般说来 是 一个 很小的 大写字母宏, 用于 所有 大于
 两个字符的 大写单词.
 .Pp
-.Dl Usage: .Tn symbol ... \*(Pu
+.Dl Usage: .Tn symbol ... 
 .Bl -tag -width ".Tn ASCII" -compact -offset 14n
 .It Li \&.Tn DEC
 .Tn DEC
@@ -1915,7 +1915,7 @@ End-display.
 .Ql \&.Em
 宏 加重或强调. 常用的 强调字体 是 斜体 (italic).
 .Pp
-.Dl Usage: .Em argument ... \*(Pu
+.Dl Usage: .Em argument ... 
 .Bl -tag -width ".Em vide infra ) ) ," -compact -offset 14n
 .It Li ".Em does not"
 .Em does not
@@ -1933,7 +1933,7 @@ End-display.
 .Ql \&.Li
 原文宏 用来 显示 字符, 变量, 常数, 任何 希望 照 输入文字 原样显示 的 内容.
 .Pp
-.Dl Usage: .Li argument ... \*(Pu
+.Dl Usage: .Li argument ... 
 .Bl -tag -width ".Li cntrl-D ) ,"  -compact -offset 14n
 .It Li \&.Li \een
 .Li \en
@@ -1951,7 +1951,7 @@ End-display.
 一般说来 symbolic 强调宏 无论在 象徵主义 角度, 还是 传统的英语 里,
 都是 用 黑体 (bold) 显示.
 .Pp
-.Dl Usage: .Sy symbol ... \*(Pu
+.Dl Usage: .Sy symbol ... 
 .Bl -tag -width ".Sy Important Noticex" -compact -offset 14n
 .It Li \&.Sy Important Notice
 .Sy Important Notice
