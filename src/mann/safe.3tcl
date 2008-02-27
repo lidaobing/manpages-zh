@@ -93,7 +93,6 @@ Safe \- 用来建立和操纵安全解释器的机制。
 ?\fB\-statics\fR \fIboolean\fR? ?\fB\-noStatics\fR?
 ?\fB\-nested\fR \fIboolean\fR? ?\fB\-nestedLoadOk\fR?
 ?\fB\-deleteHook\fR \fIscript\fR?
-.BE
 
 .SH "描述 DESCRIPTION"
 Safe Tcl 是一种机制，用于安全的执行不可信任的 Tcl 

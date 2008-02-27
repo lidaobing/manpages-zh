@@ -517,7 +517,7 @@ example,
 .CS
 \fBbinary scan \\x3f\\xcc\\xcc\\xcd f var1\fR
 .CE
-将返回 \fB1\f ，并把 \fB1.6000000238418579\fR 存储到 \fBvar1\fR。
+将返回 \fB1\fR，并把 \fB1.6000000238418579\fR 存储到 \fBvar1\fR。
 .RE
 .IP \fBd\fR 5
 除了把数据解释成 \fIcount\f 个机器本地表示的双精度浮点数之外，这种形式同于 \fBf\fR。例如，运行在 Intel Pentium 处理器的一个 Windows 系统上，

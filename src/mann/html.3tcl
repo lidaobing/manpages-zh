@@ -3,7 +3,6 @@
 '\" Generated from ./modules/html/html.man by mpexpand with fmt.nroff
 '\"
 .TH "html" 3tcl 1.2.1 html "HTML Generation"
-.BS
 .SH NAME
 html \- 产生 HTML 框架的子程序
 .SH "总览 SYNOPSIS"

@@ -16,7 +16,6 @@
 .\"----------------------------------------------------------------------------
 .\"
 .TH "Memory" 3tcl "" "Tcl"
-.BS
 .SH NAME
 ckalloc, memory, ckfree, Tcl_DisplayMemory, Tcl_InitMemory, Tcl_ValidateAllMemory - 合法的内存分配接口
 .SH "总览 SYNOPSIS"

@@ -487,7 +487,9 @@ A copy of the \fBContent-Encoding\fR meta-data value.
 .CS
 \fIHTTP/1.0 code string\fP
 .CE
-\fIcode\fR 是在 HTTP 标准中定义的一个三位数。代码 200 是 OK。以4或5开始的代码指示错误。以3开始的代码是重定向错误。在这种情况下，\fBLocation\f 元数据指定包含所需信息的一个新 URL。
+\fIcode\fR 是在 HTTP 标准中定义的一个三位数。代码 200 是 OK。以4或5开始
+的代码指示错误。以3开始的代码是重定向错误。在这种情况下，\fBLocation\fP 
+元数据指定包含所需信息的一个新 URL。
 .RE
 .TP
 \fBmeta\fR

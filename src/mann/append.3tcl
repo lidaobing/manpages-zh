@@ -252,7 +252,11 @@ append \- 向变量追加
 
 .SH 描述 DESCRIPTION
 .PP
-向变量 \fIvarName\f 的当前值添加所有的 \fIvalue\fR 参数。如果 \fIvarName\f 不存在，给她一个等价于所有 \fIvalue\fR 参数的联接(concatenation)的值。这个命令提供了一个有效的方式来增殖性地增长(build up)变量。例如，如果 \fB$a\fR 很长，``\fBappend a $b\fR'' 比 ``\fBset a $a$b\fR'' 更加有效率。
+向变量 \fIvarName\fR 的当前值添加所有的 \fIvalue\fR 参数。如果
+\fIvarName\fR 不存在，给她一个等价于所有 \fIvalue\fR 参数的联接
+(concatenation)的值。这个命令提供了一个有效的方式来增殖性地增长(build
+up)变量。例如，如果 \fB$a\fR 很长，``\fBappend a $b\fR'' 比 ``\fBset a
+$a$b\fR'' 更加有效率。
 
 .SH "参见 SEE ALSO"
 concat(n), lappend(n)
