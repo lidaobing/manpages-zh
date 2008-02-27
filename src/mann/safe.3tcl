@@ -124,7 +124,6 @@ Safe Base 在主解释器中提供的所有命令驻留在 \fBsafe\fR
 .TP
 如果未给出 \fIoptions\fR，则把给指名的这个解释器所有选项的设置返回为给这个 \fIslave \fR的选项和它们当前的值的一个列表。如果提供了一个单一的补充参数，它将返回有两个元素 \fIname\fR 和 \fIvalue\fR 的一个列表，这里的 \fIname\fR 是选项的全名而 \fIvalue\fR 是给 \fIslave \fR的这个选项当前值。如果提供多于两个补充选项，它将重新配置这个安全解释器并只改变每个提供的选项。关于选项的描述请参见下面的 OPTIONS 章节。使用的例子:
 .RS
-.CS
 # Create a new interp with the same configuration as "$i0" :
 set i1 [eval safe::interpCreate [safe::interpConfigure $i0]]
 # Get the current deleteHook
@@ -132,7 +131,6 @@ set dh [safe::interpConfigure $i0  \-del]
 # Change (only) the statics loading ok attribute of an interp
 # and its deleteHook (leaving the rest unchanged) :
 safe::interpConfigure $i0  \-delete {foo bar} \-statics 0 ;
-.CE
 .RE
 .TP
 \fB::safe::interpDelete\fR \fIslave\fR
@@ -229,7 +227,10 @@ Mac 上是 \fItoken\fR\fB:\fR\fIfilename\fR  )，这里的 \fItoken\fR 表示
 .PP
 在一个安全解释器中，当在要 source 或装载一个文件的一个请求中使用一个记号的时候，检查这个记号并把它转换成真实路径名，并在文件系统上定位要被 source 或装载的文件。安全解释器不能获取关于文件系统上在其下存储这个文件的实际路径名的知识。
 .PP
-为了进一步防止潜在的对偶然的包括在可以被安全解释器 source 的文件集中的敏感文件的信息泄露，限制 \fBsource\fR 别名为访问满足下列约束的文件: 文件名必须是十四个字符或更短，必须不包含多于一个的点(“\fB.\fR”)，不许终止于扩展 \fB.tcl\fR 或是被调用的 \fBtclIndex\fR。
+为了进一步防止潜在的对偶然的包括在可以被安全解释器 source 的文件集中的敏
+感文件的信息泄露，限制 \fBsource\fR 别名为访问满足下列约束的文件: 文件名
+必须是十四个字符或更短，必须不包含多于一个的点(\(lq\fB.\fR\(rq)，不许终止于扩
+展 \fB.tcl\fR 或是被调用的 \fBtclIndex\fR。
 .PP
 初始的访问路径列表中的每个元素将分配一个记号，它们将被设置在从解释器的 
 \fBauto_path\fR 中并且这个列表的第一个元素将被设置为这个从解释器的 \fBtcl_library\fR。

@@ -122,7 +122,6 @@ package require \fBhtml ?1.2.1?\fR
 .sp
 \fB::html::while\fR \fItest body\fR\fR
 .sp
-.BE
 .SH "描述 DESCRIPTION"
 .PP
 \fBhtml\fR 包提供了产生 HTML 的命令。这些命令一般返回 HTML 字符串作为结果。特殊的是，它们不向 \fBstdout\fR 输出结果。
