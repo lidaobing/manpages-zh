@@ -125,7 +125,7 @@ s/(警告|錯誤)信息/$1訊息/g;
     s/引導盤/啟動磁碟/g;
 
 # And, finally, add an extra backslash where needed.
-s/\G((?:[\x00-\x7f]|[\x80-\xff].)*?[\x80-\xff]\\)/$1\\/g;
+#s/\G((?:[\x00-\x7f]|[\x80-\xff].)*?[\x80-\xff]\\)/$1\\/g;
 
 # 結束
 
