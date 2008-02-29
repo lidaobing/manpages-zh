@@ -141,33 +141,32 @@ safe::interpConfigure $i0  \-delete {foo bar} \-statics 0 ;
 \fIdirectory\fR 
 的记号。如果未找到这个路径则生成一个错误。使用的例子:
 .RS
-.CS
 $slave eval [list set tk_library [::safe::interpFindInAccessPath $name $tk_library]]
-.CE
 .RE
 .TP
 \fB::safe::interpAddToAccessPath\fR \fIslave\fR \fIdirectory\fR
 这个命令把 \fIdirectory\fR 添加到在主解释器中为安全解释器维护的虚拟路径中，并返回可在安全解释器中被用来获得到在这个目录中的文件的访问的记号。如果这个路径已经存在于虚拟路径中，则它只返回记号而不再次把这个路径添加到虚拟路径中。使用的例子:
 .RS
-.CS
 $slave eval [list set tk_library [::safe::interpAddToAccessPath $name $tk_library]]
-.CE
 .RE
 .TP
 \fB::safe::setLogCmd\fR ?\fIcmd arg...\fR?
 这个命令安装在一个脚本，在这个安全解释器的特定的生命周期事件发生的时候将被调用。在调用这个命令而不加参数时，它返回当前安装的脚本。在调用并加一个参数空串时，则删除当前安装的脚本并关闭日志记录。调用这个脚本时将加上一个补充参数，它描述所感兴趣的事件。主要的目的是帮助调试安全解释器。在安全解释器只能得到一个一般错误消息的时候你可以使用这个设施获得完整的错误消息。这防止安全解释器见到关于失败的消息和其他可能包含敏感信息如真实路径名的其他事件的消息。
 .RS
 使用的例子:
-.CS
+
 ::safe::setLogCmd puts stderr
-.CE
-下面是一个样本对话的输出，这里一个安全解释器尝试着 source 一个在它的虚拟访问路径中找不到的文件。注意这个安全解释器只接收到一个错误消息，说这个文件未找到:
-.CS
+
+下面是一个样本对话的输出，这里一个安全解释器尝试着 source 一个在它的虚拟
+访问路径中找不到的文件。注意这个安全解释器只接收到一个错误消息，说这个文
+件未找到:
+
+.nf
 NOTICE for slave interp10 : Created
 NOTICE for slave interp10 : Setting accessPath=(/foo/bar) staticsok=1 nestedok=0 deletehook=()
 NOTICE for slave interp10 : auto_path in interp10 has been set to {$p(:0:)}
 ERROR for slave interp10 : /foo/bar/init.tcl: no such file or directory
-.CE
+.fi
 .RE
 
 .SH "选项 OPTIONS"

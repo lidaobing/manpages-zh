@@ -244,12 +244,8 @@ Database Class:	\\fB\\$3\\fR
 \\$1\l'|0\(ul'\\$2
 ..
 .TH tclvars 3tcl 8.0 Tcl "Tcl Built-In Commands"
-.BS
-'\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
 tclvars \- Tcl 使用的变量
-.BE
-
 .SH "描述 DESCRIPTION"
 .PP
 Tcl 库自动的建立和管理下列全局变量。除了下面专做说明的地方之外，对特定于应用的代码和用户，这些变量通常应当作为只读的来对待。
@@ -258,7 +254,10 @@ Tcl 库自动的建立和管理下列全局变量。除了下面专做说明的�
 Tcl     把这个变量维护为一个数组，它的元素是这个进程的环境变量。读取一个元素将返回相应的环境变量的值。设置这个数组的一个元素将修改相应的环境变量，如果它不存在则建立一个新的。删除     \fBenv\fR 的一个元素将删除相应的环境变量。对 \fBenv\fR     数组的变更将影响通过象 \fBexec \fR这样的命令传递给子进程的环境变量。如果删除了整个     \fBenv\fR 数组，则 Tcl 将停止监视 \fBenv\fR     访问并且将不更新环境变量。
 .RS
 .VS 8.0 
-在 Windows 下，任何大小写形式的环境变量 PATH 和  COMSPEC 都被自动转换成大写的。例如，PATH  环境变量可以被操作系统导出为“path”、“Path”、“PaTh”、等，这导致其他简单  Tcl 代码必须支持许多特殊的写法。Tcl  继承的所有其他环境变量保持不变。
+在 Windows 下，任何大小写形式的环境变量 PATH 和  COMSPEC 都被自动转换成
+大写的。例如，PATH  环境变量可以被操作系统导出为\(lqpath\(rq、\(lqPath\(rq、\(lqPaTh\(rq、
+等，这导致其他简单  Tcl 代码必须支持许多特殊的写法。Tcl  继承的所有其他
+环境变量保持不变。
 .VE
 .RE
 .RS
@@ -305,7 +304,11 @@ Tcl     把这个变量维护为一个数组，它的元素是这个进程的环
 .PP
 你还可以为 Macintosh 建立你自己的环境变量。叫做 \fBTcl Environment Variables\fR 的一个文件将被放置到 Mac 系统文件夹中的偏好文件夹中。这个文件中的每行的形式都是 \fIVAR_NAME=var_data\fR。
 .PP
-最后的选择是把环境变量放置到这个应用的叫做 \fBTcl Environment Variables\fR 的一个‘STR#’资源文件中。这被认为是更象“Mac 式”而不是一个 Unix 式样的环境变量文件。‘STR#’资源中每个条目有与上述相同的格式。源代码文件 \fItclMacEnv.c\fR 包含 env 机制的实现。这个文件包含许多 #define，它们允许你定制 env 机制来适合你的应用的需要。
+最后的选择是把环境变量放置到这个应用的叫做 \fBTcl Environment
+Variables\fR 的一个`STR#'资源文件中。这被认为是更象\(lqMac 式\(rq而不是
+一个 Unix 式样的环境变量文件。`STR#'资源中每个条目有与上述相同的格式。源
+代码文件 \fItclMacEnv.c\fR 包含 env 机制的实现。这个文件包含许多 #define
+，它们允许你定制 env 机制来适合你的应用的需要。
 .RE
 .TP
 \fBerrorCode\fR
@@ -316,19 +319,19 @@ Tcl     把这个变量维护为一个数组，它的元素是这个进程的环
 在发生一个算术错误的时候使用这个格式(例如，在 \fBexpr\fR 命令中尝试除以零)。\fICode\fR 标识准确的错误而 \fImsg\fR 提供一个人可阅读的对错误的描述。\fICode\fR 将是下列之一：DIVZERO (尝试除以零)、DOMAIN (如果函数的一个参数在它的作用域之外，比如 acos(-3))、IOVERFLOW (整数溢出)、 OVERFLOW (浮点数溢出)、或 UNKNOWN (如果不能确定错误的原因)。
 .TP
 \fBCHILDKILLED\fI pid sigName msg\fR
-在子进程被一个信号所终止的时候使用这个格式。\fBerrorCode\fR 的第二个元素是这个进程的标识符(十进制数)。第三个元素标识导致进程终止的信号的符号名字；它将是在文件 signal.h 中包含的名字之一，比如 \fBSIGPIPE\fR。第四个元素是一个描述这个信号的人可阅读的短消息，比如对 \fBSIGPIPE\fR是“write on pipe with no readers”。
+在子进程被一个信号所终止的时候使用这个格式。\fBerrorCode\fR 的第二个元素是这个进程的标识符(十进制数)。第三个元素标识导致进程终止的信号的符号名字；它将是在文件 signal.h 中包含的名字之一，比如 \fBSIGPIPE\fR。第四个元素是一个描述这个信号的人可阅读的短消息，比如对 \fBSIGPIPE\fR是\(lqwrite on pipe with no readers\(rq。
 .TP
 \fBCHILDSTATUS\fI pid code\fR
 在子进程以非零状态退出的时候使用这个格式。\fBerrorCode \fR的第二个元素是这个进程的标识符(十进制数)，而第三个元素是这个进程返回的退出代码(也是十进制数)。
 .TP
 \fBCHILDSUSP\fI pid sigName msg\fR
-在子进程被一个信号所挂起的时候使用这个格式。\fBerrorCode\fR 的第二个元素是这个进程的标识符，是一个十进制数。第三个元素识导致进程挂起的信号的符号名字；它将是在文件signal.h 中包含的名字之一，比如 \fBSIGTTIN\fR。 第四个元素是一个描述这个信号的人可阅读的短消息，比如对 \fBSIGTTIN \fR是“background tty read”。
+在子进程被一个信号所挂起的时候使用这个格式。\fBerrorCode\fR 的第二个元素是这个进程的标识符，是一个十进制数。第三个元素识导致进程挂起的信号的符号名字；它将是在文件signal.h 中包含的名字之一，比如 \fBSIGTTIN\fR。 第四个元素是一个描述这个信号的人可阅读的短消息，比如对 \fBSIGTTIN \fR是\(lqbackground tty read\(rq。
 .TP
 \fBNONE\fR
 对除了返回错误消息之外没有其他可获得的补充信息的错误使用这个格式。在这种情况下 \fBerrorCode\fR 将由只有一个单一元素的一个列表组成，这个元素的内容是 \fBNONE\fR。
 .TP
 \fBPOSIX \fIerrName msg\fR
-如果 \fBerrorCode\fR 的第一个元素是 \fBPOSIX\fR，则错误发生在一个 POSIX 内核调用期间。这个列表的第二个元素将包含发生的错误的符号名字，比如 \fBENOENT\fR；它将是在包含文件 errno.h 中定义的值之一。这个列表的第三个元素是对应于 \fIerrName\fR 的一个人可阅读的消息，比如对 \fBENOENT\fR 是“no such file or directory”。
+如果 \fBerrorCode\fR 的第一个元素是 \fBPOSIX\fR，则错误发生在一个 POSIX 内核调用期间。这个列表的第二个元素将包含发生的错误的符号名字，比如 \fBENOENT\fR；它将是在包含文件 errno.h 中定义的值之一。这个列表的第三个元素是对应于 \fIerrName\fR 的一个人可阅读的消息，比如对 \fBENOENT\fR 是\(lqno such file or directory\(rq。
 .PP
 要设置 \fBerrorCode\fR，应用应当使用库过程比如 \fBTcl_SetErrorCode\fR 和 \fBTcl_PosixError\fR，或者调用  \fBerror\fR 命令。如果使用了这些方法之一，则 Tcl 解释器将在下个错误之后重置这个变量为 \fBNONE\fR。
 .RE
@@ -344,7 +347,16 @@ Tcl     把这个变量维护为一个数组，它的元素是这个进程的环
 .VS 8.0 br
 .TP
 \fBtcl_pkgPath\fR
-这个变量持有一个目录的列表，它一般指示把包安装到哪里。在 Windows 上不使用它。它典型的包含一个或两个条目；如果它包含两个条目，第一个通常是依赖于平台的包的目录(例如，共享库的二进制文件)而第二个通常是平台无关的包的目录(例如，脚本文件)。典型的把包安装为在  \fB$tcl_pkgPath\fR 中的一个条目的一个子目录。在 \fB$tcl_pkgPath\fR 中的目录缺省的包含在 \fBauto_path\fR 变量中，所以 \fBpackage require\fR 命令期间自动的在它们和它们的直接子目录中查找包。注意: 不希望应用修改 \fBtcl_pkgPath\fR。在启动时它的值被添加到  \fBauto_path\fR；对 \fBtcl_pkgPath\fR 的变动不会反映到 \fBauto_path\fR   中。如果你想让 Tcl 来在额外的目录中查找包，你应该把这些目录的名字添加到 \fBauto_path\fR，而不是 \fBtcl_pkgPath\fR。
+这个变量持有一个目录的列表，它一般指示把包安装到哪里。在 Windows 上不使
+用它。它典型的包含一个或两个条目；如果它包含两个条目，第一个通常是依赖于
+平台的包的目录(例如，共享库的二进制文件)而第二个通常是平台无关的包的目录
+(例如，脚本文件)。典型的把包安装为在  \fB$tcl_pkgPath\fR 中的一个条目的
+一个子目录。在 \fB$tcl_pkgPath\fR 中的目录缺省的包含在 \fBauto_path\fR 
+变量中，所以 \fBpackage require\fR 命令期间自动的在它们和它们的直接子目
+录中查找包。注意: 不希望应用修改 \fBtcl_pkgPath\fR。在启动时它的值被添加
+到  \fBauto_path\fR；对 \fBtcl_pkgPath\fR 的变动不会反映到
+\fBauto_path\fR   中。如果你想让 Tcl 来在额外的目录中查找包，你应该把这
+些目录的名字添加到 \fBauto_path\fR，而不是 \fBtcl_pkgPath\fR。
 .VE
 .TP
 \fBtcl_platform\fR
@@ -381,7 +393,7 @@ Tcl     把这个变量维护为一个数组，它的元素是这个进程的环
 .TP
 \fBtcl_precision\fR
 .VS
-这个变量在把浮点数转换成字符串时控制生成的数字的数目。它缺省的是 12。对于 IEEE 浮点数 17 位数字是“最佳的”，这样允许双精度值在二进制和字符串之间来回转换而不丢失信息。但是，使用  17 位数字将禁止任何舍入，这将生成更长，而更不直观的值。例如，\fBexpr 1.4\fR 在设置 \fBtcl_precision\fR 为 17 时返回 1.3999999999999999，而在设置 \fBtcl_precision\fR 为 12 时返回 1.4 。
+这个变量在把浮点数转换成字符串时控制生成的数字的数目。它缺省的是 12。对于 IEEE 浮点数 17 位数字是\(lq最佳的\(rq，这样允许双精度值在二进制和字符串之间来回转换而不丢失信息。但是，使用  17 位数字将禁止任何舍入，这将生成更长，而更不直观的值。例如，\fBexpr 1.4\fR 在设置 \fBtcl_precision\fR 为 17 时返回 1.3999999999999999，而在设置 \fBtcl_precision\fR 为 12 时返回 1.4 。
 .RS
 在一个进程中的所有解释器共享一个单一的 \fBtcl_precision\fR  值: 在一个解释器中改变它将同样影响所有其他解释器。但是，不允许安全解释器修改这个变量。
 .RE
@@ -400,10 +412,17 @@ Tcl     把这个变量维护为一个数组，它的元素是这个进程的环
 设置这个变量的值来控制在字节码执行期间显示多少跟踪信息。缺省的，tcl_traceExec    是零而不显示信息。设置 tcl_traceExec 为 1，在每次调用一个 Tcl 过程的时候在标准输出上生成一行跟踪。设置它为 2，在用命令的名字和它的参数调用任何Tcl 命令的时候，生成一行输出。设置它为 3，生成一个详细的跟踪，展示每个字节码指令的执行结果。注意在 tcl_traceExec 是 2 或 3 的时候，不展示象 set 和 incr 这样已经被整个替换为一个字节码指令序列的命令。在跟踪怀疑是 Tcl 编译器和解释器的问题时很有用。在把现存代码转换成 Tcl8.0 时也偶尔有用。
 .TP
 \fBtcl_wordchars\fR
-这个变量的值是一个正则表达式，设置它来控制认把什么字符认为是“字”字符。例如在  Tk 的文本框中用双击来选择一个字。它是平台相关的。在  Windows 上，它缺省为 \fB\S\fR，意思是除了 Unicode  空格字符之外的任何字符。其他平台上缺省为 \fB\w\fR，它是任何   Unicode 字字符(数字、字母、下划线)。
+这个变量的值是一个正则表达式，设置它来控制认把什么字符认为是\(lq字\(rq字
+符。例如在  Tk 的文本框中用双击来选择一个字。它是平台相关的。在  Windows
+上，它缺省为 \fB\\S\fR，意思是除了 Unicode  空格字符之外的任何字符。其他
+平台上缺省为 \fB\\w\fR，它是任何   Unicode 字字符(数字、字母、下划线)。
 .TP
 \fBtcl_nonwordchars\fR
-这个变量的值是一个正则表达式，设置它来控制认把什么字符认为是“非字”字符。例如在   Tk 的文本框中用双击来选择一个字。它是平台相关的。在 Windows 上，它缺省为 \fB\s\fR，意思是任何 Unicode 空格字符。其他平台上缺省为 \fB\W\fR，它是除了 Unicode 字字符(数字、字母、下划线)之外的任何字符。
+这个变量的值是一个正则表达式，设置它来控制认把什么字符认为是\(lq非字\(rq
+字符。例如在   Tk 的文本框中用双击来选择一个字。它是平台相关的。在
+Windows 上，它缺省为 \fB\\s\fR，意思是任何 Unicode 空格字符。其他平台上缺
+省为 \fB\\W\fR，它是除了 Unicode 字字符(数字、字母、下划线)之外的任何字符
+。
 .TP
 \fBtcl_version\fR
 在建立解释器的时候，Tcl 初始化这个变量来持有这个版本的 Tcl 的版本号，形式是 \fIx.y\fR。对  \fIx\fR 的变更表示可能导致不兼容的较大的变化，对 \fIy\fR  的变更表示保持反向兼容的小增强和缺陷修理，\fBinfo tclversion\fR 命令返回这个变量的值。

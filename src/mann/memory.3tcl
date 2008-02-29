@@ -54,19 +54,18 @@ Tcl_InitMemory (interp)
 .ft R
 '
 .SH ARGUMENTS
-.AS Tcl_Interp *fileName
-.AP uint size in
+Tcl_Interp *fileName
+uint size in
 
-.AP char *ptr in
-.AP Tcl_Interp *interp in
+char *ptr in
+Tcl_Interp *interp in
 A pointer to the Tcl interpreter.
-.AP char *file in
+char *file in
 The filename of the caller of Tcl_ValidateAllMemory.
-.AP int line in
+int line in
 The line number of the caller of Tcl_ValidateAllMemory.
-.AP char *fileName in
+char *fileName in
 File to display list of active memory.
-.BE
 
 .SH "描述 DESCRIPTION"
 .SS ckalloc
@@ -180,9 +179,6 @@ This allows you to detect the common sorts of one-off problems, where
 not enough space was allocated to contain the data written, for example.
 '
 .SH THE MEMORY COMMAND
-'@help: debug/memory
-'@brief: display and debug memory problems
-'
 .TP
 .B memory \fIoptions\fR
 .br
@@ -224,7 +220,6 @@ word \fIckalloc\fR is replaced by the word \fIckfree\fR.
 .B memory \fBdisplay\fR \fIfile\fR
 .br
 向指定文件写当前所有分配的内存的一个列表。
-'@endhelp
 '
 .SH DEBUGGING DIFFICULT MEMORY CORRUPTION PROBLEMS
 .PP
