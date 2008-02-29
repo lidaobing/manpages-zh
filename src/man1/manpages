@@ -1,0 +1,43 @@
+MANPAGES = [.1 a2p.1 ab.1 ac.1 access.1 ali.1 alias.1 apm.1 apropos.1	 \
+	ar.1 arch.1 at.1 autorun.1 basename.1 bash.1 bg.1 biff.1 bind.1	 \
+	break.1 builtin.1 builtins.1 bunzip2.1 bzcat.1 bzip2.1		 \
+	bzip2recover.1 cal.1 cat.1 cce.1 cd.1 charset.1 chattr.1 chfn.1	 \
+	chgrp.1 chmod.1 chown.1 chroot.1 chsh.1 chvt.1 cksum.1 clear.1	 \
+	clusterdb.1 col.1 comm.1 command.1 compgen.1 complete.1		 \
+	continue.1 cp.1 cpio.1 createdb.1 createlang.1 createuser.1	 \
+	cut.1 date.1 dd.1 deallocvt.1 declare.1 df.1 diff.1 dig.1	 \
+	dircolor.1 dircolors.1 dirname.1 dirs.1 disown.1 dnskeygen.1	 \
+	dnsquery.1 dropdb.1 droplang.1 dropuser.1 du.1 dumpkeys.1 echo.1 \
+	ecpg.1 egrep.1 eject.1 emacs.1 enable.1 env.1 eval.1 ex.1 exec.1 \
+	exit.1 expand.1 export.1 false.1 fc.1 fg.1 fgrep.1 file.1 find.1 \
+	findsmb.1 finger.1 fmt.1 fold.1 free.1 ftp.1 gcc.1 gedit.1	 \
+	getopts.1 git.1 gnroff.1 grep.1 groff.1 groups.1 gunzip.1	 \
+	gview.1 gvim.1 gzip.1 hash.1 head.1 help.1 history.1 host.1	 \
+	hostid.1 hostname.1 iconv.1 id.1 info.1 initdb.1 initex.1	 \
+	initlocation.1 install.1 install-info.1 intro.1 ipcclean.1	 \
+	jobs.1 kbd_mode.1 kill.1 killall.1 last.1 ld.1 ldd.1 let.1	 \
+	listalias.1 ln.1 loadkeys.1 local.1 lockfile.1 logname.1	 \
+	logout.1 ls.1 lsattr.1 mail.1 mailto.1 makeinfo.1		 \
+	make_smbcodepage.1 man.1 md5sum.1 mencoder.1 mesg.1 minicom.1	 \
+	mirror.1 mkdir.1 mkfifo.1 mknod.1 mkpasswd.1 mktemp.1 more.1	 \
+	mpg123.1 mplayer.1 msmtp.1 mv.1 newgrp.1 nice.1 nmblookup.1	 \
+	nohup.1 nroff.1 octave.1 octave-bug.1 octave-config.1 paste.1	 \
+	perl.1 pg_config.1 pg_controldata.1 pg_ctl.1 pg_dump.1		 \
+	pg_dumpall.1 pg_resetxlog.1 pg_restore.1 pgtclsh.1 pgtksh.1	 \
+	popd.1 postgres.1 postmaster.1 printf.1 psfaddtable.1		 \
+	psfgettable.1 psfstriptable.1 psql.1 pushd.1 pwd.1 quota.1	 \
+	read.1 readonly.1 return.1 rgview.1 rgvim.1 rlogin.1 rm.1	 \
+	rmdir.1 rvi.1 rview.1 rvim.1 scp.1 set.1 setleds.1 setmetamode.1 \
+	sh.1 shift.1 shopt.1 showfont.1 showkey.1 size.1 sleep.1	 \
+	smbclient.1 smbcontrol.1 smbrun.1 smbsh.1 smbstatus.1 smbtar.1	 \
+	sort.1 source.1 split.1 sq.1 ssh.1 stat.1 strings.1 stty.1 su.1	 \
+	subst.1 sum.1 suspend.1 svn.1 svnadmin.1 svndumpfilter.1	 \
+	svnlook.1 svnversion.1 sync.1 tac.1 tail.1 tar.1 tclsh.1 tee.1	 \
+	testparm.1 testprns.1 tex.1 texi2dvi.1 texindex.1 times.1	 \
+	touch.1 trap.1 troff.1 true.1 tty.1 type.1 typeset.1 ulimit.1	 \
+	umask.1 unalias.1 uname.1 unicode_start.1 unicode_stop.1 uniq.1	 \
+	unset.1 unsq.1 uptime.1 usleep.1 uuencode.1 vacuumdb.1 vi.1	 \
+	view.1 vim.1 vimtutor.1 virtex.1 vt-is-UTF8.1 w.1 wait.1 wall.1	 \
+	wbinfo.1 wc.1 whatis.1 who.1 wish.1 xargs.1 xmodmap.1 xpdf.1	 \
+	xxd.1 yacc.1 yes.1 ypchfn.1 ypchsh.1 yppasswd.1 zcat.1 zipinfo.1 \
+	zless.1
