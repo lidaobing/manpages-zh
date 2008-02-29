@@ -20,8 +20,7 @@ gb-stamp:
 	mkdir -p zh_CN
 	for f in `cat $(TRANSLATED)` ; do \
 		OFNAME=`basename $$f | sed -e 's/\.\([^.]*\)$$/.zh_CN.\1/'` ; \
-		cp src/$$f zh_CN/$$OFNAME ; \
-		dos2unix zh_CN/$$OFNAME ; \
+		iconv -f utf8 -t gbk src/$$f -o zh_CN/$$OFNAME ; \
 	done
 	touch $@
 
@@ -30,7 +29,6 @@ b5-stamp:
 	for f in `cat $(TRANSLATED)` ; do \
 		OFNAME=`basename $$f | sed -e 's/\.\([^.]*\)$$/.zh_TW.\1/'` ; \
 		iconv -f utf8 -t gb18030 src/$$f | autob5 -i gb -o big5 | utils/totw.pl > zh_TW/$$OFNAME ; \
-		dos2unix zh_TW/$$OFNAME ; \
 	done
 	touch $@
 
