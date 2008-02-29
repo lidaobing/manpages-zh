@@ -133,9 +133,9 @@
 .SH "NAME"
 perldata\- Perl 数据类型
 .SH "DESCRIPTION 描述"
-.IX Header "DESCRIPTION"
+.\".IX Header "DESCRIPTION"
 .SS "Variable names 变量名"
-.IX Subsection "Variable names"
+.\".IX Subsection "Variable names"
 Perl 有三种内建的数据类型：标量，数组和关联数组（即\[lq]哈希表，
 hash\[rq]）。数组以数字为索引，通常以0开始，升序排列。哈希表以与值相关联
 的字符串为索引，内部排列是无序的。
@@ -155,31 +155,25 @@ Perl 也有内建的变量，其名称不遵循这一规则。它们名称古怪
 是这样）
 .PP
 .nf
-.Vb 4
 \&    $days               # 简单标量 "days"
 \&    $days[28]           # 数组 @days的第29个元素
 \&    $days{'Feb'}        # 哈希 %days的 `Feb' 所对应的值
 \&    $#days              # 数组 @days的最后一个元素的索引值
-.Ve
 .fi
 .PP
 整个数组（或数组和哈希的局部）以 '@'开始, 它类似英文中的\[lq]these\[rq] 
 或\[lq]those\[rq] (这些...那些...)，表示期望有多个值。
 .PP
 .nf
-.Vb 3
 \&    @days               # ($days[0], $days[1],... $days[n])
 \&    @days[3,4,5]        # 即 ($days[3],$days[4],$days[5])
 \&    @days{'a','c'}      # 即 ($days{'a'},$days{'c'})
-.Ve
 .fi
 .PP
 整个哈希以 '%' 开始:
 .PP
 .nf
-.Vb 1
 \&    %days               # (key1, val1, key2, val2 ...)
-.Ve
 .fi
 .PP
 另外，子程序以'&'来表示, 但有时在不引起误解的情况下也可以不用, 就象
@@ -206,7 +200,7 @@ Perl 也有内建的变量，其名称不遵循这一规则。它们名称古怪
 含有一个字符，如：$%\fR 或$$\fR. (大部分这样的变量都有特殊的意
 义。例如，$$\fR 是当前进程的id。)
 .SS "Context 上下文"
-.IX Subsection "Context"
+.\".IX Subsection "Context"
 在 Perl 中有时操作或值的意义取决于该操作或值所处的上下文。有两个主要的上
 下文：列表和标量上下文。相当一部分操作在需要列表的上下文中返回列表，在需
 要标量的上下文中返回标量。这在有关该操作的文档中会提到。换句话讲，Perl会
@@ -215,17 +209,13 @@ Perl 也有内建的变量，其名称不遵循这一规则。它们名称古怪
 操作可以根据不同的上下文返回不同的值。例如，如果这样写：
 .PP
 .nf
-.Vb 1
 \&    int( <STDIN> )
-.Ve
 .fi
 .PP
 integer 操作提供标量上下文给 <> 操作符, <> 会从STDIN 读入一行返回给 integer 操作，然后它返回其中的整型量。但如果你这样写：
 .PP
 .nf
-.Vb 1
 \&    sort( <STDIN> )
-.Ve
 .fi
 .PP
 sort操作提供列表上下文给<>, <>会读入STDIN中的每一行直到结束，然后将其传递给sort，sort然后将其排序输出。
@@ -234,15 +224,15 @@ sort操作提供列表上下文给<>, <>会读入STDIN中的每一行直到结�
 .PP
 当你使用`use warnings'\fR 编译指示或 Perl 的\fB\-w\fR 参数时，
 你可能会看到这样的警告：在\[lq]无效的上下文，void context\[rq] 中使用了常量
-或函数。无效上下文的意思是值被丢弃不用，比如只包含有`"fred";
-'\fR 的语句; 或是`getpwuid(0);'\fR;. 在要求列表上下文的函数
+或函数。无效上下文的意思是值被丢弃不用，比如只包含有"fred";
+\fR 的语句; 或是`getpwuid(0);'\fR;. 在要求列表上下文的函数
 被标量上下文环境调用时,也会出现这个警告.
 .PP
 用户定义的子程序可能会需要查看上下文是无效，标量，还是列表。不过，大多数并
 不需要这么做。因为标量和列表会自动插入到一个列表中。参见 perlfunc 中的
 \[lq]wantarray\[rq] 以了解如何辨明你的函数调用时的上下文。
 .SS "Scalar values 标量"
-.IX Subsection "Scalar values"
+.\".IX Subsection "Scalar values"
 Perl 中的所有数据都是标量, 标量的数组,标量的哈希. 标量可以是三种不同的值: 数字, 字符(串), 引用. 通常, 不同值之间的转换是透明的. 虽然一个标量不可能有多个值, 但是它可以是一个包含多个值的数组或哈希的引用.
 .PP
 标量不一定非此即彼. 不需要声明变量的类型是"字符串","数字","引用"或其它什麽. 因为标量会自动转换, 所以其类型不用关心. Perl 是上下文多形语言,它的标量可以是字符串,数字或引用(包括对象). 其中字符串和数字在大多数情况下并没有什麽不同, 引用是强化的,不可变的带有内建引用计数和析构器的指针.
@@ -254,17 +244,14 @@ Perl 中的所有数据都是标量, 标量的数组,标量的哈希. 标量可�
 要弄清楚一个字符串是否是有效的非0数字,只要看它是不是数字0和字母\[lq]0\[rq] 就足够了(不过这在使用-w参数时,会显示警告). 因为非数字的字符串被看作0, 与awk中相似:
 .PP
 .nf
-.Vb 3
 \&    if ($str == 0 && $str ne "0")  {
 \&        warn "That doesn't look like a number";
 \&    }
-.Ve
 .fi
 .PP
 这种方法可能是最好的,因为如若不然你不会正确对待\s-1IEEE\s0 的注释,比如`NaN'\fR 和无穷大. 别的时候, 你可能更愿意用\fIPOSIX::strtod()\fR 函数或是正则表达式来检测字符串是否能用做数字(参见perlre).
 .PP
 .nf
-.Vb 8
 \&    warn "has nondigits"        if     /\eD/;
 \&    warn "not a natural number" unless /^\ed+$/;             # rejects -3
 \&    warn "not an integer"       unless /^-?\ed+$/;           # rejects +3
@@ -273,7 +260,6 @@ Perl 中的所有数据都是标量, 标量的数组,标量的哈希. 标量可�
 \&    warn "not a decimal number" unless /^-?(?:\ed+(?:\e.\ed*)?|\e.\ed+)$/;
 \&    warn "not a C float"
 \&        unless /^([+-]?)(?=\ed|\e.\ed)\ed*(\e.\ed*)?([Ee]([+-]?\ed+))?$/;
-.Ve
 .fi
 .PP
 数组的长度是标量. 通过$#days你可以知道@days的长度. 技术上讲,这不是数组的长度; 而是最后一个元素的下标,因为第一个元素的下标是0. 对$#days 赋值会改变数组的长度. 以这种方式减少数组的话, 会破坏其中的值, 再增加其长度也不能恢复. (Perl 4中是可以的, 我们改变了它以确保析构器被及时调用.)
@@ -281,34 +267,26 @@ Perl 中的所有数据都是标量, 标量的数组,标量的哈希. 标量可�
 你可以使用一些小技巧来预扩展一个数组(如果你知道它将会变得很大的话). 可以用给超出数组范围的元素赋值的方法扩展数组. 可以给数组赋值一个空列表以清空数组. 下面语句等价:
 .PP
 .nf
-.Vb 2
 \&    @whatever = ();
 \&    $#whatever = -1;
-.Ve
 .fi
 .PP
 数组处于标量上下文中时, 返回值是数组的长度. (列表在标量上下文中,返回值是列表的最后一个元素,像是C中的逗号操作符, 而内建函数的返回值由它们自己决定.) 以下语句为真:
 .PP
 .nf
-.Vb 1
 \&    scalar(@whatever) == $#whatever - $[ + 1;
-.Ve
 .fi
 .PP
 Perl 5 改变了$[\fR 的意义: 不必担心别的程序改变了$[\fR 的值. (换言之,不推荐使用$[\fR ) 所以,可以写成这样:
 .PP
 .nf
-.Vb 1
 \&    scalar(@whatever) == $#whatever + 1;
-.Ve
 .fi
 .PP
 有些程序员为了明确起见, 会使用显式的转换:
 .PP
 .nf
-.Vb 1
 \&    $element_count = scalar(@whatever);
-.Ve
 .fi
 .PP
 当哈希处于标量上下文中时, 如果哈希为空, 返回值为假, 如果非空, 返回值为真; 说得更精确些, 返回值是个字符串, 由已经使用的存储段和分配的全部存储段组成,二者之间以斜杠分隔. 这可以用来反映Perl的哈希算法的好坏. 例如, 你的哈希中有10,000个元素,但是%HASH\fR 的标量值为"1/16"\fR, 则说明仅用到了16个存储段中的一个, 也许10,000个元素都在这一个存储段中. 最好不要发生这种情况.
@@ -316,16 +294,13 @@ Perl 5 改变了$[\fR 的意义: 不必担心别的程序改变了$[\fR 的值. 
 你可以预先为哈希分配空间, 这要使用给\fIkeys()\fR 函数赋值的方法来实现. 实际分配的空间是大于所给值的二的幂：
 .PP
 .nf
-.Vb 1
 \&    keys(%users) = 1000;                # 分配 1024 空间
-.Ve
 .fi
 .SS "Scalar value constructors 标量数据构造"
-.IX Subsection "Scalar value constructors"
+.\".IX Subsection "Scalar value constructors"
 数值常量有以下浮点和整数格式:
 .PP
 .nf
-.Vb 9
 \&    12345
 \&    12345.67
 \&    .23E-10             # a very small number
@@ -335,7 +310,6 @@ Perl 5 改变了$[\fR 的意义: 不必担心别的程序改变了$[\fR 的值. 
 \&    0xdead_beef         # more hex   
 \&    0377                # octal
 \&    0b011011            # binary
-.Ve
 .fi
 .PP
 在数字常量中可以在数字间插入下划线来增加可读性。例如，可以三位一组 (Unix 样式的分组，例如 0b110_110_100)，或者四位一组 (来表示 nibbles，例如 0b1010_0110)，或者其他分组。
@@ -348,10 +322,8 @@ Perl 5 改变了$[\fR 的意义: 不必担心别的程序改变了$[\fR 的值. 
 以下语句打印``The price is $\&100.''
 .PP
 .nf
-.Vb 2
 \&    $Price = '$100';    # not interpolated
 \&    print "The price is $Price.\en";     # interpolated
-.Ve
 .fi
 .PP
 perl 中没有 double interpolation，因此$100\fR 保持不变。
@@ -359,11 +331,9 @@ perl 中没有 double interpolation，因此$100\fR 保持不变。
 正如在有些shell中一样, 你可以用花括号括起变量名, 以便区分变量名和其后的字母及下划线. 如果要将一个变量改写为字符串时，必须这样做，以避免与后面的双冒号或单引号连接起来，否则会被当作包名：
 .PP
 .nf
-.Vb 3
 \&    $who = "Larry";
 \&    print PASSWD "${who}::0:0:Superuser:/:/bin/perl\en";
 \&    print "We use ${who}speak when ${who}'s here.\en";
-.Ve
 .fi
 .PP
 如果没有花括号, Perl会寻找 $whospeak, $who::0, 和 $who's 变量. 后两个是不存在的 who 包中的$0 和 $s.
@@ -371,7 +341,7 @@ perl 中没有 double interpolation，因此$100\fR 保持不变。
 实际上, 花括号中的标识符必须是字符串, 哈希的下标也必须是字符串. 都不需要引号, 前面的例子$days{'Feb'} 可以写作 $days{Feb} 引号会自动加上. 但是下标中的其它复杂内容被解释为表达式.
 .PP
 \fIVersion Strings\fR
-.IX Subsection "Version Strings"
+.\".IX Subsection "Version Strings"
 .PP
 \fB注意:\fR Version Strings (v\-strings) have been deprecated.  They will
 not be available after Perl 5.8.  The marginal benefits of v\-strings
@@ -380,11 +350,9 @@ were greatly outweighed by the potential for Surprise and Confusion.
 类似`v1.20.300.4000'\fR 这样的形式被解释为一个字符串. 这种形式称为 v\-strings，提供了更易读的方法来构造字符串，比起"\ex{1}\ex{14}\ex{12c}\ex{fa0}"\fR 更加易读. 这在表示 Unicode 字符串时很有用, 在使用字符串比较命令(`cmp'\fR,`gt'\fR,`lt'\fR 等)比较版本号时也非常有用. 如果其中的点号多于两个, 则开始的`v'\fR 可以省略.
 .PP
 .nf
-.Vb 3
 \&    print v9786;              # prints UTF-8 encoded SMILEY, "\ex{263a}"
 \&    print v102.111.111;       # prints "foo"
 \&    print 102.111.111;        # same
-.Ve
 .fi
 .PP
 这种形式可以用于require 和 use 中作版本检查.\[lq]$^V\[rq] 特殊变量中的Perl版本号就是以这种形式保存的. 参见 perlvar 中的\[lq]$^V\[rq]
@@ -393,7 +361,7 @@ were greatly outweighed by the potential for Surprise and Confusion.
 注意从 Perl 5.8.1 开始单个数字的 v\-strings (类似`v65'\fR) 如果在`=>'\fR 操作符(通常用来从 hash 值中区分开 hash 键) 之前，不是一个 v\-strings，而是解释为字符串 ('v65')。在 Perl 5.6.0 到 Perl 5.8.0 它一直是 v\-strings，但是这样带来了更多混淆和错误而不是优点。多个数字的 v\-strings，类似`v65.66'\fR 和65.66.67\fR，继续总是被当作 v\-strings
 .PP
 \fI特殊常量\fR
-.IX Subsection "Special Literals"
+.\".IX Subsection "Special Literals"
 .PP
 特殊变量 _\|_FILE_\|_, _\|_LINE_\|_, 和 _\|_PACKAGE_\|_ 代表当前文件名,行号,和包名. 它们只能作为单独的符号来使用; 不能用于字符串中内插. 如果没有当前包(用`package;'\fR 指令来实现), 则_\|_PACKAGE_\|_ 是一个未定义的值.
 .PP
@@ -404,86 +372,69 @@ _\|_DATA_\|_ 之后的文本可以通过文件句柄`PACKNAME::DATA'\fR 读取,`
 参见 SelfLoader 详细了解 _\|_DATA_\|_, 其中还有例子. 要注意在BEGIN 块中无法读取DATA句柄: 因为BEGIN 块在编译时即被执行, 而此时 _\|_DATA_\|_ (或 _\|_END_\|_) 还未被程序看到.
 .PP
 \fI裸词\fR
-.IX Subsection "Barewords"
+.\".IX Subsection "Barewords"
 .PP
 在文法上没有特殊意义的词语都被看作字符串. 称之为 "裸词". 和文件句柄以及标签一样, 仅包含小写字母的裸词有可能在将来与程序中的保留词发生冲突, 实际上,当你使用`use warnings'\fR 语句,或是\fB\-w\fR 选项时, Perl会对此提出警告. 一些人可能希望完全禁止这样的词. 如果有如下语句:
 .PP
 .nf
-.Vb 1
 \&    use strict 'subs';
-.Ve
 .fi
 .PP
 那么不能被解释为子程序的裸词会引起编译时错误. 这种限制到块结束时终止. 而内部的块可以撤消这一限制, 用`no strict 'subs''\fR
 .PP
 \fI数组合并分隔符\fR
-.IX Subsection "Array Joining Delimiter"
+.\".IX Subsection "Array Joining Delimiter"
 .PP
 数组和序列被合并为双引号引用的字符串时，以变量$"\fR 指定的值 (如果指定了\[lq]use English;\[rq] 那么是$LIST_SEPARATOR\fR 的值) 作为分隔符，默认是空格。下列语句等价：
 .PP
 .nf
-.Vb 2
 \&    $temp = join($", @ARGV);
 \&    system "echo $temp";
-.Ve
 .fi
 .PP
 .nf
-.Vb 1
 \&    system "echo @ARGV";
-.Ve
 .fi
 .PP
 在搜索模式中(在双引号字符串中也是)有一个易混淆之处:`/$foo[bar]/'\fR 应该是`/${foo}[bar]/'\fR (`[bar]'\fR 是正则表达式的字符类) 还是`/${foo[bar]}/'\fR/ (`[bar]'\fR 是数组@foo\fR 的下标) 呢? 如果@foo\fR 不存在, 那很明显它应该是字符类. 如果@foo\fR 存在, Perl 会尽力猜测`[bar]'\fR 的含义, 且它几乎总是对的. 如果它猜错了, 或者你比较偏执, 你可以使用花括号.
 .PP
 here\-document 的语法已经被移动到 perlop 中的\[lq]Quote and Quote-like Operators\[rq]
 .SS "List value constructors 列表值构造"
-.IX Subsection "List value constructors"
+.\".IX Subsection "List value constructors"
 列表是用逗号分开的各个值组成的(如果优先级需要的话,外面还要用圆括号包围):
 .PP
 .nf
-.Vb 1
 \&    (LIST)
-.Ve
 .fi
 .PP
 在不需要列表的上下文中, 列表的值是最后一个元素的值, 这与C中的逗号操作符类似. 例如:
 .PP
-.Vb 1
 \&    @foo = ('cc', '-E', $bar);
-.Ve
 .PP
 将列表赋给数组@foo, 但是
 .PP
-.Vb 1
 \&    $foo = ('cc', '-E', $bar);
-.Ve
 .PP
 将$bar 的值赋给$foo. 注意, 数组在标量上下文中的值是数组的长度; 下例将3赋给$foo:
 .PP
 .nf
-.Vb 2
 \&    @foo = ('cc', '-E', $bar);
 \&    $foo = @foo;                # $foo gets 3
-.Ve
 .fi
 .PP
 列表的最后可以输入逗号, 所以这样也是正确的:
 .PP
 .nf
-.Vb 5
 \&    @foo = (
 \&        1,
 \&        2,
 \&        3,
 \&    );
-.Ve
 .fi
 .PP
 要将here-document 赋给数组, 一行作为一个元素, 可以这样作:
 .PP
 .nf
-.Vb 7
 \&    @sauces = <<End_Lines =~ m/(\eS.*\eS)/g;
 \&        normal tomato
 \&        spicy tomato
@@ -491,14 +442,11 @@ here\-document 的语法已经被移动到 perlop 中的\[lq]Quote and Quote-lik
 \&        pesto
 \&        white wine
 \&    End_Lines
-.Ve
 .fi
 .PP
 列表会自动插入子列表. 也即, 下例将展开数组,哈希等, 并将其中的每一个元素作为该新列表的一个元素. 数组或哈希失去其原来的身份.列表
 .PP
-.Vb 1
 \&    (@foo,@bar,&SomeSub,%glarch)
-.Ve
 .PP
 包括@foo,@bar的每一个元素,包括函数 SomeSub 返回值列表的每一个元素, 包括 %glarch 的每一个字值对. 要想使用不内插的列表, 可以参见 perlref
 .PP
@@ -509,81 +457,59 @@ here\-document 的语法已经被移动到 perlop 中的\[lq]Quote and Quote-lik
 列表也可以象数组一样使用下标. 为了避免歧义需要在列表外使用括号. 例如:
 .PP
 .nf
-.Vb 2
 \&    # Stat returns list value.
 \&    $time = (stat($file))[8];
-.Ve
 .fi
 .PP
 .nf
-.Vb 2
 \&    # SYNTAX ERROR HERE.
 \&    $time = stat($file)[8];  # OOPS, FORGOT PARENTHESES
-.Ve
 .fi
 .PP
 .nf
-.Vb 2
 \&    # Find a hex digit.
 \&    $hexdigit = ('a','b','c','d','e','f')[$digit-10];
-.Ve
 .fi
 .PP
 .nf
-.Vb 2
 \&    # A "reverse comma operator".
 \&    return (pop(@foo),pop(@foo))[0];
-.Ve
 .fi
 .PP
 可以给列表赋值, 当然列表中的每个元素必须合法才行:
 .PP
-.Vb 1
 \&    ($a, $b, $c) = (1, 2, 3);
-.Ve
 .PP
-.Vb 1
 \&    ($map{'red'}, $map{'blue'}, $map{'green'}) = (0x00f, 0x0f0, 0xf00);
-.Ve
 .PP
 特例是可以赋值为`undef'\fR。当忽略程序的某些返回值时这很有用:
 .PP
-.Vb 1
 \&    ($dev, $ino, undef, undef, $uid, $gid) = stat($file);
-.Ve
 .PP
 列表赋值处于标量上下文中时, 返回值是等号右侧的表达式的元素个数:
 .PP
 .nf
-.Vb 2
 \&    $x = (($foo,$bar) = (3,2,1));       # set $x to 3, not 2
 \&    $x = (($foo,$bar) = f());           # set $x to f()'s return count
-.Ve
 .fi
 .PP
 这在布尔上下文中很方便, 因为多数列表函数在结束时返回空列表, 这时列表赋值会返回0, 被解释为FALSE.
 .PP
 它也是一个有用的习惯的来源，就是在列表上下文中执行一个函数或操作，然后记录返回值的个数，方法是为一个空列表赋值，然后在标量上下文中使用这个值。例如，如下代码：
 .PP
-.Vb 1
 \&    $count = () = $string =~ /\ed+/g;
-.Ve
 .PP
 将置$count\fR 为$string\fR 中找到的数字组数量。这样能行的原因是模式匹配是列表上下文 (因为它被赋予一个空列表)，因此返回所有匹配部分的列表。在标量上下文中的列表赋值将它转换为元素的个数 (这里是模式被匹配的数量)，然后赋值给$count\fR。注意简单地使用
 .PP
-.Vb 1
 \&    $count = $string =~ /\ed+/g;
-.Ve
 .PP
 没有作用，因为在标量上下文中的模式匹配只会返回 true 或 false，而不是所有的匹配。
 .PP
 最后一个元素可以是数组或哈希:
 .PP
 .nf
-.Vb 2
 \&    ($a, $b, @rest) = split;
 \&    my($a, $b, %rest) = @_;
-.Ve
 .fi
 .PP
 当然可以在任何位置使用数组或哈希, 不过第一个数组或哈希会将所有的值都据为己有, 其它的元素都会变为undefined.这在my() 或 local()中或许有用.
@@ -591,42 +517,38 @@ here\-document 的语法已经被移动到 perlop 中的\[lq]Quote and Quote-lik
 哈希可以用含有字值对的列表来初始化:
 .PP
 .nf
-.Vb 2
 \&    # same as map assignment above
 \&    %map = ('red',0x00f,'blue',0x0f0,'green',0xf00);
-.Ve
 .fi
 .PP
 列表和数组交互性很强, 哈希则不然. 你可以象使用数组时一样对列表使用下标并不意味着可以象使用哈希一样使用列表. 同样,处于列表中的哈希总是以字值对的形式展开. 因此有时使用引用要更好一些.
 .PP
-通常在字值对中使用`=>'\fR 操作符会更易读.`=>'\fR 与逗号作用相同, 不过它还有一个作用, 那就是可以使它左侧的对象被解释为字符串\*(-- 如果该对象是裸字的话,将是合法的标识符 (`=>'\fR 不引用包含双冒号的复合标识符). 这在初始化哈希时棒极了:
+通常在字值对中使用`=>'\fR 操作符会更易读.`=>'\fR 与逗号作用相同, 不过它
+还有一个作用, 那就是可以使它左侧的对象被解释为字符串: 如果该对象是裸
+字的话,将是合法的标识符 (`=>'\fR 不引用包含双冒号的复合标识符). 这在初始
+化哈希时棒极了:
 .PP
 .nf
-.Vb 5
 \&    %map = (
 \&                 red   => 0x00f,
 \&                 blue  => 0x0f0,
 \&                 green => 0xf00,
 \&   );
-.Ve
 .fi
 .PP
 或者初始化哈希的引用:
 .PP
 .nf
-.Vb 5
 \&    $rec = {
 \&                witch => 'Mable the Merciless',
 \&                cat   => 'Fluffy the Ferocious',
 \&                date  => '10/31/1776',
 \&    };
-.Ve
 .fi
 .PP
 or for using call-by-named-parameter to complicated functions:
 .PP
 .nf
-.Vb 7
 \&   $field = $query->radio_group(
 \&               name      => 'group_name',
 \&               values    => ['eenie','meenie','minie'],
@@ -634,19 +556,16 @@ or for using call-by-named-parameter to complicated functions:
 \&               linebreak => 'true',
 \&               labels    =>\e%labels
 \&   );
-.Ve
 .fi
 .PP
 注意哈希初始化时的顺序和输出时的顺序并不一定相同. 要得到顺序的输出可以参见 perlfunc 中的\[lq]sort\[rq]
 .SS "Subscripts 下标"
-.IX Subsection "Subscripts"
+.\".IX Subsection "Subscripts"
 数组可以用一个美元符号，加上它的名字(不包括前导的`@'\fR)，加上方括号和其中包含的下标来取得值。例如：
 .PP
 .nf
-.Vb 2
 \&    @myarray = (5, 50, 500, 5000);
 \&    print "Element Number 2 is", $myarray[2], "\en";
-.Ve
 .fi
 .PP
 数组下标从 0 开始。负值下标返回从尾部开始数的值。在我们的例子中，$myarray[\-1]\fR 将是 5000,$myarray[\-2]\fR 是 500。
@@ -654,7 +573,6 @@ or for using call-by-named-parameter to complicated functions:
 Hash 下标与此类似，但是不使用方括号而是花括号。例如：
 .PP
 .nf
-.Vb 7
 \&    %scientists = 
 \&    (
 \&        "Newton" => "Isaac",
@@ -662,135 +580,106 @@ Hash 下标与此类似，但是不使用方括号而是花括号。例如：
 \&        "Darwin" => "Charles",
 \&        "Feynman" => "Richard",
 \&    );
-.Ve
 .fi
 .PP
-.Vb 1
 \&    print "Darwin's First Name is ", $scientists{"Darwin"}, "\en";
-.Ve
 .SS "Slices 片段"
-.IX Subsection "Slices"
+.\".IX Subsection "Slices"
 通常对哈希或数组一次访问一个元素. 也可以使用下标对列表元素进行访问.
 .PP
 .nf
-.Vb 3
 \&    $whoami = $ENV{"USER"};             # one element from the hash
 \&    $parent = $ISA[0];                  # one element from the array
 \&    $dir    = (getpwnam("daemon"))[7];  # likewise, but with list
-.Ve
 .fi
 .PP
 片段可以一次访问列表,数组或哈希中的几个元素, 这是通过列表下标来实现的. 这比分别写出每个值要方便一些.
 .PP
 .nf
-.Vb 4
 \&    ($him, $her)   = @folks[0,-1];              # array slice
 \&    @them          = @folks[0 .. 3];            # array slice
 \&    ($who, $home)  = @ENV{"USER", "HOME"};      # hash slice
 \&    ($uid, $dir)   = (getpwnam("daemon"))[2,7]; # list slice
-.Ve
 .fi
 .PP
 既然可以给列表赋值, 当然也可以哈希或数组的片段赋值.
 .PP
 .nf
-.Vb 4
 \&    @days[3..5]    = qw/Wed Thu Fri/;
 \&    @colors{'red','blue','green'} 
 \&                   = (0xff0000, 0x0000ff, 0x00ff00);
 \&    @folks[0, -1]  = @folks[-1, 0];
-.Ve
 .fi
 .PP
 上面的操作与下列语句等价:
 .PP
 .nf
-.Vb 4
 \&    ($days[3], $days[4], $days[5]) = qw/Wed Thu Fri/;
 \&    ($colors{'red'}, $colors{'blue'}, $colors{'green'})
 \&                   = (0xff0000, 0x0000ff, 0x00ff00);
 \&    ($folks[0], $folks[-1]) = ($folks[-1], $folks[0]);
-.Ve
 .fi
 .PP
 既然改变片段就会改变数组或哈希的原始值, 那么`foreach'\fR 结构可以部分或全部地改变数组或哈希的值.
 .PP
-.Vb 1
 \&    foreach (@array[ 4 .. 10 ]) { s/peter/paul/ }
-.Ve
 .PP
 .nf
-.Vb 5
 \&    foreach (@hash{qw[key1 key2]}) {
 \&        s/^\es+//;           # trim leading whitespace
 \&        s/\es+$//;           # trim trailing whitespace
 \&        s/(\ew+)/\eu\eL$1/g;   # "titlecase" words
 \&    }
-.Ve
 .fi
 .PP
 空列表的片段还是空列表, 因此:
 .PP
 .nf
-.Vb 3
 \&    @a = ()[1,0];           # @a has no elements
 \&    @b = (@a)[0,1];         # @b has no elements
 \&    @c = (0,1)[2,3];        # @c has no elements
-.Ve
 .fi
 .PP
 但是:
 .PP
 .nf
-.Vb 2
 \&    @a = (1)[1,0];          # @a has two elements
 \&    @b = (1,undef)[1,0,2];  # @b has three elements
-.Ve
 .fi
 .PP
 下例利用了这一特性,当返回空列表时循环终止:
 .PP
 .nf
-.Vb 3
 \&    while ( ($home, $user) = (getpwent)[7,0]) {
 \&        printf "%-8s %s\en", $user, $home;
 \&    }
-.Ve
 .fi
 .PP
 我们在前面说过, 标量上下文中的列表赋值返回值是右侧的元素个数. 空列表没有元素, 所以当口令文件读完后, 返回值是0而不是2.
 .PP
 为什么对哈希的片段使用'@'而不是'%'呢. 因为括号的类型(方括号或花括号)决定了它是数组还是哈希. 而数组或哈希的开始字符('$'或'@')表示返回值是单个值还是多个值(列表).
 .SS "Typeglobs and Filehandles 全局类型和文件句柄"
-.IX Subsection "Typeglobs and Filehandles"
+.\".IX Subsection "Typeglobs and Filehandles"
 Perl 使用叫做 全局类型 的类型来支持整个符号表项. 全局类型的前缀是*, 因为它表示所有的类型. 这在过去通常用来给函数传递数组或哈希的引用, 但是现在有了真正的引用, 这就几乎不需要了.
 .PP
 现在,全局类型的主要用途是创建符号表别名. 如下赋值:
 .PP
-.Vb 1
 \&    *this = *that;
-.Ve
 .PP
 使得$this 成为 $that的别名, @this 成为 @that的别名,%this 成为 %that的别名, &this 成为 &that的别名, 等等. 使用引用会更安全. 这样:
 .PP
-.Vb 1
 \&    local *Here::blue =\e$There::green;
-.Ve
 .PP
 暂时使 $Here::blue 成为 $There::green的别名, 但不会使 @Here::blue 成为 @There::green的别名, 也不会使 %Here::blue 成为 %There::green的别名, 等等. 参见 perlmod 中的 Symbol Tables 有多个例子. 看起来可能有些怪异, 不过这却是整个import/export系统的基础.
 .PP
 全局类型的其它用途还有, 给函数传输文件句柄或是创建新的文件句柄. 如果你要使用全局类型代替文件句柄, 可以这样做:
 .PP
-.Vb 1
 \&    $fh = *STDOUT;
-.Ve
 .PP
 或者使用真正的引用, 象这样:
 .PP
 .nf
-.Vb 1
 \&    $fh =\e*STDOUT;
-.Ve
 .fi
 .PP
 参见 perlsub 有关于间接句柄的多个例子.
@@ -798,7 +687,6 @@ Perl 使用叫做 全局类型 的类型来支持整个符号表项. 全局类�
 全局类型也是使用local() 创建局部文件句柄的一种方法. 作用范围在当前块之内, 但是可以被传回.例如:
 .PP
 .nf
-.Vb 7
 \&    sub newopen {
 \&        my $path = shift;
 \&        local  *FH;  # not my!
@@ -806,7 +694,6 @@ Perl 使用叫做 全局类型 的类型来支持整个符号表项. 全局类�
 \&        return *FH;
 \&    }
 \&    $fh = newopen('/etc/passwd');
-.Ve
 .fi
 .PP
 既然我们有*foo{THING} 这样的记法, 全局类型不再多用于文件句柄,但在从函数传出或向函数传入新的文件句柄时它还是必需的.因为*HANDLE{IO} 只有在HANDLE 已经是文件句柄时才起作用. 换言之, 在建立新符号表项时必须使用 *FH; *foo{THING} 是不行的. 不知道该用谁时, 使用 *FH
@@ -814,30 +701,26 @@ Perl 使用叫做 全局类型 的类型来支持整个符号表项. 全局类�
 所有能创建文件句柄的函数 (open(), opendir(), pipe(), socketpair(), sysopen(), socket(), 和 accept()) ,在传递给它们的句柄是标量时,会自动创建一个匿名句柄. 这使得象open(my $fh, ...) 和 open(local $fh,...) 这样的结构可以创建一个在超出范围时可以自动关闭的句柄,如果没有另外的对它们的引用的话. 这大大减少了全局类型的使用,当需要打开一个可以到处使用的句柄时, 可以这样做：
 .PP
 .nf
-.Vb 5
 \&    sub myopen {
 \&        open my $fh, "@_"
 \&             or die "Can't open '@_': $!";
 \&        return $fh;
 \&    }
-.Ve
 .fi
 .PP
 .nf
-.Vb 5
 \&    {
 \&        my $f = myopen("</etc/motd");
 \&        print <$f>;
 \&        # $f implicitly closed here
 \&    }
-.Ve
 .fi
 .PP
 注意如果使用了初始化的标量，那么结果会有不同：`my $fh='zzz'; open($fh, ...)'\fR 与`open( *{'zzz'}, ...)'\fR 等价。`use strict 'refs''\fR 禁止了这样做。
 .PP
 另一个创建匿名句柄的方法是用Symbol 模块或IO::Handle 模块或诸如此类的东西. These modules have the advantage of not hiding different types of the same name during the local(). 在 open() in the perlfunc manpage 的文末有个例子.(译者注:说实话,对匿名句柄我现在也是一头雾水,翻译的不当之处,请高手指出.)
 .SH "SEE ALSO 参见"
-.IX Header "SEE ALSO"
+.\".IX Header "SEE ALSO"
 参见 the perlvar manpage 了解 Perl的内建变量和合法变量。参见the perlref manpage, the perlsub manpage, 和 Symbol Tables in the perlmod manpage 了解全局类型和 *foo{THING} 语法。
 .SH "中文版维护人"
 .B redcandle <redcandle51@nospam.chinaren.com>
