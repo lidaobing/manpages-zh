@@ -32,8 +32,6 @@ b5-stamp:
 	done
 	touch $@
 
-install: install-doc install-gb install-b5
-
 clean:
 	rm -rf UTF-8 zh_CN zh_TW html-u8 html-gb html-b5 $(TRANSLATED)
 	find . -name *~ -type f | xargs rm -f
