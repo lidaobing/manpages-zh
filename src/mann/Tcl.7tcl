@@ -241,7 +241,7 @@ Database Class:	\\fB\\$3\\fR
 .de UL
 \\$1\l'|0\(ul'\\$2
 ..
-.TH Tcl 3tcl "8.1" Tcl "Tcl Built-In Commands"
+.TH Tcl 7tcl "8.1" Tcl "Tcl Built-In Commands"
 .BS
 .SH NAME
 Tcl \- 语言语法总结.
@@ -299,7 +299,7 @@ substitution\fR): 字中的美元符号和跟随的字符被一个变量的值�
 .RE
 
 .IP [8]
-如果在一个字中出现一个反斜杠(“\”)则发生反斜杠替换 (\fIbackslash
+如果在一个字中出现一个反斜杠(\[lq]\\\[rq])则发生反斜杠替换 (\fIbackslash
 substitution\fR)。除了下面描述的这些情况之外，反斜杠 (backslash)被删除
 (drop)，跟随的字符被作为普通字符对待。这就允许在字中包含象双引号、右方括
 号、和美元符号等字符而不触发特殊的处理。下表列出的要特殊处理的反斜杠序列
