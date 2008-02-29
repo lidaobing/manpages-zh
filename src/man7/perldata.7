@@ -24,8 +24,8 @@
 .\".fi
 .\"..
 .\".\" Set up some character translations and predefined strings. \*(-- will
-.\".\" give an unbreakable dash,\*(PI will give pi,\*(L" will give a left
-.\".\" double quote, and\*(R" will give a right double quote.  | will give a
+.\".\" give an unbreakable dash,\*(PI will give pi,\[lq] will give a left
+.\".\" double quote, and\[rq] will give a right double quote.  | will give a
 .\".\" real vertical bar. \*(C+ will give a nicer C++.  Capital omega is used to
 .\".\" do unbreakable dashes and therefore won't be available. \*(C` and\*(C'
 .\".\" expand to `' in nroff, nothing in troff, for use with C<>.
@@ -136,7 +136,9 @@ perldata\- Perl 数据类型
 .IX Header "DESCRIPTION"
 .SS "Variable names 变量名"
 .IX Subsection "Variable names"
-Perl 有三种内建的数据类型：标量，数组和关联数组（即\*(L"哈希表，hash\*(R"）。数组以数字为索引，通常以0开始，升序排列。哈希表以与值相关联的字符串为索引，内部排列是无序的。
+Perl 有三种内建的数据类型：标量，数组和关联数组（即\[lq]哈希表，
+hash\[rq]）。数组以数字为索引，通常以0开始，升序排列。哈希表以与值相关联
+的字符串为索引，内部排列是无序的。
 .PP
 值通常通过一个变量名（或变量名的引用）来引用。变量名的前缀字符显示了值的数据类型。其余部分指明了引用的是哪一个特定的值。通常变量名是一个唯一的标识符，以字母或下划线开始，包括字母、下划线和数字。某些情况下，也可以是以\*(C`::\*(C'\fR 分隔的一串标识符(或者是过时的\*(C`'\*(C'\fR)；除了最后一个，其它都是包名，用来定位最后一个标识符所在的位置(详情参见 perlmod 中的 Packages)。可以用一个简单的标识符来替代它，利用引用就可以。下文有详述，也可参见 perlref .
 .PP
@@ -174,7 +176,9 @@ Perl 也有内建的变量，其名称不遵循这一规则。它们名称古怪
 .Ve
 .fi
 .PP
-另外，子程序以'&'来表示, 但有时在不引起误解的情况下也可以不用, 就象\*(L"do\*(R" 在英语中常常省略一样。 符号表项以 '*' 作为开始字符, 不过你现在还不用关心这个 (if ever ;-)
+另外，子程序以'&'来表示, 但有时在不引起误解的情况下也可以不用, 就象
+\[lq]do\[rq] 在英语中常常省略一样。 符号表项以 '*' 作为开始字符, 不过你
+现在还不用关心这个 (if ever ;-)
 .PP
 每一种数据类型都有它自己的名字空间，常量标识符也一样。这意味着你可以使用
 同一个名字来命名标量、数组、哈希、文件句柄、目录句柄、子程序、格式或标签。
@@ -183,12 +187,12 @@ Perl 也有内建的变量，其名称不遵循这一规则。它们名称古怪
 正常，因为它本来就怪异。
 .PP
 因为变量名以 '$', '@', 或 '%'开始, 保留词对变量没有什麽影响。保留词影响
-的是标签和文件句柄，因为它们不是以特殊字符前缀开始的。你不能用\*(L"log\*(R"
+的是标签和文件句柄，因为它们不是以特殊字符前缀开始的。你不能用\[lq]log\[rq]
 来命名文件句柄，因为它是保留词（提示：你可以用
 \*(C`open(LOG,'logfile')\*(C'\fR 而不是
 \*(C`open(log,'logfile')\*(C'\fR). 使用大写的文件句柄既增加了可读性，
-又减少了冲突的发生。大小写是有意义的\-\-\*(L"\s-1FOO\s0\*(R",\*(L"Foo\*(R",
-和\*(L"foo\*(R" 是不同的名称。以字母或下划线开始的名称可以包含数字和下划线。
+又减少了冲突的发生。大小写是有意义的\-\-\[lq]\s-1FOO\s0\[rq],\[lq]Foo\[rq],
+和\[lq]foo\[rq] 是不同的名称。以字母或下划线开始的名称可以包含数字和下划线。
 .PP
 可以用一个返回相关引用的表达式来替换这样的变量名。参见 perlref
 .PP
@@ -223,14 +227,14 @@ sort操作提供列表上下文给<>, <>会读入STDIN中的每一行直到结�
 赋值比较特殊，左侧的参数决定了右侧的参数的上下文。赋值给标量，则右侧参数的上下文是标量上下文；赋值给数组或哈希，则右侧参数的上下文是列表上下文。赋值给列表（或片段，其实也是列表），右侧的上下文也是列表上下文。
 .PP
 当你使用\*(C`use warnings\*(C'\fR 编译指示或 Perl 的\fB\-w\fR 参数时，
-你可能会看到这样的警告：在\*(L"无效的上下文，void context\*(R" 中使用了常量
+你可能会看到这样的警告：在\[lq]无效的上下文，void context\[rq] 中使用了常量
 或函数。无效上下文的意思是值被丢弃不用，比如只包含有\*(C`"fred";
 \*(C'\fR 的语句; 或是\*(C`getpwuid(0);\*(C'\fR;. 在要求列表上下文的函数
 被标量上下文环境调用时,也会出现这个警告.
 .PP
 用户定义的子程序可能会需要查看上下文是无效，标量，还是列表。不过，大多数并
 不需要这么做。因为标量和列表会自动插入到一个列表中。参见 perlfunc 中的
-\*(L"wantarray\*(R" 以了解如何辨明你的函数调用时的上下文。
+\[lq]wantarray\[rq] 以了解如何辨明你的函数调用时的上下文。
 .SS "Scalar values 标量"
 .IX Subsection "Scalar values"
 Perl 中的所有数据都是标量, 标量的数组,标量的哈希. 标量可以是三种不同的值: 数字, 字符(串), 引用. 通常, 不同值之间的转换是透明的. 虽然一个标量不可能有多个值, 但是它可以是一个包含多个值的数组或哈希的引用.
@@ -241,7 +245,7 @@ Perl 中的所有数据都是标量, 标量的数组,标量的哈希. 标量可�
 .PP
 有两种空字符串(有时以"empty"表示), 定义了的和未定义的. 定义了的空字符串就是长度为零的字符串,如"". 未定义的空字符串是一个值,这个值表示某事物并没有真实值与它对应, 比如出错, 或到达文件尾, 或者你引用一个未定义的数组或哈希的元素时,都会返回一个未定义的空字符串. 虽然在早期Perl 中,在要求已定义变量的上下文中使用未定义的变量可以使得该变量得到定义, 现在却只有在特殊的情况下才会出现这种结果,参见the perlref manpage. 可以用defined() 函数来检测标量是否已经定义(对数组和哈希无效),也可以用undef() 去除对变量的定义.
 .PP
-要弄清楚一个字符串是否是有效的非0数字,只要看它是不是数字0和字母\*(L"0\*(R" 就足够了(不过这在使用-w参数时,会显示警告). 因为非数字的字符串被看作0, 与awk中相似:
+要弄清楚一个字符串是否是有效的非0数字,只要看它是不是数字0和字母\[lq]0\[rq] 就足够了(不过这在使用-w参数时,会显示警告). 因为非数字的字符串被看作0, 与awk中相似:
 .PP
 .nf
 .Vb 3
@@ -330,7 +334,7 @@ Perl 5 改变了$[\fR 的意义: 不必担心别的程序改变了$[\fR 的值. 
 .PP
 在数字常量中可以在数字间插入下划线来增加可读性。例如，可以三位一组 (Unix 样式的分组，例如 0b110_110_100)，或者四位一组 (来表示 nibbles，例如 0b1010_0110)，或者其他分组。
 .PP
-字符串通常以单引号或双引号括起. 与标准Unix shells中的引号相似: 双引号可以接收转义和变量; 单引号不可以 (除了\*(C`\e'\*(C'\fR 和\*(C`\e\e\*(C'\fR)). C 样式的转义字符可以用来输入新行，跳格等字符，转义字符的列表可以参见 perlop 中的\*(L"Quote and Quote-like Operators\*(R"
+字符串通常以单引号或双引号括起. 与标准Unix shells中的引号相似: 双引号可以接收转义和变量; 单引号不可以 (除了\*(C`\e'\*(C'\fR 和\*(C`\e\e\*(C'\fR)). C 样式的转义字符可以用来输入新行，跳格等字符，转义字符的列表可以参见 perlop 中的\[lq]Quote and Quote-like Operators\[rq]
 .PP
 十六进制,八进制,或二进制以字符串形式表示(如:'0xff'),不能自动转换为十进制形式. hex() 和 oct() 函数可以实现转换. 参见 perlfunc 中的 hex 和 oct 了解详情.
 .PP
@@ -377,7 +381,7 @@ were greatly outweighed by the potential for Surprise and Confusion.
 .Ve
 .fi
 .PP
-这种形式可以用于require 和 use 中作版本检查.\*(L"$^V\*(R" 特殊变量中的Perl版本号就是以这种形式保存的. 参见 perlvar 中的\*(L"$^V\*(R"
+这种形式可以用于require 和 use 中作版本检查.\[lq]$^V\[rq] 特殊变量中的Perl版本号就是以这种形式保存的. 参见 perlvar 中的\[lq]$^V\[rq]
 注意使用 v\-strings 来保存 IPv4 地址是不可移植的，除非同时使用 Socket 包的\fIinet_aton()\fR/\fIinet_ntoa()\fR 函数。
 .PP
 注意从 Perl 5.8.1 开始单个数字的 v\-strings (类似\*(C`v65\*(C'\fR) 如果在\*(C`=>\*(C'\fR 操作符(通常用来从 hash 值中区分开 hash 键) 之前，不是一个 v\-strings，而是解释为字符串 ('v65')。在 Perl 5.6.0 到 Perl 5.8.0 它一直是 v\-strings，但是这样带来了更多混淆和错误而不是优点。多个数字的 v\-strings，类似\*(C`v65.66\*(C'\fR 和65.66.67\fR，继续总是被当作 v\-strings
@@ -409,7 +413,7 @@ _\|_DATA_\|_ 之后的文本可以通过文件句柄\*(C`PACKNAME::DATA\*(C'\fR 
 \fI数组合并分隔符\fR
 .IX Subsection "Array Joining Delimiter"
 .PP
-数组和序列被合并为双引号引用的字符串时，以变量$"\fR 指定的值 (如果指定了\*(L"use English;\*(R" 那么是$LIST_SEPARATOR\fR 的值) 作为分隔符，默认是空格。下列语句等价：
+数组和序列被合并为双引号引用的字符串时，以变量$"\fR 指定的值 (如果指定了\[lq]use English;\[rq] 那么是$LIST_SEPARATOR\fR 的值) 作为分隔符，默认是空格。下列语句等价：
 .PP
 .nf
 .Vb 2
@@ -426,7 +430,7 @@ _\|_DATA_\|_ 之后的文本可以通过文件句柄\*(C`PACKNAME::DATA\*(C'\fR 
 .PP
 在搜索模式中(在双引号字符串中也是)有一个易混淆之处:\*(C`/$foo[bar]/\*(C'\fR 应该是\*(C`/${foo}[bar]/\*(C'\fR (\*(C`[bar]\*(C'\fR 是正则表达式的字符类) 还是\*(C`/${foo[bar]}/\*(C'\fR/ (\*(C`[bar]\*(C'\fR 是数组@foo\fR 的下标) 呢? 如果@foo\fR 不存在, 那很明显它应该是字符类. 如果@foo\fR 存在, Perl 会尽力猜测\*(C`[bar]\*(C'\fR 的含义, 且它几乎总是对的. 如果它猜错了, 或者你比较偏执, 你可以使用花括号.
 .PP
-here\-document 的语法已经被移动到 perlop 中的\*(L"Quote and Quote-like Operators\*(R"
+here\-document 的语法已经被移动到 perlop 中的\[lq]Quote and Quote-like Operators\[rq]
 .SS "List value constructors 列表值构造"
 .IX Subsection "List value constructors"
 列表是用逗号分开的各个值组成的(如果优先级需要的话,外面还要用圆括号包围):
@@ -627,7 +631,7 @@ or for using call-by-named-parameter to complicated functions:
 .Ve
 .fi
 .PP
-注意哈希初始化时的顺序和输出时的顺序并不一定相同. 要得到顺序的输出可以参见 perlfunc 中的\*(L"sort\*(R"
+注意哈希初始化时的顺序和输出时的顺序并不一定相同. 要得到顺序的输出可以参见 perlfunc 中的\[lq]sort\[rq]
 .SS "Subscripts 下标"
 .IX Subsection "Subscripts"
 数组可以用一个美元符号，加上它的名字(不包括前导的\*(C`@\*(C'\fR)，加上方括号和其中包含的下标来取得值。例如：
