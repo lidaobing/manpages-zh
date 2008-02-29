@@ -1,5 +1,5 @@
 manpages-zh
 
-Version 1.5.1 (2008-02-29)
+Version 1.5.1pre1 (2008-02-29)
 * 从 CMPP 项目中分支出本项目。
 * 保证 Debian 打包时无警告。
