@@ -17,10 +17,35 @@ AM_MAINTAINER_MODE
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
+		 DOCS/Makefile
 		 src/Makefile
 		 src/man1/Makefile
 		 src/man1/zh_CN/Makefile
 		 src/man1/zh_TW/Makefile
+		 src/man2/Makefile
+		 src/man2/zh_CN/Makefile
+		 src/man2/zh_TW/Makefile
+		 src/man3/Makefile
+		 src/man3/zh_CN/Makefile
+		 src/man3/zh_TW/Makefile
+		 src/man4/Makefile
+		 src/man4/zh_CN/Makefile
+		 src/man4/zh_TW/Makefile
+		 src/man5/Makefile
+		 src/man5/zh_CN/Makefile
+		 src/man5/zh_TW/Makefile
+		 src/man6/Makefile
+		 src/man6/zh_CN/Makefile
+		 src/man6/zh_TW/Makefile
+		 src/man7/Makefile
+		 src/man7/zh_CN/Makefile
+		 src/man7/zh_TW/Makefile
+		 src/man8/Makefile
+		 src/man8/zh_CN/Makefile
+		 src/man8/zh_TW/Makefile
+		 src/mann/Makefile
+		 src/mann/zh_CN/Makefile
+		 src/mann/zh_TW/Makefile
 		 utils/Makefile
 		 ])
 AC_OUTPUT
