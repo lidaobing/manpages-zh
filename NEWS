@@ -1,5 +1,9 @@
 manpages-zh
 
+Version 1.5.1-rc2 (2008-03-01)
+* 使用 autotools 替换原来的 Makefile。
+* 支持 make install 及 make dist。
+
 Version 1.5.1-rc1 (2008-02-29)
 * 从 CMPP 项目中分支出本项目。
 * 保证 Debian 打包时无警告。

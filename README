@@ -1,6 +1,9 @@
 本项目的主页为: http://code.google.com/p/manpages-zh/
 
-本项目(manpages-zh)为 CMPP (中文 Man Pages 计划) 的分支项目。
+本项目(manpages-zh)为 i18n-zh 项目[1]的子项，从 CMPP (中文 Man Pages 计
+划) 分支而来。
+
+[1] http://code.google.com/p/i18n-zh
 
 CMPP 项目现在可能已经死亡，原主页(cmpp.linuxforum.net)已不能访问。
 
@@ -8,7 +11,7 @@ CMPP 项目现在可能已经死亡，原主页(cmpp.linuxforum.net)已不能访
 一个干净的 Debian 包。
 
 本项目使用 git 进行管理, git 主页位于
-http://repo.or.cz/w/manpages-zh.git (git的使用方法)
+http://repo.or.cz/w/manpages-zh.git
 
 本项目将继续延用 CMPP 的 GFDL 1.2 的授权方式。为与 DFSG 兼容，将不包含不
 可变章节(Invariant Sections)。
