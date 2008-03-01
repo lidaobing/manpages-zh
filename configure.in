@@ -16,6 +16,11 @@ if test x$AUTOB5 = x; then
 	AC_MSG_ERROR([can not find autob5, you can install zh-autoconvert])
 fi
 
+AC_PATH_PROG([PERL], [perl])
+if test x$PERL = x; then
+	AC_MSG_ERROR([please install perl first])
+fi
+
 AC_CONFIG_FILES([Makefile
 		 DOCS/Makefile
 		 src/Makefile
