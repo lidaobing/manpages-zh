@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([manpages-zh],[1.5.1-rc2],[http://code.google.com/p/manpages-zh/issues/list])
+AC_INIT([manpages-zh],[1.5.1-rc3],[http://code.google.com/p/manpages-zh/issues/list])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
