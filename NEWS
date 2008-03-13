@@ -1,5 +1,9 @@
 manpages-zh
 
+Version 1.5.1-rc3 (XXXX-XX-XX)
+* generate utf8 encoding manpage by default, you can use
+  `--disable-utf8' to generate the origin gbk and big5 encoding manpage.
+
 Version 1.5.1-rc2 (2008-03-01)
 * 使用 autotools 替换原来的 Makefile。
 * 支持 make install 及 make dist。
