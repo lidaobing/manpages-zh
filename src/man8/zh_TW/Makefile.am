@@ -2,7 +2,7 @@ include $(srcdir)/../manpages
 
 mandir = @mandir@/zh_TW
 
-man_MANS = $(manpages)
+man_MANS = $(MANPAGES)
 
 if UTF8
 %.8: $(srcdir)/../%.8
