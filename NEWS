@@ -4,6 +4,8 @@ Version 1.5.1 (2008-04-01)
 * remove .spec file
 * fix url in ChangeLog
 * fix typo bug in Makefile.am
+* remove .BS .BE from loadTk.3tk
+* fix section in man7/perl*.7
 
 Version 1.5.1-rc3 (2008-03-13)
 * generate utf8 encoding manpage by default, you can use

@@ -71,13 +71,10 @@
 '\"
 '\"	# Set up traps and other miscellaneous stuff for Tcl/Tk man pages.
 .TH "loadTk" 3tk 8.0 Tk "Tk Built-In Commands"
-.BS
-'\" Note:  do not modify the .SH NAME line immediately below!
 .SH NAME
 loadTk \- 把 Tk 装载到一个安全解释器中。
 .SH "总览 SYNOPSIS"
 \fB::safe::loadTk \fIslave\fR ?\fB\-use\fR \fIwindowId\fR? ?\fB\-display\fR \fIdisplayName\fR? 
-.BE
 
 Safe Tk 基于 Safe Tcl 之上，它提供一种机制，允许对自动装载和安全解释器的包的受限制和有中介的访问。Safe Tk 增加为安全 Tk 操作配置解释器和把 Tk 装载到安全解释器的功能。
 
