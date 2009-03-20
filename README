@@ -10,7 +10,7 @@ CMPP 项目现在可能已经死亡，原主页(cmpp.linuxforum.net)已不能访
 本项目的目的是维护 CMPP 遗留下的成果，并对其错误/漏洞进行修改。
 
 本项目使用 git 进行管理, git 主页位于
-http://gitorious.org/projects/manpages-zh
+http://github.com/lidaobing/manpages-zh/tree/master
 
 本项目将继续延用 CMPP 的 GFDL 1.2 的授权方式。为与 DFSG 兼容，将不包含不
 可变章节(Invariant Sections)。
