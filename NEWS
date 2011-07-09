@@ -1,5 +1,8 @@
 manpages-zh
 
+Version 1.5.2 (2010-07-09)
+* remove git.1
+
 Version 1.5.1 (2008-04-01)
 * remove .spec file
 * fix url in ChangeLog

@@ -1,8 +1,11 @@
-you can find the changelog through git-log, or direct view it at
-http://github.org/lidaobing/manpages-zh
+2011-07-09  LI Daobing <lidaobing@gmail.com>
+
+	* remove git.1.
+	* release 1.5.2.
+
 
 The old changelog for CMPP is in DOCS/ChangeLog.
 
 Thanks.
 
-# vim:ft=txt:
+# vim:ft=changelog:
