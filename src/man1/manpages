@@ -18,9 +18,9 @@ MANPAGES = [.1 a2p.1 ab.1 ac.1 access.1 ali.1 alias.1 apm.1 apropos.1	 \
 	jobs.1 kbd_mode.1 kill.1 killall.1 last.1 ld.1 ldd.1 let.1	 \
 	listalias.1 ln.1 loadkeys.1 local.1 lockfile.1 logname.1	 \
 	logout.1 ls.1 lsattr.1 mail.1 mailto.1 makeinfo.1		 \
-	make_smbcodepage.1 man.1 md5sum.1 mencoder.1 mesg.1 minicom.1	 \
+	make_smbcodepage.1 man.1 md5sum.1 mesg.1 minicom.1	 \
 	mirror.1 mkdir.1 mkfifo.1 mknod.1 mkpasswd.1 mktemp.1 more.1	 \
-	mpg123.1 mplayer.1 msmtp.1 mv.1 newgrp.1 nice.1 nmblookup.1	 \
+	mpg123.1 msmtp.1 mv.1 newgrp.1 nice.1 nmblookup.1	 \
 	nohup.1 nroff.1 octave.1 octave-bug.1 octave-config.1 paste.1	 \
 	perl.1 pg_config.1 pg_controldata.1 pg_ctl.1 pg_dump.1		 \
 	pg_dumpall.1 pg_resetxlog.1 pg_restore.1 pgtclsh.1 pgtksh.1	 \
