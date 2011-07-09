@@ -11,7 +11,7 @@ MANPAGES = [.1 a2p.1 ab.1 ac.1 access.1 ali.1 alias.1 apm.1 apropos.1	 \
 	ecpg.1 egrep.1 eject.1 emacs.1 enable.1 env.1 eval.1 ex.1 exec.1 \
 	exit.1 expand.1 export.1 false.1 fc.1 fg.1 fgrep.1 file.1 find.1 \
 	findsmb.1 finger.1 fmt.1 fold.1 free.1 ftp.1 gcc.1 gedit.1	 \
-	getopts.1 git.1 gnroff.1 grep.1 groff.1 groups.1 gunzip.1	 \
+	getopts.1 gnroff.1 grep.1 groff.1 groups.1 gunzip.1	 \
 	gview.1 gvim.1 gzip.1 hash.1 head.1 help.1 history.1 host.1	 \
 	hostid.1 hostname.1 iconv.1 id.1 info.1 initdb.1 initex.1	 \
 	initlocation.1 install.1 install-info.1 intro.1 ipcclean.1	 \
