@@ -1,0 +1,6 @@
+install:
+  - sudo apt-get install zh-autoconvert
+script:
+  - ./autogen.sh
+  - ./configure
+  - make
