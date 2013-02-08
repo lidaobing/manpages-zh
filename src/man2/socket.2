@@ -1,0 +1,370 @@
+'\" t
+.\" Copyright (c) 1983, 1991 The Regents of the University of California.
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"	This product includes software developed by the University of
+.\"	California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\"     $Id: socket.2,v 1.4 1999/05/13 11:33:42 freitag Exp $
+.\"
+.\" Modified 1993-07-24 by Rik Faith <faith@cs.unc.edu>
+.\" Modified 1996-10-22 by Eric S. Raymond <esr@thyrsus.com>
+.\" Modified 1998, 1999 by Andi Kleen <ak@muc.de>
+.\" Modified 2002-07-17 by Michael Kerrisk <mtk.manpages@gmail.com>
+.\" Modified 2004-06-17 by Michael Kerrisk <mtk.manpages@gmail.com>
+.\" 翻译 2011-07-26 by 月吹智也 <getsufuki#gmail.com>
+.\"
+.TH SOCKET 2 2009-01-19 "Linux" "Linux Programmer's Manual"
+.SH 名字
+socket - 建立一个用于交流的端点
+.SH 概要
+.BR "#include <sys/types.h>" "          /* See NOTES */"
+.br
+.B #include <sys/socket.h>
+.sp
+.BI "int socket(int " domain ", int " type ", int " protocol );
+.SH 描述
+.BR socket ()
+建立一个用于交流的端点并且返回一个描述符。
+.PP
+The
+.I domain
+参数指定一个通讯域名；选择的协议将会用于通讯。协议名在
+.IR <sys/socket.h>
+中定义。 目前已知的格式包括：
+.TS
+tab(:);
+l l l.
+名称:目的：手册页
+T{
+.BR AF_UNIX ", " 本地通讯:
+T}:T{
+unix(7)
+T}:T{
+.BR unix (7)
+T}
+T{
+.B AF_INET
+T}:IPv4 网络协议:T{
+.BR ip (7)
+T}
+T{
+.B AF_INET6
+T}:IPv6 网络协议:T{
+.BR ipv6 (7)
+T}
+T{
+.B AF_IPX
+T}:IPX \- Novell 协议
+T{
+.B AF_NETLINK
+T}:T{
+内核用户界面设备
+T}:T{
+.BR netlink (7)
+T}
+T{
+.B AF_X25
+T}:ITU-T X.25 / ISO-8208 协议:T{
+.BR x25 (7)
+T}
+T{
+.B AF_AX25
+T}:T{
+Amateur radio AX.25 protocol
+T}:
+T{
+.B AF_ATMPVC
+T}:Access to raw ATM PVCs:
+T{
+.B AF_APPLETALK
+T}:Appletalk:T{
+.BR ddp (7)
+T}
+T{
+.B AF_PACKET
+T}:T{
+底层包连接
+T}:T{
+.BR packet (7)
+T}
+.TE
+.PP
+套接字通过
+.IR type ,
+参数来确定通信语义。目前定义的类型有：
+.TP 16
+.B SOCK_STREAM
+提供有序的，可靠的，双向的，基于字节流的通讯。可能支持带外传输。
+.TP
+.B SOCK_DGRAM
+提供数据报（不面向连接的, 不可靠的固定最大长度的信息）。
+.TP
+.B SOCK_SEQPACKET
+提供有序的，可靠的，双向的，基于固定最大长度的数据报传输路径；需要一个读取整个伴有输入系统调用的包的用户。
+.TP
+.B SOCK_RAW
+提供未加工(raw)的网络协议通道。 
+.TP
+.B SOCK_RDM
+提供可靠的数据报层，但是不保证顺序。 
+.TP
+.B SOCK_PACKET
+废弃的，不应该在新的程序中使用，参考
+.BR packet (7)。
+.PP
+一些套接字类型并未被所有的协议实现； 例如，
+.B SOCK_SEQPACKET
+并不被 AF_INET
+.BR AF_INET
+实现。
+.PP
+从 Linux 2.6.27 开始，
+.I type
+参数可以提供其他的功能： 注意一些套接字类型可能包括一下值的或位，用来修改
+.BR socket ():
+的行为。
+.TP 16
+.B SOCK_NONBLOCK
+设置
+.BR O_NONBLOCK
+的标志于新打开的文件描述符。 通过这个标志可以不用调用 
+.BR fcntl(2) 
+来达到相同的结果。
+.TP
+.B SOCK_CLOEXEC
+设置 close-on-exec 
+.RB ( FD_CLOEXEC )
+的标志于新打开的文件描述符。参见
+.BR open (2)
+中关于
+.B O_CLOEXEC
+的描述，因为一些原因这个标志很有用。
+.PP
+.I protocol
+指定一个协议用于套接字。指定一个协议用于套接字。一般情况下，在给定的协议中只允许在一个套接字上使用一个协议， 注意
+.I protocol
+可以指定为数字0 。
+但是，可能存在着很多协议，但是在本手册的协议必须使用一个。协议用于指定通讯发生地方的\*(lq通讯域名\*(rq，参考
+.BR protocols (5)
+。参考
+.BR getprotoent (3)
+中关于如何把协议名称字符串与协议编号进行映射。
+.PP
+.B SOCK_STREAM
+类型的套接字是双向直接数据流的，和管道十分相似。他们不对记录溢出提供保护。一个套接字流在接受或发出任何数据时必须处于
+.I connected
+的状态。和其它套接字通过
+.BR connect (2)
+调用来建立连接。
+一旦连接， 数据可能通过
+.BR read (2)
+和
+.BR write (2)
+系统调用来传输，也或者是不同的
+.BR send (2)
+和
+.BR recv (2)
+系统调用。当会话结束时，可能会执行
+.BR close (2)
+带外数据可能也用
+.BR send (2)
+和
+.BR recv (2)
+描述与接受。
+.PP
+.B SOCK_STREAM
+类型的的通信协议应确保信息不丢失与重复。如果一块有协议缓冲的数据不能在合理时间内传输，连接会被认为超时。当在套接字上启用
+.B SO_KEEPALIVE
+，协议会以其特定方式检查另一端是否活着。当一个进程接受或发送了一个错误的数据流，
+会产生并接受一个
+.B SIGPIPE
+信号；对于采取默认处理此信号的进程，
+它将会退出。
+.B SOCK_SEQPACKET
+套接字采用和
+.B SOCK_STREAM
+ 套接字相同的系统调用。唯一不同的是，
+.BR read (2)
+系统调用只会返回请求的数据量，并将余下到达的任何数据数据包丢弃。此外所有的消息边界的传入的数据报将被保留。
+.PP
+.B SOCK_DGRAM
+和
+.B SOCK_RAW
+类型的套接字支持用
+.BR sendto (2)
+系统调用来发送数据报，数据报通常是用
+.BR recvfrom (2),
+来接受的，这个调用会在下一个数据报中单独的返回发送者的地址。
+.PP
+.B SOCK_PACKET
+是一个遗留的套接字类型，用来从设备驱动中接受原始数据，已经被
+.BR packet (7)
+调用取代。
+.PP
+.BR fcntl (2)
+的
+.B F_SETOWN
+操作可以在带外数据到达时让进程或进程组会收到一个
+.B SIGURG
+信号，或者在
+.B SOCK_STREAM
+类型的连接在被不期望地打断时，收到
+.B SIGPIPE
+信号。这个操作也可能被用于让进程或进程组通过
+.BR SIGIO .
+接收 I/O 和 I/O 不同步的通知。使用
+.B F_SETOWN
+等同于使用了
+.B FIOSETOWN
+或
+.B SIOCSPGRP
+参数的
+.BR ioctl (2)
+系统调用。
+.PP
+当网络向协议模型发出一个错误情况的信号（例如，对IP使用ICMP消息），套接字将会设置上pending错误标志。对套接字接下去的操作将会返回pending错误的错误代码。对于一些协议，可能会为每一个接字接启用一个用于取出详细错误信息的错误列队；
+参见
+.BR ip (7)
+中的
+.B IP_RECVERR
+。
+.PP
+套接字的操作由套接字级的
+.IR 选项
+来控制。
+这些选项定义于
+.IR <sys/socket.h> 
+中。
+.BR setsockopt (2)和
+.BR setsockopt (2)
+用于分别用于设置和读取选项。
+.SH "返回值"
+成功时，会返回新套接字的文件描述符。错误时，返回 \-1 ，同时
+.I errno
+会被适当设置。
+.SH 错误
+.TP
+.B EACCES
+不允许创建指定的 类型 和/或 指定的协议的套接字。
+.TP
+.B EAFNOSUPPORT
+工具不支持指定的地址。
+.TP
+.B EINVAL
+未知协议，或协议组不可用。
+.TP
+.B EINVAL
+.\" Since Linux 2.6.27
+错误的
+.IR type 
+标志。
+.TP
+.B EMFILE
+进程文件表溢出。
+.TP
+.B ENFILE
+已经达到系统上限的文件打开数。
+.TP
+.BR ENOBUFS " 或 " ENOMEM
+没有足够的内存，直到有可用的资源套接字不能被创建。
+.TP
+.B EPROTONOSUPPORT
+协议类型或指定的协议不被当前域所支持。
+.PP
+其它的错误可能是由协议模型产生的。
+.SH "兼容性"
+4.4BSD, POSIX.1-2001.
+
+
+.B SOCK_NONBLOCK
+和
+.B SOCK_CLOEXEC
+标志是 Linux 特有的。
+.BR socket ()
+appeared in 4.2BSD.
+出现于 4.2BSD 。通常，非 BSD 系统的 BSD 套接字层克隆是可移植的（包括 System V 的变种）。
+.SH 注意
+并不要求包含
+.IR <sys/types.h> 
+，这个头文件在Linux下是不必须的。 可是一些历史上的 (BSD) 工具要求这个头文件，可移植程序很可能希望包含它。
+4.x BSD下明显固定的协议组有
+.BR PF_UNIX，
+.BR PF_INET，
+等等，但是AF_UNIX等，它们是用于地址组的。可是BSD的man page保证“协议组一般等于地址组”，随后的标准在每个地方都使用了 AF_* 。
+
+.I <sys/types.h>
+文件头只在libc4以前是必须的。一些包，如util-linux，claim，是用于在所以Linux版本和库上可移植的。它们确实需要这个头文件。
+.SH 例子
+在
+.BR getaddrinfo (3)。
+中有一个使用
+.BR socket ()
+的例子。
+.SH "参见"
+.BR accept (2),
+.BR bind (2),
+.BR connect (2),
+.BR fcntl (2),
+.BR getpeername (2),
+.BR getsockname (2),
+.BR getsockopt (2),
+.BR ioctl (2),
+.BR listen (2),
+.BR read (2),
+.BR recv (2),
+.BR select (2),
+.BR send (2),
+.BR shutdown (2),
+.BR socketpair (2),
+.BR write (2),
+.BR getprotoent (3),
+.BR ip (7),
+.BR socket (7),
+.BR tcp (7),
+.BR udp (7),
+.BR unix (7)
+.PP
+\(lqAn Introductory  4.3BSD Interprocess Communication Tutorial” 在
+.IUNIX Programmer's Supplementary Documents Volume 1 
+中被重印。
+.PP
+\(lqBSD Interprocess Communication Tutorial\(rq
+在
+.I UNIX Programmer's Supplementary Documents Volume 1
+中被重印。
+.SH COLOPHON
+This page is part of release 3.27 of the Linux
+.I man-pages
+project.
+A description of the project,
+and information about reporting bugs,
+can be found at
+http://www.kernel.org/doc/man-pages/.
+译者于2011-07-26翻译，于2013-02-08修订
+译文与原文的版权协议一致
