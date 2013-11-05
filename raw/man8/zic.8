@@ -1,6 +1,10 @@
-.TH ZIC 8
+.\" %%%LICENSE_START(PUBLIC_DOMAIN)
+.\" This page is in the public domain
+.\" %%%LICENSE_END
+.\"
+.TH ZIC 8 2010-02-25 "" "Linux System Administration"
 .SH NAME
-zic \- time zone compiler
+zic \- timezone compiler
 .SH SYNOPSIS
 .B zic
 [
@@ -49,7 +53,7 @@ Create time conversion information files in the named directory rather than
 in the standard directory named below.
 .TP
 .BI "\-l " timezone
-Use the given time zone as local time.
+Use the given timezone as local time.
 .I Zic
 will act as if the input contained a link line of the form
 .sp
@@ -57,8 +61,8 @@ will act as if the input contained a link line of the form
 Link	\fItimezone\fP		localtime
 .TP
 .BI "\-p " timezone
-Use the given time zone's rules when handling POSIX-format
-time zone environment variables.
+Use the given timezone's rules when handling POSIX-format
+timezone environment variables.
 .I Zic
 will act as if the input contained a link line of the form
 .sp
@@ -73,7 +77,7 @@ no leap second information appears in output files.
 .B \-v
 Complain if a year that appears in a data file is outside the range
 of years representable by
-.IR time (2)
+.BR time (2)
 values.
 .TP
 .B \-s
@@ -96,7 +100,7 @@ to the end of the line the sharp character appears on.
 White space characters and sharp characters may be enclosed in double quotes
 (") if they're to be used as part of a field.
 Any line that is blank (after comment stripping) is ignored.
-Non-blank lines are expected to be of one of three types:
+Nonblank lines are expected to be of one of three types:
 rule lines, zone lines, and link lines.
 .PP
 A rule line has the form
@@ -121,10 +125,10 @@ Gives the (arbitrary) name of the set of rules this rule is part of.
 Gives the first year in which the rule applies.
 Any integer year can be supplied; the Gregorian calendar is assumed.
 The word
-.B minimum
+.I minimum
 (or an abbreviation) means the minimum year representable as an integer.
 The word
-.B maximum
+.I maximum
 (or an abbreviation) means the maximum year representable as an integer.
 Rules can describe times that are not representable as time values,
 with the unrepresentable times ignored; this allows rules to be portable
@@ -133,12 +137,12 @@ among hosts with differing time value types.
 .B TO
 Gives the final year in which the rule applies.
 In addition to
-.B minimum
+.I minimum
 and
-.B maximum
+.I maximum
 (as above),
 the word
-.B only
+.I only
 (or an abbreviation)
 may be used to repeat the value of the
 .B FROM
@@ -161,7 +165,9 @@ is something else, then
 .I zic
 executes the command
 .ti +.5i
-\fByearistype\fP \fIyear\fP \fItype\fP
+.B yearistype
+.I year
+.I type
 .br
 to check the type of a year:
 an exit status of zero is taken to mean that the year is of the given type;
@@ -209,19 +215,19 @@ Recognized forms include:
 where hour 0 is midnight at the start of the day,
 and hour 24 is midnight at the end of the day.
 Any of these forms may be followed by the letter
-.B w
+.I w
 if the given time is local
 .q "wall clock"
 time,
-.B s
+.I s
 if the given time is local
 .q standard
 time, or
-.B u
+.I u
 (or
-.B g
+.I g
 or
-.BR z )
+.IR z )
 if the given time is universal time;
 in the absence of an indicator,
 wall clock time is assumed.
@@ -233,9 +239,9 @@ This field has the same format as the
 .B AT
 field
 (although, of course, the
-.B w
+.I w
 and
-.B s
+.I s
 suffixes are not used).
 .TP
 .B LETTER/S
@@ -249,7 +255,7 @@ in
 .q EST
 or
 .q EDT )
-of time zone abbreviations to be used when this rule is in effect.
+of timezone abbreviations to be used when this rule is in effect.
 If this field is
 .BR \- ,
 the variable part is null.
@@ -258,8 +264,8 @@ A zone line has the form
 .sp
 .nf
 .ti +.5i
-.ta \w'Zone\0\0'u +\w'Australia/Adelaide\0\0'u +\w'GMTOFF\0\0'u +\w'RULES/SAVE\0\0'u +\w'FORMAT\0\0'u
-Zone	NAME	GMTOFF	RULES/SAVE	FORMAT	[UNTIL]
+.ta \w'Zone\0\0'u +\w'Australia/Adelaide\0\0'u +\w'UTCOFF\0\0'u +\w'RULES/SAVE\0\0'u +\w'FORMAT\0\0'u
+Zone	NAME	UTCOFF	RULES/SAVE	FORMAT	[UNTIL]
 .sp
 For example:
 .sp
@@ -268,13 +274,13 @@ Zone	Australia/Adelaide	9:30	Aus	CST	1971 Oct 31 2:00
 .sp
 .fi
 The fields that make up a zone line are:
-.TP "\w'GMTOFF'u"
+.TP "\w'UTCOFF'u"
 .B NAME
-The name of the time zone.
+The name of the timezone.
 This is the name used in creating the time conversion information file for the
 zone.
 .TP
-.B GMTOFF
+.B UTCOFF
 The amount of time to add to UTC to get standard time in this zone.
 This field has the same format as the
 .B AT
@@ -284,19 +290,19 @@ fields of rule lines;
 begin the field with a minus sign if time must be subtracted from UTC.
 .TP
 .B RULES/SAVE
-The name of the rule(s) that apply in the time zone or,
+The name of the rule(s) that apply in the timezone or,
 alternately, an amount of time to add to local standard time.
 If this field is
 .B \-
-then standard time always applies in the time zone.
+then standard time always applies in the timezone.
 .TP
 .B FORMAT
-The format for time zone abbreviations in this time zone.
+The format for timezone abbreviations in this timezone.
 The pair of characters
 .B %s
 is used to show where the
 .q "variable part"
-of the time zone abbreviation goes.
+of the timezone abbreviation goes.
 Alternately,
 a slash (/)
 separates standard and daylight abbreviations.
@@ -305,7 +311,7 @@ separates standard and daylight abbreviations.
 The time at which the UTC offset or the rule(s) change for a location.
 It is specified as a year, a month, a day, and a time of day.
 If this is specified,
-the time zone information is generated from the given UTC offset
+the timezone information is generated from the given UTC offset
 and rule change until the time specified.
 The month, day, and time of day have the same format as the IN, ON, and AT
 columns of a rule; trailing columns can be omitted, and default to the
@@ -401,14 +407,15 @@ or
 .q Rolling
 if the leap second time given by the other fields should be interpreted as
 local wall clock time.
-.SH NOTE
+.SH FILES
+/usr/local/etc/zoneinfo	standard directory used for created files
+.SH NOTES
 For areas with more than two types of local time,
 you may need to use local standard time in the
 .B AT
 field of the earliest transition time's rule to ensure that
 the earliest transition time recorded in the compiled file is correct.
-.SH FILE
-/usr/local/etc/zoneinfo	standard directory used for created files
-.SH "SEE ALSO"
-newctime(3), tzfile(5), zdump(8)
+.SH SEE ALSO
+.BR tzfile (5),
+.BR zdump (8)
 .\" @(#)zic.8	7.19

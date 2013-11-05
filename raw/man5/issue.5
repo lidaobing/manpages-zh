@@ -1,5 +1,7 @@
-.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de),
+.\"     Fri Apr  2 11:32:09 MET DST 1993
 .\"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
 .\" This is free documentation; you can redistribute it and/or
 .\" modify it under the terms of the GNU General Public License as
 .\" published by the Free Software Foundation; either version 2 of
@@ -16,23 +18,27 @@
 .\" GNU General Public License for more details.
 .\"
 .\" You should have received a copy of the GNU General Public
-.\" License along with this manual; if not, write to the Free
-.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
-.\" USA.
-.\" 
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.\"
 .\" Modified Sun Jul 25 11:06:22 1993 by Rik Faith <faith@cs.unc.edu>
 .\" Modified Mon Oct 21 17:47:19 EDT 1996 by Eric S. Raymond <esr@thyrsus.com>
 .TH ISSUE 5 1993-07-24 "Linux" "Linux Programmer's Manual"
 .SH NAME
-issue \- pre-login message and identification file
+issue \- prelogin message and identification file
 .SH DESCRIPTION
-The file \fB/etc/issue\fP is a text file which contains a message or
-system identification to be printed before the login prompt.  It may
-contain various \fB@\fP\fIchar\fP and \fB\e\fP\fIchar\fP sequences, if
-supported by
-.BR mingetty (1).
+The file
+.I /etc/issue
+is a text file which contains a message or
+system identification to be printed before the login prompt.
+It may contain various \fB@\fP\fIchar\fP and \fB\e\fP\fIchar\fP
+sequences, if supported by the
+.BR getty -type
+program employed on the system.
 .SH FILES
 /etc/issue
-.SH "SEE ALSO"
-.BR mingetty (1),
-.BR motd (5)
+.SH SEE ALSO
+.BR motd (5),
+.BR agetty (8),
+.BR mingetty (8)

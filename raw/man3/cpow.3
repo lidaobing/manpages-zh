@@ -1,0 +1,38 @@
+.\" Copyright 2002 Walter Harms (walter.harms@informatik.uni-oldenburg.de)
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
+.\" Distributed under GPL
+.\" %%%LICENSE_END
+.\"
+.TH CPOW 3 2008-08-11 "" "Linux Programmer's Manual"
+.SH NAME
+cpow, cpowf, cpowl \- complex power function
+.SH SYNOPSIS
+.nf
+.B #include <complex.h>
+.sp
+.BI "double complex cpow(double complex " x ", complex double " z ");"
+.br
+.BI "float complex cpowf(float complex " x ", complex float " z ");"
+.br
+.BI "long double complex cpowl(long double complex " x ,
+.BI "                          complex long double " z ");"
+.sp
+Link with \fI\-lm\fP.
+.fi
+.SH DESCRIPTION
+The function calculates
+.I x
+raised to the power
+.IR z .
+(With a branch cut for
+.I x
+along the negative real axis.)
+.SH VERSIONS
+These functions first appeared in glibc in version 2.1.
+.SH CONFORMING TO
+C99.
+.SH SEE ALSO
+.BR cabs (3),
+.BR pow (3),
+.BR complex (7)

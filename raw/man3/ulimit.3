@@ -1,7 +1,6 @@
-.\" Hey Emacs! This file is -*- nroff -*- source.
-.\"
 .\" Copyright (C) 1996 Andries Brouwer (aeb@cwi.nl)
 .\"
+.\" %%%LICENSE_START(VERBATIM)
 .\" Permission is granted to make and distribute verbatim copies of this
 .\" manual provided the copyright notice and this permission notice are
 .\" preserved on all copies.
@@ -9,8 +8,8 @@
 .\" Permission is granted to copy and distribute modified versions of this
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
-.\" permission notice identical to this one
-.\" 
+.\" permission notice identical to this one.
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -18,13 +17,14 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
 .\"
 .\" Moved to man3, aeb, 980612
 .\"
-.TH ULIMIT 3 1998-06-12 "Linux 2.0" "Linux Programmer's Manual"
+.TH ULIMIT 3 2008-08-06 "Linux" "Linux Programmer's Manual"
 .SH NAME
 ulimit \- get and set user limits
 .SH SYNOPSIS
@@ -32,22 +32,26 @@ ulimit \- get and set user limits
 .sp
 .BI "long ulimit(int " cmd ", long " newlimit );
 .SH DESCRIPTION
-Warning: This routine is obsolete. The include file is no longer
-provided by glibc.  Use getrlimit(2), setrlimit(2) and sysconf(3)
+Warning: This routine is obsolete.
+Use
+.BR getrlimit (2),
+.BR setrlimit (2),
+and
+.BR sysconf (3)
 instead.
 For the shell command
-.BR ulimit ,
+.BR ulimit (),
 see
 .BR bash (1).
 
 The
-.B ulimit
-call will get or set some limit for the current process.
+.BR ulimit ()
+call will get or set some limit for the calling process.
 The
 .I cmd
 argument can have one of the following values.
 .TP
-.B UL_GETFSIZE 
+.B UL_GETFSIZE
 Return the limit on the size of a file, in units of 512 bytes.
 .TP
 .B UL_SETFSIZE
@@ -60,10 +64,9 @@ Return the maximum possible address of the data segment.
 .B 4
 (Implemented but no symbolic constant provided.)
 Return the maximum number of files that the calling process can open.
-
-.SH "RETURN VALUE"
+.SH RETURN VALUE
 On success,
-.B ulimit
+.BR ulimit ()
 returns a nonnegative value.
 On error, \-1 is returned, and
 .I errno
@@ -71,10 +74,13 @@ is set appropriately.
 .SH ERRORS
 .TP
 .B EPERM
-A non-root process tried to increase a limit.
-.SH "CONFORMING TO"
-SVID.
-.SH "SEE ALSO"
+A unprivileged process tried to increase a limit.
+.SH CONFORMING TO
+SVr4, POSIX.1-2001.
+POSIX.1-2008 marks
+.BR ulimit ()
+as obsolete.
+.SH SEE ALSO
 .BR bash (1),
 .BR getrlimit (2),
 .BR setrlimit (2),

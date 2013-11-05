@@ -5,6 +5,7 @@
 .\" Chris Torek and the American National Standards Committee X3,
 .\" on Information Processing Systems.
 .\"
+.\" %%%LICENSE_START(BSD_4_CLAUSE_UCB)
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
 .\" are met:
@@ -32,6 +33,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
+.\" %%%LICENSE_END
 .\"
 .\"     @(#)fopen.3	6.8 (Berkeley) 6/29/91
 .\"
@@ -39,20 +41,30 @@
 .\" Modified, aeb, 960421, 970806
 .\" Modified, joey, aeb, 2002-01-03
 .\"
-.TH FOPEN 3  2002-01-03 "BSD MANPAGE" "Linux Programmer's Manual"
+.TH FOPEN 3  2012-04-22 "GNU" "Linux Programmer's Manual"
 .SH NAME
 fopen, fdopen, freopen \- stream open functions
 .SH SYNOPSIS
+.nf
 .B #include <stdio.h>
 .sp
 .BI "FILE *fopen(const char *" path ", const char *" mode );
-.br
-.BI "FILE *fdopen(int " fildes ", const char *" mode );
-.br
+
+.BI "FILE *fdopen(int " fd ", const char *" mode );
+
 .BI "FILE *freopen(const char *" path ", const char *" mode ", FILE *" stream );
+.fi
+.sp
+.in -4n
+Feature Test Macro Requirements for glibc (see
+.BR feature_test_macros (7)):
+.in
+.sp
+.BR fdopen ():
+_POSIX_C_SOURCE\ >=\ 1 || _XOPEN_SOURCE || _POSIX_SOURCE
 .SH DESCRIPTION
 The
-.B fopen
+.BR fopen ()
 function opens the file whose name is the string pointed to by
 .I path
 and associates a stream with it.
@@ -60,50 +72,56 @@ and associates a stream with it.
 The argument
 .I mode
 points to a string beginning with one of the following sequences
-(Additional characters may follow these sequences.):
+(possibly followed by additional characters, as described below):
 .TP
 .B r
-Open text file for reading.  The stream is positioned at the beginning of
-the file.
+Open text file for reading.
+The stream is positioned at the beginning of the file.
 .TP
 .B r+
-Open for reading and writing.  The stream is positioned at the beginning of
-the file.
+Open for reading and writing.
+The stream is positioned at the beginning of the file.
 .TP
 .B w
-Truncate file to zero length or create text file for writing.  The stream
-is positioned at the beginning of the file.
+Truncate file to zero length or create text file for writing.
+The stream is positioned at the beginning of the file.
 .TP
 .B w+
-Open for reading and writing.  The file is created if it does not exist,
-otherwise it is truncated.  The stream is positioned at the beginning of
+Open for reading and writing.
+The file is created if it does not exist, otherwise it is truncated.
+The stream is positioned at the beginning of
 the file.
 .TP
 .B a
-Open for appending (writing at end of file).  The file is created
-if it does not exist.  The stream is positioned at the end of the file.
+Open for appending (writing at end of file).
+The file is created if it does not exist.
+The stream is positioned at the end of the file.
 .TP
 .B a+
-Open for reading and appending (writing at end of file).  The file
-is created if it does not exist.
+Open for reading and appending (writing at end of file).
+The file is created if it does not exist.
 The initial file position for reading is at the beginning of the file,
 but output is always appended to the end of the file.
 .PP
 The
 .I mode
-string can also include the letter ``b'' either as a last character or as
+string can also include the letter \(aqb\(aq either as a last character or as
 a character between the characters in any of the two-character strings
-described above.  This is strictly for compatibility with ANSI X3.159-1989
-(``ANSI C'') and has no effect; the ``b'' is ignored on all POSIX
+described above.
+This is strictly for compatibility with C89
+and has no effect; the \(aqb\(aq is ignored on all POSIX
 conforming systems, including Linux.
 (Other systems may treat text files and binary files differently,
-and adding the ``b'' may be a good idea if you do I/O to a binary
-file and expect that your program may be ported to non-Unix
+and adding the \(aqb\(aq may be a good idea if you do I/O to a binary
+file and expect that your program may be ported to non-UNIX
 environments.)
 .PP
+See NOTES below for details of glibc extensions for
+.IR mode .
+.PP
 Any created files will have mode
-.BR S_IRUSR \&| S_IWUSR \&|  S_IRGRP \&|  S_IWGRP \&| S_IROTH \&| S_IWOTH
-(0666), as modified by the process' umask value (see
+.BR S_IRUSR " | " S_IWUSR " | "  S_IRGRP " | "  S_IWGRP " | " S_IROTH " | " S_IWOTH
+(0666), as modified by the process's umask value (see
 .BR umask (2)).
 .PP
 Reads and writes may be intermixed on read/write streams in any order.
@@ -113,68 +131,71 @@ between output and input, unless an input operation encounters end-of-file.
 result of writes other than the most recent.)
 Therefore it is good practice (and indeed sometimes necessary
 under Linux) to put an
-.B fseek
+.BR fseek (3)
 or
-.B fgetpos
-operation between write and read operations on such a stream.  This
-operation may be an apparent no-op (as in \fIfseek(..., 0L,
-SEEK_CUR)\fR called for its synchronizing side effect.
+.BR fgetpos (3)
+operation between write and read operations on such a stream.
+This operation may be an apparent no-op
+(as in \fIfseek(..., 0L, SEEK_CUR)\fP
+called for its synchronizing side effect.
 .PP
-Opening a file in append mode (\fBa\fR as the first character of
+Opening a file in append mode (\fBa\fP as the first character of
 .IR mode )
 causes all subsequent write operations to this stream to occur
-at end-of-file, as if preceded by an
-.RS
-fseek(stream,0,SEEK_END);
-.RE
-call.
+at end-of-file, as if preceded the call:
+.nf
+
+    fseek(stream, 0, SEEK_END);
+.fi
 .PP
 The
-.B fdopen
+.BR fdopen ()
 function associates a stream with the existing file descriptor,
-.IR fildes .
+.IR fd .
 The
 .I mode
 of the stream (one of the values "r", "r+", "w", "w+", "a", "a+")
 must be compatible with the mode of the file descriptor.
 The file position indicator of the new stream is set to that
 belonging to
-.IR fildes ,
+.IR fd ,
 and the error and end-of-file indicators are cleared.
 Modes "w" or "w+" do not cause truncation of the file.
 The file descriptor is not dup'ed, and will be closed when
 the stream created by
-.B fdopen
+.BR fdopen ()
 is closed.
 The result of applying
-.B fdopen
+.BR fdopen ()
 to a shared memory object is undefined.
 .PP
 The
-.B freopen
+.BR freopen ()
 function opens the file whose name is the string pointed to by
 .I path
 and associates the stream pointed to by
 .I stream
-with it.  The original stream (if it exists) is closed.  The
+with it.
+The original stream (if it exists) is closed.
+The
 .I mode
 argument is used just as in the
-.B fopen
-function.  The primary use of the
-.B freopen
+.BR fopen ()
+function.
+The primary use of the
+.BR freopen ()
 function is to change the file associated with a standard text stream
-.IR "" ( stderr ", " stdin ", or " stdout ).
-.SH "RETURN VALUE"
+.RI ( stderr ", " stdin ", or " stdout ).
+.SH RETURN VALUE
 Upon successful completion
-.BR fopen ,
-.B fdopen
+.BR fopen (),
+.BR fdopen ()
 and
-.B freopen
+.BR freopen ()
 return a
-.B FILE
-pointer.  Otherwise,
-.B NULL
-is returned and the global variable
+.I FILE
+pointer.
+Otherwise, NULL is returned and
 .I errno
 is set to indicate the error.
 .SH ERRORS
@@ -183,38 +204,38 @@ is set to indicate the error.
 The
 .I mode
 provided to
-.BR fopen ,
-.BR fdopen ,
+.BR fopen (),
+.BR fdopen (),
 or
-.B freopen
+.BR freopen ()
 was invalid.
 .PP
 The
-.BR fopen ,
-.B fdopen
+.BR fopen (),
+.BR fdopen ()
 and
-.B freopen
+.BR freopen ()
 functions may also fail and set
 .I errno
 for any of the errors specified for the routine
 .BR malloc (3).
 .PP
 The
-.B fopen
+.BR fopen ()
 function may also fail and set
 .I errno
 for any of the errors specified for the routine
 .BR open (2).
 .PP
 The
-.B fdopen
+.BR fdopen ()
 function may also fail and set
 .I errno
 for any of the errors specified for the routine
 .BR fcntl (2).
 .PP
 The
-.B freopen
+.BR freopen ()
 function may also fail and set
 .I errno
 for any of the errors specified for the routines
@@ -222,15 +243,111 @@ for any of the errors specified for the routines
 .BR fclose (3)
 and
 .BR fflush (3).
-.SH "CONFORMING TO"
+.SH CONFORMING TO
 The
-.B fopen
+.BR fopen ()
 and
-.B freopen
-functions conform to ANSI X3.159-1989 (``ANSI C'').  The
-.B fdopen
-function conforms to IEEE Std1003.1-1988 (``POSIX.1'').
-.SH "SEE ALSO"
+.BR freopen ()
+functions conform to C89.
+The
+.BR fdopen ()
+function conforms to POSIX.1-1990.
+.SH NOTES
+.SS Glibc notes
+The GNU C library allows the following extensions for the string specified in
+.IR mode :
+.TP
+.BR c " (since glibc 2.3.3)"
+Do not make the open operation,
+or subsequent read and write operations,
+thread cancellation points.
+This flag is ignored for
+.BR fdopen ().
+.TP
+.BR e " (since glibc 2.7)"
+Open the file with the
+.B O_CLOEXEC
+flag.
+See
+.BR open (2)
+for more information.
+This flag is ignored for
+.BR fdopen ().
+.TP
+.BR m " (since glibc 2.3)"
+Attempt to access the file using
+.BR mmap (2),
+rather than I/O system calls
+.RB ( read (2),
+.BR write (2)).
+Currently,
+.\" As at glibc 2.4:
+use of
+.BR mmap (2)
+is attempted only for a file opened for reading.
+.TP
+.B x
+.\" Since glibc 2.0?
+.\" FIXME C11 specifies this flag
+Open the file exclusively
+(like the
+.B O_EXCL
+flag of
+.BR open (2)).
+If the file already exists,
+.BR fopen ()
+fails, and sets
+.I errno
+to
+.BR EEXIST .
+This flag is ignored for
+.BR fdopen ().
+.PP
+In addition to the above characters,
+.BR fopen ()
+and
+.BR freopen ()
+support the following syntax
+in
+.IR mode :
+
+.BI "    ,ccs=" string
+
+The given
+.I string
+is taken as the name of a coded character set and
+the stream is marked as wide-oriented.
+Thereafter, internal conversion functions convert I/O
+to and from the character set
+.IR string .
+If the
+.BI ,ccs= string
+syntax is not specified,
+then the wide-orientation of the stream is
+determined by the first file operation.
+If that operation is a wide-character operation,
+the stream is marked wide-oriented,
+and functions to convert to the coded character set are loaded.
+.SH BUGS
+When parsing for individual flag characters in
+.IR mode
+(i.e., the characters preceding the "ccs" specification),
+the glibc implementation of
+.\" FIXME http://sourceware.org/bugzilla/show_bug.cgi?id=12685
+.BR fopen ()
+and
+.BR freopen ()
+limits the number of characters examined in
+.I mode
+to 7 (or, in glibc versions before 2.14, to 6,
+which was not enough to include possible specifications such as "rb+cmxe").
+The current implementation of
+.BR fdopen ()
+parses at most 5 characters in
+.IR mode .
+.SH SEE ALSO
 .BR open (2),
 .BR fclose (3),
-.BR fileno (3)
+.BR fileno (3),
+.BR fmemopen (3),
+.BR fopencookie (3)

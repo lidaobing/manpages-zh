@@ -1,0 +1,274 @@
+.\" Copyright (C) 2006, Janak Desai <janak@us.ibm.com>
+.\" and Copyright (C) 2006, Michael Kerrisk <mtk.manpages@gmail.com>
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
+.\" Licensed under the GPL
+.\" %%%LICENSE_END
+.\"
+.\" Patch Justification:
+.\" unshare system call is needed to implement, using PAM,
+.\" per-security_context and/or per-user namespace to provide
+.\" polyinstantiated directories. Using unshare and bind mounts, a
+.\" PAM module can create private namespace with appropriate
+.\" directories(based on user's security context) bind mounted on
+.\" public directories such as /tmp, thus providing an instance of
+.\" /tmp that is based on user's security context. Without the
+.\" unshare system call, namespace separation can only be achieved
+.\" by clone, which would require porting and maintaining all commands
+.\" such as login, and su, that establish a user session.
+.\"
+.TH UNSHARE 2 2013-04-17 "Linux" "Linux Programmer's Manual"
+.SH NAME
+unshare \- disassociate parts of the process execution context
+.SH SYNOPSIS
+.nf
+.B #include <sched.h>
+.sp
+.BI "int unshare(int " flags );
+.fi
+.sp
+.in -4n
+Feature Test Macro Requirements for glibc (see
+.BR feature_test_macros (7)):
+.in
+.sp
+.BR unshare ():
+.ad l
+.RS 4
+.PD 0
+.TP 4
+Since glibc 2.14:
+_GNU_SOURCE
+.TP 4
+.\" FIXME See http://sources.redhat.com/bugzilla/show_bug.cgi?id=4749
+Before glibc 2.14:
+_BSD_SOURCE || _SVID_SOURCE
+    /* _GNU_SOURCE also suffices */
+.PD
+.RE
+.ad b
+.SH DESCRIPTION
+.BR unshare ()
+allows a process to disassociate parts of its execution
+context that are currently being shared with other processes.
+Part of the execution context, such as the mount namespace, is shared
+implicitly when a new process is created using
+.BR fork (2)
+or
+.BR vfork (2),
+while other parts, such as virtual memory, may be
+shared by explicit request when creating a process using
+.BR clone (2).
+
+The main use of
+.BR unshare ()
+is to allow a process to control its
+shared execution context without creating a new process.
+
+The
+.I flags
+argument is a bit mask that specifies which parts of
+the execution context should be unshared.
+This argument is specified by ORing together zero or more
+of the following constants:
+.TP
+.B CLONE_FILES
+Reverse the effect of the
+.BR clone (2)
+.B CLONE_FILES
+flag.
+Unshare the file descriptor table, so that the calling process
+no longer shares its file descriptors with any other process.
+.TP
+.B CLONE_FS
+Reverse the effect of the
+.BR clone (2)
+.B CLONE_FS
+flag.
+Unshare filesystem attributes, so that the calling process
+no longer shares its root directory
+.RB ( chroot (2)),
+current directory
+.RB ( chdir (2)),
+or umask
+.RB ( umask (2))
+attributes with any other process.
+.TP
+.BR CLONE_NEWIPC " (since Linux 2.6.19)
+This flag has the same effect as the
+.BR clone (2)
+.B CLONE_NEWIPC
+flag.
+Unshare the System V IPC namespace,
+so that the calling process has a private copy of the
+System V IPC namespace which is not shared with any other process.
+Specifying this flag automatically implies
+.BR CLONE_SYSVSEM
+as well.
+Use of
+.BR CLONE_NEWIPC
+requires the
+.BR CAP_SYS_ADMIN
+capability.
+.TP
+.BR CLONE_NEWNET " (since Linux 2.6.24)
+This flag has the same effect as the
+.BR clone (2)
+.B CLONE_NEWNET
+flag.
+Unshare the network namespace,
+so that the calling process is moved into a
+new network namespace which is not shared
+with any previously existing process.
+Use of
+.BR CLONE_NEWNET
+requires the
+.BR CAP_SYS_ADMIN
+capability.
+.TP
+.B CLONE_NEWNS
+.\" These flag name are inconsistent:
+.\" CLONE_NEWNS does the same thing in clone(), but CLONE_VM,
+.\" CLONE_FS, and CLONE_FILES reverse the action of the clone()
+.\" flags of the same name.
+This flag has the same effect as the
+.BR clone (2)
+.B CLONE_NEWNS
+flag.
+Unshare the mount namespace,
+so that the calling process has a private copy of
+its namespace which is not shared with any other process.
+Specifying this flag automatically implies
+.B CLONE_FS
+as well.
+Use of
+.BR CLONE_NEWNS
+requires the
+.BR CAP_SYS_ADMIN
+capability.
+.TP
+.BR CLONE_NEWUTS " (since Linux 2.6.19)
+This flag has the same effect as the
+.BR clone (2)
+.B CLONE_NEWUTS
+flag.
+Unshare the UTS IPC namespace,
+so that the calling process has a private copy of the
+UTS namespace which is not shared with any other process.
+Use of
+.BR CLONE_NEWUTS
+requires the
+.BR CAP_SYS_ADMIN
+capability.
+.TP
+.BR CLONE_SYSVSEM " (since Linux 2.6.26)
+.\" commit 9edff4ab1f8d82675277a04e359d0ed8bf14a7b7
+This flag reverses the effect of the
+.BR clone (2)
+.B CLONE_SYSVSEM
+flag.
+Unshare System V semaphore undo values,
+so that the calling process has a private copy
+which is not shared with any other process.
+Use of
+.BR CLONE_SYSVSEM
+requires the
+.BR CAP_SYS_ADMIN
+capability.
+.\" As at 2.6.16, the following forced implications also apply,
+.\" although the relevant flags are not yet implemented.
+.\" If CLONE_THREAD is set force CLONE_VM.
+.\" If CLONE_VM is set, force CLONE_SIGHAND.
+.\" CLONE_NEWNSIf CLONE_SIGHAND is set and signals are also being shared
+.\" (i.e., current->signal->count > 1), force CLONE_THREAD.
+.\"
+.\" FIXME . CLONE_VM is not (yet, as at 2.6.16) implemented.
+.\" .TP
+.\" .B CLONE_VM
+.\" Reverse the effect of the
+.\" .BR clone (2)
+.\" .B CLONE_VM
+.\" flag.
+.\" .RB ( CLONE_VM
+.\" is also implicitly set by
+.\" .BR vfork (2),
+.\" and can be reversed using this
+.\" .BR unshare ()
+.\" flag.)
+.\" Unshare virtual memory, so that the calling process no
+.\" longer shares its virtual address space with any other process.
+.PP
+If
+.I flags
+is specified as zero, then
+.BR unshare ()
+is a no-op;
+no changes are made to the calling process's execution context.
+.SH RETURN VALUE
+On success, zero returned.
+On failure, \-1 is returned and
+.I errno
+is set to indicate the error.
+.SH ERRORS
+.TP
+.B EINVAL
+An invalid bit was specified in
+.IR flags .
+.TP
+.B ENOMEM
+Cannot allocate sufficient memory to copy parts of caller's
+context that need to be unshared.
+.TP
+.B EPERM
+The calling process did not have the required privileges for this operation.
+.SH VERSIONS
+The
+.BR unshare ()
+system call was added to Linux in kernel 2.6.16.
+.SH CONFORMING TO
+The
+.BR unshare ()
+system call is Linux-specific.
+.SH NOTES
+Not all of the process attributes that can be shared when
+a new process is created using
+.BR clone (2)
+can be unshared using
+.BR unshare ().
+In particular, as at kernel 3.8,
+.\" FIXME all of the following needs to be reviewed for the current kernel
+.BR unshare ()
+does not implement flags that reverse the effects of
+.BR CLONE_SIGHAND ,
+.\" However, we can do unshare(CLONE_SIGHAND) if CLONE_SIGHAND
+.\" was not specified when doing clone(); i.e., unsharing
+.\" signal handlers is permitted if we are not actually
+.\" sharing signal handlers.   mtk
+.BR CLONE_THREAD ,
+or
+.BR CLONE_VM .
+.\" However, we can do unshare(CLONE_VM) if CLONE_VM
+.\" was not specified when doing clone(); i.e., unsharing
+.\" virtual memory is permitted if we are not actually
+.\" sharing virtual memory.   mtk
+Such functionality may be added in the future, if required.
+.\"
+.\"9) Future Work
+.\"--------------
+.\"The current implementation of unshare does not allow unsharing of
+.\"signals and signal handlers. Signals are complex to begin with and
+.\"to unshare signals and/or signal handlers of a currently running
+.\"process is even more complex. If in the future there is a specific
+.\"need to allow unsharing of signals and/or signal handlers, it can
+.\"be incrementally added to unshare without affecting legacy
+.\"applications using unshare.
+.\"
+.SH SEE ALSO
+.BR clone (2),
+.BR fork (2),
+.BR kcmp (2),
+.BR setns (2),
+.BR vfork (2)
+
+.I Documentation/unshare.txt
+in the Linux kernel source tree

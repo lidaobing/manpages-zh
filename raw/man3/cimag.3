@@ -1,0 +1,49 @@
+.\" Copyright 2002 Walter Harms (walter.harms@informatik.uni-oldenburg.de)
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
+.\" Distributed under GPL
+.\" %%%LICENSE_END
+.\"
+.TH CIMAG 3 2013-06-21 "" "Linux Programmer's Manual"
+.SH NAME
+cimag, cimagf, cimagl \- get imaginary part of a complex number
+.SH SYNOPSIS
+.B #include <complex.h>
+.sp
+.BI "double cimag(double complex " z ");"
+.br
+.BI "float cimagf(float complex " z ");"
+.br
+.BI "long double cimagl(long double complex " z ");"
+.sp
+Link with \fI\-lm\fP.
+.SH DESCRIPTION
+The
+.BR cimag ()
+function returns the imaginary part of the complex number
+.IR z .
+.LP
+One has:
+.nf
+
+    z = creal(z) + I * cimag(z)
+.fi
+.SH VERSIONS
+These functions first appeared in glibc in version 2.1.
+.SH ATTRIBUTES
+.SS Multithreading (see pthreads(7))
+The
+.BR cimag (),
+.BR cimagf (),
+and
+.BR cimagl ()
+functions are thread-safe.
+.SH CONFORMING TO
+C99.
+.SH NOTES
+gcc also supports __imag__.
+That is a GNU extension.
+.SH SEE ALSO
+.BR cabs (3),
+.BR creal (3),
+.BR complex (7)

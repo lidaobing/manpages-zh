@@ -1,254 +1,453 @@
 .\" This man page is Copyright (C) 1999 Andi Kleen <ak@muc.de>.
+.\"
+.\" %%%LICENSE_START(VERBATIM_ONE_PARA)
 .\" Permission is granted to distribute possibly modified copies
 .\" of this page provided the header is included verbatim,
 .\" and in case of nontrivial modification author and date
 .\" of the modification is added to the header.
+.\" %%%LICENSE_END
 .\"
-.\" Modified, 2 Dec 2002, Michael Kerrisk, mtk16@ext.canterbury.ac.nz
+.\" Modified, 2003-12-02, Michael Kerrisk, <mtk.manpages@gmail.com>
+.\" Modified, 2003-09-23, Adam Langley
+.\" Modified, 2004-05-27, Michael Kerrisk, <mtk.manpages@gmail.com>
+.\"	Added SOCK_SEQPACKET
+.\" 2008-05-27, mtk, Provide a clear description of the three types of
+.\"     address that can appear in the sockaddr_un structure: pathname,
+.\"     unnamed, and abstract.
 .\"
-.TH UNIX  7 2002-12-02 "Linux Man Page" "Linux Programmer's Manual" 
+.TH UNIX  7 2012-05-10 "Linux" "Linux Programmer's Manual"
 .SH NAME
-unix, PF_UNIX, AF_UNIX, PF_LOCAL, AF_LOCAL \- Sockets for local interprocess communication.
+unix \- sockets for local interprocess communication
 .SH SYNOPSIS
 .B #include <sys/socket.h>
 .br
 .B #include <sys/un.h>
 
-.IB unix_socket " = socket(PF_UNIX, type, 0);"
+.IB unix_socket " = socket(AF_UNIX, type, 0);"
 .br
-.IB error " = socketpair(PF_UNIX, type, 0, int *" sv ");"
-
+.IB error " = socketpair(AF_UNIX, type, 0, int *" sv ");"
 .SH DESCRIPTION
 The
-.B PF_UNIX
+.B AF_UNIX
 (also known as
-.BR PF_LOCAL )
+.BR AF_LOCAL )
 socket family is used to communicate between processes on the same machine
-efficiently. Unix sockets can be either anonymous (created by 
-.BR socketpair (2))
-or associated with a file of type socket. 
+efficiently.
+Traditionally, UNIX domain sockets can be either unnamed,
+or bound to a filesystem pathname (marked as being of type socket).
 Linux also supports an abstract namespace which is independent of the
-file system.
+filesystem.
 
-Valid types are 
-.B SOCK_STREAM 
-for a stream oriented socket and 
-.B SOCK_DGRAM
-for a datagram oriented socket that preserves message boundaries. Unix
-sockets are always reliable and don't reorder datagrams.
+Valid types are:
+.BR SOCK_STREAM ,
+for a stream-oriented socket and
+.BR SOCK_DGRAM ,
+for a datagram-oriented socket that preserves message boundaries
+(as on most UNIX implementations, UNIX domain datagram
+sockets are always reliable and don't reorder datagrams);
+and (since Linux 2.6.4)
+.BR SOCK_SEQPACKET ,
+for a connection-oriented socket that preserves message boundaries
+and delivers messages in the order that they were sent.
 
-Unix sockets support passing file descriptors or process credentials to other
-processes using ancillary data.
-
-.SH "ADDRESS FORMAT"
-A unix address is defined as a filename in the filesystem or 
-as a unique string in the abstract namespace. Sockets created by 
-.BR socketpair (2)
-are anonymous. For non-anonymous sockets the target address can be set 
-using
-.BR connect (2). 
-The local address can be set using
-.BR bind (2). 
-When a socket is connected and it doesn't already have a local address a
-unique address in the abstract namespace will be generated automatically. 
-
-.RS
+UNIX domain sockets support passing file descriptors or process credentials
+to other processes using ancillary data.
+.SS Address format
+A UNIX domain socket address is represented in the following structure:
+.in +4n
 .nf
-#define UNIX_PATH_MAX	108
 
-.ta 4n 17n 42n
+#define UNIX_PATH_MAX    108
+
 struct sockaddr_un {
-	sa_family_t	sun_family;	/* AF_UNIX */
-	char	sun_path[UNIX_PATH_MAX];	/* pathname */
+    sa_family_t sun_family;               /* AF_UNIX */
+    char        sun_path[UNIX_PATH_MAX];  /* pathname */
 };
 .fi
-.RE 
-
-.B sun_family 
+.in
+.PP
+.I sun_family
 always contains
 .BR AF_UNIX .
-.B sun_path
-contains the zero-terminated pathname of the socket in the file system.
-If 
-.B sun_path
-starts with a zero byte it refers to the abstract namespace maintained by
-the Unix protocol module.
-The socket's address in this namespace is given by the rest of the bytes in
-.BR sun_path .
-Note that names in the abstract namespace are not zero-terminated.
 
-.SH "SOCKET OPTIONS"
-For historical reasons these socket options are specified with a 
-SOL_SOCKET type even though they are PF_UNIX specific.
-They can be set with 
+Three types of address are distinguished in this structure:
+.IP * 3
+.IR pathname :
+a UNIX domain socket can be bound to a null-terminated file
+system pathname using
+.BR bind (2).
+When the address of the socket is returned by
+.BR getsockname (2),
+.BR getpeername (2),
+and
+.BR accept (2),
+its length is
+
+    offsetof(struct sockaddr_un, sun_path) + strlen(sun_path) + 1
+
+and
+.I sun_path
+contains the null-terminated pathname.
+.IP *
+.IR unnamed :
+A stream socket that has not been bound to a pathname using
+.BR bind (2)
+has no name.
+Likewise, the two sockets created by
+.BR socketpair (2)
+are unnamed.
+When the address of an unnamed socket is returned by
+.BR getsockname (2),
+.BR getpeername (2),
+and
+.BR accept (2),
+its length is
+.IR "sizeof(sa_family_t)" ,
+and
+.I sun_path
+should not be inspected.
+.\" There is quite some variation across implementations: FreeBSD
+.\" says the length is 16 bytes, HP-UX 11 says it's zero bytes.
+.IP *
+.IR abstract :
+an abstract socket address is distinguished by the fact that
+.IR sun_path[0]
+is a null byte (\(aq\\0\(aq).
+The socket's address in this namespace is given by the additional
+bytes in
+.IR sun_path
+that are covered by the specified length of the address structure.
+(Null bytes in the name have no special significance.)
+The name has no connection with filesystem pathnames.
+When the address of an abstract socket is returned by
+.BR getsockname (2),
+.BR getpeername (2),
+and
+.BR accept (2),
+the returned
+.I addrlen
+is greater than
+.IR "sizeof(sa_family_t)"
+(i.e., greater than 2), and the name of the socket is contained in
+the first
+.IR "(addrlen \- sizeof(sa_family_t))"
+bytes of
+.IR sun_path .
+The abstract socket namespace is a nonportable Linux extension.
+.SS Socket options
+For historical reasons these socket options are specified with a
+.B SOL_SOCKET
+type even though they are
+.B AF_UNIX
+specific.
+They can be set with
 .BR setsockopt (2)
-and read with 
+and read with
 .BR getsockopt (2)
-by specifying SOL_SOCKET as the socket family.
+by specifying
+.B SOL_SOCKET
+as the socket family.
 .TP
 .B SO_PASSCRED
-Enables the receiving of the credentials of the sending process 
-ancillary message. When this option is set and the socket is not yet connected
+Enables the receiving of the credentials of the sending process in an
+ancillary message.
+When this option is set and the socket is not yet connected
 a unique name in the abstract namespace will be generated automatically.
-Expects an integer boolean flag. 
+Expects an integer boolean flag.
+.SS Autobind feature
+If a
+.BR bind (2)
+call specifies
+.I addrlen
+as
+.IR sizeof(sa_family_t) ,
+.\" i.e. sizeof(short)
+or the
+.BR SO_PASSCRED
+socket option was specified for a socket that was
+not explicitly bound to an address,
+then the socket is autobound to an abstract address.
+The address consists of a null byte
+followed by 5 bytes in the character set
+.IR [0-9a-f] .
+Thus, there is a limit of 2^20 autobind addresses.
+(From Linux 2.1.15, when the autobind feature was added,
+8 bytes were used, and the limit was thus 2^32 autobind addresses.
+The change to 5 bytes came in Linux 2.3.15.)
+.SS Sockets API
+The following paragraphs describe domain-specific details and
+unsupported features of the sockets API for UNIX domain sockets on Linux.
 
-.SH "ANCILLARY MESSAGES"
+UNIX domain sockets do not support the transmission of
+out-of-band data (the
+.B MSG_OOB
+flag for
+.BR send (2)
+and
+.BR recv (2)).
+
+The
+.BR send (2)
+.B MSG_MORE
+flag is not supported by UNIX domain sockets.
+
+The use of
+.B MSG_TRUNC
+in the
+.I flags
+argument of
+.BR recv (2)
+is not supported by UNIX domain sockets.
+
+The
+.B SO_SNDBUF
+socket option does have an effect for UNIX domain sockets, but the
+.B SO_RCVBUF
+option does not.
+For datagram sockets, the
+.B SO_SNDBUF
+value imposes an upper limit on the size of outgoing datagrams.
+This limit is calculated as the doubled (see
+.BR socket (7))
+option value less 32 bytes used for overhead.
+.SS Ancillary messages
 Ancillary data is sent and received using
 .BR sendmsg (2)
 and
 .BR recvmsg (2).
 For historical reasons the ancillary message types listed below
-are specified with a SOL_SOCKET type even though they are PF_UNIX specific.
+are specified with a
+.B SOL_SOCKET
+type even though they are
+.B AF_UNIX
+specific.
 To send them set the
-.B cmsg_level
-field of the struct 
-.B cmsghdr
-to SOL_SOCKET and the 
-.B cmsg_type 
-field to the type. For more information see 
-.BR cmsg (3). 
-
+.I cmsg_level
+field of the struct
+.I cmsghdr
+to
+.B SOL_SOCKET
+and the
+.I cmsg_type
+field to the type.
+For more information see
+.BR cmsg (3).
 .TP
 .B SCM_RIGHTS
-Send or receive a set of open file descriptors from another process. 
+Send or receive a set of open file descriptors from another process.
 The data portion contains an integer array of the file descriptors.
 The passed file descriptors behave as though they have been created with
 .BR dup (2).
-
 .TP
 .B SCM_CREDENTIALS
-Send or receive unix credentials.  This can be used for authentication.
-The credentials are passed as a 
-.B struct ucred
+Send or receive UNIX credentials.
+This can be used for authentication.
+The credentials are passed as a
+.I struct ucred
 ancillary message.
+Thus structure is defined in
+.I <sys/socket.h>
+as follows:
 
-.RS
+.in +4n
 .nf
-.ta 4n 11n 17n
 struct ucred {
-	pid_t	pid;	/* process id of the sending process */  
-	uid_t	uid;	/* user id of the sending process */ 
-	gid_t	gid;	/* group id of the sending process */ 
+    pid_t pid;    /* process ID of the sending process */
+    uid_t uid;    /* user ID of the sending process */
+    gid_t gid;    /* group ID of the sending process */
 };
 .fi
-.RE 
- 
+.in
+
+Since glibc 2.8, the
+.B _GNU_SOURCE
+feature test macro must be defined (before including
+.I any
+header files) in order to obtain the definition
+of this structure.
+
 The credentials which the sender specifies are checked by the kernel.
-A process with effective user ID 0 is allowed to specify values that do 
-not match his own. 
+A process with effective user ID 0 is allowed to specify values that do
+not match its own.
 The sender must specify its own process ID (unless it has the capability
 .BR CAP_SYS_ADMIN ),
-its user ID, effective user ID or set user ID (unless it has
+its user ID, effective user ID, or saved set-user-ID (unless it has
 .BR CAP_SETUID ),
-and its group id, effective group ID or set group ID (unless it has
+and its group ID, effective group ID, or saved set-group-ID
+(unless it has
 .BR CAP_SETGID ).
 To receive a
-.B struct ucred
+.I struct ucred
 message the
-.B SO_PASSCRED 
+.B SO_PASSCRED
 option must be enabled on the socket.
-
-.SH VERSIONS
-.B SCM_CREDENTIALS 
-and the abstract namespace were introduced with Linux 2.2 and should not
-be used in portable programs.
-(Some BSD-derived systems also support credential passing,
-but the implementation details differ.)
-
-.SH NOTES
-In the Linux implementation, sockets which are visible in the
-filesystem honour the permissions of the directory they are in. Their
-owner, group and their permissions can be changed.
-Creation of a new socket will fail if the process does not have write and
-search (execute) permission on the directory the socket is created in.
-Connecting to the socket object requires read/write permission.
-This behavior differs from many BSD-derived systems which
-ignore permissions for Unix sockets. Portable programs should not rely on
-this feature for security.
-
-Binding to a socket with a filename creates a socket
-in the file system that must be deleted by the caller when it is no
-longer needed (using
-.BR unlink (2)).
-The usual Unix close-behind semantics apply; the socket can be unlinked
-at any time and will be finally removed from the file system when the last 
-reference to it is closed.
-
-To pass file descriptors or credentials you need to send/read at least 
-one byte of data.
-
-Unix domain stream sockets do not support the notion of out-of-band data.
+.SS Ioctls
+The following
+.BR ioctl (2)
+calls return information in
+.IR value .
+The correct syntax is:
+.PP
+.RS
+.nf
+.BI int " value";
+.IB error " = ioctl(" unix_socket ", " ioctl_type ", &" value ");"
+.fi
+.RE
+.PP
+.I ioctl_type
+can be:
+.TP
+.B SIOCINQ
+Returns the amount of queued unread data in the receive buffer.
+The socket must not be in LISTEN state, otherwise an error
+.RB ( EINVAL )
+is returned.
+.B SIOCINQ
+is defined in
+.IR <linux/sockios.h> .
+.\" FIXME http://sources.redhat.com/bugzilla/show_bug.cgi?id=12002,
+.\" filed 2010-09-10, may cause SIOCINQ to be defined in glibc headers
+Alternatively,
+you can use the synonymous
+.BR FIONREAD ,
+defined in
+.IR <sys/ioctl.h> .
+.\" SIOCOUTQ also has an effect for UNIX domain sockets, but not
+.\" quite what userland might expect. It seems to return the number
+.\" of bytes allocated for buffers containing pending output.
+.\" That number is normally larger than the number of bytes of pending
+.\" output. Since this info is, from userland's point of view, imprecise,
+.\" and it may well change, probably best not to document this now.
 .SH ERRORS
 .TP
-.B ENOMEM
-Out of memory.
+.B EADDRINUSE
+The specified local address is already in use or the filesystem socket
+object already exists.
 .TP
 .B ECONNREFUSED
+The remote address specified by
 .BR connect (2)
-called with a socket object that isn't listening. This can happen when
-the remote socket does not exist or the filename is not a socket.
+was not a listening socket.
+This error can also occur if the target filename is not a socket.
+.TP
+.B ECONNRESET
+Remote socket was unexpectedly closed.
+.TP
+.B EFAULT
+User memory address was not valid.
 .TP
 .B EINVAL
-Invalid argument passed. A common cause is the missing setting of AF_UNIX
-in the sun_type field of passed addresses or the socket being in an invalid
-state for the applied operation.
-.TP
-.B EOPNOTSUPP
-Stream operation called on non-stream oriented socket or tried to 
-use the out-of-band data option.
-.TP
-.B EPROTONOSUPPORT
-Passed protocol is not PF_UNIX.
-.TP
-.B ESOCKTNOSUPPORT
-Unknown socket type.
-.TP 
-.B EPROTOTYPE
-Remote socket does not match the local socket type (SOCK_DGRAM vs.
-SOCK_STREAM)
-.TP
-.B EADDRINUSE
-Selected local address is already taken or filesystem socket object already
-exists. 
+Invalid argument passed.
+A common cause is that the value
+.B AF_UNIX
+was not specified in the
+.I sun_type
+field of passed addresses, or the socket was in an
+invalid state for the applied operation.
 .TP
 .B EISCONN
 .BR connect (2)
 called on an already connected socket or a target address was
 specified on a connected socket.
 .TP
+.B ENOENT
+The pathname in the remote address specified to
+.BR connect (2)
+did not exist.
+.TP
+.B ENOMEM
+Out of memory.
+.TP
 .B ENOTCONN
 Socket operation needs a target address, but the socket is not connected.
 .TP
-.B ECONNRESET
-Remote socket was unexpectedly closed.
+.B EOPNOTSUPP
+Stream operation called on non-stream oriented socket or tried to
+use the out-of-band data option.
+.TP
+.B EPERM
+The sender passed invalid credentials in the
+.IR "struct ucred" .
 .TP
 .B EPIPE
-Remote socket was closed on a stream socket. If enabled, a 
-.B SIGPIPE 
-is sent as well. This can be avoided by passing the 
+Remote socket was closed on a stream socket.
+If enabled, a
+.B SIGPIPE
+is sent as well.
+This can be avoided by passing the
 .B MSG_NOSIGNAL
 flag to
 .BR sendmsg (2)
 or
 .BR recvmsg (2).
 .TP
-.B EFAULT
-User memory address was not valid.
+.B EPROTONOSUPPORT
+Passed protocol is not
+.BR AF_UNIX .
 .TP
-.B EPERM
-The sender passed invalid credentials in the
-.BR "struct ucred" .
+.B EPROTOTYPE
+Remote socket does not match the local socket type
+.RB ( SOCK_DGRAM
+versus
+.BR SOCK_STREAM )
+.TP
+.B ESOCKTNOSUPPORT
+Unknown socket type.
 .PP
-Other errors can be generated by the generic socket layer or 
-by the filesystem while generating a filesystem socket object. See
-the appropriate manual pages for more information. 
-.SH "SEE ALSO"
+Other errors can be generated by the generic socket layer or
+by the filesystem while generating a filesystem socket object.
+See the appropriate manual pages for more information.
+.SH VERSIONS
+.B SCM_CREDENTIALS
+and the abstract namespace were introduced with Linux 2.2 and should not
+be used in portable programs.
+(Some BSD-derived systems also support credential passing,
+but the implementation details differ.)
+.SH NOTES
+In the Linux implementation, sockets which are visible in the
+filesystem honor the permissions of the directory they are in.
+Their owner, group and their permissions can be changed.
+Creation of a new socket will fail if the process does not have write and
+search (execute) permission on the directory the socket is created in.
+Connecting to the socket object requires read/write permission.
+This behavior differs from many BSD-derived systems which
+ignore permissions for UNIX domain sockets.
+Portable programs should not rely on
+this feature for security.
+
+Binding to a socket with a filename creates a socket
+in the filesystem that must be deleted by the caller when it is no
+longer needed (using
+.BR unlink (2)).
+The usual UNIX close-behind semantics apply; the socket can be unlinked
+at any time and will be finally removed from the filesystem when the last
+reference to it is closed.
+
+To pass file descriptors or credentials over a
+.BR SOCK_STREAM ,
+you need
+to send or receive at least one byte of nonancillary data in the same
+.BR sendmsg (2)
+or
+.BR recvmsg (2)
+call.
+
+UNIX domain stream sockets do not support the notion of out-of-band data.
+.SH EXAMPLE
+See
+.BR bind (2).
+
+For an example of the use of
+.BR SCM_RIGHTS
+see
+.BR cmsg (3).
+.SH SEE ALSO
 .BR recvmsg (2),
 .BR sendmsg (2),
 .BR socket (2),
 .BR socketpair (2),
 .BR cmsg (3),
 .BR capabilities (7),
+.BR credentials (7),
 .BR socket (7)
-.\" .SH CREDITS
-.\" This man page was written by Andi Kleen. 

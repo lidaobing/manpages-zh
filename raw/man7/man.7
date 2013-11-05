@@ -1,6 +1,7 @@
 .\" (C) Copyright 1992-1999 Rickard E. Faith and David A. Wheeler
 .\" (faith@cs.unc.edu and dwheeler@ida.org)
 .\"
+.\" %%%LICENSE_START(VERBATIM)
 .\" Permission is granted to make and distribute verbatim copies of this
 .\" manual provided the copyright notice and this permission notice are
 .\" preserved on all copies.
@@ -8,8 +9,8 @@
 .\" Permission is granted to copy and distribute modified versions of this
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
-.\" permission notice identical to this one
-.\" 
+.\" permission notice identical to this one.
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -17,18 +18,20 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
 .\"
 .\" Modified Sun Jul 25 11:06:05 1993 by Rik Faith (faith@cs.unc.edu)
 .\" Modified Sat Jun  8 00:39:52 1996 by aeb
 .\" Modified Wed Jun 16 23:00:00 1999 by David A. Wheeler (dwheeler@ida.org)
 .\" Modified Thu Jul 15 12:43:28 1999 by aeb
-.\"  [todo: split this into man.7 describing the macros
-.\"   and manpage.7 describing the Linux man page conventions]
+.\" Modified Sun Jan  6 18:26:25 2002 by Martin Schulze <joey@infodrom.org>
+.\" Modified Tue Jul 27 20:12:02 2004 by Colin Watson <cjwatson@debian.org>
+.\" 2007-05-30, mtk: various rewrites and moved much text to new man-pages.7.
 .\"
-.TH MAN 7 1999-06-16 "Linux" "Linux Programmer's Manual"
+.TH MAN 7 2012-08-05 "Linux" "Linux Programmer's Manual"
 .SH NAME
 man \- macros to format man pages
 .SH SYNOPSIS
@@ -45,12 +48,13 @@ man \- macros to format man pages
 .I title
 .SH DESCRIPTION
 This manual page explains the
-.B "groff tmac.an"
+.B "groff an.tmac"
 macro package (often called the
 .B man
-macro package) and related conventions for creating manual (man) pages.
+macro package).
 This macro package should be used by developers when
-writing or porting man pages for Linux.  It is fairly compatible with other
+writing or porting man pages for Linux.
+It is fairly compatible with other
 versions of this macro package, so porting man pages should not be a major
 problem (exceptions include the NET-2 BSD release, which uses a totally
 different macro package called mdoc; see
@@ -62,271 +66,69 @@ simply by specifying the
 .B \-mdoc
 option instead of the
 .B \-man
-option.  Using the
+option.
+Using the
 .B \-mandoc
 option is, however, recommended, since this will automatically detect which
 macro package is in use.
-.SH PREAMBLE
-The first command in a man page (after comment lines) should be
+.PP
+For conventions that should be employed when writing man pages
+for the Linux \fIman-pages\fP package, see
+.BR man-pages (7).
+.SS Title line
+The first command in a man page (after comment lines,
+that is, lines that start with \fB.\\"\fP) should be
 .RS
 .sp
 .B \&.TH
-.IR "title section date source manual" ,
+.I "title section date source manual"
 .sp
 .RE
-where:
-.RS
-.TP 10
-.I title
-The title of the man page (e.g.,
-.IR MAN ).
-.TP
-.I section
-The section number the man page should be placed in (e.g.,
-.IR 7 ).
-.TP
-.I date
-The date of the last revision\(emremember to change this every time a
-change is made to the man page, since this is the most general way of doing
-version control.
-.TP
-.I source
-The source of the command.
-.sp
-For binaries, use something like:
-.IR GNU ", " NET-2 ", " "SLS Distribution" ", " "MCC Distribution" .
-.sp
-For system calls, use the version of the kernel that you are currently
-looking at:
-.IR "Linux 0.99.11" .
-.sp
-For library calls, use the source of the function:
-.IR GNU ", " "BSD 4.3" ", " "Linux DLL 4.4.1" .
-.TP
-.I manual
-The title of the manual (e.g.,
-.IR "Linux Programmer's Manual" ).
-.RE
+For details of the arguments that should be supplied to the
+.B TH
+command, see
+.BR man-pages (7).
 .PP
 Note that BSD mdoc-formatted pages begin with the
 .B Dd
 command, not the
 .B TH
 command.
-.PP
-The manual sections are traditionally defined as follows:
-.RS
-.TP 10
-.B 1 Commands
-Those commands that can be executed by the user from within
-a shell.
-.TP
-.B 2 System calls
-Those functions which must be performed by the kernel.
-.TP
-.B 3 Library calls
-Most of the
-.I libc
-functions, such as
-.BR qsort (3))
-.TP
-.B 4 Special files
-Files found in
-.IR /dev )
-.TP
-.B 5 File formats and conventions
-The format for
-.I /etc/passwd
-and other human-readable files.
-.TP
-.B 6 Games
-.TP
-.B 7 Macro packages and conventions
-A description of the standard file system layout, network protocols,
-ASCII and other character codes, this man page, and other things.
-.TP
-.B 8 System management commands
-Commands like
-.BR mount (8),
-many of which only
-.I root
-can execute.
-.TP
-.B 9 Kernel routines
-This is an obsolete manual section.
-Once it was thought a good idea to document the Linux kernel here,
-but in fact very little has been documented, and the documentation
-that exists is outdated already. There are better sources of
-information for kernel developers. 
-.RE
-.SH SECTIONS
+.SS Sections
 Sections are started with
 .B \&.SH
-followed by the heading name.  If the name contains spaces and appears
-on the same line as
-.BR \&.SH ,
-then place the heading in double quotes.  Traditional or suggested
-headings include:
-NAME, SYNOPSIS, DESCRIPTION, RETURN VALUE,
-EXIT STATUS, ERROR HANDLING, ERRORS,
-OPTIONS, USAGE, EXAMPLES, FILES, ENVIRONMENT, DIAGNOSTICS, SECURITY,
-CONFORMING TO, NOTES,
-BUGS, AUTHOR, and SEE ALSO.
-Where a traditional heading would apply, please use it;
-this kind of consistency can make the information easier to understand.
-However, feel free to create your own headings if they make things easier
-to understand.
-The only required heading is
-.IR NAME ,
-which should be the first section and
-be followed on the next line by a one line description of the program:
+followed by the heading name.
+.\" The following doesn't seem to be required (see Debian bug 411303),
+.\" If the name contains spaces and appears
+.\" on the same line as
+.\" .BR \&.SH ,
+.\" then place the heading in double quotes.
+
+The only mandatory heading is NAME, which should be the first section and
+be followed on the next line by a one-line description of the program:
 .RS
 .sp
 \&.SH NAME
 .br
-chess \\- the game of chess
+item \\- description
 .sp
 .RE
 It is extremely important that this format is followed, and that there is a
-backslash before the single dash which follows the command name.  This
-syntax is used by the
-.BR makewhatis (8)
-program to create a database of short command descriptions for the
+backslash before the single dash which follows the item name.
+This syntax is used by the
+.BR mandb (8)
+program to create a database of short descriptions for the
 .BR whatis (1)
 and
 .BR apropos (1)
 commands.
+(See
+.BR lexgrog (1)
+for further details on the syntax of the NAME section.)
 .PP
-Some other traditional sections have the following contents:
-.TP 14
-.B SYNOPSIS
-briefly describes the command or function's interface.
-For commands, this shows the syntax of the command and its arguments
-(including options);
-boldface is used for as-is text and italics are used to indicate replaceable
-arguments. Brackets ([]) surround optional arguments, vertical bars (|)
-separate choices, and ellipses (\&...) can be repeated.
-For functions, it shows any required data declarations or
-.B #include
-directives, followed by the function declaration.
-.TP
-.B DESCRIPTION
-gives an explanation of what the command, function, or format does.
-Discuss how it interacts with files and standard input, and what it
-produces on standard output or standard error.
-Omit internals and implementation details unless they're critical for
-understanding the interface.
-Describe the usual case; for information on options use the
-.B OPTIONS
-section.
-If there is some kind of input grammar or complex set of subcommands,
-consider describing them in a separate
-.B USAGE
-section (and just place an overview in the
-.B DESCRIPTION
-section).
-.TP
-.B RETURN VALUE
-gives a
-list of the values the library routine will return to the caller
-and the conditions that cause these values to be returned.
-.TP
-.B EXIT STATUS
-lists the possible exit status values or a program and
-the conditions that cause these values to be returned.
-.TP
-.B OPTIONS
-describes the options accepted by the program and how they change
-its behavior.
-.TP
-.B USAGE
-describes the grammar of any sublanguage this implements.
-.TP
-.B EXAMPLES
-provides one or more examples describing how this function, file or
-command is used.
-.TP
-.B FILES
-lists the files the program or function uses, such as
-configuration files, startup files,
-and files the program directly operates on.
-Give the full pathname of these files, and use the installation
-process to modify the directory part to match user preferences.
-For many programs, the default installation location is in /usr/local,
-so your base manual page should use /usr/local as the base.
-.TP
-.B ENVIRONMENT
-lists all environment variables that affect your program or function
-and how they affect it.
-.TP
-.B DIAGNOSTICS
-gives an overview of the most common error messages and how to
-cope with them.  You don't need to explain system error messages
-or fatal signals that can appear during execution of any program
-unless they're special in some way to your program.
-.TP
-.B SECURITY
-discusses security issues and implications.
-Warn about configurations or environments that should be avoided,
-commands that may have security implications, and so on, especially
-if they aren't obvious.
-Discussing security in a separate section isn't necessary;
-if it's easier to understand, place security information in the
-other sections (such as the
-.B DESCRIPTION
-or
-.B USAGE
-section).
-However, please include security information somewhere!
-.TP
-.B CONFORMING TO
-describes any standards or conventions this implements.
-.TP
-.B NOTES
-provides miscellaneous notes.
-.TP
-.B BUGS
-lists limitations, known defects or inconveniences,
-and other questionable activities.
-.TP
-.B AUTHOR
-lists authors of the documentation or program so you can mail in bug
-reports.
-.TP
-.B SEE ALSO
-lists related man pages in alphabetical order, possibly followed by
-other related pages or documents.
-Conventionally this is the last section.
-.SH FONTS
-Although there are many arbitrary conventions for man pages in the UNIX
-world, the existence of several hundred Linux-specific man pages defines our
-font standards:
-.IP
-For functions, the arguments are always specified using italics,
-.IR "even in the SYNOPSIS section" ,
-where the rest of the function is specified in bold:
-.RS
-.BI "int myfunction(int " argc ", char **" argv );
-.RE
-.IP
-Filenames are always in italics (e.g.,
-.IR "/usr/include/stdio.h" ),
-except in the SYNOPSIS section, where included files are in bold (e.g.,
-.BR "#include <stdio.h>" ).
-.IP
-Special macros, which are usually in upper case, are in bold (e.g.,
-.BR MAXINT ).
-.IP
-When enumerating a list of error codes, the codes are in bold (this list
-usually uses the
-.B \&.TP
-macro).
-.IP
-Any reference to another man page (or to the subject of the current man
-page) is in bold.  If the manual section number is given, it is given in
-Roman (normal) font, without any spaces (e.g.,
-.BR man (7)).
-.LP
+For a list of other sections that might appear in a manual page, see
+.BR man-pages (7).
+.SS Fonts
 The commands to select the type face are:
 .TP 4
 .B \&.B
@@ -365,16 +167,16 @@ Small (useful for acronyms)
 Traditionally, each command can have up to six arguments, but the GNU
 implementation removes this limitation (you might still want to limit
 yourself to 6 arguments for portability's sake).
-Arguments are delimited by
-spaces.  Double quotes can be used to specify an argument which contains
-spaces.  All of the arguments will be printed next to each other without
+Arguments are delimited by spaces.
+Double quotes can be used to specify an argument which contains spaces.
+All of the arguments will be printed next to each other without
 intervening spaces, so that the
 .B \&.BR
 command can be used to specify a word in bold followed by a mark of
 punctuation in Roman.
 If no arguments are given, the command is applied to the following line
 of text.
-.SH "OTHER MACROS AND STRINGS"
+.SS Other macros and strings
 .PP
 Below are other relevant macros and predefined strings.
 Unless noted otherwise, all macros
@@ -387,13 +189,14 @@ macros may omit
 .I i
 in which case the current prevailing indent will be used.
 As a result, successive indented paragraphs can use the same indent without
-re-specifying the indent value.
-A normal (non-indented) paragraph resets the prevailing indent value
+respecifying the indent value.
+A normal (nonindented) paragraph resets the prevailing indent value
 to its default value (0.5 inches).
-By default a given indent is measured in ens; try to ens or ems as units for
+By default a given indent is measured in ens;
+try to use ens or ems as units for
 indents, since these will automatically adjust to font size changes.
 The other key macro definitions are:
-.SS "Normal Paragraphs"
+.SS Normal paragraphs
 .TP 9m
 .B \&.LP
 Same as
@@ -407,10 +210,10 @@ Same as
 .TP
 .B \&.PP
 Begin a new paragraph and reset prevailing indent.
-.SS "Relative Margin Indent"
+.SS Relative margin indent
 .TP 9m
 .BI \&.RS " i"
-Start relative margin indent - moves the left margin
+Start relative margin indent: moves the left margin
 .I i
 to the right (if
 .I i
@@ -423,7 +226,7 @@ indented until the corresponding
 .B \&.RE
 End relative margin indent and
 restores the previous value of the prevailing indent.
-.SS "Indented Paragraph Macros"
+.SS Indented paragraph macros
 .TP 9m
 .BI \&.HP " i"
 Begin paragraph with a hanging indent
@@ -441,7 +244,7 @@ If the tag
 is provided, it is hung at the left margin
 before the following indented paragraph
 (this is just like
-.BR \&.TP
+.B \&.TP
 except the tag is included with the command instead of being on the
 following line).
 If the tag is too long, the text after the tag will be moved down to the
@@ -452,52 +255,88 @@ a period as the tag;
 this simplifies translation to other formats.
 .TP
 .BI \&.TP " i"
-Begin paragraph with hanging tag.  The tag is given on the next line, but
+Begin paragraph with hanging tag.
+The tag is given on the next line, but
 its results are like those of the
 .B \&.IP
 command.
-.SS "Hypertext Link Macros"
+.SS Hypertext link macros
+(Feature supported with
+.B groff
+only.)
+In order to use hypertext link macros, it is necessary to load the
+.B www.tmac
+macro package.
+Use the request
+.B .mso www.tmac
+to do this.
 .TP 9m
-.BI \&.UR " u"
-Begins a hypertext link to the URI (URL)
-.IR u ;
-it will end with the corresponding
-.B UE
-command.
+.BI \&.URL " url link trailer"
+Inserts a hypertext link to the URI (URL)
+.IR url ,
+with
+.I link
+as the text of the link.
+The
+.I trailer
+will be printed immediately afterward.
 When generating HTML this should translate into the HTML command
-\fB<A HREF="\fP\fIu\fP\fB">\fP.
-There is an exception: if
-.I u
-is the special value ":", then no hypertext link of any kind
-will be generated until after the closing
-.B UE
-(this permits disabling hypertext links in phrases like
-.UR ":"
-LALR(1)
-.UE
-when linking is not appropriate).
-These hypertext link "macros" are new, and
+\fB<A HREF="\fP\fIurl\fP\fB">\fIlink\fP\fB</A>\fP\fItrailer\fP.
+.\" The following is a kludge to get a paragraph into the listing.
+.TP
+.B " "
+This and other related macros are new, and
 many tools won't do anything with them, but
 since many tools (including troff) will simply ignore undefined macros
 (or at worst insert their text) these are safe to insert.
+.\" The following is a kludge to get a paragraph into the listing.
 .TP
-.BI \&.UE
-Ends the corresponding
-.B UR
-command;
-when generating HTML this should translate into
-\fB</A>\fP.
+.B " "
+It can be useful to define your own
+.B URL
+macro in manual pages for the benefit of those viewing it with a roff
+viewer other than
+.BR groff .
+That way, the URL, link text, and trailer text (if any) are still visible.
+.\" The following is a kludge to get a paragraph into the listing.
 .TP
-.BI \&.UN " u"
-Creates a named hypertext location named
-.IR u ;
-do not include a corresponding
-.B UE
-command.
-When generating HTML this should translate into the HTML command
-\fB<A NAME="\fP\fIu\fP\fB" id="\fP\fIu\fP\fB">&nbsp;</A>\fP
-(the &nbsp; is optional if support for Mosaic is unneeded).
-.SS "Miscellaneous Macros"
+.B " "
+Here's an example:
+.RS 1.5i
+\&.de URL
+.br
+\\\\$2 \\(laURL: \\\\$1 \\(ra\\\\$3
+.br
+\&..
+.br
+\&.if \\n[.g] .mso www.tmac
+.br
+\&.TH
+.I ...
+.br
+.I (later in the page)
+.br
+This software comes from the
+.br
+\&.URL "http://www.gnu.org/" "GNU Project" " of the"
+.br
+\&.URL "http://www.fsf.org/" "Free Software Foundation" .
+.RE
+.\" The following is a kludge to get a paragraph into the listing.
+.TP
+.B " "
+In the above, if
+.B groff
+is being used, the
+.B www.tmac
+macro package's definition of the URL macro will supersede the locally
+defined one.
+.PP
+A number of other link macros are available.
+See
+.BR groff_www (7)
+for more details.
+.SS Miscellaneous macros
 .TP 9m
 .B \&.DT
 Reset tabs to default tab values (every 0.5 inches);
@@ -514,7 +353,7 @@ Subheading
 (like
 .BR \&.SH ,
 but used for a subsection inside a section).
-.SS "Predefined Strings"
+.SS Predefined strings
 The
 .B man
 package has the following predefined strings:
@@ -525,22 +364,22 @@ Change to default font size
 .IP \e*(Tm
 Trademark Symbol: \*(Tm
 .IP \e*(lq
-Left angled doublequote: \*(lq
+Left angled double quote: \*(lq
 .IP \e*(rq
-Right angled doublequote: \*(rq
-.SH "SAFE SUBSET"
+Right angled double quote: \*(rq
+.SS Safe subset
 Although technically
 .B man
 is a troff macro package, in reality a large number of other tools
 process man page files that don't implement all of troff's abilities.
-Thus, it's best to avoid some of troff's more exotic abilities where possible
-to permit these other tools to work correctly.
+Thus, it's best to avoid some of troff's more exotic abilities
+where possible to permit these other tools to work correctly.
 Avoid using the various troff preprocessors
 (if you must, go ahead and use
 .BR tbl (1),
 but try to use the
 .B IP
-and 
+and
 .B TP
 commands instead for two-column tables).
 Avoid using computations; most other tools can't process them.
@@ -617,8 +456,8 @@ and
 macros instead).
 The condition test
 .RB ( if,ie )
-should only have 't' or 'n' as the condition.
-Only translations 
+should only have \(aqt\(aq or \(aqn\(aq as the condition.
+Only translations
 .RB ( tr )
 that can be ignored should be used.
 Font changes
@@ -633,6 +472,10 @@ Once you've confirmed that the additional capability is safe,
 let the maintainer of this
 document know about the safe command or sequence
 that should be added to this list.
+.SH FILES
+.IR /usr/share/groff/ [*/] tmac/an.tmac
+.br
+.I /usr/man/whatis
 .SH NOTES
 .PP
 By all means include full URLs (or URIs) in the text itself;
@@ -640,23 +483,28 @@ some tools such as
 .BR man2html (1)
 can automatically turn them into hypertext links.
 You can also use the new
-.B UR
+.B URL
 macro to identify links to related information.
 If you include URLs, use the full URL
-(e.g., <http://www.kernelnotes.org>) to ensure that tools
-can automatically find the URLs.
+(e.g.,
+.UR http://www.kernelnotes.org
+.UE )
+to ensure that tools can automatically find the URLs.
 .PP
 Tools processing these files should open the file and examine the first
-non-whitespace character. A period (.) or single quote (')
-at the beginning of a line indicates a troff-based file (such as man or mdoc).
+nonwhitespace character.
+A period (.) or single quote (') at the beginning
+of a line indicates a troff-based file (such as man or mdoc).
 A left angle bracket (<) indicates an SGML/XML-based
-file (such as HTML or Docbook). Anything else suggests simple ASCII
+file (such as HTML or Docbook).
+Anything else suggests simple ASCII
 text (e.g., a "catman" result).
 .PP
-Many man pages begin with '\e" followed by a space and a list of characters,
+Many man pages begin with \fB\'\e"\fP followed by a
+space and a list of characters,
 indicating how the page is to be preprocessed.
-For portability's sake to non-troff translators we recommend that you avoid
-using anything other than
+For portability's sake to non-troff translators we recommend
+that you avoid using anything other than
 .BR tbl (1),
 and Linux can detect that automatically.
 However, you might want to include this information so your man page
@@ -680,10 +528,6 @@ tbl(1)
 .TP
 .B v
 vgrind(1)
-.SH FILES
-.IR /usr/share/groff/ [*/] tmac/tmac.an
-.br
-.I /usr/man/whatis
 .SH BUGS
 .PP
 Most of the macros describe formatting (e.g., font type and spacing) instead
@@ -701,23 +545,27 @@ automate transitioning to a different reference page format in the future.
 The Sun macro
 .B TX
 is not implemented.
-.SH AUTHORS
-.IP \(em 3m
-James Clark (jjc@jclark.com) wrote the implementation of the macro package.
-.IP \(em
-Rickard E. Faith (faith@cs.unc.edu) wrote the initial version of
-this manual page.
-.IP \(em
-Jens Schweikhardt (schweikh@noc.fdn.de) wrote the Linux Man-Page Mini-HOWTO
-(which influenced this manual page).
-.IP \(em
-David A. Wheeler (dwheeler@ida.org) heavily modified this
-manual page, such as adding detailed information on sections and macros.
-.SH "SEE ALSO"
+.\" .SH AUTHORS
+.\" .IP \(em 3m
+.\" James Clark (jjc@jclark.com) wrote the implementation of the macro package.
+.\" .IP \(em
+.\" Rickard E. Faith (faith@cs.unc.edu) wrote the initial version of
+.\" this manual page.
+.\" .IP \(em
+.\" Jens Schweikhardt (schweikh@noc.fdn.de) wrote the Linux Man-Page Mini-HOWTO
+.\" (which influenced this manual page).
+.\" .IP \(em
+.\" David A. Wheeler (dwheeler@ida.org) heavily modified this
+.\" manual page, such as adding detailed information on sections and macros.
+.SH SEE ALSO
 .BR apropos (1),
 .BR groff (1),
+.BR lexgrog (1),
 .BR man (1),
 .BR man2html (1),
+.BR whatis (1),
+.BR groff_man (7),
+.BR groff_www (7),
+.BR man-pages (7),
 .BR mdoc (7),
-.BR mdoc.samples (7),
-.BR whatis (1)
+.BR mdoc.samples (7)

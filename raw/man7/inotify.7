@@ -1,0 +1,467 @@
+'\" t
+.\" Copyright (C) 2006 Michael Kerrisk <mtk.manpages@gmail.com>
+.\"
+.\" %%%LICENSE_START(VERBATIM)
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
+.\"
+.TH INOTIFY 7 2013-09-16 "Linux" "Linux Programmer's Manual"
+.SH NAME
+inotify \- monitoring filesystem events
+.SH DESCRIPTION
+The
+.I inotify
+API provides a mechanism for monitoring filesystem events.
+Inotify can be used to monitor individual files,
+or to monitor directories.
+When a directory is monitored, inotify will return events
+for the directory itself, and for files inside the directory.
+
+The following system calls are used with this API:
+.BR inotify_init (2)
+(or
+.BR inotify_init1 (2)),
+.BR inotify_add_watch (2),
+.BR inotify_rm_watch (2),
+.BR read (2),
+and
+.BR close (2).
+
+.BR inotify_init (2)
+creates an inotify instance and returns a file descriptor
+referring to the inotify instance.
+The more recent
+.BR inotify_init1 (2)
+is like
+.BR inotify_init (2),
+but provides some extra functionality.
+
+.BR inotify_add_watch (2)
+manipulates the "watch list" associated with an inotify instance.
+Each item ("watch") in the watch list specifies the pathname of
+a file or directory,
+along with some set of events that the kernel should monitor for the
+file referred to by that pathname.
+.BR inotify_add_watch (2)
+either creates a new watch item, or modifies an existing watch.
+Each watch has a unique "watch descriptor", an integer
+returned by
+.BR inotify_add_watch (2)
+when the watch is created.
+
+.BR inotify_rm_watch (2)
+removes an item from an inotify watch list.
+
+When all file descriptors referring to an inotify
+instance have been closed,
+the underlying object and its resources are
+freed for reuse by the kernel;
+all associated watches are automatically freed.
+
+To determine what events have occurred, an application
+.BR read (2)s
+from the inotify file descriptor.
+If no events have so far occurred, then,
+assuming a blocking file descriptor,
+.BR read (2)
+will block until at least one event occurs
+(unless interrupted by a signal,
+in which case the call fails with the error
+.BR EINTR ;
+see
+.BR signal (7)).
+
+Each successful
+.BR read (2)
+returns a buffer containing one or more of the following structures:
+.in +4n
+.nf
+
+struct inotify_event {
+    int      wd;       /* Watch descriptor */
+.\" FIXME . The type of the 'wd' field should probably be "int32_t".
+.\" I submitted a patch to fix this.  See the LKML thread
+.\" "[patch] Fix type errors in inotify interfaces", 18 Nov 2008
+.\" Glibc bug filed: http://sources.redhat.com/bugzilla/show_bug.cgi?id=7040
+    uint32_t mask;     /* Mask of events */
+    uint32_t cookie;   /* Unique cookie associating related
+                          events (for rename(2)) */
+    uint32_t len;      /* Size of \fIname\fP field */
+    char     name[];   /* Optional null-terminated name */
+};
+.fi
+.in
+
+.I wd
+identifies the watch for which this event occurs.
+It is one of the watch descriptors returned by a previous call to
+.BR inotify_add_watch (2).
+
+.I mask
+contains bits that describe the event that occurred (see below).
+
+.I cookie
+is a unique integer that connects related events.
+Currently this is used only for rename events, and
+allows the resulting pair of
+.B IN_MOVED_FROM
+and
+.B IN_MOVED_TO
+events to be connected by the application.
+For all other event types,
+.I cookie
+is set to 0.
+
+The
+.I name
+field is present only when an event is returned
+for a file inside a watched directory;
+it identifies the file pathname relative to the watched directory.
+This pathname is null-terminated,
+and may include further null bytes (\(aq\\0\(aq) to align subsequent reads to a
+suitable address boundary.
+
+The
+.I len
+field counts all of the bytes in
+.IR name ,
+including the null bytes;
+the length of each
+.I inotify_event
+structure is thus
+.IR "sizeof(struct inotify_event)+len" .
+
+The behavior when the buffer given to
+.BR read (2)
+is too small to return information about the next event depends
+on the kernel version: in kernels before 2.6.21,
+.BR read (2)
+returns 0; since kernel 2.6.21,
+.BR read (2)
+fails with the error
+.BR EINVAL .
+Specifying a buffer of size
+
+    sizeof(struct inotify_event) + NAME_MAX + 1
+
+will be sufficient to read at least one event.
+.SS inotify events
+The
+.BR inotify_add_watch (2)
+.I mask
+argument and the
+.I mask
+field of the
+.I inotify_event
+structure returned when
+.BR read (2)ing
+an inotify file descriptor are both bit masks identifying
+inotify events.
+The following bits can be specified in
+.I mask
+when calling
+.BR inotify_add_watch (2)
+and may be returned in the
+.I mask
+field returned by
+.BR read (2):
+.RS 4
+.sp
+.PD 0
+.TP 18
+.B IN_ACCESS
+File was accessed (read) (*).
+.TP
+.B IN_ATTRIB
+Metadata changed, e.g., permissions, timestamps, extended attributes,
+link count (since Linux 2.6.25), UID, GID, etc. (*).
+.TP
+.B IN_CLOSE_WRITE
+File opened for writing was closed (*).
+.TP
+.B IN_CLOSE_NOWRITE
+File not opened for writing was closed (*).
+.TP
+.B IN_CREATE
+File/directory created in watched directory (*).
+.TP
+.B IN_DELETE
+File/directory deleted from watched directory (*).
+.TP
+.B IN_DELETE_SELF
+Watched file/directory was itself deleted.
+.TP
+.B IN_MODIFY
+File was modified (*).
+.TP
+.B IN_MOVE_SELF
+Watched file/directory was itself moved.
+.TP
+.B IN_MOVED_FROM
+Generated for the directory containing the old filename
+when a file is renamed (*).
+.TP
+.B IN_MOVED_TO
+Generated for the directory containing the new filename
+when a file is renamed (*).
+.TP
+.B IN_OPEN
+File was opened (*).
+.PD
+.RE
+.PP
+When monitoring a directory,
+the events marked with an asterisk (*) above can occur for
+files in the directory, in which case the
+.I name
+field in the returned
+.I inotify_event
+structure identifies the name of the file within the directory.
+.PP
+The
+.B IN_ALL_EVENTS
+macro is defined as a bit mask of all of the above events.
+This macro can be used as the
+.I mask
+argument when calling
+.BR inotify_add_watch (2).
+
+Two additional convenience macros are
+.BR IN_MOVE ,
+which equates to
+IN_MOVED_FROM|IN_MOVED_TO,
+and
+.BR IN_CLOSE ,
+which equates to
+IN_CLOSE_WRITE|IN_CLOSE_NOWRITE.
+.PP
+The following further bits can be specified in
+.I mask
+when calling
+.BR inotify_add_watch (2):
+.RS 4
+.sp
+.PD 0
+.TP 18
+.BR IN_DONT_FOLLOW " (since Linux 2.6.15)"
+Don't dereference
+.I pathname
+if it is a symbolic link.
+.TP
+.BR IN_EXCL_UNLINK " (since Linux 2.6.36)"
+.\" commit 8c1934c8d70b22ca8333b216aec6c7d09fdbd6a6
+By default, when watching events on the children of a directory,
+events are generated for children even after they have been unlinked
+from the directory.
+This can result in large numbers of uninteresting events for
+some applications (e.g., if watching
+.IR /tmp ,
+in which many applications create temporary files whose
+names are immediately unlinked).
+Specifying
+.B IN_EXCL_UNLINK
+changes the default behavior,
+so that events are not generated for children after
+they have been unlinked from the watched directory.
+.TP
+.B IN_MASK_ADD
+Add (OR) events to watch mask for this pathname if
+it already exists (instead of replacing mask).
+.TP
+.B IN_ONESHOT
+Monitor
+.I pathname
+for one event, then remove from
+watch list.
+.TP
+.BR IN_ONLYDIR " (since Linux 2.6.15)"
+Only watch
+.I pathname
+if it is a directory.
+.PD
+.RE
+.PP
+The following bits may be set in the
+.I mask
+field returned by
+.BR read (2):
+.RS 4
+.sp
+.PD 0
+.TP 18
+.B IN_IGNORED
+Watch was removed explicitly
+.RB ( inotify_rm_watch (2))
+or automatically (file was deleted, or filesystem was unmounted).
+.TP
+.B IN_ISDIR
+Subject of this event is a directory.
+.TP
+.B IN_Q_OVERFLOW
+Event queue overflowed
+.RI ( wd
+is \-1 for this event).
+.TP
+.B IN_UNMOUNT
+Filesystem containing watched object was unmounted.
+.PD
+.RE
+.SS /proc interfaces
+The following interfaces can be used to limit the amount of
+kernel memory consumed by inotify:
+.TP
+.I /proc/sys/fs/inotify/max_queued_events
+The value in this file is used when an application calls
+.BR inotify_init (2)
+to set an upper limit on the number of events that can be
+queued to the corresponding inotify instance.
+Events in excess of this limit are dropped, but an
+.B IN_Q_OVERFLOW
+event is always generated.
+.TP
+.I /proc/sys/fs/inotify/max_user_instances
+This specifies an upper limit on the number of inotify instances
+that can be created per real user ID.
+.TP
+.I /proc/sys/fs/inotify/max_user_watches
+This specifies an upper limit on the number of watches
+that can be created per real user ID.
+.SH VERSIONS
+Inotify was merged into the 2.6.13 Linux kernel.
+The required library interfaces were added to glibc in version 2.4.
+.RB ( IN_DONT_FOLLOW ,
+.BR IN_MASK_ADD ,
+and
+.B IN_ONLYDIR
+were added in version 2.5.)
+.SH CONFORMING TO
+The inotify API is Linux-specific.
+.SH NOTES
+Inotify file descriptors can be monitored using
+.BR select (2),
+.BR poll (2),
+and
+.BR epoll (7).
+When an event is available, the file descriptor indicates as readable.
+
+Since Linux 2.6.25,
+signal-driven I/O notification is available for inotify file descriptors;
+see the discussion of
+.B F_SETFL
+(for setting the
+.B O_ASYNC
+flag),
+.BR F_SETOWN ,
+and
+.B F_SETSIG
+in
+.BR fcntl (2).
+The
+.I siginfo_t
+structure (described in
+.BR sigaction (2))
+that is passed to the signal handler has the following fields set:
+.IR si_fd
+is set to the inotify file descriptor number;
+.IR si_signo
+is set to the signal number;
+.IR si_code
+is set to
+.BR POLL_IN ;
+and
+.B POLLIN
+is set in
+.IR si_band .
+
+If successive output inotify events produced on the
+inotify file descriptor are identical (same
+.IR wd ,
+.IR mask ,
+.IR cookie ,
+and
+.IR name )
+then they are coalesced into a single event if the
+older event has not yet been read (but see BUGS).
+
+The events returned by reading from an inotify file descriptor
+form an ordered queue.
+Thus, for example, it is guaranteed that when renaming from
+one directory to another, events will be produced in the
+correct order on the inotify file descriptor.
+
+The
+.B FIONREAD
+.BR ioctl (2)
+returns the number of bytes available to read from an
+inotify file descriptor.
+.SS Limitations and caveats
+Inotify monitoring of directories is not recursive:
+to monitor subdirectories under a directory,
+additional watches must be created.
+This can take a significant amount time for large directory trees.
+
+The inotify API provides no information about the user or process that
+triggered the inotify event.
+In particular, there is no easy
+way for a process that is monitoring events via inotify
+to distinguish events that it triggers
+itself from those that are triggered by other processes.
+
+Note that the event queue can overflow.
+In this case, events are lost.
+Robust applications should handle the possibility of
+lost events gracefully.
+
+The inotify API identifies affected files by filename.
+However, by the time an application processes an inotify event,
+the filename may already have been deleted or renamed.
+
+If monitoring an entire directory subtree,
+and a new subdirectory is created in that tree,
+be aware that by the time you create a watch for the new subdirectory,
+new files may already have been created in the subdirectory.
+Therefore, you may want to scan the contents of the subdirectory
+immediately after adding the watch.
+.SH BUGS
+In kernels before 2.6.16, the
+.B IN_ONESHOT
+.I mask
+flag does not work.
+
+Before kernel 2.6.25,
+the kernel code that was intended to coalesce successive identical events
+(i.e., the two most recent events could potentially be coalesced
+if the older had not yet been read)
+instead checked if the most recent event could be coalesced with the
+.I oldest
+unread event.
+.SH SEE ALSO
+.BR inotifywait (1),
+.BR inotifywatch (1),
+.BR inotify_add_watch (2),
+.BR inotify_init (2),
+.BR inotify_init1 (2),
+.BR inotify_rm_watch (2),
+.BR read (2),
+.BR stat (2)
+
+.IR Documentation/filesystems/inotify.txt
+in the Linux kernel source tree

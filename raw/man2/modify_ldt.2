@@ -1,0 +1,137 @@
+.\" Copyright (c) 1995 Michael Chastain (mec@duracef.shout.net), 22 July 1995.
+.\"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.\"
+.TH MODIFY_LDT 2 2012-07-13 "Linux" "Linux Programmer's Manual"
+.SH NAME
+modify_ldt \- get or set ldt
+.SH SYNOPSIS
+.nf
+.B #include <sys/types.h>
+.sp
+.BI "int modify_ldt(int " "func" ", void *" "ptr" ", unsigned long " "bytecount" );
+.fi
+
+.IR Note :
+There is no glibc wrapper for this system call; see NOTES.
+.SH DESCRIPTION
+.BR modify_ldt ()
+reads or writes the local descriptor table (ldt) for a process.
+The ldt is a per-process memory management table used by the i386 processor.
+For more information on this table, see an Intel 386 processor handbook.
+.PP
+When
+.I func
+is 0,
+.BR modify_ldt ()
+reads the ldt into the memory pointed to by
+.IR ptr .
+The number of bytes read is the smaller of
+.I bytecount
+and the actual size of the ldt.
+.PP
+When
+.I func
+is 1,
+.BR modify_ldt ()
+modifies one ldt entry.
+.I ptr
+points to a
+.I user_desc
+structure
+and
+.I bytecount
+must equal the size of this structure.
+.\"
+.\" FIXME ? say something about func == 2 and func == 0x11?
+.\" In Linux 2.4, func == 2 returned "the default ldt"
+.\" In Linux 2.6, func == 2 is a nop, returning a zeroed out structure.
+.\" Linux 2.4 and 2.6 implement an operation for func == 0x11
+
+The
+.I user_desc
+structure is defined in \fI<asm/ldt.h>\fP as:
+.in +4n
+.nf
+
+struct user_desc {
+    unsigned int  entry_number;
+    unsigned long base_addr;
+    unsigned int  limit;
+    unsigned int  seg_32bit:1;
+    unsigned int  contents:2;
+    unsigned int  read_exec_only:1;
+    unsigned int  limit_in_pages:1;
+    unsigned int  seg_not_present:1;
+    unsigned int  useable:1;
+};
+.fi
+.in
+.PP
+In Linux 2.4 and earlier, this structure was named
+.IR modify_ldt_ldt_s .
+.\" .PP
+.\" The ldt is specific for the calling process. Any attempts to change
+.\" the ldt to include the address space of another process or the kernel
+.\" will result in a segmentation violation when trying to access the memory
+.\" outside of the process address space. The memory protection is enforced
+.\" at the paging layer.
+.SH RETURN VALUE
+On success,
+.BR modify_ldt ()
+returns either the actual number of bytes read (for reading)
+or 0 (for writing).
+On failure,
+.BR modify_ldt ()
+returns \-1 and sets
+.I errno
+to indicate the error.
+.SH ERRORS
+.TP
+.B EFAULT
+.I ptr
+points outside the address space.
+.TP
+.B EINVAL
+.I ptr
+is 0,
+or
+.I func
+is 1 and
+.I bytecount
+is not equal to the size of the structure
+.IR modify_ldt_ldt_s ,
+or
+.I func
+is 1 and the new ldt entry has invalid values.
+.TP
+.B ENOSYS
+.I func
+is neither 0 nor 1.
+.SH CONFORMING TO
+This call is Linux-specific and should not be used in programs intended
+to be portable.
+.SH NOTES
+Glibc does not provide a wrapper for this system call; call it using
+.BR syscall (2).
+.SH SEE ALSO
+.BR vm86 (2)

@@ -1,0 +1,128 @@
+.\" Written by Michael Haardt, Fri Nov 25 14:51:42 MET 1994
+.\"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.\"
+.\" Added sigsetjmp, Sun Mar  2 22:03:05 EST 1997, jrv@vanzandt.mv.com
+.\" Modifications, Sun Feb 26 14:39:45 1995, faith@cs.unc.edu
+.\" "
+.TH SETJMP 3 2009-06-26 "" "Linux Programmer's Manual"
+.SH NAME
+setjmp, sigsetjmp \- save stack context for nonlocal goto
+.SH SYNOPSIS
+.B #include <setjmp.h>
+.sp
+.nf
+.BI "int setjmp(jmp_buf " env );
+
+.BI "int sigsetjmp(sigjmp_buf " env ", int " savesigs );
+.fi
+.sp
+.in -4n
+Feature Test Macro Requirements for glibc (see
+.BR feature_test_macros (7)):
+.in
+.sp
+.BR setjmp ():
+see NOTES.
+.br
+.BR sigsetjmp ():
+_POSIX_C_SOURCE\ >=\ 1 || _XOPEN_SOURCE || _POSIX_C_SOURCE
+.SH DESCRIPTION
+.BR setjmp ()
+and
+.BR longjmp (3)
+are useful for dealing with errors
+and interrupts encountered in a low-level subroutine of a program.
+.BR setjmp ()
+saves the stack context/environment in
+.I env
+for
+later use by
+.BR longjmp (3).
+The stack context will be invalidated
+if the function which called
+.BR setjmp ()
+returns.
+.P
+.BR sigsetjmp ()
+is similar to
+.BR setjmp ().
+If, and only if,
+.I savesigs
+is nonzero,
+the process's current signal mask is saved in
+.I env
+and will be restored if a
+.BR siglongjmp (3)
+is later performed with this
+.IR env .
+.SH RETURN VALUE
+.BR setjmp ()
+and
+.BR sigsetjmp ()
+return 0 if returning directly, and
+nonzero when returning from
+.BR longjmp (3)
+or
+.BR siglongjmp (3)
+using the saved context.
+.SH CONFORMING TO
+C89, C99, and POSIX.1-2001 specify
+.BR setjmp ().
+POSIX.1-2001 specifies
+.BR sigsetjmp ().
+.SH NOTES
+POSIX does not specify whether
+.BR setjmp ()
+will save the signal mask.
+In System V it will not.
+In 4.3BSD it will, and there
+is a function
+.B _setjmp
+that will not.
+By default, Linux/glibc follows the System V behavior,
+but the BSD behavior is provided if the
+.BR _BSD_SOURCE
+feature test macro is defined and none of
+.BR _POSIX_SOURCE ,
+.BR _POSIX_C_SOURCE ,
+.BR _XOPEN_SOURCE ,
+.BR _XOPEN_SOURCE_EXTENDED ,
+.BR _GNU_SOURCE ,
+or
+.B _SVID_SOURCE
+is defined.
+
+If you want to portably save and restore signal masks, use
+.BR sigsetjmp ()
+and
+.BR siglongjmp (3).
+.P
+.BR setjmp ()
+and
+.BR sigsetjmp ()
+make programs hard to understand
+and maintain.
+If possible an alternative should be used.
+.SH SEE ALSO
+.BR longjmp (3),
+.BR siglongjmp (3)

@@ -1,0 +1,47 @@
+.\" Copyright 2002 Walter Harms (walter.harms@informatik.uni-oldenburg.de)
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
+.\" Distributed under GPL
+.\" %%%LICENSE_END
+.\"
+.TH CONJ 3 2013-06-21 "" "Linux Programmer's Manual"
+.SH NAME
+conj, conjf, conjl \- calculate the complex conjugate
+.SH SYNOPSIS
+.B #include <complex.h>
+.sp
+.BI "double complex conj(double complex " z );
+.br
+.BI "float complex conjf(float complex " z );
+.br
+.BI "long double complex conjl(long double complex " z );
+.sp
+Link with \fI\-lm\fP.
+.SH DESCRIPTION
+The
+.BR conj ()
+function returns the complex conjugate value of
+.IR z .
+That is the value obtained by changing the sign of the imaginary part.
+.LP
+One has:
+.nf
+
+    cabs(z) = csqrt(z * conj(z))
+.fi
+.SH VERSIONS
+These functions first appeared in glibc in version 2.1.
+.SH ATTRIBUTES
+.SS Multithreading (see pthreads(7))
+The
+.BR conj (),
+.BR conjf (),
+and
+.BR conjl ()
+functions are thread-safe.
+.SH CONFORMING TO
+C99.
+.SH SEE ALSO
+.BR cabs (3),
+.BR csqrt (3),
+.BR complex (7)

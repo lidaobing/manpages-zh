@@ -1,5 +1,6 @@
 .\" Copyright (c) 2002 Andries Brouwer <aeb@cwi.nl>
 .\"
+.\" %%%LICENSE_START(VERBATIM)
 .\" Permission is granted to make and distribute verbatim copies of this
 .\" manual provided the copyright notice and this permission notice are
 .\" preserved on all copies.
@@ -7,8 +8,8 @@
 .\" Permission is granted to copy and distribute modified versions of this
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
-.\" permission notice identical to this one
-.\" 
+.\" permission notice identical to this one.
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -16,28 +17,52 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
 .\"
-.TH INTRO 1 2002-08-06 "Linux" "Linux Programmer's Manual"
+.\" 2007-10-23 mtk Added intro paragraph about section, plus a paragraph
+.\"     about exit status values.
+.\"
+.TH INTRO 1 2007-11-15 "Linux" "Linux User's Manual"
 .SH NAME
-intro \- Introduction to user commands
+intro \- introduction to user commands
 .SH DESCRIPTION
-Linux is a flavour of Unix, and as a first approximation
-all user commands under Unix work precisely the same under
-Linux (and FreeBSD and lots of other Unix-like systems).
+Section 1 of the manual describes user commands and tools,
+for example, file manipulation tools, shells, compilers,
+web browsers, file and image viewers and editors, and so on.
+
+All commands yield a status value on termination.
+This value can be tested (e.g., in most shells the variable
+.I $?
+contains the status of the last executed command)
+to see whether the command completed successfully.
+A zero exit status is conventionally used to indicate success,
+and a nonzero status means that the command was unsuccessful.
+(Details of the exit status can be found in
+.BR wait (2).)
+A nonzero exit status can be in the range 1 to 255, and some commands
+use different nonzero status values to indicate the reason why the
+command failed.
+.SH NOTES
+Linux is a flavor of UNIX, and as a first approximation
+all user commands under UNIX work precisely the same under
+Linux (and FreeBSD and lots of other UNIX-like systems).
 .LP
 Under Linux there are GUIs (graphical user interfaces), where you
 can point and click and drag, and hopefully get work done without
-first reading lots of documentation. The traditional Unix environment
+first reading lots of documentation.
+The traditional UNIX environment
 is a CLI (command line interface), where you type commands to
-tell the computer what to do. That is faster and more powerful,
+tell the computer what to do.
+That is faster and more powerful,
 but requires finding out what the commands are.
 Below a bare minimum, to get started.
-.SS "Login"
+.SS Login
 In order to start working, you probably first have to login,
-that is, give your username and password. See also
+that is, give your username and password.
+See also
 .BR login (1).
 The program
 .I login
@@ -45,13 +70,16 @@ now starts a
 .I shell
 (command interpreter) for you.
 In case of a graphical login, you get a screen with menus or icons
-and a mouse click will start a shell in a window. See also
+and a mouse click will start a shell in a window.
+See also
 .BR xterm (1).
-.SS "The shell"
+.SS The shell
 One types commands to the
 .IR shell ,
-the command interpreter. It is not built-in, but is just a program
-and you can change your shell. Everybody has her own favourite one.
+the command interpreter.
+It is not built-in, but is just a program
+and you can change your shell.
+Everybody has her own favorite one.
 The standard one is called
 .IR sh .
 See also
@@ -71,7 +99,7 @@ A session might go like
 Tue Aug  6 23:50:44 CEST 2002
 .BI "% " cal
      August 2002
-Su Mo Tu We Th Fr Sa 
+Su Mo Tu We Th Fr Sa
              1  2  3
  4  5  6  7  8  9 10
 11 12 13 14 15 16 17
@@ -80,39 +108,40 @@ Su Mo Tu We Th Fr Sa
 
 .BI "% " ls
 bin  tel
-.BI "% " "ls -l"
+.BI "% " "ls \-l"
 total 2
-drwxrwxr-x   2 aeb       1024 Aug  6 23:51 bin
--rw-rw-r--   1 aeb         37 Aug  6 23:52 tel
+drwxrwxr\-x   2 aeb       1024 Aug  6 23:51 bin
+\-rw\-rw\-r\-\-   1 aeb         37 Aug  6 23:52 tel
 .BI "% " "cat tel"
-maja    0501-1136285
-peter   0136-7399214
+maja    0501\-1136285
+peter   0136\-7399214
 .BI "% " "cp tel tel2"
-.BI "% " "ls -l"
+.BI "% " "ls \-l"
 total 3
-drwxr-xr-x   2 aeb       1024 Aug  6 23:51 bin
--rw-r--r--   1 aeb         37 Aug  6 23:52 tel
--rw-r--r--   1 aeb         37 Aug  6 23:53 tel2
+drwxr\-xr\-x   2 aeb       1024 Aug  6 23:51 bin
+\-rw\-r\-\-r\-\-   1 aeb         37 Aug  6 23:52 tel
+\-rw\-r\-\-r\-\-   1 aeb         37 Aug  6 23:53 tel2
 .BI "% " "mv tel tel1"
-.BI "% " "ls -l"
+.BI "% " "ls \-l"
 total 3
-drwxr-xr-x   2 aeb       1024 Aug  6 23:51 bin
--rw-r--r--   1 aeb         37 Aug  6 23:52 tel1
--rw-r--r--   1 aeb         37 Aug  6 23:53 tel2
+drwxr\-xr\-x   2 aeb       1024 Aug  6 23:51 bin
+\-rw\-r\-\-r\-\-   1 aeb         37 Aug  6 23:52 tel1
+\-rw\-r\-\-r\-\-   1 aeb         37 Aug  6 23:53 tel2
 .BI "% " "diff tel1 tel2"
 .BI "% " "rm tel1"
 .BI "% " "grep maja tel2"
-maja    0501-1136285
-.BI "% "
+maja    0501\-1136285
+.B "% "
 .fi
 .RE
 and here typing Control-D ended the session.
 The
 .B "% "
-here was the command prompt - it is the shell's way of indicating
-that it is ready for the next command. The prompt can be customized
-in lots of ways, and one might include stuff like user name,
-machine name, current directory, time, etc.
+here was the command prompt\(emit is the shell's way of indicating
+that it is ready for the next command.
+The prompt can be customized
+in lots of ways, and one might include stuff like username,
+machine name, current directory, time, and so on.
 An assignment PS1="What next, master? "
 would change the prompt as indicated.
 .LP
@@ -124,8 +153,11 @@ We see that there are commands
 .LP
 The command
 .I ls
-lists the contents of the current directory - it tells you what
-files you have. With a \-l option it gives a long listing,
+lists the contents of the current directory\(emit tells you what
+files you have.
+With a
+.I \-l
+option it gives a long listing,
 that includes the owner and size and date of the file, and the
 permissions people have for reading and/or changing the file.
 For example, the file "tel" here is 37 bytes long, owned by aeb
@@ -157,21 +189,24 @@ Here there was no output because there were no differences.
 The command
 .I rm
 (from "remove") deletes the file, and be careful! it is gone.
-No wastepaper basket or anything. Deleted means lost.
+No wastepaper basket or anything.
+Deleted means lost.
 .LP
 The command
 .I grep
 (from "g/re/p") finds occurrences of a string in one or more files.
 Here it finds Maja's telephone number.
-.SS "Path names and the current directory"
+.SS Pathnames and the current directory
 Files live in a large tree, the file hierarchy.
 Each has a
-.I "path name"
+.I "pathname"
 describing the path from the root of the tree (which is called /)
-to the file. For example, such a full path name might be /home/aeb/tel.
-Always using full path names would be inconvenient, and the name
-of a file in the current directory may be abbreviated by only giving
-the last component. That is why "/home/aeb/tel" can be abbreviated
+to the file.
+For example, such a full pathname might be /home/aeb/tel.
+Always using full pathnames would be inconvenient, and the name
+of a file in the current directory may be abbreviated by giving
+only the last component.
+That is why "/home/aeb/tel" can be abbreviated
 to "tel" when the current directory is "/home/aeb".
 .LP
 The command
@@ -182,7 +217,7 @@ The command
 .I cd
 changes the current directory.
 Try "cd /" and "pwd" and "cd" and "pwd".
-.SS "Directories"
+.SS Directories
 The command
 .I mkdir
 makes a new directory.
@@ -194,24 +229,27 @@ removes a directory if it is empty, and complains otherwise.
 The command
 .I find
 (with a rather baroque syntax) will find files with given name
-or other properties. For example, "find . -name tel" would find
+or other properties.
+For example, "find . \-name tel" would find
 the file "tel" starting in the present directory (which is called ".").
-And "find / -name tel" would do the same, but starting at the root
-of the tree. Large searches on a multi-GB disk will be time-consuming,
+And "find / \-name tel" would do the same, but starting at the root
+of the tree.
+Large searches on a multi-GB disk will be time-consuming,
 and it may be better to use
 .BR locate (1).
-.SS "Disks and Filesystems"
+.SS Disks and filesystems
 The command
 .I mount
 will attach the filesystem found on some disk (or floppy, or CDROM or so)
-to the big filesystem hierarchy. And
+to the big filesystem hierarchy.
+And
 .I umount
 detaches it again.
 The command
 .I df
 will tell you how much of your disk is still free.
-.SS "Processes"
-On a Unix system many user and system processes run simultaneously.
+.SS Processes
+On a UNIX system many user and system processes run simultaneously.
 The one you are talking to runs in the
 .IR foreground ,
 the others in the
@@ -222,11 +260,13 @@ will show you which processes are active and what numbers these
 processes have.
 The command
 .I kill
-allows you to get rid of them. Without option this is a friendly
-request: please go away. And "kill -9" followed by the number
+allows you to get rid of them.
+Without option this is a friendly
+request: please go away.
+And "kill \-9" followed by the number
 of the process is an immediate kill.
 Foreground processes can often be killed by typing Control-C.
-.SS "Getting information"
+.SS Getting information
 There are thousands of commands, each with many options.
 Traditionally commands are documented on
 .IR "man pages" ,
@@ -240,19 +280,24 @@ usually
 .IR less .
 Hit the space bar to get the next page, hit q to quit.
 .LP
-In documentation it is custumary to refer to man pages
+In documentation it is customary to refer to man pages
 by giving the name and section number, as in
 .BR man (1).
 Man pages are terse, and allow you to find quickly some forgotten
-detail. For newcomers an introductory text with more examples
+detail.
+For newcomers an introductory text with more examples
 and explanations is useful.
 .LP
-A lot of GNU/FSF software is provided with info files. Type "info info"
+A lot of GNU/FSF software is provided with info files.
+Type "info info"
 for an introduction on the use of the program "info".
 .LP
-Special topics are often treated in HOWTOs. Look in
+Special topics are often treated in HOWTOs.
+Look in
 .I /usr/share/doc/howto/en
 and use a browser if you find HTML files there.
 .\"
 .\" Actual examples? Separate section for each of cat, cp, ...?
 .\" gzip, bzip2, tar, rpm
+.SH SEE ALSO
+.BR standards (7)

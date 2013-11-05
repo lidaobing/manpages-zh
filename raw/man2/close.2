@@ -1,8 +1,7 @@
-.\" Hey Emacs! This file is -*- nroff -*- source.
-.\"
 .\" This manpage is Copyright (C) 1992 Drew Eckhardt;
-.\"                               1993 Michael Haardt, Ian Jackson.
+.\"             and Copyright (C) 1993 Michael Haardt, Ian Jackson.
 .\"
+.\" %%%LICENSE_START(VERBATIM)
 .\" Permission is granted to make and distribute verbatim copies of this
 .\" manual provided the copyright notice and this permission notice are
 .\" preserved on all copies.
@@ -10,8 +9,8 @@
 .\" Permission is granted to copy and distribute modified versions of this
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
-.\" permission notice identical to this one
-.\" 
+.\" permission notice identical to this one.
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -19,9 +18,10 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
 .\"
 .\" Modified Wed Jul 21 22:40:25 1993 by Rik Faith <faith@cs.unc.edu>
 .\" Modified Sat Feb 18 15:27:48 1995 by Michael Haardt
@@ -29,10 +29,10 @@
 .\"   corrected description of effect on locks (thanks to
 .\"   Tigran Aivazian <tigran@sco.com>).
 .\" Modified Fri Jan 31 16:21:46 1997 by Eric S. Raymond <esr@thyrsus.com>
-.\" Modified 2000-07-22 by Nicol?s Lichtmaier <nick@debian.org>
+.\" Modified 2000-07-22 by Nicolás Lichtmaier <nick@debian.org>
 .\"   added note about close(2) not guaranteeing that data is safe on close.
 .\"
-.TH CLOSE 2 2001-12-13 "" "Linux Programmer's Manual"
+.TH CLOSE 2 2007-12-28 "Linux" "Linux Programmer's Manual"
 .SH NAME
 close \- close a file descriptor
 .SH SYNOPSIS
@@ -42,23 +42,31 @@ close \- close a file descriptor
 .BI "int close(int " fd );
 .fi
 .SH DESCRIPTION
-.B close
+.BR close ()
 closes a file descriptor, so that it no longer refers to any file and
-may be reused. Any locks held on the file it was associated with,
+may be reused.
+Any record locks (see
+.BR fcntl (2))
+held on the file it was associated with,
 and owned by the process, are removed (regardless of the file
 descriptor that was used to obtain the lock).
 .PP
 If
 .I fd
-is the last copy of a particular file descriptor the resources
-associated with it are freed;
+is the last file descriptor referring to the underlying
+open file description (see
+.BR open (2)),
+the resources associated with the open file description are freed;
 if the descriptor was the last reference to a file which has been
 removed using
 .BR unlink (2)
 the file is deleted.
-.SH "RETURN VALUE"
-.B close
-returns zero on success, or \-1 if an error occurred.
+.SH RETURN VALUE
+.BR close ()
+returns zero on success.
+On error, \-1 is returned, and
+.I errno
+is set appropriately.
 .SH ERRORS
 .TP
 .B EBADF
@@ -68,34 +76,56 @@ isn't a valid open file descriptor.
 .B EINTR
 The
 .BR close ()
-call was interrupted by a signal.
+call was interrupted by a signal; see
+.BR signal (7).
 .TP
 .B EIO
 An I/O error occurred.
-.SH "CONFORMING TO"
-SVr4, SVID, POSIX, X/OPEN, BSD 4.3.  SVr4 documents an additional
-ENOLINK error condition.
+.SH CONFORMING TO
+SVr4, 4.3BSD, POSIX.1-2001.
+.\" SVr4 documents an additional ENOLINK error condition.
 .SH NOTES
-Not checking the return value of close is a common but nevertheless
-serious programming error.  It is quite possible that errors on a
+Not checking the return value of
+.BR close ()
+is a common but nevertheless
+serious programming error.
+It is quite possible that errors on a
 previous
 .BR write (2)
 operation are first reported at the final
-.BR close .
+.BR close ().
 Not checking the return value when closing the file may lead to
-silent loss of data.  This can especially be observed with NFS
-and disk quotas.
+silent loss of data.
+This can especially be observed with NFS
+and with disk quota.
 .PP
 A successful close does not guarantee that the data has been successfully
-saved to disk, as the kernel defers writes. It is not common for a filesystem
-to flush the buffers when the stream is closed. If you need to be sure that
+saved to disk, as the kernel defers writes.
+It is not common for a filesystem
+to flush the buffers when the stream is closed.
+If you need to be sure that
 the data is physically stored use
 .BR fsync (2).
 (It will depend on the disk hardware at this point.)
-.SH "SEE ALSO"
-.BR open (2),
+.PP
+It is probably unwise to close file descriptors while
+they may be in use by system calls in
+other threads in the same process.
+Since a file descriptor may be reused,
+there are some obscure race conditions
+that may cause unintended side effects.
+.\" Date: Tue, 4 Sep 2007 13:57:35 +0200
+.\" From: Fredrik Noring <noring@nocrew.org>
+.\" One such race involves signals and ERESTARTSYS. If a file descriptor
+.\" in use by a system call is closed and then reused by e.g. an
+.\" independent open() in some unrelated thread, before the original system
+.\" call has restared after ERESTARTSYS, the original system call will
+.\" later restart with the reused file descriptor. This is most likely a
+.\" serious programming error.
+.SH SEE ALSO
 .BR fcntl (2),
+.BR fsync (2),
+.BR open (2),
 .BR shutdown (2),
 .BR unlink (2),
-.BR fclose (3),
-.BR fsync (2)
+.BR fclose (3)

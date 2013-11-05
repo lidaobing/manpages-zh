@@ -1,5 +1,6 @@
-.\" (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\" Copyright (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
 .\"
+.\" %%%LICENSE_START(VERBATIM)
 .\" Permission is granted to make and distribute verbatim copies of this
 .\" manual provided the copyright notice and this permission notice are
 .\" preserved on all copies.
@@ -7,8 +8,8 @@
 .\" Permission is granted to copy and distribute modified versions of this
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
-.\" permission notice identical to this one
-.\" 
+.\" permission notice identical to this one.
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -16,105 +17,121 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
 .\"
 .\" Modified Sat Jul 24 17:28:34 1993 by Rik Faith <faith@cs.unc.edu>
 .\" Modified Sun Jun 01 17:16:34 1997 by Jochen Hein
 .\"   <jochen.hein@delphi.central.de>
 .\" Modified Thu Apr 25 00:43:19 2002 by Bruno Haible <bruno@clisp.org>
 .\"
-.TH LOCALE 7  1993-04-24 "Linux" "Linux Programmer's Manual"
+.\" FIXME Document LOCPATH;
+.\" see http://sourceware.org/bugzilla/show_bug.cgi?id=174
+.TH LOCALE 7  2008-12-05 "Linux" "Linux Programmer's Manual"
 .SH NAME
-locale \- Description of multi-language support
+locale \- description of multilanguage support
 .SH SYNOPSIS
 .nf
 .B #include <locale.h>
 .fi
 .SH DESCRIPTION
-A locale is a set of language and cultural rules.  These cover aspects
-such as language for messages, different character sets, lexigraphic
-conventions, etc.  A program needs to be able to determine its locale
+A locale is a set of language and cultural rules.
+These cover aspects
+such as language for messages, different character sets, lexicographic
+conventions, and so on.
+A program needs to be able to determine its locale
 and act accordingly to be portable to different cultures.
 .PP
 The header
-.B <locale.h>
+.I <locale.h>
 declares data types, functions and macros which are useful in this
 task.
 .PP
 The functions it declares are
-.B setlocale()
+.BR setlocale (3)
 to set the current locale, and
-.B localeconv()
+.BR localeconv (3)
 to get information about number formatting.
 .PP
 There are different categories for local information a program might
-need; they are declared as macros.  Using them as the first argument
+need; they are declared as macros.
+Using them as the first argument
 to the
-.B setlocale()
+.BR setlocale (3)
 function, it is possible to set one of these to the desired locale:
 .TP
 .B LC_COLLATE
-This is used to change the behaviour of the functions
-.B strcoll()
+This is used to change the behavior of the functions
+.BR strcoll (3)
 and
-.BR strxfrm() ,
-which are used to compare strings in the local alphabet.  For example,
+.BR strxfrm (3),
+which are used to compare strings in the local alphabet.
+For example,
 the German sharp s is sorted as "ss".
 .TP
 .B LC_CTYPE
-This changes the behaviour of the character handling and
+This changes the behavior of the character handling and
 classification functions, such as
-.B isupper()
+.BR isupper (3)
 and
-.BR toupper() ,
-and the multi\-byte character functions such as
-.B mblen()
+.BR toupper (3),
+and the multibyte character functions such as
+.BR mblen (3)
 or
-.BR wctomb() .
+.BR wctomb (3).
 .TP
 .B LC_MONETARY
 changes the information returned by
-.B localeconv()
+.BR localeconv (3)
 which describes the way numbers are usually printed, with details such
-as decimal point versus decimal comma.  This information is internally
+as decimal point versus decimal comma.
+This information is internally
 used by the function
-.BR strfmon() .
+.BR strfmon (3).
 .TP
 .B LC_MESSAGES
-changes the language messages are displayed in and how an affirmative or
-negative answer looks like.  The GNU C-library contains the
-.BR gettext() ,
-.BR ngettext() ,
+changes the language messages are displayed in and what an affirmative or
+negative answer looks like.
+The GNU C-library contains the
+.BR gettext (3),
+.BR ngettext (3),
 and
-.B rpmatch()
-functions to ease the use of these information.  The GNU gettext family of
+.BR rpmatch (3)
+functions to ease the use of these information.
+The GNU gettext family of
 functions also obey the environment variable
-.BR LANGUAGE .
+.BR LANGUAGE
+(containing a colon-separated list of locales)
+if the category is set to a valid locale other than
+.BR """C""" .
 .TP
 .B LC_NUMERIC
 changes the information used by the
-.B printf()
+.BR printf (3)
 and
-.B scanf()
-family of functions, when they are advised to use the
-locale-settings.  This information can also be read with the 
-.B localeconv()
+.BR scanf (3)
+family of functions, when they are advised to use the locale-settings.
+This information can also be read with the
+.BR localeconv (3)
 function.
 .TP
 .B LC_TIME
-changes the behaviour of the
-.B strftime()
+changes the behavior of the
+.BR strftime (3)
 function to display the current time in a locally acceptable form; for
-example, most of Europe uses a 24\-hour clock vs. the US' 12\-hour
-clock.
+example, most of Europe uses a 24-hour clock versus the
+12-hour clock used in the United States.
 .TP
 .B LC_ALL
 All of the above.
+.\" FIXME glibc 2.2.2 added new nonstandard locale categories:
+.\" LC_ADDRESS, LC_IDENTIFICATION, LC_MEASUREMENT, LC_NAME,
+.\" LC_PAPER, LC_TELEPHONE.  These need to be documented.
 .PP
 If the second argument to
-.B setlocale()
+.BR setlocale (3)
 is empty string,
 .BR """""" ,
 for the default locale, it is determined using the following steps:
@@ -135,70 +152,73 @@ the value of
 is used.
 .PP
 Values about local numeric formatting is made available in a
-.B struct lconv
+.I struct lconv
 returned by the
-.B localeconv()
+.BR localeconv (3)
 function, which has the following declaration:
+.in +2n
 .nf
-struct lconv
-{
-  /* Numeric (non-monetary) information.  */
 
-  char *decimal_point;		/* Decimal point character.  */
-  char *thousands_sep;		/* Thousands separator.  */
-  /* Each element is the number of digits in each group;
-     elements with higher indices are farther left.
-     An element with value CHAR_MAX means that no further grouping is done.
-     An element with value 0 means that the previous element is used
-     for all groups farther left.  */
-  char *grouping;
+struct lconv {
 
-  /* Monetary information.  */
+    /* Numeric (nonmonetary) information */
 
-  /* First three chars are a currency symbol from ISO 4217.
-     Fourth char is the separator.  Fifth char is '\0'.  */
-  char *int_curr_symbol;
-  char *currency_symbol;	/* Local currency symbol.  */
-  char *mon_decimal_point;	/* Decimal point character.  */
-  char *mon_thousands_sep;	/* Thousands separator.  */
-  char *mon_grouping;		/* Like `grouping' element (above).  */
-  char *positive_sign;		/* Sign for positive values.  */
-  char *negative_sign;		/* Sign for negative values.  */
-  char int_frac_digits;		/* Int'l fractional digits.  */
-  char frac_digits;		/* Local fractional digits.  */
-  /* 1 if currency_symbol precedes a positive value, 0 if succeeds.  */
-  char p_cs_precedes;
-  /* 1 if a space separates currency_symbol from a positive value.  */
-  char p_sep_by_space;
-  /* 1 if currency_symbol precedes a negative value, 0 if succeeds.  */
-  char n_cs_precedes;
-  /* 1 if a space separates currency_symbol from a negative value.  */
-  char n_sep_by_space;
-  /* Positive and negative sign positions:
-     0 Parentheses surround the quantity and currency_symbol.
-     1 The sign string precedes the quantity and currency_symbol.
-     2 The sign string succeeds the quantity and currency_symbol.
-     3 The sign string immediately precedes the currency_symbol.
-     4 The sign string immediately succeeds the currency_symbol.  */
-  char p_sign_posn;
-  char n_sign_posn;
+    char *decimal_point;     /* Radix character */
+    char *thousands_sep;     /* Separator for digit groups to left
+                                of radix character */
+    char *grouping; /* Each element is the number of digits in a
+                       group; elements with higher indices are
+                       further left.  An element with value CHAR_MAX
+                       means that no further grouping is done.  An
+                       element with value 0 means that the previous
+                       element is used for all groups further left. */
+
+    /* Remaining fields are for monetary information */
+
+    char *int_curr_symbol;   /* First three chars are a currency symbol
+                                from ISO 4217.  Fourth char is the
+                                separator.  Fifth char is \(aq\\0\(aq. */
+    char *currency_symbol;   /* Local currency symbol */
+    char *mon_decimal_point; /* Radix character */
+    char *mon_thousands_sep; /* Like \fIthousands_sep\fP above */
+    char *mon_grouping;      /* Like \fIgrouping\fP above */
+    char *positive_sign;     /* Sign for positive values */
+    char *negative_sign;     /* Sign for negative values */
+    char  int_frac_digits;   /* International fractional digits */
+    char  frac_digits;       /* Local fractional digits */
+    char  p_cs_precedes;     /* 1 if currency_symbol precedes a
+                                positive value, 0 if succeeds */
+    char  p_sep_by_space;    /* 1 if a space separates currency_symbol
+                                from a positive value */
+    char  n_cs_precedes;     /* 1 if currency_symbol precedes a
+                                negative value, 0 if succeeds */
+    char  n_sep_by_space;    /* 1 if a space separates currency_symbol
+                                from a negative value */
+    /* Positive and negative sign positions:
+       0 Parentheses surround the quantity and currency_symbol.
+       1 The sign string precedes the quantity and currency_symbol.
+       2 The sign string succeeds the quantity and currency_symbol.
+       3 The sign string immediately precedes the currency_symbol.
+       4 The sign string immediately succeeds the currency_symbol. */
+    char  p_sign_posn;
+    char  n_sign_posn;
 };
 .fi
-.SH "CONFORMS TO"
-.nf
-POSIX.1
-.fi
+.in
+.SH CONFORMING TO
+POSIX.1-2001.
+
 The GNU gettext functions are specified in LI18NUX2000.
-.SH "SEE ALSO"
-.BR setlocale (3),
-.BR localeconv (3),
+.SH SEE ALSO
 .BR locale (1),
 .BR localedef (1),
-.BR nl_langinfo (3),
 .BR gettext (3),
+.BR localeconv (3),
 .BR ngettext (3),
+.BR nl_langinfo (3),
 .BR rpmatch (3),
-.BR strfmon (3),
+.BR setlocale (3),
 .BR strcoll (3),
-.BR strxfrm (3),
-.BR strftime (3)
+.BR strfmon (3),
+.BR strftime (3),
+.BR strxfrm (3)
