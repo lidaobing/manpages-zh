@@ -1,0 +1,35 @@
+.\" Copyright 2002 Walter Harms (walter.harms@informatik.uni-oldenburg.de)
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
+.\" Distributed under GPL
+.\" %%%LICENSE_END
+.\"
+.TH CCOS 3 2008-08-11 "" "Linux Programmer's Manual"
+.SH NAME
+ccos, ccosf, ccosl \- complex cosine function
+.SH SYNOPSIS
+.B #include <complex.h>
+.sp
+.BI "double complex ccos(double complex " z ");"
+.br
+.BI "float complex ccosf(float complex " z ");"
+.br
+.BI "long double complex ccosl(long double complex " z ");"
+.sp
+Link with \fI\-lm\fP.
+.SH DESCRIPTION
+The complex cosine function is defined as:
+.nf
+
+    ccos(z) = (exp(i * z) + exp(\-i * z)) / 2
+.fi
+.SH VERSIONS
+These functions first appeared in glibc in version 2.1.
+.SH CONFORMING TO
+C99.
+.SH SEE ALSO
+.BR cabs (3),
+.BR cacos (3),
+.BR csin (3),
+.BR ctan (3),
+.BR complex (7)

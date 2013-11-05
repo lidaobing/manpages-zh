@@ -1,6 +1,7 @@
 .\" Copyright (c) 1991 The Regents of the University of California.
 .\" All rights reserved.
 .\"
+.\" %%%LICENSE_START(BSD_4_CLAUSE_UCB)
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
 .\" are met:
@@ -28,15 +29,18 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
+.\" %%%LICENSE_END
 .\"
 .\"     @(#)exec.3	6.4 (Berkeley) 4/19/91
 .\"
 .\" Converted for Linux, Mon Nov 29 11:12:48 1993, faith@cs.unc.edu
 .\" Updated more for Linux, Tue Jul 15 11:54:18 1997, pacman@cqc.com
+.\" Modified, 24 Jun 2004, Michael Kerrisk <mtk.manpages@gmail.com>
+.\"     Added note on casting NULL
 .\"
-.TH EXEC 3  1993-11-29 "BSD MANPAGE" "Linux Programmer's Manual"
+.TH EXEC 3  2010-09-25 "GNU" "Linux Programmer's Manual"
 .SH NAME
-execl, execlp, execle, execv, execvp \- execute a file
+execl, execlp, execle, execv, execvp, execvpe \- execute a file
 .SH SYNOPSIS
 .B #include <unistd.h>
 .sp
@@ -46,33 +50,46 @@ execl, execlp, execle, execv, execvp \- execute a file
 .br
 .BI "int execlp(const char *" file ", const char *" arg ", ...);"
 .br
-.BI "int execle(const char *" path ", const char *" arg
-.BI ", ..., char * const " envp "[]);"
+.BI "int execle(const char *" path ", const char *" arg ,
+.br
+.BI "           ..., char * const " envp "[]);"
 .br
 .BI "int execv(const char *" path ", char *const " argv "[]);"
 .br
 .BI "int execvp(const char *" file ", char *const " argv "[]);"
+.br
+.BI "int execvpe(const char *" file ", char *const " argv "[],"
+.br
+.BI "            char *const " envp "[]);"
+.sp
+.in -4n
+Feature Test Macro Requirements for glibc (see
+.BR feature_test_macros (7)):
+.in
+.sp
+.BR execvpe ():
+_GNU_SOURCE
 .SH DESCRIPTION
 The
-.B exec
+.BR exec ()
 family of functions replaces the current process image with a new process
-image.  The functions described in this manual page are front-ends for the
-function
+image.
+The functions described in this manual page are front-ends for
 .BR execve (2).
 (See the manual page for
-.B execve
-for detailed information about the replacement of the current process.)
+.BR execve (2)
+for further details about the replacement of the current process image.)
 .PP
-The initial argument for these functions is the pathname of a file which is
+The initial argument for these functions is the name of a file that is
 to be executed.
 .PP
 The
-.I "const char *arg"
+.I "const char\ *arg"
 and subsequent ellipses in the
-.BR execl ,
-.BR execlp ,
+.BR execl (),
+.BR execlp (),
 and
-.B execle
+.BR execle ()
 functions can be thought of as
 .IR arg0 ,
 .IR arg1 ,
@@ -80,128 +97,151 @@ functions can be thought of as
 .IR argn .
 Together they describe a list of one or more pointers to null-terminated
 strings that represent the argument list available to the executed program.
-The first argument, by convention, should point to the file name associated
-with the file being executed.  The list of arguments
+The first argument, by convention, should point to the filename associated
+with the file being executed.
+The list of arguments
 .I must
-be terminated by a
-.B NULL
-pointer.
+be terminated by a NULL
+pointer, and, since these are variadic functions, this pointer must be cast
+.IR "(char\ *) NULL" .
 .PP
 The
-.B execv
+.BR execv (),
+.BR execvp (),
 and
-.B execvp
+.BR execvpe ()
 functions provide an array of pointers to null-terminated strings that
-represent the argument list available to the new program.  The first
-argument, by convention, should point to the file name associated with the
-file being executed.  The array of pointers
+represent the argument list available to the new program.
+The first argument, by convention, should point to the filename
+associated with the file being executed.
+The array of pointers
 .I must
-be terminated by a
-.B NULL
-pointer.
+be terminated by a NULL pointer.
 .PP
 The
-.B execle
-function also specifies the environment of the executed process by following
-the
-.B NULL
-pointer that terminates the list of arguments in the parameter list or the
-pointer to the argv array with an additional parameter.  This additional
-parameter is an array of pointers to null-terminated strings and
+.BR execle ()
+and
+.BR execvpe ()
+functions allow the caller to specify the environment of the
+executed program via the argument
+.IR envp .
+The
+.I envp
+argument is an array of pointers to null-terminated strings and
 .I must
-be terminated by a
-.B NULL
-pointer.  The other functions take the environment for the new process
+be terminated by a NULL pointer.
+The other functions take the environment for the new process
 image from the external variable
 .I environ
-in the current process.
+in the calling process.
+.SS Special semantics for execlp() and execvp()
 .PP
-Some of these functions have special semantics.
-.PP
-The functions
-.B execlp
+The
+.BR execlp (),
+.BR execvp (),
 and
-.B execvp
-will duplicate the actions of the shell in searching for an executable file
-if the specified file name does not contain a slash (/) character.  The
-search path is the path specified in the environment by the
+.BR execvpe ()
+functions duplicate the actions of the shell in
+searching for an executable file
+if the specified filename does not contain a slash (/) character.
+The file is sought in the colon-separated list of directory pathnames
+specified in the
 .B PATH
-variable.  If this variable isn't specified, the default path
-``:/bin:/usr/bin'' is used.  In addition, certain
-errors are treated specially.
-.PP
+environment variable.
+If this variable isn't defined, the path list defaults to
+the current directory followed by the list of directories returned by
+.IR confstr(_CS_PATH) .
+(This
+.BR confstr (3)
+call typically returns the value "/bin:/usr/bin".)
+
+If the specified filename includes a slash character, then
+.B PATH
+is ignored, and the file at the specified pathname is executed.
+
+In addition, certain errors are treated specially.
+
 If permission is denied for a file (the attempted
-.B execve
-returned
+.BR execve (2)
+failed with the error
 .BR EACCES ),
-these functions will continue searching the rest of the search path.  If no
-other file is found, however, they will return with the global variable
+these functions will continue searching the rest of the search path.
+If no other file is found, however,
+they will return with
 .I errno
 set to
 .BR EACCES .
-.PP
+
 If the header of a file isn't recognized (the attempted
-.B execve
-returned
+.BR execve (2)
+failed with the error
 .BR ENOEXEC ),
-these functions will execute the shell with the path of the file as its
-first argument.  (If this attempt fails, no further searching is done.)
-.SH "RETURN VALUE"
-If any of the
-.B exec
-functions returns, an error will have occurred.  The return value is \-1,
-and the global variable
+these functions will execute the shell
+.RI ( /bin/sh )
+with the path of the file as its first argument.
+(If this attempt fails, no further searching is done.)
+.SH RETURN VALUE
+The
+.BR exec ()
+functions return only if an error has occurred.
+The return value is \-1, and
 .I errno
-will be set to indicate the error.
-.SH FILES
-.I /bin/sh
+is set to indicate the error.
 .SH ERRORS
 All of these functions may fail and set
 .I errno
-for any of the errors specified for the library function
+for any of the errors specified for
 .BR execve (2).
-.SH "SEE ALSO"
-.BR sh (1),
-.BR execve (2),
-.BR fork (2),
-.BR environ (5),
-.BR ptrace (2)
-.SH COMPATIBILITY
-On some other systems the default path (used when the environment
+.SH VERSIONS
+The
+.BR execvpe ()
+function first appeared in glibc 2.11.
+.SH CONFORMING TO
+POSIX.1-2001, POSIX.1-2008.
+
+The
+.BR execvpe ()
+function is a GNU extension.
+.SH NOTES
+On some other systems, the default path (used when the environment
 does not contain the variable \fBPATH\fR) has the current working
 directory listed after
 .I /bin
 and
 .IR /usr/bin ,
-as an anti-Trojan-horse measure. Linux uses here the
+as an anti-Trojan-horse measure.
+Linux uses here the
 traditional "current directory first" default path.
 .PP
 The behavior of
-.B execlp
+.BR execlp ()
 and
-.B execvp
+.BR execvp ()
 when errors occur while attempting to execute the file is historic
 practice, but has not traditionally been documented and is not specified by
-the POSIX standard. BSD (and possibly other systems) do an automatic
-sleep and retry if ETXTBSY is encountered. Linux treats it as a hard
+the POSIX standard.
+BSD (and possibly other systems) do an automatic
+sleep and retry if
+.B ETXTBSY
+is encountered.
+Linux treats it as a hard
 error and returns immediately.
 .PP
 Traditionally, the functions
-.B execlp
+.BR execlp ()
 and
-.B execvp
+.BR execvp ()
 ignored all errors except for the ones described above and
 .B ENOMEM
 and
 .BR E2BIG ,
-upon which they returned.  They now return if any error other than the ones
+upon which they returned.
+They now return if any error other than the ones
 described above occurs.
-.SH "CONFORMING TO"
-.BR execl ,
-.BR execv ,
-.BR execle ,
-.B execlp
-and
-.B execvp
-conform to
-IEEE Std1003.1-88 (``POSIX.1'').
+.SH SEE ALSO
+.BR sh (1),
+.BR execve (2),
+.BR fork (2),
+.BR ptrace (2),
+.BR fexecve (3),
+.BR environ (7)

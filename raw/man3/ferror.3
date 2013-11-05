@@ -5,6 +5,7 @@
 .\" Chris Torek and the American National Standards Committee X3,
 .\" on Information Processing Systems.
 .\"
+.\" %%%LICENSE_START(BSD_4_CLAUSE_UCB)
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
 .\" are met:
@@ -32,6 +33,7 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
+.\" %%%LICENSE_END
 .\"
 .\"     @(#)ferror.3	6.8 (Berkeley) 6/29/91
 .\"
@@ -39,68 +41,86 @@
 .\" Converted for Linux, Mon Nov 29 14:24:40 1993, faith@cs.unc.edu
 .\" Added remark on EBADF for fileno, aeb, 2001-03-22
 .\"
-.TH FERROR 3  2001-10-16 "" "Linux Programmer's Manual"
+.TH FERROR 3  2013-06-21 "" "Linux Programmer's Manual"
 .SH NAME
 clearerr, feof, ferror, fileno \- check and reset stream status
 .SH SYNOPSIS
 .B #include <stdio.h>
 .sp
 .BI "void clearerr(FILE *" stream );
-.br
+
 .BI "int feof(FILE *" stream );
-.br
+
 .BI "int ferror(FILE *" stream );
-.br
+
 .BI "int fileno(FILE *" stream );
+.sp
+.in -4n
+Feature Test Macro Requirements for glibc (see
+.BR feature_test_macros (7)):
+.in
+.sp
+.BR fileno ():
+_POSIX_C_SOURCE\ >=\ 1 || _XOPEN_SOURCE || _POSIX_SOURCE
 .SH DESCRIPTION
 The function
-.B clearerr
+.BR clearerr ()
 clears the end-of-file and error indicators for the stream pointed to by
 .IR stream .
 .PP
 The function
-.B feof
+.BR feof ()
 tests the end-of-file indicator for the stream pointed to by
 .IR stream ,
-returning non-zero if it is set.  The end-of-file indicator can only be
-cleared by the function
-.BR clearerr .
+returning nonzero if it is set.
+The end-of-file indicator can be cleared only by the function
+.BR clearerr ().
 .PP
 The function
-.B ferror
+.BR ferror ()
 tests the error indicator for the stream pointed to by
 .IR stream ,
-returning non-zero if it is set.  The error indicator can only be reset by
-the
-.B clearerr
+returning nonzero if it is set.
+The error indicator can be reset only by the
+.BR clearerr ()
 function.
 .PP
 The function
-.B fileno
+.BR fileno ()
 examines the argument
 .I stream
 and returns its integer descriptor.
 .PP
-For non-locking counterparts, see
+For nonlocking counterparts, see
 .BR unlocked_stdio (3).
 .SH ERRORS
 These functions should not fail and do not set the external variable
 .IR errno .
 (However, in case
-.B fileno
+.BR fileno ()
 detects that its argument is not a valid stream, it must
 return \-1 and set
 .I errno
 to
 .BR EBADF .)
-.SH "CONFORMING TO"
-The functions
-.BR clearerr ,
-.BR feof ,
+.SH ATTRIBUTES
+.SS Multithreading (see pthreads(7))
+The
+.BR clearerr (),
+.BR feof (),
+.BR ferror (),
 and
-.BR ferror
-conform to X3.159-1989 (``ANSI C'').
-.SH "SEE ALSO"
+.BR fileno ()
+functions are thread-safe.
+.SH CONFORMING TO
+The functions
+.BR clearerr (),
+.BR feof (),
+and
+.BR ferror ()
+conform to C89 and C99.
+.SH SEE ALSO
 .BR open (2),
-.BR unlocked_stdio (3),
-.BR stdio (3)
+.BR fdopen (3),
+.BR stdio (3),
+.BR unlocked_stdio (3)

@@ -5,6 +5,7 @@
 .\" Chris Torek and the American National Standards Committee X3,
 .\" on Information Processing Systems.
 .\"
+.\" %%%LICENSE_START(BSD_4_CLAUSE_UCB)
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
 .\" are met:
@@ -32,42 +33,45 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
+.\" %%%LICENSE_END
 .\"
 .\"     @(#)fclose.3	6.7 (Berkeley) 6/29/91
 .\"
 .\" Converted for Linux, Mon Nov 29 15:19:14 1993, faith@cs.unc.edu
 .\"
-.\" Modified 2000-07-22 by Nicol??s Lichtmaier <nick@debian.org>
+.\" Modified 2000-07-22 by Nicolás Lichtmaier <nick@debian.org>
 .\"
-.TH FCLOSE 3  1993-11-29 "BSD MANPAGE" "Linux Programmer's Manual"
+.TH FCLOSE 3  2009-02-23 "GNU" "Linux Programmer's Manual"
 .SH NAME
 fclose \- close a stream
 .SH SYNOPSIS
 .B #include <stdio.h>
 .sp
-.BI "int fclose(FILE *" stream );
+.BI "int fclose(FILE *" fp );
 .SH DESCRIPTION
 The
-.B fclose
-function dissociates the named
-.I stream
-from its underlying file or set of functions.  If the stream was being used
-for output, any buffered data is written first, using
-.BR fflush (3).
-.SH "RETURN VALUE"
-Upon successful completion 0 is returned.  Otherwise,
+.BR fclose ()
+function flushes the stream pointed to by
+.I fp
+(writing any buffered output data using
+.BR fflush (3))
+and closes the underlying file descriptor.
+.SH RETURN VALUE
+Upon successful completion 0 is returned.
+Otherwise,
 .B EOF
-is returned and the global variable
+is returned and
 .I errno
-is set to indicate the error.  In either case any further access
+is set to indicate the error.
+In either case any further access
 (including another call to
-.BR fclose "())"
-to the stream results in undefined behaviour.
+.BR fclose ())
+to the stream results in undefined behavior.
 .SH ERRORS
 .TP
 .B EBADF
-The filedescriptor underlying
-.I stream
+The file descriptor underlying
+.I fp
 is not valid.
 .\"  This error cannot occur unless you are mixing ANSI C stdio operations and
 .\"  low-level file operations on the same stream. If you do get this error,
@@ -75,7 +79,7 @@ is not valid.
 .\"  something like close(fileno(fp)).
 .PP
 The
-.B fclose
+.BR fclose ()
 function may also fail and set
 .I errno
 for any of the errors specified for the routines
@@ -83,20 +87,19 @@ for any of the errors specified for the routines
 .BR write (2)
 or
 .BR fflush (3).
+.SH CONFORMING TO
+C89, C99.
 .SH NOTES
 Note that
-.B fclose
-only flushes the user space buffers provided by the
-C library. To ensure that the data is physically stored
-on disk the kernel buffers must be flushed too, e.g. with
+.BR fclose ()
+only flushes the user-space buffers provided by the
+C library.
+To ensure that the data is physically stored
+on disk the kernel buffers must be flushed too, for example, with
 .BR sync (2)
 or
 .BR fsync (2).
-.SH "CONFORMING TO"
-The
-.B fclose
-function conforms to ANSI X3.159-1989 (``ANSI C'').
-.SH "SEE ALSO"
+.SH SEE ALSO
 .BR close (2),
 .BR fcloseall (3),
 .BR fflush (3),

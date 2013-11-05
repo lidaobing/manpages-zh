@@ -2,17 +2,22 @@
 .\" sync(8) manpage, dating back to the Linux 0.99 days.  The Linux-specific
 .\" information is attributed to Linus Torvalds
 .\" Copyright 1992, 1993 Rickard E. Faith (faith@cs.unc.edu)
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
 .\" May be distributed under the GNU General Public License
-.TH SYNC 8 1998-11 "GNU fileutils 4.0"
+.\" %%%LICENSE_END
+.\"
+.TH SYNC 8 1998-11-01 "GNU" "Linux Programmer's Manual"
 .SH NAME
 sync \- synchronize data on disk with memory
-.SH SYNOPSYS
+.SH SYNOPSIS
 .B "sync [\-\-help] [\-\-version]"
 .SH DESCRIPTION
 .B sync
-writes any data buffered in memory out to disk.  This can
-include (but is not limited to) modified superblocks, modified inodes,
-and delayed reads and writes.  This must be implemented by the kernel;
+writes any data buffered in memory out to disk.
+This can include (but is not limited to) modified superblocks,
+modified inodes, and delayed reads and writes.
+This must be implemented by the kernel;
 The
 .B sync
 program does nothing but exercise the
@@ -20,7 +25,8 @@ program does nothing but exercise the
 system call.
 .PP
 The kernel keeps data in memory to avoid doing (relatively slow) disk
-reads and writes.  This improves performance, but if the computer
+reads and writes.
+This improves performance, but if the computer
 crashes, data may be lost or the filesystem corrupted as a result.
 .B sync
 ensures that everything in memory is written to disk.
@@ -43,7 +49,7 @@ documentation; on some systems one should not call
 and
 .BR halt (8)
 directly.)
-.SH "GNU STANDARD OPTIONS"
+.SH OPTIONS
 .TP
 .B "\-\-help"
 Print a usage message on standard output and exit successfully.
@@ -54,14 +60,19 @@ Print version information on standard output, then exit successfully.
 .B "\-\-"
 Terminate option list.
 .SH ENVIRONMENT
-The variables LANG, LC_ALL, LC_CTYPE, and LC_MESSAGES have the
-usual meaning.
-.SH "CONFORMING TO"
-POSIX 1003.2
+The variables
+.BR LANG ,
+.BR LC_ALL ,
+.BR LC_CTYPE ,
+and
+.B LC_MESSAGES
+have the usual meaning.
+.SH CONFORMING TO
+POSIX.2.
 .SH NOTES
 On Linux,
 .B sync
-is only guaranteed to schedule the dirty blocks for writing; it can
+is guaranteed only to schedule the dirty blocks for writing; it can
 actually take a short time before all the blocks are finally written.
 The
 .BR reboot (8)
@@ -75,9 +86,7 @@ This page describes
 .B sync
 as found in the file\%utils-4.0 package;
 other versions may differ slightly.
-Mail corrections and additions to aeb@cwi.nl.
-Report bugs in the program to fileutils-bugs@gnu.ai.mit.edu.
-.SH "SEE ALSO"
+.SH SEE ALSO
 .BR sync (2),
 .BR halt (8),
 .BR reboot (8),

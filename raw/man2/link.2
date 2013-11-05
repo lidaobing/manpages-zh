@@ -1,0 +1,196 @@
+.\" This manpage is Copyright (C) 1992 Drew Eckhardt;
+.\"             and Copyright (C) 1993 Michael Haardt, Ian Jackson.
+.\"
+.\" %%%LICENSE_START(VERBATIM)
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" %%%LICENSE_END
+.\"
+.\" Modified 1993-07-23 by Rik Faith <faith@cs.unc.edu>
+.\" Modified 1994-08-21 by Michael Haardt
+.\" Modified 2004-06-23 by Michael Kerrisk <mtk.manpages@gmail.com>
+.\" Modified 2005-04-04, as per suggestion by Michael Hardt for rename.2
+.\"
+.TH LINK 2 2013-01-27 "Linux" "Linux Programmer's Manual"
+.SH NAME
+link \- make a new name for a file
+.SH SYNOPSIS
+.B #include <unistd.h>
+.sp
+.BI "int link(const char *" oldpath ", const char *" newpath );
+.SH DESCRIPTION
+.BR link ()
+creates a new link (also known as a hard link) to an existing file.
+
+If
+.I newpath
+exists it will
+.I not
+be overwritten.
+
+This new name may be used exactly as the old one for any operation;
+both names refer to the same file (and so have the same permissions
+and ownership) and it is impossible to tell which name was the
+"original".
+.SH RETURN VALUE
+On success, zero is returned.
+On error, \-1 is returned, and
+.I errno
+is set appropriately.
+.SH ERRORS
+.TP
+.B EACCES
+Write access to the directory containing
+.I newpath
+is denied, or search permission is denied for one of the directories
+in the path prefix of
+.I oldpath
+or
+.IR newpath .
+(See also
+.BR path_resolution (7).)
+.TP
+.B EDQUOT
+The user's quota of disk blocks on the filesystem has been exhausted.
+.TP
+.B EEXIST
+.I newpath
+already exists.
+.TP
+.B EFAULT
+.IR oldpath " or " newpath " points outside your accessible address space."
+.TP
+.B EIO
+An I/O error occurred.
+.TP
+.B ELOOP
+Too many symbolic links were encountered in resolving
+.IR oldpath " or " newpath .
+.TP
+.B EMLINK
+The file referred to by
+.I oldpath
+already has the maximum number of links to it.
+.TP
+.B ENAMETOOLONG
+.IR oldpath " or " newpath " was too long."
+.TP
+.B ENOENT
+A directory component in
+.IR oldpath " or " newpath
+does not exist or is a dangling symbolic link.
+.TP
+.B ENOMEM
+Insufficient kernel memory was available.
+.TP
+.B ENOSPC
+The device containing the file has no room for the new directory
+entry.
+.TP
+.B ENOTDIR
+A component used as a directory in
+.IR oldpath " or " newpath
+is not, in fact, a directory.
+.TP
+.B EPERM
+.I oldpath
+is a directory.
+.TP
+.B EPERM
+The filesystem containing
+.IR oldpath " and " newpath
+does not support the creation of hard links.
+.TP
+.BR EPERM " (since Linux 3.6)"
+The caller does not have permission to create a hard link to this file
+(see the description of
+.IR /proc/sys/fs/protected_hardlink
+in
+.BR proc (5)).
+.TP
+.B EROFS
+The file is on a read-only filesystem.
+.TP
+.B EXDEV
+.IR oldpath " and " newpath
+are not on the same mounted filesystem.
+(Linux permits a filesystem to be mounted at multiple points, but
+.BR link ()
+does not work across different mount points,
+even if the same filesystem is mounted on both.)
+.SH CONFORMING TO
+SVr4, 4.3BSD, POSIX.1-2001 (but see NOTES).
+.\" SVr4 documents additional ENOLINK and
+.\" EMULTIHOP error conditions; POSIX.1 does not document ELOOP.
+.\" X/OPEN does not document EFAULT, ENOMEM or EIO.
+.SH NOTES
+Hard links, as created by
+.BR link (),
+cannot span filesystems.
+Use
+.BR symlink (2)
+if this is required.
+
+POSIX.1-2001 says that
+.BR link ()
+should dereference
+.I oldpath
+if it is a symbolic link.
+However, since kernel 2.0,
+.\" more precisely: since kernel 1.3.56
+Linux does not do so: if
+.I oldpath
+is a symbolic link, then
+.I newpath
+is created as a (hard) link to the same symbolic link file
+(i.e.,
+.I newpath
+becomes a symbolic link to the same file that
+.I oldpath
+refers to).
+Some other implementations behave in the same manner as Linux.
+.\" For example, the default Solaris compilation environment
+.\" behaves like Linux, and contributors to a March 2005
+.\" thread in the Austin mailing list reported that some
+.\" other (System V) implementations did/do the same -- MTK, Apr 05
+POSIX.1-2008 changes the specification of
+.BR link (),
+making it implementation-dependent whether or not
+.I oldpath
+is dereferenced if it is a symbolic link.
+For precise control over the treatment of symbolic links when
+creating a link, see
+.BR linkat (2).
+.SH BUGS
+On NFS filesystems, the return code may be wrong in case the NFS server
+performs the link creation and dies before it can say so.
+Use
+.BR stat (2)
+to find out if the link got created.
+.SH SEE ALSO
+.BR ln (1),
+.BR linkat (2),
+.BR open (2),
+.BR rename (2),
+.BR stat (2),
+.BR symlink (2),
+.BR unlink (2),
+.BR path_resolution (7),
+.BR symlink (7)

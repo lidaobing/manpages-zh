@@ -1,5 +1,7 @@
-.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de),
+.\"     Fri Apr  2 11:32:09 MET DST 1993
 .\"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
 .\" This is free documentation; you can redistribute it and/or
 .\" modify it under the terms of the GNU General Public License as
 .\" published by the Free Software Foundation; either version 2 of
@@ -16,35 +18,49 @@
 .\" GNU General Public License for more details.
 .\"
 .\" You should have received a copy of the GNU General Public
-.\" License along with this manual; if not, write to the Free
-.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
-.\" USA.
-.\" 
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.\"
 .\" Modified Sat Jul 24 17:06:03 1993 by Rik Faith (faith@cs.unc.edu)
-.TH GROUP 5 1992-12-29 "Linux" "Linux Programmer's Manual"
+.TH GROUP 5 2010-10-21 "Linux" "Linux Programmer's Manual"
 .SH NAME
 group \- user group file
 .SH DESCRIPTION
-\fB/etc/group\fP is an ASCII file which defines the groups to which users
-belong.  There is one entry per line, and each line has the format:
+The
+.I /etc/group
+file is a text file that defines the groups on the system.
+There is one entry per line, with the following format:
 .sp
 .RS
-group_name:passwd:GID:user_list
+group_name:password:GID:user_list
 .RE
 .sp
-The field descriptions are:
-.IP group_name
+The fields are as follows:
+.TP 12
+.I group_name
 the name of the group.
-.IP password
-the (encrypted) group password.  If this field is
-empty, no password is needed.
-.IP GID
-the numerical group ID.
-.IP user_list
-all the group member's user names, separated by commas.
+.TP
+.I password
+the (encrypted) group password.
+If this field is empty, no password is needed.
+.TP
+.I GID
+the numeric group ID.
+.TP
+.I user_list
+a list of the usernames that are members of this group, separated by commas.
 .SH FILES
 /etc/group
-.SH "SEE ALSO"
+.SH BUGS
+As the 4.2BSD
+.BR initgroups (3)
+man page says: No-one seems to keep
+.I /etc/group
+up-to-date.
+.SH SEE ALSO
 .BR login (1),
 .BR newgrp (1),
+.BR getgrent (3),
+.BR getgrnam (3),
 .BR passwd (5)

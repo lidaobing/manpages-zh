@@ -1,5 +1,7 @@
-.\" Copyright (c) 1993 Michael Haardt (michael@moria.de), Fri Apr  2 11:32:09 MET DST 1993
+.\" Copyright (c) 1993 Michael Haardt (michael@moria.de),
+.\"     Fri Apr  2 11:32:09 MET DST 1993
 .\"
+.\" %%%LICENSE_START(GPLv2+_DOC_FULL)
 .\" This is free documentation; you can redistribute it and/or
 .\" modify it under the terms of the GNU General Public License as
 .\" published by the Free Software Foundation; either version 2 of
@@ -16,20 +18,20 @@
 .\" GNU General Public License for more details.
 .\"
 .\" You should have received a copy of the GNU General Public
-.\" License along with this manual; if not, write to the Free
-.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
-.\" USA.
-.\" 
+.\" License along with this manual; if not, see
+.\" <http://www.gnu.org/licenses/>.
+.\" %%%LICENSE_END
+.\"
 .\" Modified Sun Jul 25 11:06:27 1993 by Rik Faith (faith@cs.unc.edu)
 .TH SECURETTY 5 1992-12-29 "Linux" "Linux Programmer's Manual"
 .SH NAME
-securetty \- file which lists ttys from which root can log in
+securetty \- file which lists terminals from which root can log in
 .SH DESCRIPTION
 The file
 .I /etc/securetty
 is used by (some versions of)
 .BR login (1).
-The file contains the device names of tty lines
+The file contains the device names of terminal lines
 (one per line, without leading
 .IR /dev/ )
 on which root is allowed to login.
@@ -38,6 +40,6 @@ See
 if you use the shadow suite.
 .SH FILES
 .I /etc/securetty
-.SH "SEE ALSO"
+.SH SEE ALSO
 .BR login (1),
 .BR login.defs (5)

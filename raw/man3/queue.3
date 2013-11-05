@@ -1,0 +1,490 @@
+.\" Copyright (c) 1993
+.\"     The Regents of the University of California.  All rights reserved.
+.\"
+.\" %%%LICENSE_START(BSD_4_CLAUSE_UCB)
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. All advertising materials mentioning features or use of this software
+.\"    must display the following acknowledgement:
+.\"     This product includes software developed by the University of
+.\"     California, Berkeley and its contributors.
+.\" 4. Neither the name of the University nor the names of its contributors
+.\"    may be used to endorse or promote products derived from this software
+.\"    without specific prior written permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\" %%%LICENSE_END
+.\"
+.\"     @(#)queue.3     8.2 (Berkeley) 1/24/94
+.\"
+.\" hch, 2002-03-25
+.\" 2007-12-08, mtk, Converted from mdoc to man macros
+.\"
+.TH QUEUE 3 2007-12-28 "Linux" "Linux Programmer's Manual"
+.SH NAME
+LIST_ENTRY, LIST_HEAD, LIST_INIT, LIST_INSERT_AFTER,
+LIST_INSERT_HEAD, LIST_REMOVE, TAILQ_ENTRY, TAILQ_HEAD,
+TAILQ_INIT, TAILQ_INSERT_AFTER, TAILQ_INSERT_HEAD, TAILQ_INSERT_TAIL,
+TAILQ_REMOVE, CIRCLEQ_ENTRY, CIRCLEQ_HEAD, CIRCLEQ_INIT,
+CIRCLEQ_INSERT_AFTER, CIRCLEQ_INSERT_BEFORE,
+CIRCLEQ_INSERT_HEAD, CIRCLEQ_INSERT_TAIL,
+CIRCLEQ_REMOVE \- implementations of lists, tail queues, and circular queues
+.SH SYNOPSIS
+.nf
+.B #include <sys/queue.h>
+
+.BI "LIST_ENTRY(" TYPE );
+.BI "LIST_HEAD(" HEADNAME ", " TYPE );
+.BI "LIST_INIT(LIST_HEAD *" head );
+.BI "LIST_INSERT_AFTER(LIST_ENTRY *" listelm ", "
+.BI "                TYPE *" elm ", LIST_ENTRY " NAME );
+.BI "LIST_INSERT_HEAD(LIST_HEAD *" head ", "
+.BI "                TYPE *" elm ", LIST_ENTRY " NAME );
+.BI "LIST_REMOVE(TYPE *" elm ", LIST_ENTRY " NAME );
+
+.BI "TAILQ_ENTRY(" TYPE );
+.BI "TAILQ_HEAD("HEADNAME ", " TYPE );
+.BI "TAILQ_INIT(TAILQ_HEAD *" head );
+.BI "TAILQ_INSERT_AFTER(TAILQ_HEAD *" head ", TYPE *" listelm ", "
+.BI "                TYPE *" elm ", TAILQ_ENTRY " NAME );
+.BI "TAILQ_INSERT_HEAD(TAILQ_HEAD *" head ", "
+.BI "                TYPE *" elm ", TAILQ_ENTRY " NAME );
+.BI "TAILQ_INSERT_TAIL(TAILQ_HEAD *" head ", "
+.BI "                TYPE *" elm ", TAILQ_ENTRY " NAME );
+.BI "TAILQ_REMOVE(TAILQ_HEAD *" head ", TYPE *" elm ", TAILQ_ENTRY " NAME );
+
+.BI CIRCLEQ_ENTRY( TYPE );
+.BI "CIRCLEQ_HEAD(" HEADNAME ", " TYPE );
+.BI "CIRCLEQ_INIT(CIRCLEQ_HEAD *" head );
+.BI "CIRCLEQ_INSERT_AFTER(CIRCLEQ_HEAD *" head ", TYPE *" listelm ", "
+.BI "                TYPE *" elm ", CIRCLEQ_ENTRY " NAME );
+.BI "CIRCLEQ_INSERT_BEFORE(CIRCLEQ_HEAD *" head ", TYPE *" listelm ", "
+.BI "                TYPE *" elm ", CIRCLEQ_ENTRY " NAME );
+.BI "CIRCLEQ_INSERT_HEAD(CIRCLEQ_HEAD *" head ", "
+.BI "                TYPE *" elm ", CIRCLEQ_ENTRY " NAME );
+.BI "CIRCLEQ_INSERT_TAIL(CIRCLEQ_HEAD *" head ", "
+.BI "                TYPE *" elm ", CIRCLEQ_ENTRY " NAME );
+.BI "CIRCLEQ_REMOVE(CIRCLEQ_HEAD *" head ", "
+.BI "                TYPE *" elm ", CIRCLEQ_ENTRY " NAME );
+.fi
+.SH DESCRIPTION
+These macros define and operate on three types of data structures:
+lists, tail queues, and circular queues.
+All three structures support the following functionality:
+.sp
+.RS 4
+.PD 0
+.IP * 4
+Insertion of a new entry at the head of the list.
+.IP *
+Insertion of a new entry after any element in the list.
+.IP *
+Removal of any entry in the list.
+.IP *
+Forward traversal through the list.
+.PD
+.RE
+.PP
+Lists are the simplest of the three data structures and support
+only the above functionality.
+
+Tail queues add the following functionality:
+.RS 4
+.IP * 4
+Entries can be added at the end of a list.
+.RE
+.PP
+However:
+.sp
+.RS 4
+.PD 0
+.IP 1. 4
+All list insertions and removals must specify the head of the list.
+.IP 2.
+Each head entry requires two pointers rather than one.
+.IP 3.
+Code size is about 15% greater and operations run about 20% slower
+than lists.
+.PD
+.RE
+.PP
+Circular queues add the following functionality:
+.sp
+.RS 4
+.PD 0
+.IP * 4
+Entries can be added at the end of a list.
+.IP *
+Entries can be added before another entry.
+.IP *
+They may be traversed backward, from tail to head.
+.PD
+.RE
+.PP
+However:
+.sp
+.RS 4
+.PD 0
+.IP 1. 4
+All list insertions and removals must specify the head of the list.
+.IP 2.
+Each head entry requires two pointers rather than one.
+.IP 3.
+The termination condition for traversal is more complex.
+.IP 4.
+Code size is about 40% greater and operations run about 45% slower
+than lists.
+.PD
+.RE
+.PP
+In the macro definitions,
+.I TYPE
+is the name of a user-defined structure,
+that must contain a field of type
+.BR "LIST_ENTRY" ,
+.BR "TAILQ_ENTRY" ,
+or
+.BR "CIRCLEQ_ENTRY" ,
+named
+.IR NAME .
+The argument
+.I HEADNAME
+is the name of a user-defined structure that must be declared
+using the macros
+.BR "LIST_HEAD" ,
+.BR "TAILQ_HEAD" ,
+or
+.BR "CIRCLEQ_HEAD" .
+See the examples below for further explanation of how these
+macros are used.
+.SS Lists
+A list is headed by a structure defined by the
+.B LIST_HEAD
+macro.
+This structure contains a single pointer to the first element
+on the list.
+The elements are doubly linked so that an arbitrary element can be
+removed without traversing the list.
+New elements can be added to the list after an existing element or
+at the head of the list.
+A
+.B LIST_HEAD
+structure is declared as follows:
+.in +4n
+.nf
+
+LIST_HEAD(HEADNAME, TYPE) head;
+.fi
+.in
+.PP
+where
+.I HEADNAME
+is the name of the structure to be defined, and
+.I TYPE
+is the type of the elements to be linked into the list.
+A pointer to the head of the list can later be declared as:
+.in +4n
+.nf
+
+struct HEADNAME *headp;
+.fi
+.in
+.PP
+(The names
+.IR "head"
+and
+.IR "headp"
+are user selectable.)
+.PP
+The macro
+.B LIST_ENTRY
+declares a structure that connects the elements in
+the list.
+.PP
+The macro
+.B LIST_INIT
+initializes the list referenced by
+.IR head .
+.PP
+The macro
+.B LIST_INSERT_HEAD
+inserts the new element
+.I elm
+at the head of the list.
+.PP
+The macro
+.B LIST_INSERT_AFTER
+inserts the new element
+.I elm
+after the element
+.IR listelm .
+.PP
+The macro
+.B LIST_REMOVE
+removes the element
+.I elm
+from the list.
+.SS List example
+.nf
+LIST_HEAD(listhead, entry) head;
+struct listhead *headp;                 /* List head. */
+struct entry {
+    ...
+    LIST_ENTRY(entry) entries;          /* List. */
+    ...
+} *n1, *n2, *np;
+
+LIST_INIT(&head);                       /* Initialize the list. */
+
+n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+LIST_INSERT_HEAD(&head, n1, entries);
+
+n2 = malloc(sizeof(struct entry));      /* Insert after. */
+LIST_INSERT_AFTER(n1, n2, entries);
+                                        /* Forward traversal. */
+for (np = head.lh_first; np != NULL; np = np\->entries.le_next)
+    np\-> ...
+
+.\" FIXME http://sourceware.org/bugzilla/show_bug.cgi?id=1506
+while (head.lh_first != NULL)           /* Delete. */
+    LIST_REMOVE(head.lh_first, entries);
+.fi
+.SS Tail queues
+A tail queue is headed by a structure defined by the
+.B TAILQ_HEAD
+macro.
+This structure contains a pair of pointers,
+one to the first element in the tail queue and the other to
+the last element in the tail queue.
+The elements are doubly linked so that an arbitrary element can be
+removed without traversing the tail queue.
+New elements can be added to the tail queue after an existing element,
+at the head of the tail queue, or at the end of the tail queue.
+A
+.B TAILQ_HEAD
+structure is declared as follows:
+.in +4n
+.nf
+
+TAILQ_HEAD(HEADNAME, TYPE) head;
+.fi
+.in
+.PP
+where
+.IR "HEADNAME"
+is the name of the structure to be defined, and
+.IR "TYPE"
+is the type of the elements to be linked into the tail queue.
+A pointer to the head of the tail queue can later be declared as:
+.in +4n
+.nf
+
+struct HEADNAME *headp;
+.fi
+.in
+.PP
+(The names
+.IR "head"
+and
+.IR "headp"
+are user selectable.)
+.PP
+The macro
+.B TAILQ_ENTRY
+declares a structure that connects the elements in
+the tail queue.
+.PP
+The macro
+.B TAILQ_INIT
+initializes the tail queue referenced by
+.IR head .
+.PP
+The macro
+.B TAILQ_INSERT_HEAD
+inserts the new element
+.I elm
+at the head of the tail queue.
+.PP
+The macro
+.B TAILQ_INSERT_TAIL
+inserts the new element
+.I elm
+at the end of the tail queue.
+.PP
+The macro
+.B TAILQ_INSERT_AFTER
+inserts the new element
+.I elm
+after the element
+.IR listelm .
+.PP
+The macro
+.B TAILQ_REMOVE
+removes the element
+.I elm
+from the tail queue.
+.SS Tail queue example
+.nf
+TAILQ_HEAD(tailhead, entry) head;
+struct tailhead *headp;                 /* Tail queue head. */
+struct entry {
+    ...
+    TAILQ_ENTRY(entry) entries;         /* Tail queue. */
+    ...
+} *n1, *n2, *np;
+
+TAILQ_INIT(&head);                      /* Initialize the queue. */
+
+n1 = malloc(sizeof(struct entry));      /* Insert at the head. */
+TAILQ_INSERT_HEAD(&head, n1, entries);
+
+n1 = malloc(sizeof(struct entry));      /* Insert at the tail. */
+TAILQ_INSERT_TAIL(&head, n1, entries);
+
+n2 = malloc(sizeof(struct entry));      /* Insert after. */
+TAILQ_INSERT_AFTER(&head, n1, n2, entries);
+                                        /* Forward traversal. */
+for (np = head.tqh_first; np != NULL; np = np\->entries.tqe_next)
+    np\-> ...
+                                        /* Delete. */
+while (head.tqh_first != NULL)
+    TAILQ_REMOVE(&head, head.tqh_first, entries);
+.fi
+.SS Circular queues
+A circular queue is headed by a structure defined by the
+.B CIRCLEQ_HEAD
+macro.
+This structure contains a pair of pointers,
+one to the first element in the circular queue and the other to the
+last element in the circular queue.
+The elements are doubly linked so that an arbitrary element can be
+removed without traversing the queue.
+New elements can be added to the queue after an existing element,
+before an existing element, at the head of the queue, or at the end
+of the queue.
+A
+.B CIRCLEQ_HEAD
+structure is declared as follows:
+.in +4n
+.nf
+
+CIRCLEQ_HEAD(HEADNAME, TYPE) head;
+.fi
+.in
+.PP
+where
+.IR "HEADNAME"
+is the name of the structure to be defined, and
+.IR "TYPE"
+is the type of the elements to be linked into the circular queue.
+A pointer to the head of the circular queue can later be declared as:
+.in +4n
+.nf
+
+struct HEADNAME *headp;
+.fi
+.in
+.PP
+(The names
+.IR "head"
+and
+.IR "headp"
+are user selectable.)
+.PP
+The macro
+.B CIRCLEQ_ENTRY
+declares a structure that connects the elements in
+the circular queue.
+.PP
+The macro
+.B CIRCLEQ_INIT
+initializes the circular queue referenced by
+.IR head .
+.PP
+The macro
+.B CIRCLEQ_INSERT_HEAD
+inserts the new element
+.I elm
+at the head of the circular queue.
+.PP
+The macro
+.B CIRCLEQ_INSERT_TAIL
+inserts the new element
+.I elm
+at the end of the circular queue.
+.PP
+The macro
+.B CIRCLEQ_INSERT_AFTER
+inserts the new element
+.I elm
+after the element
+.IR listelm .
+.PP
+The macro
+.B CIRCLEQ_INSERT_BEFORE
+inserts the new element
+.I elm
+before the element
+.IR listelm .
+.PP
+The macro
+.B CIRCLEQ_REMOVE
+removes the element
+.I elm
+from the circular queue.
+.SS Circular queue example
+.nf
+CIRCLEQ_HEAD(circleq, entry) head;
+struct circleq *headp;              /* Circular queue head. */
+struct entry {
+    ...
+    CIRCLEQ_ENTRY(entry) entries;   /* Circular queue. */
+    ...
+} *n1, *n2, *np;
+
+CIRCLEQ_INIT(&head);                /* Initialize the circular queue. */
+
+n1 = malloc(sizeof(struct entry));  /* Insert at the head. */
+CIRCLEQ_INSERT_HEAD(&head, n1, entries);
+
+n1 = malloc(sizeof(struct entry));  /* Insert at the tail. */
+CIRCLEQ_INSERT_TAIL(&head, n1, entries);
+
+n2 = malloc(sizeof(struct entry));  /* Insert after. */
+CIRCLEQ_INSERT_AFTER(&head, n1, n2, entries);
+
+n2 = malloc(sizeof(struct entry));  /* Insert before. */
+CIRCLEQ_INSERT_BEFORE(&head, n1, n2, entries);
+                                    /* Forward traversal. */
+for (np = head.cqh_first; np != (void *)&head;
+        np = np\->entries.cqe_next)
+    np\-> ...
+                                    /* Reverse traversal. */
+for (np = head.cqh_last; np != (void *)&head; np = np\->entries.cqe_prev)
+    np\-> ...
+                                    /* Delete. */
+while (head.cqh_first != (void *)&head)
+    CIRCLEQ_REMOVE(&head, head.cqh_first, entries);
+.fi
+.SH CONFORMING TO
+Not in POSIX.1-2001.
+Present on the BSDs.
+The
+queue functions first appeared in
+4.4BSD.

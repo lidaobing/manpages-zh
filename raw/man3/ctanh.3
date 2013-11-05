@@ -1,0 +1,36 @@
+.\" Copyright 2002 Walter Harms (walter.harms@informatik.uni-oldenburg.de)
+.\"
+.\" %%%LICENSE_START(GPL_NOVERSION_ONELINE)
+.\" Distributed under GPL
+.\" %%%LICENSE_END
+.\"
+.TH CTANH 3 2008-08-11 "" "Linux Programmer's Manual"
+.SH NAME
+ctanh, ctanhf, ctanhl \- complex hyperbolic tangent
+.SH SYNOPSIS
+.B #include <complex.h>
+.sp
+.BI "double complex ctanh(double complex " z ");"
+.br
+.BI "float complex ctanhf(float complex " z );
+.br
+.BI "long double complex ctanhl(long double complex " z ");"
+.sp
+Link with \fI\-lm\fP.
+.SH DESCRIPTION
+The complex hyperbolic tangent function is defined
+mathematically as:
+.nf
+
+    ctanh(z) = csinh(z) / ccosh(z)
+.fi
+.SH VERSIONS
+These functions first appeared in glibc in version 2.1.
+.SH CONFORMING TO
+C99.
+.SH SEE ALSO
+.BR cabs (3),
+.BR catanh (3),
+.BR ccosh (3),
+.BR csinh (3),
+.BR complex (7)

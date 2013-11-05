@@ -5,6 +5,7 @@
 .\" Chris Torek and the American National Standards Committee X3,
 .\" on Information Processing Systems.
 .\"
+.\" %%%LICENSE_START(BSD_4_CLAUSE_UCB)
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
 .\" are met:
@@ -32,15 +33,16 @@
 .\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
+.\" %%%LICENSE_END
 .\"
 .\"     @(#)fflush.3	5.4 (Berkeley) 6/29/91
 .\"
 .\" Converted for Linux, Mon Nov 29 15:22:01 1993, faith@cs.unc.edu
 .\"
-.\" Modified 2000-07-22 by Nicol??s Lichtmaier <nick@debian.org>
+.\" Modified 2000-07-22 by Nicolás Lichtmaier <nick@debian.org>
 .\" Modified 2001-10-16 by John Levon <moz@compsoc.man.ac.uk>
 .\"
-.TH FFLUSH 3  1993-11-29 "BSD MANPAGE" "Linux Programmer's Manual"
+.TH FFLUSH 3  2013-07-15 "GNU" "Linux Programmer's Manual"
 .SH NAME
 fflush \- flush a stream
 .SH SYNOPSIS
@@ -48,28 +50,32 @@ fflush \- flush a stream
 .sp
 .BI "int fflush(FILE *" stream );
 .SH DESCRIPTION
-The function
-.B fflush
+For output streams,
+.BR fflush ()
 forces a write of all user-space buffered data for the given output or update
 .I stream
-via the stream's underlying write function.  The open status of the stream
-is unaffected.
+via the stream's underlying write function.
+For input streams,
+.BR fflush ()
+discards any buffered data that has been fetched from the underlying file,
+but has not been consumed by the application.
+The open status of the stream is unaffected.
 .PP
 If the
 .I stream
-argument is
-.BR NULL ,
-.B fflush
+argument is NULL,
+.BR fflush ()
 flushes
 .I all
 open output streams.
 .PP
-For a non-locking counterpart, see
+For a nonlocking counterpart, see
 .BR unlocked_stdio (3).
-.SH "RETURN VALUE"
-Upon successful completion 0 is returned.  Otherwise,
+.SH RETURN VALUE
+Upon successful completion 0 is returned.
+Otherwise,
 .B EOF
-is returned and the global variable
+is returned and
 .I errno
 is set to indicate the error.
 .SH ERRORS
@@ -79,25 +85,32 @@ is set to indicate the error.
 is not an open stream, or is not open for writing.
 .PP
 The function
-.B fflush
+.BR fflush ()
 may also fail and set
 .I errno
-for any of the errors specified for the routine
+for any of the errors specified for
 .BR write (2).
+.SH ATTRIBUTES
+.SS Multithreading (see pthreads(7))
+The
+.BR fflush ()
+function is thread-safe.
+.SH CONFORMING TO
+C89, C99, POSIX.1-2001, POSIX.1-2008.
+
+The standards do not specify the behavior for input streams.
+Most other implementations behave the same as Linux.
+.\" Verified on: Solaris 8.
 .SH NOTES
 Note that
-.B fflush()
-only flushes the user space buffers provided by the C library.
+.BR fflush ()
+only flushes the user-space buffers provided by the C library.
 To ensure that the data is physically stored on disk
-the kernel buffers must be flushed too, e.g. with
+the kernel buffers must be flushed too, for example, with
 .BR sync (2)
 or
 .BR fsync (2).
-.SH "CONFORMING TO"
-The function
-.BR fflush()
-conforms to ANSI X3.159-1989 (``ANSI C'').
-.SH "SEE ALSO"
+.SH SEE ALSO
 .BR fsync (2),
 .BR sync (2),
 .BR write (2),
