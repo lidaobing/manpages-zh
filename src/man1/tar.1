@@ -226,6 +226,9 @@ tar cf man.tar ./man
 .TP
 .B -i, --ignore-zeros	
 忽略存档中的 0 字节块（通常意味着文件结束）
+.TP 
+.B -j, --bzip2, --bunzip2
+用 bzip2 对存档压缩或解压
 .TP
 .B --ignore-failed-read	
 在不可读文件中作 0 标记后再退出？？？
@@ -311,9 +314,6 @@ like -p -s
 .TP 
 .B -X, --exclude-from FILE
 从指定文件中读入不想包含的文件的列表
-.TP 
-.B  -y, --bzip2, --bunzip2
-用 bzip2 对存档压缩或解压
 .TP 
 .B -Z, --compress, --uncompress
 用 compress 对存档压缩或解压 
