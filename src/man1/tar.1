@@ -1,332 +1,789 @@
-.\" @(#)tar.1 1.13.14 99/11/09 Bero;
-.TH TAR 1 "09 November 1999"
-.SH NAME
+.TH TAR 1 "Mar 2010" "GNU" "tar"
+.SH 名字
 tar \- tar 档案文件管理程序的 GNU 版本。
 .SH 总览
 .B tar
+.I <操作参数> [选项]
+
+.I 操作参数:
+.nf
+.B [-]A --catenate --concatenate
+.B [-]c --create
+.B [-]d --diff --compare
+.B [-]r --append
+.B [-]t --list
+.B [-]u --update
+.B [-]x --extract --get
+.B --delete
+.fi
+
+.I 常用选项:
+.nf
+.BR -C ", " --directory " 目录"
+.BR -f ", " --file " 文件"
+.BR -j ", " --bzip2
+.BR -J ", " --xz
+.BR -p ", " --preserve-permissions
+.BR -v ", " --verbose
+.BR -z ", " --gzip
+.fi
+
+.I 所有选项:
+.br
 [
-.B \-
-]
-.B A --catenate --concatenate \||\| c --create \||\| d --diff --compare \||\| r --append \||\| t --list \||\| u --update \||\| x -extract --get
-[
-.B --atime-preserve
-]
-[
-.B -b, --block-size N
-]
-[
-.B -B, --read-full-blocks
-]
-[
-.B -C, --directory DIR
-]
-[
-.B --checkpoint	
-]
-[
-.B -f, --file [HOSTNAME:]F
-]
-[
-.B --force-local	
-]
-[
-.B -F, --info-script F --new-volume-script F
-]
-[
-.B -G, --incremental
-]
-[
-.B -g, --listed-incremental F
+.BR -a ", " --auto-compress
 ]
 [
-.B -h, --dereference
+.BR --add-file " 文件"
 ]
 [
-.B -i, --ignore-zeros
+.BR --anchored
 ]
 [
-.B -I, --bzip
+.BR --atime-preserve
 ]
 [
-.B --ignore-failed-read
+.BR -b ", " --blocking-factor " N"
 ]
 [
-.B -k, --keep-old-files
+.BR -B ", " --read-full-records
 ]
 [
-.B -K, --starting-file F
+.BR --backup "[=备份类型]"
 ]
 [
-.B -l, --one-file-system
+.BR --block-compress
 ]
 [
-.B -L, --tape-length N
+.BR -C ", " --directory " 目录"
 ]
 [
-.B -m, --modification-time
+.BR --checkpoint
 ]
 [
-.B -M, --multi-volume
+.BR --delay-directory-restore
 ]
 [
-.B -N, --after-date DATE, --newer DATE
+.BR --exclude " 文件或目录"
 ]
 [
-.B -o, --old-archive, --portability
+.BR --exclude-caches
 ]
 [
-.B -O, --to-stdout
+.BR --exclude-caches-all
 ]
 [
-.B -p, --same-permissions, --preserve-permissions
+.BR --exclude-caches-under
 ]
 [
-.B -P, --absolute-paths
+.BR --exclude-tag " 文件"
 ]
 [
-.B --preserve	
+.BR --exclude-tag-all " 文件"
 ]
 [
-.B -R, --record-number
+.BR --exclude-tag-under " 文件"
 ]
 [
-.B --remove-files
+.BR -f ", " --file " [主机名:]文件"
 ]
 [
-.B -s, --same-order, --preserve-order
+.BR -F ", " --info-script " 文件, " --new-volume-script " 文件"
 ]
 [
-.B --same-owner
+.BR --force-local
 ]
 [
-.B -S, --sparse
+.BR --format " 格式"
 ]
 [
-.B -T, --files-from F
+.BR -g ", " --listed-incremental " 快照"
 ]
 [
-.B --null	
+.BR -G ", " --incremental
 ]
 [
-.B --totals	
+.BR --group " 组"
 ]
 [
-.B -v, --verbose
+.BR -h ", " --dereference
 ]
 [
-.B -V, --label NAME
+.BR --help
 ]
 [
-.B --version	
+.BR -i ", " --ignore-zeros
 ]
 [
-.B -w, --interactive, --confirmation
+.BR -I ", " --use-compress-program " 程序"
 ]
 [
-.B -W, --verify	
+.BR --ignore-case
 ]
 [
-.B --exclude FILE
+.BR --ignore-command-error
 ]
 [
-.B -X, --exclude-from FILE
+.BR --ignore-failed-read
 ]
 [
-.B -Z, --compress, --uncompress
+.BR --index-file " 文件"
 ]
 [
-.B -z, --gzip, --ungzip	
+.BR -j ", " --bzip2
 ]
 [
-.B --use-compress-program PROG
+.BR -J ", " --xz
 ]
 [
-.B --block-compress
+.BR -k ", " --keep-old-files
 ]
 [
-.B -[0-7][lmh]	
+.BR -K ", " --starting-file " 文件"
 ]
-.TP
-.I filename1 [ filename2, ... filenameN ] 
-.TP
-.I directory1 [ directory2, ...directoryN ]
+[
+.BR --keep-newer-files
+]
+[
+.BR -l ", " --check-links
+]
+[
+.BR -L ", " --tape-length " N"
+]
+[
+.BR --lzip
+]
+[
+.BR --lzma
+]
+[
+.BR --lzop
+]
+[
+.BR -m ", " --touch ", " --modification-time
+]
+[
+.BR -M ", " --multi-volume
+]
+[
+.BR --mode " 权限"
+]
+[
+.BR --mtime " 日期"
+]
+[
+.BR -N ", " --after-date " 日期, " --newer " 日期"
+]
+[
+.BR --newer-mtime " 日期"
+]
+[
+.BR --no-anchored
+]
+[
+.BR --no-auto-compress
+]
+[
+.BR --no-delay-directory-restore
+]
+[
+.BR --no-ignore-case
+]
+[
+.BR --no-ignore-command-error
+]
+[
+.BR --no-overwrite-dir
+]
+[
+.BR --no-quote-chars
+]
+[
+.BR --no-recursion
+]
+[
+.BR --no-same-permissions
+]
+[
+.BR --no-unquote
+]
+[
+.BR --no-wildcards
+]
+[
+.BR --no-wildcards-match-slash
+]
+[
+.BR --null
+]
+[
+.BR --numeric-owner
+]
+[
+.BR -o ", " --old-archive ", " --portability ", " --no-same-owner
+]
+[
+.BR -O ", " --to-stdout
+]
+[
+.BR --occurrence " 次数"
+]
+[
+.BR --one-file-system
+]
+[
+.BR --overwrite
+]
+[
+.BR --overwrite-dir
+]
+[
+.BR --owner " 用户"
+]
+[
+.BR -p ", " --same-permissions ", " --preserve-permissions
+]
+[
+.BR -P ", " --absolute-names
+]
+[
+.BR --pax-option " 关键字列表"
+]
+[
+.BR --posix
+]
+[
+.BR --preserve
+]
+[
+.BR --quote-chars " 字符串"
+]
+[
+.BR --quote-style " 风格"
+]
+[
+.BR -R ", " --block-number
+]
+[
+.BR --record-size " 字节数"
+]
+[
+.BR --recursion
+]
+[
+.BR --recursive-unlink
+]
+[
+.BR --remove-files
+]
+[
+.BR --restrict
+]
+[
+.BR --rmt-command " 命令"
+]
+[
+.BR --rsh-command " 命令"
+]
+[
+.BR -s ", " --same-order ", " --preserve-order
+]
+[
+.BR -S ", " --sparse
+]
+[
+.BR --same-owner
+]
+[
+.BR --show-defaults
+]
+[
+.BR --show-omitted-dirs
+]
+[
+.BR --show-transformed-names ", " --show-stored-names
+]
+[
+.BR --strip-components " 目录层数"
+]
+[
+.BR --suffix " 后缀"
+]
+[
+.BR -T ", " --files-from " 文件"
+]
+[
+.BR --test-label
+]
+[
+.BR --to-command " 命令"
+]
+[
+.BR --transform " sed表达式"
+]
+[
+.BR --totals
+]
+[
+.BR -U ", " --unlink-first
+]
+[
+.BR --unquote
+]
+[
+.BR --utc
+]
+[
+.BR -v ", " --verbose
+]
+[
+.BR -V ", " --label " 名称"
+]
+[
+.BR --version
+]
+[
+.BR --volno-file " 文件"
+]
+[
+.BR -w ", " --interactive ", " --confirmation
+]
+[
+.BR -W ", " --verify
+]
+[
+.BR --wildcards
+]
+[
+.BR --wildcards-match-slash
+]
+[
+.BR -X ", " --exclude-from " 文件"
+]
+[
+.BR -z ", " --gzip ", " --gunzip ", " --ungzip
+]
+[
+.BR -Z ", " --compress ", " --uncompress
+]
+[
+.BR -[0-7][lmh]
+]
 .SH 描述
-tar 程序用于储存或展开 tar 存档文件。存档文件可放在磁盘中 ，也可以存为普通文件。
-tar是需要参数的，可选的参数是A、c、d、r、t、u、x，您在使用tar时必须首先为 tar
-指定至少一个参数；然后，您必须指定要处理的文件或目录。如果指定一个目录则该目录下
-的所有子目录都将被加入存档。
-.SS 应用举例：
-.PP
-1）展开 abc.tar.gz 使用命令： tar xvzf abc.tar.gz
-展开 abc.tar 使用命令： tar xvf abc.tar
-.PP
-2）将当前目录下的 man 目录及其子目录存成存档 man.tar
-tar cf man.tar ./man
-.SH 参数说明
-运行tar时必须要有下列参数中的至少一个才可运行
+这是\fBtar\fR的GUN版本的手册页。 \fBtar\fR是一个用于储存或提取\fItar文件\fR的程序。 \fItar文件\fR可放在磁盘中， 也可以存为普通文件。
+\fBtar\fR\ 的第一个参数必须是操作参数A、c、d、r、t、u、x 中的一个， 参数后面可跟着任意可选选项。
+\fBtar\fR的最后一个参数是你要处理的文件或目录的名字。 如果你指定了一个目录， 该目录的所有子目录都将被加入存档。
+.SH 应用举例
 .TP
-.B -A, --catenate, --concatenate
+.B tar -xvf foo.tar
+提取 foo.tar 文件并显示提取过程
+.TP
+.B tar -xzf foo.tar.gz
+提取用 gzip 压缩的文件 foo.tar.gz
+.TP
+.B tar -cjf foo.tar.bz2 bar/
+用 bzip 为目录 bar 创建一个叫做 foo.tar.bz2存档
+.TP
+.B tar -xjf foo.tar.bz2 -C bar/
+把用 bzip 压缩的文件 foo.tar.bz2 提取到 bar 目录
+.TP
+.B tar -xzf foo.tar.gz blah.txt
+把文件 blah.txt 从 foo.tar.gz 中提取出来
+.P
+注意: 当压缩或提取的时候， 压缩类型选项常常是不必需的， 因为\fBtar\fR会根据文件的后缀自动选择压缩类型。
+.SH "参数说明"
+.TP
+.B 下列参数中必须有至少一个被使用：
+.TP
+.BR -A ", " --catenate ", " --concatenate
 将一存档与已有的存档合并
 .TP
-.B -c, --create	
-建立新的存档
+.BR -c ", " --create
+创建一个新的存档
 .TP
-.B -d, --diff, --compare
-比较存档与当前文件的不同之处
+.BR -d ", " --diff ", " --compare
+比较存档与相应的未存档文件的不同之处
 .TP
-.B --delete		
-从存档中删除
+.BR -r ", " --append
+将文件附加到存档结尾
 .TP
-.B -r, --append		
-附加到存档结尾
-.TP
-.B -t, --list		
+.BR -t ", " --list
 列出存档中文件的目录
 .TP
-.B -u, --update		
+.BR -u ", " --update
 仅将较新的文件附加到存档中
 .TP
-.B -x, --extract, --get		
-从存档展开文件
-.SH 其他参数
+.BR -x ", " --extract ", " --get
+从存档提取文件
 .TP
-.B --atime-preserve	
-不改变转储文件的存取时间 
+.BR --delete
+把指定文件从存档中删除（不要用于磁带！）
+.SH "常用选项"
 .TP
-.B -b, --block-size N	
-指定块大小为 Nx512 字节（缺省时 N=20)
+.BR -C ", " --directory " 目录"
+提取存档到指定目录
 .TP
-.B -B, --read-full-blocks	
-\
-读取时重组块（？？？！！！）
-.TP 
-.B -C, --directory DIR	
-转到指定的目录
-.TP 
-.B --checkpoint		
+.BR -f ", " --file " [主机名:]文件"
+指定存档或设备中的文件 (默认是\ "-"，\ 表示\ 标准输入/输出)
+.TP
+.BR -j ", " --bzip2
+用 bzip2 处理存档;\ 用于\ .bz2\ 文件
+.TP
+.BR -J ", " --xz
+用 xz 处理存档;\ 用于\ .xz\ 文件
+.TP
+.BR -p ", " --preserve-permissions
+提取所有保护信息
+.TP
+.BR -v ", " --verbose
+显示文件处理过程
+.TP
+.BR -z ", " --gzip ", " --ungzip
+用 gzip 处理存档;\ 用于\ .gz\ 文件
+.SH "所有选项"
+.TP
+.BR -a ", " --auto-compress
+根据存档后缀来选择压缩程序
+.TP
+.BR --add-file " 文件"
+添加指定文件到存档 (对以下标线开头的文件很有用)
+.TP
+.BR --anchored
+patterns will match the start of file names
+.TP
+.BR --atime-preserve
+不改变存档中文件的访问时间
+.TP
+.BR -b ", " --blocking-factor " N"
+指定块大小为 Nx512 字节（默认N=20)
+.TP
+.BR -B ", " --read-full-blocks
+读取时重组块\ (用于读取4.2BSD pipes)
+.TP
+.BR --backup "[=备份类型]"
+备份文件而不是删除它们,  备份类型有simple、numbered等
+.TP
+.BR --block-compress
+让磁带的输出结果成块输出
+.TP
+.BR -C ", " --directory " 目录"
+提取文档到指定目录
+.TP
+.BR --checkpoint
 读取存档时显示目录名
 .TP
-.B -f, --file [HOSTNAME:]F	
-指定存档或设备 (缺省为 /dev/rmt0)
+.BR --delay-directory-restore
+延迟对已提取目录的修改时间和权限的设定， 直到提取结束
 .TP
-.B --force-local		
-强制使用本地存档，即使存在克隆
-.TP 
-.B -F, --info-script F --new-volume-script F 
-在每个磁盘结尾使用脚本 F （隐含 -M）
+.BR --exclude " 文件或目录"
+排除指定文件或目录
 .TP
-.B -G, --incremental	
-建立老 GNU 格式的备份
+.BR --exclude-caches
+排除带有\ 缓存目录\ 标记的目录
 .TP
-.B -g, --listed-incremental F 
-建立新 GNU 格式的备份
-.TP 
-.B -h, --dereference	
-不转储动态链接，转储动态链接指向的文件。
+.BR --exclude-tag " 文件"
+排除包含指定文件的目录
 .TP
-.B -i, --ignore-zeros	
-忽略存档中的 0 字节块（通常意味着文件结束）
-.TP 
-.B -j, --bzip2, --bunzip2
-用 bzip2 对存档压缩或解压
+.BR -f ", " --file " [主机名:]文件"
+指定存档或设备中的文件 (默认是\ "-"，\ 表示\ 标准输入/输出)
 .TP
-.B --ignore-failed-read	
-在不可读文件中作 0 标记后再退出？？？
+.BR -F ", " --info-script " 文件, " --new-volume-script " 文件"
+在每卷磁带的结尾运行脚本 （会应用\fI--multi-volume\fR选项）
 .TP
-.B -k, --keep-old-files	
-保存现有文件；从存档中展开时不进行覆盖
+.BR --force-local
+存档文件是本地的，\ 即使它的名称中含有冒号
 .TP
-.B -K, --starting-file F	
-从存档文件 F 开始
+.BR --format " FORMAT"
+选择创建存档的格式
+.nf
+\fIv7\fR - Unix V7
+\fIoldgnu\fR - GNU tar <=1.12
+\fIgnu\fR - GNU tar 1.13
+\fIustar\fR - POSIX.1-1988
+\fIposix\fR - POSIX.1-2001
+.fi
 .TP
-.B -l, --one-file-system	
-在本地文件系统中创建存档
+.BR -g ", " --listed-incremental " 快照"
+创建/列出/提取\ 新GNU格式的增量备份
 .TP
-.B -L, --tape-length N	
-在写入 N*1024 个字节后暂停，等待更换磁盘
+.BR --group " 组"
+将添加到存档的文件的组标识设置为指定组， 而不是源文件所在的组; 这个选项对提取无效
 .TP
-.B -m, --modification-time	
-当从一个档案中恢复文件时，不使用新的时间标签
+.BR -G ", " --incremental
+创建/列出/提取\ 旧GNU格式的增量备份
 .TP
-.B -M, --multi-volume	
-建立多卷存档,以便在几个磁盘中存放
+.BR -h ", " --dereference
+不存入符号链接;\ 存入链接指向的文件
 .TP
-.B -N, --after-date DATE, --newer DATE	
-仅存储时间较新的文件
+.BR --help
+显示像本手册这样的帮助信息， 但不像这么详细
 .TP
-.B -o, --old-archive, --portability	
-以 V7 格式存档，不用 ANSI 格式
+.BR -i ", " --ignore-zeros
+忽略存档中的 0 字节块 （那通常意味着文件结束)
 .TP
-.B -O, --to-stdout		
-将文件展开到标准输出
+.BR -I ", " --use-compress-program " 程序"
+通过指定程序访问存档 (该程序通常是一个压缩程序; 它需能接受\ \fI-d\fR\ 参数)
 .TP
-.B -p, --same-permissions, --preserve-permissions 
-展开所有保护信息
+.BR --ignore-case
+排除文件时不区分大小写
 .TP
-.B -P, --absolute-paths	
-不要从文件名中去除 '/'
+.BR --ignore-command-error
+忽略子程序的退出代码
 .TP
-.B --preserve		
-like -p -s
-与 -p -s 相似
+.BR --ignore-failed-read
+遇到不可读文件的非零状态不退出
 .TP
-.B -R, --record-number	
-显示信息时同时显示存档中的记录数
-.TP 
-.B --remove-files		
-建立存档后删除源文件
+.BR --index-file " 文件"
+将处理过程信息输出到指定文件， 而不是输出到标准输出
 .TP
-.B -s, --same-order, --preserve-order	
-？？？
-.TP 
-.B --same-owner
-展开以后使所有文件属于同一所有者
-.TP 
-.B -S, --sparse
-高效处理
-.TP 
-.B -T, --files-from F
-从文件中得到要展开或要创建的文件名
-.TP 
-.B --null
-读取空结束的文件名，使 -C 失效 
+.BR -j ", " --bzip2
+用 bzip2 处理存档，\ 用于\ .bz2\ 文件
 .TP
-.B --totals
-显示用 --create 参数写入的总字节数
-.TP 
-.B -v, --verbose
-详细显示处理的文件
-.TP 
-.B -V, --label NAME
-为存档指定卷标
-.TP 
-.B --version
-显示 tar 程序的版本号
-.TP 
-.B -w, --interactive, --confirmation
-每个操作都要求确认
-.TP 
-.B -W, --verify
-写入存档后进行校验
-.TP 
-.B --exclude FILE
-不把指定文件包含在内
-.TP 
-.B -X, --exclude-from FILE
-从指定文件中读入不想包含的文件的列表
-.TP 
-.B -Z, --compress, --uncompress
-用 compress 对存档压缩或解压 
-.TP 
-.B -z, --gzip, --ungzip
-用 gzip 对存档压缩或解压 
+.BR -J ", " --xz
+用 xz 处理存档，\ 用于\ .xz\ 文件
 .TP
-.B --use-compress-program PROG
-用 PROG 对存档压缩或解压 ( PROG 需能接受 -d 参数）
-.TP 
-.B --block-compress
-为便于磁盘存储，按块记录存档
-.TP 
-.B -[0-7][lmh]
-指定驱动器和密度[高中低]
+.BR -k ", " --keep-old-files
+保留已存在的文件;\ 不用存档中的文件覆盖它们
+.TP
+.BR -K ", " --starting-file " FILE"
+从存档中的指定文件处开始
+.TP
+.BR --keep-newer-files
+不覆盖比存档新的文件
+.TP
+.BR -l ", " --check-links
+如果文件系统中文件的硬链接数和存档中记录的不同， 则发出警告
+.TP
+.BR -L ", " --tape-length " N"
+在写入了N*1024字节后， 更换磁带
+.TP
+.BR -m ", " --touch ", " --modification-time
+不提取文件的修改时间
+.TP
+.BR -M ", " --multi-volume
+创建/列出/提取 多卷存档
+.TP
+.BR --mode " 权限"
+添加文件时应用指定的权限 (参看\ \fBchmod\fR(1))
+.TP
+.BR --mtime " 日期"
+当创建存档时，\ 使用指定日期作为存档成员的修改日期， 而不是使用文件的实际修改时间
+.TP
+.BR -N ", " --after-date " 日期, " --newer " 日期"
+只存储在指定日期后有修改或状态更新 (权限，\ ACLs，\ 扩展属性，\ ...)的文件
+.TP
+.BR --newer-mtime " 日期"
+和\ \fI--newer\fR\ 类似， 但是只存储指定日期后有修改的文件
+.TP
+.BR --no-anchored
+匹配任意‘/’后字符项\fI--exclude\fR一起使用
+.TP
+.BR --no-auto-compress
+不根据存档后缀来决定使用哪个压缩程序
+.TP
+.BR --no-delay-directory-restore
+在目录中的所有文件都被提取完成时， 就设定该目录的修改时间和权限; 这是默认设置
+.TP
+.BR --no-ignore-command-error
+对以非零状态终止的子程序的显示警告
+.TP
+.BR --no-ignore-case
+用\ \fI--exclude\fR\ 匹配时区分大小写
+.TP
+.BR --no-overwrite-dir
+从存档中提取文件时，\ 保留已存在目录的元数据。
+.TP
+.BR --no-quote-chars " 字符串"
+把指定字符串中的字符从\fI--quote-chars\fR选项指定的字符中去除
+.TP
+.BR --no-recursion
+不递归进入子目录
+.TP
+.BR --no-same-permissions
+提取时应用用户的umask， 而不是用已记录的权限
+.TP
+.BR --no-unquote
+将所有输入文件或成员的名字作为普通文字， 不解释转义序列
+.TP
+.BR --no-wildcards
+不对\fI--exclude\fR使用通配符
+.TP
+.BR --no-wildcards-match-slash
+\fI--exclude\fR的通配符不匹配斜杠(/)
+.TP
+.BR --null
+\fI--files-from\fR读取以空值终止的名字， 禁用\fI--directory\fR
+.TP
+.BR --numeric-owner
+总是用数字作为 用户/组 的名字
+.TP
+.BR -o ", " --old-archive ", " --portability
+相当于\fI--format=v7\fR； 当创建存档时\fI-o\fR选项表示这个行为 （已弃用的行为）
+.TP
+.BR -o ", " --no-same-owner
+提取时不恢复所有权； 当提取时\fI-o\fR选项表示这个行为
+.TP
+.BR -O ", " --to-stdout
+将文件提取到标准输出
+.TP
+.BR --occurrence " 次数"
+只处理指定次数每个已被命名的文件的在操作中的出现； 用于\fI--delete\fR, \fI--diff\fR, \fI--extract\fR, 或 \fI--list\fR
+.TP
+.BR --one-file-system
+创建存档时停留在本地文件系统
+.TP
+.BR --overwrite
+提取时覆盖已存在的文件和目录中的元数据
+.TP
+.BR --overwrite-dir
+提取时覆盖目录中的元数据
+.TP
+.BR --owner " 用户"
+将文件所有者设为指定用户， 而不是原文件的所有者； 这个选项对提取无效 
+.TP
+.BR -p ", " --preserve-permissions ", " --same-permissions
+提取所有保护信息
+.TP
+.BR -P ", " --absolute-names
+将文件名开头的“/”符号看作文件名的一部分
+.TP
+.BR --pax-option " 关键字列表"
+修改\fBtar\fR处理扩展头关键字的方式， 只用于POSIX.1-2001存档
+.TP
+.BR --posix
+相当于\fI--format=posix\fR
+.TP
+.BR --preserve
+相当于\fI--preserve-permissions\fR加上\fI--same-order\fR
+.TP
+.BR --quote-chars " 字符串"
+总是标出指定字符串中包含的的字符， 即使已选择的标识风格不标识它们
+.TP
+.BR --quote-style " 风格"
+设定显示成员和文件名称的标识风格
+.TP
+.BR -R ", " --record-number
+显示存档中每条信息的记录数字
+.TP
+.BR --record-size " 字节数"
+访问存档时每条记录使用指定的字节数
+.TP
+.BR --recursion
+递归进入目录
+.TP
+.BR --recursive-unlink
+提取目录之前先把存在的相同名称的目录删除
+.TP
+.BR --remove-files
+把文件加入到存档后删除这些文件
+.TP
+.BR --restrict
+禁用一些有潜在害处的选项； 目前这会禁用多卷菜单中对shell的调用
+.TP
+.BR --rmt-command " 命令"
+用指定的命令代替默认的/usr/sbin/rmt
+.TP
+.BR --rsh-command " 命令"
+用指定的远程命令代替\fBrsh\fR(1)
+.TP
+.BR -s ", " --same-order ", " --preserve-order
+名称列表会被排序以匹配存档
+.TP
+.BR -S ", " --sparse
+高效地处理稀疏文件
+.TP
+.BR --same-owner
+以相同的所有权创建提取出的文件
+.TP
+.BR --show-defaults
+显示\fBtar\fR使用的默认选项
+.TP
+.BR --show-omitted-dirs
+显示提取时\fBtar\fR跳过的目录
+.TP
+.BR --show-transformed-names ", " --show-stored-names
+应用了任何\fBsed\fR转换之后， 显示文件或成员名字
+.TP
+.BR --strip-components " 目录层数"
+在提取前， 把文件从前往后指定层数的目录都从提取路径中去掉， 如果文件包含在指定层数中， 则不被提取
+.TP
+.BR --suffix " 后缀"
+备份文件时， 使用指定的后缀， 而不是使用默认后缀‘～’
+.TP
+.BR -T ", " --files-from " 文件"
+从指定文件中获得要提取或创建的存档的名字
+.TP
+.BR --test-label
+读取卷标； 如果一个词被指定了， 则测试它是否匹配这个卷标
+.TP
+.BR --to-command " 命令"
+提取期间， 将提取的文件导入到指定命令的标准输入
+.TP
+.BR --totals
+显示用--create参数写入的总字节数
+.TP
+.BR --transform " sed表达式"
+用\fBsed\fR的转换表达式转换文件或成员的名字
+.TP
+.BR -U ", " --unlink-first
+提取文件之前，删除已存在的与之同名的文件
+.TP
+.BR --unquote
+不标识输入文件或成员的名字； 这是默认选项
+.TP
+.BR --utc
+以UTC时间显示文件的修改日期
+.TP
+.BR -v ", " --verbose
+列出文件的处理情况
+.TP
+.BR -V ", " --label " 名称"
+用指定卷名创建存档
+.TP
+.BR --version
+显示\fBtar\fR程序的版本信息
+.TP
+.BR --volno-file " 文件"
+保持追踪指定文件中多卷存档的卷编号； 和\fI--multi-volume\fR一起使用
+.TP
+.BR -w ", " --interactive ", " --confirmation
+每一个动作都要求确认
+.TP
+.BR -W ", " --verify
+写完存档后对其进行校验
+.TP
+.BR --wildcards
+对\fI--exclude\fR用通配符
+.TP
+.BR --wildcards-match-slash
+\fI--exclude\fR的通配符匹配斜杠(/)
+.TP
+.BR -X ", " --exclude-from " 文件"
 
+排除列在指定文件中的文件
+.TP
+.BR -z ", " --gzip ", " --gunzip ", " --ungzip
+用gzip对存档进行操作
+.TP
+.BR -Z ", " --compress ", " --uncompress
+用compress对存档进行操作
+.TP
+.BR -[0-7][lmh]
+指定驱动器[0-7]和压缩密度[低中高]
+.SH BUGS
+GUN世界的人， 通常不喜欢man手册， 而是写文档代替之。
+\fBtar\fR的维护者也是如此。 所以，\ 这个man手册页可能会不完全， 或者不够新， 它被包含在Gentoo的portage树中， 因为man是一个非常好的工具：）。 这个man手册页最初取自Debian\ Linux， 从那时起已在这里被很好地更新。
+.SH "报告 BUGS"
+请通过 http://bugs.gentoo.org/ 报告Bug。
+翻译问题请联系译者或到 https://github.com/lidaobing/manpages-zh/ 提交问题
+.SH "作者"
+.nf
+Debian Linux http://www.debian.org/
+Mike Frysinger <vapier@gentoo.org>
+.SH "译者"
+.nf
+CMPP 中文手册页计划 http://cmpp.linuxforum.net (2001/08/08)
+Saigut <gosaigut@gmail.com> (2013/11/09)
+.SH "中文版最新更新"
+.R 2013/11/09
+.fi
