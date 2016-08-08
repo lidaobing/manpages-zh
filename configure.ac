@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.61])
 AC_INIT([manpages-zh],[1.5.2],[https://github.com/lidaobing/manpages-zh/issues])
-AM_INIT_AUTOMAKE([dist-bzip2])
+AM_INIT_AUTOMAKE([dist-bzip2 subdir-objects])
 AM_MAINTAINER_MODE
 
 AC_ARG_ENABLE([utf8],
@@ -59,6 +59,18 @@ if test x$zhcn = xtrue; then
         zh_CN=zh_CN
         AC_SUBST(zh_CN)
 fi
+
+AC_ARG_ENABLE([cjkpunct-workaround],
+              [AS_HELP_STRING([--enable-cjkpunct-workaround],
+                              [install cjkpunct workaround for groff << 1.22.4])],
+              [case "${enableval}" in
+                yes) enable_cjkpunct_workaround=true ;;
+                no) enable_cjkpunct_workaround=false ;;
+                *) AC_MSG_ERROR([bad value ${enableval} for --enable-cjkpunct-workaround]) ;;
+               esac],
+              [enable_cjkpunct_workaround=false]
+              )
+AM_CONDITIONAL(CJKPUNCT_WORKAROUND, [test x"${enable_cjkpunct_workaround}" = x"true" ])
 
 AC_CONFIG_FILES([Makefile
                  DOCS/Makefile

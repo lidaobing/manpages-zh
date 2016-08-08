@@ -1,3 +1,4 @@
+. mso zh.tmac
 .TH SpinBox 3tk "tcllib - BWidget"
 
 .SH NAME
