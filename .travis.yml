@@ -1,6 +1,6 @@
 install:
-  - sudo apt-get install zh-autoconvert
+  - sudo apt-get install zh-autoconvert autoconf automake
 script:
-  - ./autogen.sh
+  - autoreconf --install --verbose
   - ./configure
   - make
