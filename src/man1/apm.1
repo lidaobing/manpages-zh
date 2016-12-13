@@ -29,7 +29,7 @@ apm \- 查询高级电源管理(APM) BIOS
 .SH 总览
 .B apm
 [ \-
-.I vVmsS
+.I VvmMsSdin
 ]
 .SH 描述
 .B apm
@@ -91,14 +91,6 @@ apm \- 查询高级电源管理(APM) BIOS
 面的 "
 .I apm -i
 " 调用的方法。
-.SH  缺陷
-本程序要求内核在 
-.BI 1.3.57
-以上。除非在老的内核上增加
-.B  APM
-补丁否则不能运行。原因是
-.B  /proc/apm
-的格式被更改得非常迅速。
 .SH 相关文件
 .I /proc/apm
 .br
