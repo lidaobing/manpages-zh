@@ -1,15 +1,20 @@
 .\" -*- nroff -*-
+.mso zh.tmac
 .TH CHATTR 1 "1999年11月" "E2fsprogs version 1.18"
 .SH NAME(名称)
-chattr \- 修改文件在Linux第二扩展文件系统(E2fs)上的特有属性
+chattr \- 修改 Linux 文件系统中的文件属性
 .SH SYNOPSIS(总览)
 .B chattr
 [
-.B \-RV
+.B \-RVf
 ]
 [
 .B \-v
-.I version
+.I 版本
+]
+[
+.B \-p
+.I project
 ]
 [
 .I mode
@@ -17,9 +22,9 @@ chattr \- 修改文件在Linux第二扩展文件系统(E2fs)上的特有属性
 .I files...
 .SH DESCRIPTION(描述)
 .B chattr
-修改文件在Linux第二扩展文件系统(E2fs)上的特有属性
+修改文件在 Linux 文件系统中的特有属性。
 .PP
-符号模式有+-=[ASacdisu]几种格式.
+符号模式有 +-=[aAcCdDeijsStTu] 几种格式.
 .PP
 操作符`+'用来在文件已有属性的基础上增加选定的属性;
 `-'用来去掉文件上的选定的属性;而`='用来指定该文件的唯一属性.
@@ -88,8 +93,10 @@ chattr \- 修改文件在Linux第二扩展文件系统(E2fs)上的特有属性
 对tsx-11.mit.edu的匿名ftp访问在
 /pub/linux/packages/ext2fs下找到它.
 .SH SEE ALSO(另见)
-.BR lsattr (1)
-
+.BR lsattr (1),
+.BR btrfs (5),
+.BR ext4 (5),
+.BR xfs (5)
 
 .SH "[中文版维护人]"
 .B riser <boomer@ccidnet.com>
