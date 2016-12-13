@@ -1,3 +1,9 @@
+2016-12-14  Boyuan Yang <073plan@gmail.com>
+
+    * remove all conflicting man pages.
+	* some minor modifications.
+	* release 1.5.4.
+
 2011-07-09  LI Daobing <lidaobing@gmail.com>
 
 	* remove git.1.
