@@ -1,3 +1,4 @@
+. mso zh.tmac
 '\" -*- tcl -*- doctools manpage
 '\"
 '\" Generated from ./modules/html/html.man by mpexpand with fmt.nroff

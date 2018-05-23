@@ -1,3 +1,4 @@
+. mso zh.tmac
 .TH ScrollableFrame 3tk "tcllib - BWidget"
 
 .SH NAME

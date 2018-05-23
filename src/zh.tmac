@@ -1,0 +1,48 @@
+.\" -*- mode: nroff; coding: utf-8; -*-
+.\"
+.\" Chinese localization for groff
+.\"
+.\" Copyright (C) 2015  Free Software Foundation, Inc.
+.\"   Written by Darcy SHEN <sadhen1992@gmail.com>
+.\"   using `ja.tmac' as a template
+.\"
+.\" This file is part of groff.
+.\"
+.\" groff is free software; you can redistribute it and/or modify it under
+.\" the terms of the GNU General Public License as published by the Free
+.\" Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" groff is distributed in the hope that it will be useful, but WITHOUT ANY
+.\" WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.\" Please send comments to groff@gnu.org.
+.
+.
+.\" The following rules work for both zh_CN and zh_TW.
+.
+.\" Locale string
+.
+.ds locale chinese\"
+.
+.
+.class [CJKprepunct] \
+  , : ; > } \
+  \[u2026] \[u201D] \
+  \[u3001] \[u3002] \[u3009] \[u300B] \[u300D] \[u300F] \[u3011] \
+  \[uFF01] \[uFF09] \[uFF0C] \[uFF1A] \[uFF1B] \[uFF1F]
+.class [CJKpostpunct] \
+  \[u201C] \[u3008] \[u300A] \[u300C] \[u300E] \[u3010] \[uFF08]
+.
+.\" Chinese glyphs.
+.class [CJKnormal] \
+  \[u4E00]-\[u9FFF]
+.
+.cflags 128 \C'[CJKprepunct]'
+.cflags 266 \C'[CJKpostpunct]'
+.cflags 512 \C'[CJKnormal]'
