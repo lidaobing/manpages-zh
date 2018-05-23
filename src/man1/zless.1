@@ -18,6 +18,12 @@ zless \- 用于在显示器上阅读被压缩的文本文件的过滤器
 .SH "另见 (SEE ALSO)"
 zmore(1), less(1)
 
+.SH "缺陷 (BUGS)"
+\fIZless\fR 无法在压缩数据使用管道经由标准输入方式提供的情况下工作；
+它要求输入文件必须经由参数给出。
+如需从管道中读取压缩数据，您可以使用 ...\fI|gunzip|less\fR
+来替代 ...\fI|zless\fR。
+
 .SH "[中文版维护人]"
 .B 徐明 <xuming@users.sourceforge.net>
 .SH "[中文版最新更新]"
